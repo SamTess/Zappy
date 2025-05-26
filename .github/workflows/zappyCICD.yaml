@@ -172,3 +172,20 @@ jobs:
           done
           # Si une erreur a été trouvée, retourner 1
           exit $has_error
+
+  push_to_mirror:
+    name: Pushing to good repository
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, coding-style-C]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to mirror repository
+        uses: pixta-dev/repository-mirroring-action@v1.1.1
+        with:
+          target_repo_url: ${{ env.GITHUB_URL }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
