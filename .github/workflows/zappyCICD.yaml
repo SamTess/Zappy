@@ -1,0 +1,174 @@
+name: ZappyActions
+
+on:
+  push:
+    branches-ignore:
+      - 'ga-ignore-*'
+      - 'HEAD'
+
+  pull_request:
+    branches-ignore:
+      - 'ga-ignore-*'
+      - 'HEAD'
+
+env:
+  MIRROR_URL: https://github.com/EpitechPromo2028/B-YEP-400-NAN-4-1-zappy-samuel.tesson.git
+  GITHUB_URL: git@github.com:EpitechPromo2028/B-YEP-400-NAN-4-1-zappy-samuel.tesson.git
+  BINARIES: "zappy_gui, zappy_server"
+  LIBRARIES: "libgui.a, libserver.a"
+
+jobs:
+  build:
+    name: Build project
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        timeout-minutes: 2
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make g++ libsfml-dev libcriterion-dev build-essential cmake gcovr
+
+      - name: Build project
+        timeout-minutes: 10
+        run: |
+          make
+
+      - name: Check Binaries
+        timeout-minutes: 2
+        run: |
+          for binary in $(echo ${{ env.BINARIES }} | tr "," "\n"); do
+            if [ ! -f "./$binary" ]; then
+              echo "❌ Binary $binary not found in ./"
+              exit 1
+            elif [[ ! -x "./$binary" ]]; then
+              echo "❌ Binary $binary is not executable"
+              exit 1
+            else
+              echo "✅ Binary $binary found in ./"
+            fi
+          done
+
+      - name: Check Libraries
+        timeout-minutes: 2
+        run: |
+          for library in $(echo ${{ env.LIBRARIES }} | tr "," "\n"); do
+            if [ ! -f "./build/$library" ]; then
+              echo "❌ Library $library not found in ./build"
+              exit 1
+            elif [[ ! "./build/$library" =~ \.(so|a|dylib)$ ]]; then
+              echo "❌ $library is not a recognized library file (expected .so, .a, or .dylib)"
+              exit 1
+            else
+              echo "✅ Library $library found in ./build"
+            fi
+          done
+
+  coding-style-C:
+    name: Checking coding-style and display it if error
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    container: ghcr.io/epitech/coding-style-checker:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        timeout-minutes: 2
+
+      - name: Run coding-style
+        timeout-minutes: 5
+        run: check.sh $(pwd)/src $(pwd)
+
+      - name: Create annotation for coding-style errors
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          input=$(pwd)/coding-style-reports.log
+          while IFS= read -r -a line; do
+            fields=($(printf "%s" "$line"|cut -d':' --output-delimiter=' ' -f1-))
+            echo "::error title=${fields[2]} coding style error,file=${fields[0]},line=${fields[1]}::${fields[3]}"
+          done < $input
+
+      - name: Report banana result
+        timeout-minutes: 1
+        shell: bash
+        run: |
+          NB_ERROR=$(cat $(pwd)/coding-style-reports.log | wc -l)
+          if [ $NB_ERROR -gt 0 ]; then
+            exit 1
+          fi
+  coding-style-CPP:
+    needs: coding-style-C
+    name: Checking CPP code with cppcheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        timeout-minutes: 2
+
+      - name: Install cppcheck
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck gcc g++ libtinyxml2-dev python3-pip
+          pip install cpplint
+
+      - name: Run cpplint
+        id: cpplint
+        timeout-minutes: 5
+        run: |
+          has_error=0
+          # Capture cpplint output and parse it
+          while IFS= read -r line; do
+            # Parse lines like: src/GUI/main.cpp:22:  { should almost always be at the end of the previous line  [whitespace/braces] [4]
+            if [[ $line =~ ^([^:]+):([0-9]+):[[:space:]]*(.+)[[:space:]]\[([^]]+)\][[:space:]]\[([0-9]+)\]$ ]]; then
+              file="${BASH_REMATCH[1]}"
+              line_num="${BASH_REMATCH[2]}"
+              description="${BASH_REMATCH[3]}"
+              category="${BASH_REMATCH[4]}"
+              severity="${BASH_REMATCH[5]}"
+
+              # Remove leading/trailing whitespace from description
+              description=$(echo "$description" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+              if [[ $severity -ge 4 ]]; then
+                echo "::error file=$file,line=$line_num,title=cpplint [$category]::$description"
+                has_error=1
+              else
+                echo "::warning file=$file,line=$line_num,title=cpplint [$category]::$description"
+              fi
+            fi
+          done < <(python3 tools/cpplint.py src/GUI 2>&1)
+
+          exit $has_error
+
+      - name: Run cppcheck
+        id: cppcheck
+        timeout-minutes: 5
+        run: |
+          # Variable pour suivre s'il y a une erreur
+          has_error=0
+          cppcheck --enable=all --template='{severity}|{file}|{line}|{id}|{message}' . 2>&1 | while IFS='|' read -r severity file line id msg
+          do
+            # Si pas de ligne spécifiée, GitHub Actions ne doit pas planter
+            line=${line:-1}
+            case "$severity" in
+              error)
+                echo "::error file=$file,line=$line,title=$id::$msg"
+                has_error=1  # Détecte une erreur
+                ;;
+              warning)
+                echo "::warning file=$file,line=$line,title=$id::$msg"
+                ;;
+              *)
+                echo "::notice severity=$severity file=$file,line=$line,title=$id::$msg"
+                ;;
+            esac
+          done
+          # Si une erreur a été trouvée, retourner 1
+          exit $has_error

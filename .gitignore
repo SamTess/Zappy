@@ -1,0 +1,54 @@
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Executables
+zappy_server
+zappy_client
+unit_tests
+tests/Functionnal/Test1
+tests/Functionnal/Test2
+tests/Functionnal/Test3
+
+# Code coverage
+*.gcno
+*.gcda
+*.gcov
+*.html
+*.css
+*.js
+coverage_html/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Debug files
+vgcore.*
+core
+*.log
+*.dSYM/
+
+# Documentation
+docs/Doxygen/build/
+
+# Coding style
+coding-style-reports.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+doc.txt
+data_handler(temp).c
+jetpack_client_tristan
+tempv2.sh
+test_binary_handler.c
+test_main.c
+test_server
+doc.txt
+maps
