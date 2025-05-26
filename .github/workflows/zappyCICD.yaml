@@ -102,7 +102,7 @@ jobs:
             exit 1
           fi
   coding-style-CPP:
-    needs: coding-style-C
+    needs: build
     name: Checking CPP code with cppcheck
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -177,7 +177,7 @@ jobs:
     name: Pushing to good repository
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [build, coding-style-C]
+    needs: [build, coding-style-C, coding-style-CPP]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
