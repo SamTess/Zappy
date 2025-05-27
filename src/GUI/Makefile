@@ -15,15 +15,17 @@ SFMLFLAGS		=	-lsfml-graphics -lsfml-window -lsfml-system \
 SRC_DIR			=	.
 INCLUDE_DIR		=	include
 SHARED_INCLUDE	=	../Shared/include
+BUILD_DIR		= ../../build
 
+MAIN_FILE 		= 	main.cpp
 # Source files
-SRCS			=	main.cpp \
-					help.cpp
-OBJS			=	$(SRCS:.cpp=.o)
-BINARY_NAME		=	../../zappy_gui
+SRCS			=	help.cpp
+OBJ_FILES		= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
+LIB_NAME		= $(BUILD_DIR)/libgui.a
+BINARY_NAME		= ../../zappy_gui
 
 # Includes
-INCLUDES		=	-I$(INCLUDE_DIR) -I$(SHARED_INCLUDE)
+INCLUDES		=	-Iinclude -I../Shared/include
 
 # Colors
 RED				=	\033[0;91m
@@ -33,25 +35,33 @@ BLUE			=	\033[0;94m
 CYAN			=	\033[0;96m
 RESET			=	\033[0m
 
-all: $(BINARY_NAME)
+all: $(LIB_NAME) $(BINARY_NAME)
 
-$(BINARY_NAME): $(OBJS)
+$(LIB_NAME): $(OBJ_FILES)
+	@mkdir -p $(BUILD_DIR)
+	@ar rcs $(LIB_NAME) $(OBJ_FILES)
+
+$(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
 	@echo -e "$(GREEN)Compiling GUI binary...$(RESET)"
-	@$(CXX) -o $(BINARY_NAME) $(OBJS) $(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS)
+	@$(CXX) -o $(BINARY_NAME) $(MAIN_FILE) $(OBJ_FILES) $(LIB_NAME) \
+		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS)
 
-%.o: %.cpp
+$(BUILD_DIR)/GUI/%.o: %.cpp
+	@mkdir -p $(BUILD_DIR)/GUI
+	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: $(BINARY_NAME)
+debug: all
 
 clean:
 	@echo -e "$(YELLOW)Cleaning GUI objects...$(RESET)"
-	@rm -f $(OBJS)
+	@rm -f $(BUILD_DIR)/GUI/*.o
 
 fclean: clean
-	@echo -e "$(RED)Cleaning GUI binary...$(RESET)"
+	@echo -e "$(RED)Cleaning GUI binary and library...$(RESET)"
 	@rm -f $(BINARY_NAME)
+	@rm -f $(LIB_NAME)
 
 re: fclean all
 

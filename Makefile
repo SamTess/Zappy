@@ -133,7 +133,7 @@ docusaurus-deploy:
 
 style: fclean
 	@echo "$(YELLOW)Running coding style checks...$(RESET)"
-	@coding-style.sh . .
+	@coding-style.sh src/ .
 	@cat coding-style-reports.log
 	@rm -rf coding-style-reports.log
 

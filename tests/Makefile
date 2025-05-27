@@ -13,30 +13,25 @@ LDFLAGS			=	-lcriterion --coverage
 SFMLFLAGS		=	-lsfml-graphics -lsfml-window -lsfml-system \
 					-lsfml-audio -lsfml-network
 
-# Directories
 BUILD_DIR		=	../build/tests
-COVERAGE_DIR	=	$(BUILD_DIR)/coverage
 SERVER_LIB		=	../build/libserver.a
 GUI_LIB			=	../build/libgui.a
 
-# Test files
 SERVER_TESTS	=	server/test_server.c
 CLIENT_TESTS	=	client/test_client.cpp
 ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS)
 
-# Object files
 SERVER_TEST_OBJS = $(SERVER_TESTS:%.c=$(BUILD_DIR)/%.o)
 CLIENT_TEST_OBJS = $(CLIENT_TESTS:%.cpp=$(BUILD_DIR)/%.o)
 ALL_TEST_OBJS	=	$(SERVER_TEST_OBJS) $(CLIENT_TEST_OBJS)
 
-# Includes
 SERVER_INCLUDE	=	-I../src/Server/include
 GUI_INCLUDE		=	-I../src/GUI/include
 SHARED_INCLUDE	=	-I../src/Shared/include
 ALL_INCLUDES	=	$(SERVER_INCLUDE) $(GUI_INCLUDE) $(SHARED_INCLUDE)
 
-# Binary
 TESTS_NAME		=	../unit_tests
+COVERAGE_DIR	=	$(BUILD_DIR)/coverage
 
 # Colors
 RED				=	\033[0;91m
@@ -57,29 +52,29 @@ $(TESTS_NAME): $(ALL_TEST_OBJS) $(SERVER_LIB) $(GUI_LIB)
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo -e "$(BLUE)Compiling test file $< into $@...$(RESET)"
-	@$(CC) $(CFLAGS) $(ALL_INCLUDES) -c $< -o $@
+	@$(CC) $(CFLAGS) -fprofile-abs-path $(ALL_INCLUDES) -c $< -o $@
 
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo -e "$(BLUE)Compiling test file $< into $@...$(RESET)"
-	@$(CXX) $(CXXFLAGS) $(ALL_INCLUDES) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -fprofile-abs-path $(ALL_INCLUDES) -c $< -o $@
 
 $(SERVER_LIB):
 	@echo -e "$(CYAN)Building server library for tests...$(RESET)"
-	@$(MAKE) -C ../src/Server
+	@$(MAKE) ../../build/libserver.a -C ../src/Server
 
 $(GUI_LIB):
 	@echo -e "$(CYAN)Building GUI library for tests...$(RESET)"
-	@$(MAKE) -C ../src/GUI
+	@$(MAKE) ../../build/libgui.a -C  ../src/GUI
 
 tests_run: $(TESTS_NAME)
 	@echo -e "$(MAGENTA)Running unit tests...$(RESET)"
 	@./$(TESTS_NAME)
 	@echo -e "$(CYAN)Generating coverage report...$(RESET)"
 	@mkdir -p $(COVERAGE_DIR)
-	@gcovr --exclude tests/ --exclude build/ -r .. --object-directory $(BUILD_DIR)
-	@gcovr --exclude tests/ --exclude build/ -r .. --object-directory $(BUILD_DIR) \
-		--html --html-details -o $(COVERAGE_DIR)/coverage.html
+	@cd .. && gcovr --exclude tests/ --exclude build/ --exclude 'tests/.*' --exclude 'tests/client/.*' --exclude 'tests/server/.*' -r . --object-directory build/tests
+	@cd .. && gcovr --exclude tests/ --exclude build/ --exclude 'tests/.*' --exclude 'tests/client/.*' --exclude 'tests/server/.*' -r . --object-directory build/tests \
+		--html --html-details -o build/tests/coverage/coverage.html
 	@echo -e "$(GREEN)Coverage report generated at $(COVERAGE_DIR)/coverage.html$(RESET)"
 
 clean:
