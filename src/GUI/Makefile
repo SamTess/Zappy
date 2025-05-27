@@ -19,7 +19,9 @@ BUILD_DIR		= ../../build
 
 MAIN_FILE 		= 	main.cpp
 # Source files
-SRCS			=	help.cpp
+SRCS			=	shared/exception/AException.cpp \
+					parsing/ParsingCLI.cpp \
+
 OBJ_FILES		= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME		= $(BUILD_DIR)/libgui.a
 BINARY_NAME		= ../../zappy_gui
@@ -47,7 +49,7 @@ $(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
 		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS)
 
 $(BUILD_DIR)/GUI/%.o: %.cpp
-	@mkdir -p $(BUILD_DIR)/GUI
+	@mkdir -p $(dir $@)
 	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 

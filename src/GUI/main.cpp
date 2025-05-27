@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <string>
-#include <cstring>
+#include "parsing/ParsingCLI.hpp"
 
 void display_help();
 
@@ -18,10 +18,17 @@ void display_help();
  * @return 0 on success, 84 on error
  */
 int main(int argc, char **argv) {
-    if ((argc == 2 && (strcmp(argv[1], "-help") == 0 ||
-        strcmp(argv[1], "help") == 0)) || argc == 1) {
-        display_help();
-        return 0;
+
+    try {
+        ParsingCLI parser(argc, argv);
+        std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
+
+    } catch (const AException &e) {
+        std::cerr << e.getFormattedMessage() << std::endl;
+        return 84;
+    } catch (...) {
+        std::cerr << "An unexpected error occurred." << std::endl;
+        return 84;
     }
     return 0;
 }
