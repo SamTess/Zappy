@@ -8,8 +8,8 @@
 #ifndef AEXCEPTION_HPP_
 #define AEXCEPTION_HPP_
 
-#include "IException.hpp"
 #include <string>
+#include "IException.hpp"
 
 class AException : public IException {
     public:

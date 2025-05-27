@@ -5,9 +5,10 @@
 ** ParsingCLI
 */
 
-#include "ParsingCLI.hpp"
+#include <string>
 #include <iostream>
 #include <cstring>
+#include "ParsingCLI.hpp"
 
 ParsingCLI::ParsingCLI(int argc, char **argv) {
     _port = 0;

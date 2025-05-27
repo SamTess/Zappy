@@ -28,14 +28,13 @@ class ParsingCLI {
 
         void checkValidityCLI() const;
 
-    protected:
     private:
         int _port;
         std::string _machine;
 
         class ParsingCLIException : public AException {
             public:
-                ParsingCLIException(const std::string &message)
+                explicit ParsingCLIException(const std::string &message)
                 : AException("ParsingCLIException", message) {}
         };
 };
