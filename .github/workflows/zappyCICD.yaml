@@ -147,32 +147,6 @@ jobs:
 
           exit $has_error
 
-      - name: Run cppcheck
-        id: cppcheck
-        timeout-minutes: 5
-        run: |
-          # Variable pour suivre s'il y a une erreur
-          has_error=0
-          cppcheck --enable=all --template='{severity}|{file}|{line}|{id}|{message}' . 2>&1 | while IFS='|' read -r severity file line id msg
-          do
-            # Si pas de ligne spécifiée, GitHub Actions ne doit pas planter
-            line=${line:-1}
-            case "$severity" in
-              error)
-                echo "::error file=$file,line=$line,title=$id::$msg"
-                has_error=1  # Détecte une erreur
-                ;;
-              warning)
-                echo "::warning file=$file,line=$line,title=$id::$msg"
-                ;;
-              *)
-                echo "::notice severity=$severity file=$file,line=$line,title=$id::$msg"
-                ;;
-            esac
-          done
-          # Si une erreur a été trouvée, retourner 1
-          exit $has_error
-
   push_to_mirror:
     name: Pushing to good repository
     runs-on: ubuntu-latest

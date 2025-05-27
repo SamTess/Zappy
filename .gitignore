@@ -7,7 +7,8 @@ build/
 
 # Executables
 zappy_server
-zappy_client
+zappy_gui
+zappy_ai
 unit_tests
 tests/Functionnal/Test1
 tests/Functionnal/Test2
