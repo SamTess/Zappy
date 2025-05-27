@@ -19,7 +19,7 @@ static void free_names(char **names)
 
 void parsing_error(char *error_message, parsing_info_t *parsed_info)
 {
-    if (parsed_info->names[0] != NULL)
+    if (parsed_info->names != NULL && parsed_info->names[0] != NULL)
         free_names(parsed_info->names);
     printf("%s\n", error_message);
     display_help();

@@ -42,7 +42,7 @@ static int parse_coordinates(char **av, int i, parsing_info_t *parsed_info)
         parsing_error("coordinates arg can't be null", parsed_info);
     res = atoi(av[i + 1]);
     if (res < 1)
-        parsing_error("coordiantes can't be less than 1", parsed_info);
+        parsing_error("coordinates can't be less than 1", parsed_info);
     return res;
 }
 
