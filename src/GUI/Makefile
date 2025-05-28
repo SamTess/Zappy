@@ -20,11 +20,10 @@ PLUGINS_DIR		= ../../plugins
 
 MAIN_FILE 		= 	main.cpp
 
-SRCS            =   help.cpp \
+SRCS			=	shared/exception/AException.cpp \
+					parsing/ParsingCLI.cpp \
 
-OBJ_FILES = \
-    $(BUILD_DIR)/GUI/help.o \
-
+OBJ_FILES		= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME		= $(BUILD_DIR)/libgui.a
 BINARY_NAME		= ../../zappy_gui
 GRAPHIC_LIB_NAME	= $(PLUGINS_DIR)/libraylibcpp.so
@@ -59,7 +58,7 @@ $(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
 		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS)
 
 $(BUILD_DIR)/GUI/%.o: %.cpp
-	@mkdir -p $(BUILD_DIR)/GUI
+	@mkdir -p $(dir $@)
 	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
