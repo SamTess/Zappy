@@ -6,8 +6,8 @@
 */
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "include/server.h"
-#include "include/parsing.h"
 
 static int check_mini_args(int ac, char **av)
 {
@@ -38,6 +38,14 @@ static void disp_args(parsing_info_t *parsed_info)
     printf("\n");
 }
 
+static void server_loop(server_t *server)
+{
+    while (1) {
+        check_client(server);
+    }
+    close(server->s_fd);
+}
+
 /**
  * @brief Main function for the zappy server
  * @param argc Number of arguments
@@ -47,6 +55,7 @@ static void disp_args(parsing_info_t *parsed_info)
 int main(int ac, char **av)
 {
     parsing_info_t parsed_info;
+    server_t server;
 
     if (ac <= 10 || check_mini_args(ac, av) == 1) {
         display_help();
@@ -54,5 +63,7 @@ int main(int ac, char **av)
     }
     parse_args(ac, av, &parsed_info);
     disp_args(&parsed_info);
+    create_server(&server, &parsed_info);
+    server_loop(&server);
     return 0;
 }
