@@ -22,7 +22,9 @@ BINARY_NAME		= ../../zappy_server
 # Source files
 MAIN_FILE 		= 	main.c
 
-SRCS			=	help.c
+SRCS			=	help.c			\
+					parsing_err.c	\
+					parsing.c		\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 
