@@ -18,7 +18,6 @@ def parse_inventory(inventory_str):
                 resource_dict[resource_name] = amount
             except ValueError:
                 print(f"Error parsing amount for resource '{resource_name}': {parts[1]} is not an integer.")
-                print
                 continue
     return resource_dict
 
