@@ -12,7 +12,9 @@ namespace raylibcpp {
 Camera2DWrap::Camera2DWrap() {
     camera = {0};
 }
+
 Camera2DWrap::~Camera2DWrap() {}
+
 Camera2D& Camera2DWrap::get() {
     return camera;
 }
@@ -47,5 +49,4 @@ void Camera3DWrap::beginMode() {
 void Camera3DWrap::endMode() {
     EndMode3D();
 }
-
 }  // namespace raylibcpp

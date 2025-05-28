@@ -76,4 +76,4 @@ namespace TypeAdapter {
         result.height = rect.height;
         return result;
     }
-}
+}  // namespace TypeAdapter

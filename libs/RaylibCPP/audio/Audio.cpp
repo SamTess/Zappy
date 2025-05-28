@@ -14,6 +14,7 @@ namespace raylibcpp {
 Audio::Audio() {
     InitAudioDevice();
 }
+
 Audio::~Audio() {
     CloseAudioDevice();
 }
@@ -23,6 +24,7 @@ SoundWrap::SoundWrap(const std::string& path) {
     if (sound.frameCount == 0)
         throw std::runtime_error("Erreur chargement sound: " + path);
 }
+
 SoundWrap::~SoundWrap() {
     UnloadSound(sound);
 }
@@ -56,6 +58,7 @@ MusicWrap::MusicWrap(const std::string& path) {
     if (music.ctxData == nullptr)
         throw std::runtime_error("Erreur chargement music: " + path);
 }
+
 MusicWrap::~MusicWrap() {
     UnloadMusicStream(music);
 }
@@ -87,5 +90,4 @@ void MusicWrap::setVolume(float volume) const {
 Music& MusicWrap::get() {
     return music;
 }
-
 }  // namespace raylibcpp

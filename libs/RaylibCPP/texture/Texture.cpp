@@ -14,22 +14,27 @@
 #include <string>
 
 namespace raylibcpp {
+
 Texture::Texture(const std::string& path) {
     texture = LoadTexture(path.c_str());
 }
+
 Texture::~Texture() {
     UnloadTexture(texture);
 }
+
 void Texture::draw(int x, int y) const {
     DrawTexture(texture, x, y, WHITE);
 }
+
 Texture2D Texture::get() const {
     return texture;
 }
 
 Texture3DWrap::Texture3DWrap(const std::string& path) {
     texture = LoadTexture(path.c_str());
-    if (texture.id == 0) throw std::runtime_error("Erreur chargement texture: " + path);
+    if (texture.id == 0)
+        throw std::runtime_error("Erreur chargement texture: " + path);
 }
 
 Texture3DWrap::~Texture3DWrap() {
@@ -41,11 +46,14 @@ void Texture3DWrap::bind(int unit) const {
     rlEnableTexture(texture.id);
 }
 
-Texture2D& Texture3DWrap::get() { return texture; }
+Texture2D& Texture3DWrap::get() {
+    return texture;
+}
 
 ModelWrap::ModelWrap(const std::string& objPath) {
     model = LoadModel(objPath.c_str());
-    if (model.meshCount == 0) throw std::runtime_error("Erreur chargement model: " + objPath);
+    if (model.meshCount == 0)
+        throw std::runtime_error("Erreur chargement model: " + objPath);
 }
 
 ModelWrap::~ModelWrap() {
@@ -60,4 +68,4 @@ Model& ModelWrap::get() {
     return model;
 }
 
-}
+}  // namespace raylibcpp
