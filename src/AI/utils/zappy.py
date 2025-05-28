@@ -22,7 +22,7 @@ def parse_inventory(inventory_str):
     return resource_dict
 
 # tries to find the closest item in surroundings string
-# returns distance to the item if found, otherwise None
+# returns distance to the item if found, otherwise -1
 def get_closest_of_item(surroundings_str, item):
     cleaned = surroundings_str.strip("[ ]")
     tiles = cleaned.split(", ")
