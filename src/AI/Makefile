@@ -37,11 +37,8 @@ $(LIB_AI_NAME):
 
 $(BINARY_NAME): $(MAIN_FILE) $(LIB_AI_NAME)
 	@mkdir -p $(BUILD_DIR)
-	@echo -e "$(GREEN)Creating AI script...$(RESET)"
-	@echo '#!/usr/bin/env python3' > $(BINARY_NAME)
-	@cat $(MAIN_FILE) >> $(BINARY_NAME)
-	@chmod +x $(BINARY_NAME)
-	@mv $(BINARY_NAME) ../../
+	@echo -e "$(GREEN)Creating AI zipapp...$(RESET)"
+	@cd build_zipapp && $(PYTHON) build_zipapp.py
 
 install:
 	@if [ -f $(REQUIREMENTS) ]; then \
