@@ -28,6 +28,8 @@ SRCS			=	help.c						\
 					network/connection_err.c	\
 					network/connection.c		\
 					network/server_run.c		\
+					map/map_creation.c			\
+					map/tile.c					\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 
