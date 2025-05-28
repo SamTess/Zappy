@@ -22,9 +22,12 @@ BINARY_NAME		= ../../zappy_server
 # Source files
 MAIN_FILE 		= 	main.c
 
-SRCS			=	help.c			\
-					parsing_err.c	\
-					parsing.c		\
+SRCS			=	help.c						\
+					parsing_err.c				\
+					parsing.c					\
+					network/connection_err.c	\
+					network/connection.c		\
+					network/server_run.c		\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 
@@ -51,7 +54,7 @@ $(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
 		$(CFLAGS) $(INCLUDES)
 
 $(BUILD_DIR)/Server/%.o: %.c
-	@mkdir -p $(BUILD_DIR)/Server
+	@mkdir -p $(dir $@)
 	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
