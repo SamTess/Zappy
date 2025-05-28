@@ -1,8 +1,7 @@
 import sys
 import random
 
-sys.path.append("..")
-from defs.zappy import resources
+from ..defs.zappy import resources
 
 # transforms inventory string into a list of pair ressource - amount
 def parse_inventory(inventory_str):
