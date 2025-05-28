@@ -1,0 +1,127 @@
+/*
+** EPITECH PROJECT, 2025
+** Zappy
+** File description:
+** server_run
+*/
+#include "../include/server.h"
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+client_t *find_client_by_socket(server_t *server, int socket_fd)
+{
+    client_t *temp = server->client;
+
+    while (temp) {
+        if (temp->client_fd == socket_fd)
+            return temp;
+        temp = temp->next;
+    }
+    printf("Error: Could not find client for socket %d\n", socket_fd);
+    return NULL;
+}
+
+static void new_connection(server_t *server)
+{
+    struct sockaddr_in client_addr;
+    socklen_t addr_len = sizeof(client_addr);
+    char client_ip[INET_ADDRSTRLEN];
+    int client_fd;
+    client_t *new_client;
+
+    memset(&client_addr, 0, sizeof(client_addr));
+    client_fd = accept(server->s_fd, (struct sockaddr *)&client_addr,
+        &addr_len);
+    if (client_fd < 0) {
+        perror("Accept failed");
+        exit(84);
+    }
+    add_fd(server, client_fd);
+    server->nfds += 1;
+    new_client = find_client_by_socket(server, client_fd);
+    if (new_client != NULL)
+        print_co(client_ip, &client_addr, new_client);
+}
+
+static void check_new_connection(server_t *server)
+{
+    if (server->client->client_poll->revents & POLLIN)
+        new_connection(server);
+}
+
+static void temporary_function(client_t *temp, server_t *server)
+{
+    char buffer[1024];
+    ssize_t bytes_read;
+
+    memset(buffer, 0, sizeof(buffer));
+    bytes_read = recv(temp->client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytes_read > 0) {
+        buffer[bytes_read] = '\0';
+        printf("Client %d sent: %s\n", temp->client_fd, buffer);
+    }
+    if (bytes_read <= 0) {
+        printf("Client %d disconnected\n", temp->client_fd);
+        if (temp->client_fd != 0)
+            remove_fd(server, temp->client_fd);
+    }
+}
+
+static void check_client_message(server_t *server)
+{
+    client_t *temp = server->client;
+    client_t *next = NULL;
+
+    while (temp != NULL) {
+        next = temp->next;
+        if (temp->client_poll != NULL && temp->client_poll->revents != 0
+            && (temp->client_poll->revents & POLLIN)){
+                temporary_function(temp, server);
+        }
+        temp = next;
+    }
+}
+
+static void poll_fds(server_t *server, client_t *current, int nfds,
+    struct pollfd *fds)
+{
+    server->client->client_poll->revents = fds[0].revents;
+    check_new_connection(server);
+    current = server->client->next;
+    for (int i = 1; i < nfds && current != NULL; i++) {
+        current->client_poll->revents = fds[i].revents;
+        current = current->next;
+    }
+    if (server->nfds > 0)
+        check_client_message(server);
+}
+
+static void helper_function(server_t *server, int nfds, struct pollfd *fds)
+{
+    client_t *current = server->client;
+    int i = 0;
+
+    fds[0] = *(current->client_poll);
+    current = current->next;
+    for (i = 1; i < nfds && current != NULL; i++) {
+        fds[i] = *(current->client_poll);
+        current = current->next;
+    }
+    if (poll(fds, nfds, 10) > 0)
+        poll_fds(server, current, nfds, fds);
+}
+
+void check_client(server_t *server)
+{
+    struct pollfd *fds = calloc((server->nfds + 1), sizeof(struct pollfd));
+
+    if (!fds) {
+        perror("Poll array allocation failed");
+        exit(84);
+    }
+    fds[0] = *(server->client->client_poll);
+    helper_function(server, server->nfds + 1, fds);
+    free(fds);
+}
