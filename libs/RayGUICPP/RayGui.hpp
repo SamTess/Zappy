@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400
+** File description:
+** RayGUI encapsulation
+*/
+
 #pragma once
 #include <memory>
 #include <string>

@@ -1,3 +1,9 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400
+** File description:
+** GuiLib interface
+*/
 #pragma once
 
 #include <memory>

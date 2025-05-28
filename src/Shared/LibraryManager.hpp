@@ -1,3 +1,10 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400
+** File description:
+** LibraryManager
+*/
+
 #pragma once
 
 #include <string>
