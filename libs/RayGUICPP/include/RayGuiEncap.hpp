@@ -8,6 +8,7 @@
 #pragma once
 #include <cstring>
 #include <memory>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include "../raygui-4.0/src/raygui.h"
@@ -94,11 +95,16 @@ public:
 class TextBox {
 public:
     static bool Draw(const Rectangle& bounds, std::shared_ptr<std::string> text, int maxLength, bool editMode) {
-        char buffer[1024];
-        std::strncpy(buffer, text->c_str(), sizeof(buffer));
-        buffer[sizeof(buffer)-1] = '\0';
-        bool changed = GuiTextBox(bounds, buffer, maxLength, editMode);
-        *text = buffer;
+        if (!text || maxLength <= 0)
+            return false;
+        const int bufferSize = std::min(maxLength + 1, 1024);
+        std::vector<char> buffer(bufferSize);
+        std::strncpy(buffer.data(), text->c_str(), bufferSize - 1);
+        buffer[bufferSize - 1] = '\0';
+        const int effectiveMaxLength = std::min(maxLength, bufferSize - 1);
+        bool changed = GuiTextBox(bounds, buffer.data(), effectiveMaxLength, editMode);
+        if (changed)
+            *text = buffer.data();
         return changed;
     }
 };
