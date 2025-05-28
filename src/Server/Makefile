@@ -54,7 +54,7 @@ $(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
 		$(CFLAGS) $(INCLUDES)
 
 $(BUILD_DIR)/Server/%.o: %.c
-	@mkdir -p $(BUILD_DIR)/Server
+	@mkdir -p $(dir $@)
 	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
