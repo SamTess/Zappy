@@ -86,21 +86,29 @@ static void distribute_one_resource(resource_dist_t *dist, int res, int total)
     }
 }
 
+static void init_resource_dist(int width, int height,
+    tile_t **map, resource_dist_t *dist)
+{
+    int total_tiles = width * height;
+
+    dist->tile_indices = malloc(sizeof(int) * total_tiles);
+    if (dist->tile_indices == NULL)
+        exit(84);
+    for (int i = 0; i < total_tiles; ++i)
+        dist->tile_indices[i] = i;
+    dist->map = map;
+    dist->width = width;
+    dist->height = height;
+}
+
 void distribute_resources(tile_t **map, int width, int height)
 {
-    int total_tiles;
     int total;
     resource_dist_t dist;
     static double resource_densities[COUNT] = {FOOD_D, LINEMATE_D, DERAUMERE_D,
         SIBUR_D, MENDIANE_D, PHIRAS_D, THYSTAME_D};
 
-    total_tiles = width * height;
-    dist.tile_indices = malloc(sizeof(int) * total_tiles);
-    for (int i = 0; i < total_tiles; ++i)
-        dist.tile_indices[i] = i;
-    dist.map = map;
-    dist.width = width;
-    dist.height = height;
+    init_resource_dist(width, height, map, &dist);
     for (int res = 0; res < COUNT; ++res) {
         total = (int)(width * height * resource_densities[res] + 0.5);
         if (total < 1)
