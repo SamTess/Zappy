@@ -58,7 +58,7 @@ class ClientAI:
           print(f"Agent {self.agent_id}: getFood > Command result: {result}")
       else:
           self.take_items_on_ground(surroundings)
-          result = self.send_command(utils.go_get_item(surroundings, utils.get_best_available_resource(surroundings, resources)))
+          result = self.send_command(utils.go_get_item(surroundings, utils.get_best_available_resource(surroundings)))
           print(f"Agent {self.agent_id}: getRessource > Command result: {result}")
 
     def run(self):
