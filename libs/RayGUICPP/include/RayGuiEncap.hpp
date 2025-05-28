@@ -6,11 +6,11 @@
 */
 
 #pragma once
-#include <raylib.h>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
-#include "raygui.h"
+#include "../raygui-4.0/src/raygui.h"
 
 namespace RayGUICPP {
 
@@ -93,27 +93,27 @@ public:
 
 class TextBox {
 public:
-    static bool Draw(const Rectangle& bounds, std::string& text, int maxLength, bool editMode) {
+    static bool Draw(const Rectangle& bounds, std::shared_ptr<std::string> text, int maxLength, bool editMode) {
         char buffer[1024];
-        std::strncpy(buffer, text.c_str(), sizeof(buffer));
+        std::strncpy(buffer, text->c_str(), sizeof(buffer));
         buffer[sizeof(buffer)-1] = '\0';
         bool changed = GuiTextBox(bounds, buffer, maxLength, editMode);
-        text = buffer;
+        *text = buffer;
         return changed;
     }
 };
 
 class ValueBox {
 public:
-    static bool Draw(const Rectangle& bounds, int& value, int minValue, int maxValue, bool editMode) {
-        return GuiValueBox(bounds, nullptr, &value, minValue, maxValue, editMode);
+    static bool Draw(const Rectangle& bounds, std::shared_ptr<int> value, int minValue, int maxValue, bool editMode) {
+        return GuiValueBox(bounds, nullptr, value.get(), minValue, maxValue, editMode);
     }
 };
 
 class Spinner {
 public:
-    static bool Draw(const Rectangle& bounds, int& value, int minValue, int maxValue, bool editMode) {
-        return GuiSpinner(bounds, nullptr, &value, minValue, maxValue, editMode);
+    static bool Draw(const Rectangle& bounds, std::shared_ptr<int> value, int minValue, int maxValue, bool editMode) {
+        return GuiSpinner(bounds, nullptr, value.get(), minValue, maxValue, editMode);
     }
 };
 
@@ -165,9 +165,9 @@ public:
 
 class ScrollPanel {
 public:
-    static Rectangle Draw(const Rectangle& bounds, const std::string& text, Rectangle content, Vector2& scroll) {
+    static Rectangle Draw(const Rectangle& bounds, const std::string& text, Rectangle content, std::shared_ptr<Vector2> scroll) {
         Rectangle view = {0};
-        GuiScrollPanel(bounds, text.c_str(), content, &scroll, &view);
+        GuiScrollPanel(bounds, text.c_str(), content, scroll.get(), &view);
         return view;
     }
 };
@@ -201,9 +201,8 @@ public:
 class ColorPicker {
 public:
     static Color Draw(const Rectangle& bounds, Color color) {
-        Color c = color;
-        GuiColorPicker(bounds, nullptr, &c);
-        return c;
+        GuiColorPicker(bounds, nullptr, &color);
+        return color;
     }
 };
 
@@ -216,12 +215,12 @@ public:
 
 class TextInputBox {
 public:
-    static int Draw(const Rectangle& bounds, const std::string& title, const std::string& message, std::string& text, const std::string& buttons) {
+    static int Draw(const Rectangle& bounds, const std::string& title, const std::string& message, std::shared_ptr<std::string> text, const std::string& buttons) {
         char buffer[1024];
-        std::strncpy(buffer, text.c_str(), sizeof(buffer));
+        std::strncpy(buffer, text->c_str(), sizeof(buffer));
         buffer[sizeof(buffer)-1] = '\0';
         int result = GuiTextInputBox(bounds, title.c_str(), message.c_str(), buttons.c_str(), buffer, sizeof(buffer), nullptr);
-        text = buffer;
+        *text = buffer;
         return result;
     }
 };
