@@ -5,7 +5,7 @@
 ## GUI Makefile
 ##
 
-CXX					= g++
+CXX					= 	g++
 CXXFLAGS			=	-Wextra -Wall -Werror -std=c++20
 DEBUGFLAGS			=	-ggdb -fsanitize=address
 SFMLFLAGS			=	-lsfml-graphics -lsfml-window -lsfml-system \
@@ -43,6 +43,7 @@ all: libs_so $(LIB_NAME) $(BINARY_NAME)
 libs_so:
 	@$(MAKE) -C ../../libs
 
+
 $(BUILD_DIR)/Shared/%.o: ../Shared/%.cpp
 	@mkdir -p $(BUILD_DIR)/Shared
 	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
@@ -52,7 +53,7 @@ $(LIB_NAME): $(OBJ_FILES)
 	@mkdir -p $(BUILD_DIR)
 	@ar rcs $(LIB_NAME) $(OBJ_FILES)
 
-$(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
+$(BINARY_NAME): $(LIB_NAME)
 	@echo -e "$(GREEN)Compiling GUI binary...$(RESET)"
 	@$(CXX) -o $(BINARY_NAME) $(MAIN_FILE) $(LIB_NAME) \
 		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS)
