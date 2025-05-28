@@ -1,25 +1,12 @@
 from enum import Enum, IntEnum
 import datetime
 
-class Priority(Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-
 class LogLevel(IntEnum):
     DEBUG = 10
     INFO = 20
     WARNING = 30
     ERROR = 40
     CRITICAL = 50
-
-class LogType(Enum):
-    EVENT = "event"
-    ERROR = "error"
-    WARNING = "warning"
-    INFO = "info"
-    DEBUG = "debug"
-
 
 class Logger:
     def __init__(self, fileName: str = "AI.log"):
