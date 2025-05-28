@@ -7,7 +7,7 @@ class ParsingArgsError(Exception):
         print(f"ParsingArgsError: {message}", file=sys.stderr)
         super().__init__(self.message)
 
-class ParsingArgs:
+class parseArgs:
     def __init__(self):
         self.args = sys.argv[1:]
         self.port = 0
