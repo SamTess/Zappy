@@ -54,12 +54,24 @@ public:
      * @return Pointeur vers l'instance créée
      */
     std::unique_ptr<T> getInstance(const std::string& creatorName) {
-        using CreatorFunc = T* (*)();
-        CreatorFunc creator = getSymbol<CreatorFunc>(creatorName);
-        T* instance = creator();
-        if (!instance)
-            throw std::runtime_error("La fonction de création a retourné un pointeur null");
-        return std::unique_ptr<T>(instance);
+        try {
+            using SharedCreatorFunc = std::shared_ptr<T> (*)();
+            SharedCreatorFunc sharedCreator = getSymbol<SharedCreatorFunc>(creatorName);
+            std::shared_ptr<T> sharedInstance = sharedCreator();
+            if (!sharedInstance)
+                throw std::runtime_error("La fonction de création a retourné un pointeur null");
+            return std::unique_ptr<T, std::function<void(T*)>>(
+                sharedInstance.get(),
+                [capture = sharedInstance](T*) { }
+            );
+        } catch (const std::exception& e) {
+            using RawCreatorFunc = T* (*)();
+            RawCreatorFunc rawCreator = getSymbol<RawCreatorFunc>(creatorName);
+            T* instance = rawCreator();
+            if (!instance)
+                throw std::runtime_error("La fonction de création a retourné un pointeur null");
+            return std::unique_ptr<T>(instance);
+        }
     }
 
 private:

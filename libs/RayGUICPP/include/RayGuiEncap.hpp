@@ -112,14 +112,22 @@ public:
 class ValueBox {
 public:
     static bool Draw(const Rectangle& bounds, std::shared_ptr<int> value, int minValue, int maxValue, bool editMode) {
-        return GuiValueBox(bounds, nullptr, value.get(), minValue, maxValue, editMode);
+        if (!value) return false;
+        int temp = *value;
+        bool changed = GuiValueBox(bounds, nullptr, &temp, minValue, maxValue, editMode);
+        if (changed) *value = temp;
+        return changed;
     }
 };
 
 class Spinner {
 public:
     static bool Draw(const Rectangle& bounds, std::shared_ptr<int> value, int minValue, int maxValue, bool editMode) {
-        return GuiSpinner(bounds, nullptr, value.get(), minValue, maxValue, editMode);
+        if (!value) return false;
+        int temp = *value;
+        bool changed = GuiSpinner(bounds, nullptr, &temp, minValue, maxValue, editMode);
+        if (changed) *value = temp;
+        return changed;
     }
 };
 
@@ -173,7 +181,10 @@ class ScrollPanel {
 public:
     static Rectangle Draw(const Rectangle& bounds, const std::string& text, Rectangle content, std::shared_ptr<Vector2> scroll) {
         Rectangle view = {0};
-        GuiScrollPanel(bounds, text.c_str(), content, scroll.get(), &view);
+        if (!scroll) return view;
+        Vector2 temp = *scroll;
+        GuiScrollPanel(bounds, text.c_str(), content, &temp, &view);
+        *scroll = temp;
         return view;
     }
 };
@@ -222,6 +233,7 @@ public:
 class TextInputBox {
 public:
     static int Draw(const Rectangle& bounds, const std::string& title, const std::string& message, std::shared_ptr<std::string> text, const std::string& buttons) {
+        if (!text) return -1;
         char buffer[1024];
         std::strncpy(buffer, text->c_str(), sizeof(buffer));
         buffer[sizeof(buffer)-1] = '\0';

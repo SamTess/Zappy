@@ -14,7 +14,7 @@ class IGraphicsLib {
 public:
     virtual ~IGraphicsLib() = default;
     // Fenêtre
-    virtual void InitWindow(int width, int height, const char* title) = 0;
+    virtual void InitWindow(int width, int height, const std::string& title) = 0;
     virtual void CloseWindow() = 0;
     virtual bool WindowShouldClose() = 0;
     virtual void BeginDrawing() = 0;

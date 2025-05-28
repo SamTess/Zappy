@@ -14,8 +14,8 @@
 RayLib::RayLib() {}
 RayLib::~RayLib() { if (_initialized) CloseWindow(); }
 
-void RayLib::InitWindow(int width, int height, const char* title) {
-    _window = std::make_unique<raylibcpp::Window>(width, height, std::string(title));
+void RayLib::InitWindow(int width, int height, const std::string& title) {
+    _window = std::make_unique<raylibcpp::Window>(width, height, title);
     _initialized = true;
 }
 void RayLib::CloseWindow() {
@@ -125,8 +125,8 @@ void RayLib::UpdateMusic() {
 }
 
 extern "C" {
-    IGraphicsLib* createGraphicsLib() {
-        static RayLib instance;
-        return &instance;
+    std::shared_ptr<IGraphicsLib> createGraphicsLib() {
+        static std::shared_ptr<RayLib> instance = std::make_shared<RayLib>();
+        return instance;
     }
 }
