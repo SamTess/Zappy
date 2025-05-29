@@ -12,11 +12,13 @@
 
 static char *get_one_item_content(player_inventory_t item)
 {
-    char *content = malloc(50);
+    int total_length = strlen(item.name) +
+        snprintf(NULL, 0, "%d", item.quantity) + 3;
+    char *content = malloc(total_length);
 
     if (!content)
         return NULL;
-    snprintf(content, 50, "%s %d", item.name, item.quantity);
+    snprintf(content, total_length  , "%s %d", item.name, item.quantity);
     return content;
 }
 
