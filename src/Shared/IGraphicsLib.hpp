@@ -55,4 +55,20 @@ public:
     virtual void StopMusic() = 0;
     virtual void SetMusicVolume(float volume) = 0;
     virtual void UpdateMusic() = 0;
+
+    // Caméras
+    virtual void CreateCamera2D() = 0;
+    virtual void CreateCamera3D(ZappyTypes::Vector3 position, ZappyTypes::Vector3 target, ZappyTypes::Vector3 up, float fovy, int projection) = 0;
+    virtual void BeginCamera3D() = 0;
+    virtual void EndCamera3D() = 0;
+
+    // Textures 3D
+    virtual void LoadTexture3D(const std::string& path) = 0;
+    virtual void BindTexture3D(int unit = 0) = 0;
+    virtual void UnloadTexture3D() = 0;
+
+    // Modèles 3D
+    virtual void LoadModel3D(const std::string& path) = 0;
+    virtual void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) = 0;
+    virtual void UnloadModel3D() = 0;
 };
