@@ -33,6 +33,8 @@ char *get_resource_name(ResourceType_t type)
 
 bool inventory_has_item(player_t *player, ResourceType_t type)
 {
+    if (!player || !player->inventory)
+        return false;
     for (int i = 0; i < player->inventory_size; i++) {
         if (player->inventory[i].type == type) {
             return true;
@@ -43,6 +45,8 @@ bool inventory_has_item(player_t *player, ResourceType_t type)
 
 int how_many_in_inventory(player_t *player, ResourceType_t type)
 {
+    if (!player)
+        return 0;
     for (int i = 0; i < player->inventory_size; i++) {
         if (player->inventory[i].type == type) {
             return player->inventory[i].quantity;
