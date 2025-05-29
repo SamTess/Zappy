@@ -56,13 +56,20 @@ bool add_item_to_inventory(player_t *player, ResourceType_t type, int quantity)
 
 static void remove_one_item_from_inventory(player_t *player, int i)
 {
+    void *tmp;
+
     free(player->inventory[i].name);
     for (int j = i; j < player->inventory_size - 1; j++)
         player->inventory[j] = player->inventory[j + 1];
     player->inventory_size--;
     if (player->inventory_size > 0) {
-        player->inventory = realloc(player->inventory,
+        tmp = realloc(player->inventory,
             sizeof(player_inventory_t) * player->inventory_size);
+        if (!tmp) {
+            perror("Error: Memory allocation failed for inventory");
+            exit(84);
+        }
+        player->inventory = tmp;
     } else {
         free(player->inventory);
         player->inventory = NULL;
