@@ -8,7 +8,8 @@
 CC				=	gcc
 CXX				=	g++
 CFLAGS			=	-Wextra -Wall -Werror -std=gnu17 --coverage
-CXXFLAGS		=	-Wextra -Wall -Werror -std=c++17 --coverage
+CXXFLAGS		=	-Wextra -Wall -Werror -std=c++20 --coverage
+CPP_TEST_FLAGS	=	--coverage -lcriterion -include cstdint
 LDFLAGS			=	-lcriterion --coverage
 SFMLFLAGS		=	-lsfml-graphics -lsfml-window -lsfml-system \
 					-lsfml-audio -lsfml-network
@@ -30,7 +31,8 @@ GUI_INCLUDE		=	-I../src/GUI/include
 SHARED_INCLUDE	=	-I../src/Shared/include
 ALL_INCLUDES	=	$(SERVER_INCLUDE) $(GUI_INCLUDE) $(SHARED_INCLUDE)
 
-TESTS_NAME		=	../unit_tests
+SERVER_TESTS_NAME = ../server_tests
+CLIENT_TESTS_NAME = ../client_tests
 COVERAGE_DIR	=	$(BUILD_DIR)/coverage
 
 # Colors
@@ -42,22 +44,28 @@ MAGENTA			=	\033[0;95m
 CYAN			=	\033[0;96m
 RESET			=	\033[0m
 
-all: $(TESTS_NAME)
+all: $(SERVER_TESTS_NAME) $(CLIENT_TESTS_NAME)
 
-$(TESTS_NAME): $(ALL_TEST_OBJS) $(SERVER_LIB) $(GUI_LIB)
-	@echo -e "$(GREEN)Compiling test binary...$(RESET)"
-	@$(CXX) -o $(TESTS_NAME) $(ALL_TEST_OBJS) $(SERVER_LIB) $(GUI_LIB) \
-		$(CXXFLAGS) $(ALL_INCLUDES) $(LDFLAGS) $(SFMLFLAGS)
+$(SERVER_TESTS_NAME): $(SERVER_TEST_OBJS) $(SERVER_LIB)
+	@echo -e "$(GREEN)Compiling server test binary...$(RESET)"
+	@$(CC) -o $(SERVER_TESTS_NAME) $(SERVER_TEST_OBJS) $(SERVER_LIB) \
+		$(CFLAGS) $(SERVER_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS)
+
+$(CLIENT_TESTS_NAME): $(GUI_LIB)
+	@echo -e "$(GREEN)Compiling client test binary...$(RESET)"
+	@mkdir -p $(dir $(BUILD_DIR)/client/)
+	@$(CXX) -o $(CLIENT_TESTS_NAME) $(CLIENT_TESTS) $(GUI_LIB) \
+		$(CPP_TEST_FLAGS) $(GUI_INCLUDE) $(SHARED_INCLUDE) $(SFMLFLAGS)
 
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
-	@echo -e "$(BLUE)Compiling test file $< into $@...$(RESET)"
-	@$(CC) $(CFLAGS) -fprofile-abs-path $(ALL_INCLUDES) -c $< -o $@
+	@echo -e "$(BLUE)Compiling C test file $< into $@...$(RESET)"
+	@$(CC) $(CFLAGS) -fprofile-abs-path $(SERVER_INCLUDE) $(SHARED_INCLUDE) -c $< -o $@
 
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	@echo -e "$(BLUE)Compiling test file $< into $@...$(RESET)"
-	@$(CXX) $(CXXFLAGS) -fprofile-abs-path $(ALL_INCLUDES) -c $< -o $@
+	@echo -e "$(BLUE)Compiling C++ test file $< into $@...$(RESET)"
+	@$(CXX) $(CXXFLAGS) -fprofile-abs-path $(GUI_INCLUDE) $(SHARED_INCLUDE) -c $< -o $@
 
 $(SERVER_LIB):
 	@echo -e "$(CYAN)Building server library for tests...$(RESET)"
@@ -67,26 +75,36 @@ $(GUI_LIB):
 	@echo -e "$(CYAN)Building GUI library for tests...$(RESET)"
 	@$(MAKE) ../../build/libgui.a -C  ../src/GUI
 
-tests_run: $(TESTS_NAME)
-	@echo -e "$(MAGENTA)Running unit tests...$(RESET)"
-	@./$(TESTS_NAME)
+tests_run: $(SERVER_TESTS_NAME) $(CLIENT_TESTS_NAME)
+	@echo -e "$(MAGENTA)Running server unit tests...$(RESET)"
+	@./$(SERVER_TESTS_NAME)
+	@echo -e "$(MAGENTA)Running client unit tests...$(RESET)"
+	@./$(CLIENT_TESTS_NAME)
 	@echo -e "$(CYAN)Generating coverage report...$(RESET)"
 	@mkdir -p $(COVERAGE_DIR)
-	@cd .. && gcovr --exclude tests/ --exclude build/ --exclude 'tests/.*' --exclude 'tests/client/.*' --exclude 'tests/server/.*' -r . --object-directory build/tests
-	@cd .. && gcovr --exclude tests/ --exclude build/ --exclude 'tests/.*' --exclude 'tests/client/.*' --exclude 'tests/server/.*' -r . --object-directory build/tests \
-		--html --html-details -o build/tests/coverage/coverage.html
+
 	@echo -e "$(GREEN)Coverage report generated at $(COVERAGE_DIR)/coverage.html$(RESET)"
+
+server_tests: $(SERVER_TESTS_NAME)
+	@echo -e "$(MAGENTA)Running server unit tests only...$(RESET)"
+	@./$(SERVER_TESTS_NAME)
+
+client_tests: $(CLIENT_TESTS_NAME)
+	@echo -e "$(MAGENTA)Running client unit tests only...$(RESET)"
+	@./$(CLIENT_TESTS_NAME)
 
 clean:
 	@echo -e "$(YELLOW)Cleaning test objects...$(RESET)"
 	@rm -rf $(BUILD_DIR)
 	@rm -f *.gcda *.gcno
 	@rm -f */*.gcda */*.gcno
+	@rm -f ../client_tests-*.gc*
+	@rm -f ../server_tests-*.gc*
 
 fclean: clean
-	@echo -e "$(RED)Cleaning test binary...$(RESET)"
-	@rm -f $(TESTS_NAME)
+	@echo -e "$(RED)Cleaning test binaries...$(RESET)"
+	@rm -f $(SERVER_TESTS_NAME) $(CLIENT_TESTS_NAME)
 
 re: fclean all
 
-.PHONY: all tests_run clean fclean re
+.PHONY: all tests_run server_tests client_tests clean fclean re
