@@ -18,7 +18,7 @@ static char *get_one_item_content(player_inventory_t item)
 
     if (!content)
         return NULL;
-    snprintf(content, total_length  , "%s %d", item.name, item.quantity);
+    snprintf(content, total_length, "%s %d", item.name, item.quantity);
     return content;
 }
 
