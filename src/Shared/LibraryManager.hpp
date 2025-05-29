@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 #include "DLLoader.hpp"
 #include "IGraphicsLib.hpp"
 #include "IGuiLib.hpp"
@@ -92,9 +93,10 @@ private:
     LibraryManager() = default;
     LibraryManager(const LibraryManager&) = delete;
     LibraryManager& operator=(const LibraryManager&) = delete;
+
     std::unique_ptr<DLLoader<IGraphicsLib>> _graphicsLoader;
     std::unique_ptr<DLLoader<IGuiLib>> _guiLoader;
-    std::unique_ptr<IGraphicsLib> _graphicsLib;
-    std::unique_ptr<IGuiLib> _guiLib;
+    std::unique_ptr<IGraphicsLib, std::function<void(IGraphicsLib*)>> _graphicsLib;
+    std::unique_ptr<IGuiLib, std::function<void(IGuiLib*)>> _guiLib;
     std::string _lastError;
 };

@@ -10,6 +10,7 @@
 #include <string>
 #include <stdexcept>
 #include <memory>
+#include <functional>
 
 template <typename T>
 class DLLoader {
@@ -51,9 +52,9 @@ public:
     /**
      * @brief Crée une instance de l'interface en utilisant une fonction de création
      * @param creatorName Nom de la fonction de création dans la bibliothèque
-     * @return Pointeur vers l'instance créée
+     * @return Pointeur vers l'instance créée avec un deleteur personnalisé
      */
-    std::unique_ptr<T> getInstance(const std::string& creatorName) {
+    std::unique_ptr<T, std::function<void(T*)>> getInstance(const std::string& creatorName) {
         try {
             using SharedCreatorFunc = std::shared_ptr<T> (*)();
             SharedCreatorFunc sharedCreator = getSymbol<SharedCreatorFunc>(creatorName);
@@ -62,7 +63,7 @@ public:
                 throw std::runtime_error("La fonction de création a retourné un pointeur null");
             return std::unique_ptr<T, std::function<void(T*)>>(
                 sharedInstance.get(),
-                [capture = sharedInstance](T*) { }
+                [](T* ptr) { }
             );
         } catch (const std::exception& e) {
             using RawCreatorFunc = T* (*)();
@@ -70,10 +71,10 @@ public:
             T* instance = rawCreator();
             if (!instance)
                 throw std::runtime_error("La fonction de création a retourné un pointeur null");
-            return std::unique_ptr<T>(instance);
+            return std::unique_ptr<T, std::function<void(T*)>>(instance, std::default_delete<T>());
         }
     }
 
 private:
-    void* _handle = nullptr; // Handle de la bibliothèque chargée
+    void* _handle = nullptr;
 };
