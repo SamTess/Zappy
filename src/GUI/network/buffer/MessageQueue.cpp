@@ -7,6 +7,7 @@
 
 
 #include "MessageQueue.hpp"
+#include <string>
 
 MessageQueue::MessageQueue() {
 }

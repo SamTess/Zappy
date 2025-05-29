@@ -13,6 +13,5 @@
 #include <atomic>
 
 class NetworkThread {
-
 };
 #endif /* !NETWORKTHREAD_HPP_ */

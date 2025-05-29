@@ -8,9 +8,9 @@
 #ifndef TCPCONNECTION_HPP_
 #define TCPCONNECTION_HPP_
 
-#include <string>
 #include <netinet/in.h>
 #include <poll.h>
+#include <string>
 #include "../../shared/exception/AException.hpp"
 
 class TcpConnection {

@@ -8,6 +8,7 @@
 #include "Message.hpp"
 #include <utility>
 #include <iostream>
+#include <string>
 
 Message::Message() {
     std::cout << "creating empty message" << std::endl;

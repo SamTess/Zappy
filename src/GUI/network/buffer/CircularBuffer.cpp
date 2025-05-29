@@ -8,6 +8,7 @@
 #include "CircularBuffer.hpp"
 #include <algorithm>
 #include <utility>
+#include <vector>
 
 CircularBuffer::CircularBuffer(size_t capacity)
     : _capacity(capacity), _head(0), _tail(0), _size(0) {

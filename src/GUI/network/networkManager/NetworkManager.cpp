@@ -5,14 +5,14 @@
 ** networkManager
 */
 
-#include "NetworkManager.hpp"
-#include "NetworkLogger.hpp"
 #include <iostream>
 #include <algorithm>
 #include <thread>
 #include <chrono>
 #include <mutex>
 #include <string>
+#include "NetworkManager.hpp"
+#include "NetworkLogger.hpp"
 
 NetworkManager::NetworkManager()
     : _connection(std::make_unique<TcpConnection>()),

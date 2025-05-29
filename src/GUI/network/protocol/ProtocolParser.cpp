@@ -7,7 +7,10 @@
 
 #include "ProtocolParser.hpp"
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
+#include <vector>
+#include <string>
 
 ProtocolParser::ProtocolParser() {
     _validHeaders = {
@@ -205,5 +208,7 @@ Message ProtocolParser::parseServerMessage(const std::string &message) {
 
 Message ProtocolParser::parseUnknownCommand(const std::string &message) {
     (void)message;
+
+    std::cout << "Unknown command received: " << message << std::endl;
     return Message(SUC_HEADER, "");
 }

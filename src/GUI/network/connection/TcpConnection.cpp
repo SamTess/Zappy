@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cerrno>
+#include <string>
 #include <cstring>
 
 TcpConnection::TcpConnection() : _socket(-1) {
