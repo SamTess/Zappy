@@ -8,7 +8,7 @@
 CC				=	gcc
 CXX				=	g++
 CFLAGS			=	-Wextra -Wall -Werror -std=gnu17 --coverage
-CXXFLAGS		=	-Wextra -Wall -Werror -std=c++20 --coverage
+CXXFLAGS		=	-Wextra -Wall -Werror -std=c++17 --coverage
 LDFLAGS			=	-lcriterion --coverage
 SFMLFLAGS		=	-lsfml-graphics -lsfml-window -lsfml-system \
 					-lsfml-audio -lsfml-network
@@ -17,7 +17,7 @@ BUILD_DIR		=	../build/tests
 SERVER_LIB		=	../build/libserver.a
 GUI_LIB			=	../build/libgui.a
 
-SERVER_TESTS	=	server/test_server.c
+SERVER_TESTS	=	server/test_server.c server/test_player_inventory.c
 CLIENT_TESTS	=	client/test_client.cpp
 ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS)
 
