@@ -18,7 +18,16 @@ SERVER_LIB		=	../build/libserver.a
 GUI_LIB			=	../build/libgui.a
 
 SERVER_TESTS	=	server/test_server.c
-CLIENT_TESTS	=	client/test_client.cpp
+CLIENT_TESTS	=	client/test_client.cpp \
+					client/test_network.cpp \
+					client/test_network_manager.cpp \
+					client/test_protocol_parser.cpp \
+					client/test_network_integration.cpp \
+					client/test_tcp_connection.cpp \
+					client/test_network_buffer.cpp \
+					client/test_protocol_parser_detailed.cpp \
+					client/test_network_manager_integration.cpp \
+					client/test_ticket_validation.cpp
 ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS)
 
 SERVER_TEST_OBJS = $(SERVER_TESTS:%.c=$(BUILD_DIR)/%.o)
@@ -26,8 +35,8 @@ CLIENT_TEST_OBJS = $(CLIENT_TESTS:%.cpp=$(BUILD_DIR)/%.o)
 ALL_TEST_OBJS	=	$(SERVER_TEST_OBJS) $(CLIENT_TEST_OBJS)
 
 SERVER_INCLUDE	=	-I../src/Server/include
-GUI_INCLUDE		=	-I../src/GUI/include
-SHARED_INCLUDE	=	-I../src/Shared/include
+GUI_INCLUDE		=	-I../src/GUI
+SHARED_INCLUDE	=	-I../src/Shared
 ALL_INCLUDES	=	$(SERVER_INCLUDE) $(GUI_INCLUDE) $(SHARED_INCLUDE)
 
 TESTS_NAME		=	../unit_tests
