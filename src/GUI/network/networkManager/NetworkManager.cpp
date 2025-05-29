@@ -6,10 +6,13 @@
 */
 
 #include "NetworkManager.hpp"
+#include "NetworkLogger.hpp"
 #include <iostream>
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include <mutex>
+#include <string>
 
 NetworkManager::NetworkManager()
     : _connection(std::make_unique<TcpConnection>()),
@@ -58,14 +61,15 @@ bool NetworkManager::isConnected() const {
 void NetworkManager::startNetworkThread() {
     if (!_isRunning) {
         _isRunning = true;
-        // Start the network thread
+        _networkThreadObj = std::thread([this]() { this->networkThreadLoop(); });
     }
 }
 
 void NetworkManager::stopNetworkThread() {
     if (_isRunning) {
         _isRunning = false;
-        // Stop the network thread
+        if (_networkThreadObj.joinable())
+            _networkThreadObj.join();
     }
 }
 
@@ -75,15 +79,17 @@ void NetworkManager::networkThreadLoop() {
             if (_connection->hasData()) {
                 std::string data = _connection->receive();
                 if (!data.empty()) {
+                    NetworkLogger::get().log(std::string("Réception: ") + data);
                     _incomingQueue->enqueue(data);
                 }
             }
             processIncomingMessages();
         } catch (const std::exception& e) {
-            std::cerr << "Network thread error: " << e.what() << std::endl;
+            std::cerr << "[ERROR] Network thread: " << e.what() << std::endl;
             _isConnected = false;
             break;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
@@ -91,17 +97,24 @@ void NetworkManager::processIncomingMessages() {
     while (!_incomingQueue->isEmpty()) {
         std::string message = _incomingQueue->dequeue();
         if (!message.empty()) {
+            NetworkLogger::get().log(std::string("Dispatch: ") + message);
             processIncomingMessage(message);
         }
     }
 }
 
 void NetworkManager::processIncomingMessage(const std::string& message) {
-    (void)message;
+    NetworkLogger::get().log(std::string("[RECV] ") + message);
 }
 
 void NetworkManager::sendCommand(const std::string& command) {
     if (_isConnected) {
-        _incomingQueue->enqueue(command);
+        try {
+            NetworkLogger::get().log(std::string("Envoi: ") + command);
+            _connection->send(command);
+        } catch (const std::exception& e) {
+            std::cerr << "[ERROR] Send: " << e.what() << std::endl;
+            _isConnected = false;
+        }
     }
 }

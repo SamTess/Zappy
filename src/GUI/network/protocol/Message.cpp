@@ -6,6 +6,7 @@
 */
 
 #include "Message.hpp"
+#include <utility>
 #include <iostream>
 
 Message::Message() {

@@ -12,6 +12,8 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <thread>
+#include <mutex>
 #include "../connection/TcpConnection.hpp"
 #include "../protocol/ProtocolParser.hpp"
 #include "../protocol/HeaderMessage.hpp"
@@ -19,7 +21,6 @@
 #include "../buffer/MessageQueue.hpp"
 #include "../buffer/CircularBuffer.hpp"
 
-// Forward declaration for observer pattern
 class NetworkObserver;
 
 class NetworkManager {
@@ -43,6 +44,8 @@ class NetworkManager {
 
         bool _isConnected;
         bool _isRunning;
+        std::thread _networkThreadObj;
+        std::mutex _logMutex;
 
         std::vector<NetworkObserver*> _observers;
 
@@ -50,7 +53,6 @@ class NetworkManager {
         void stopNetworkThread();
         void networkThreadLoop();
         void processIncomingMessage(const std::string& message);
-
 };
 
 #endif /* !NETWORKMANAGER_HPP_ */
