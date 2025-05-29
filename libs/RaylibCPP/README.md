@@ -1,93 +1,71 @@
-# Raylib C++ Encapsulation
+# RaylibCPP - Encapsulation C++ de Raylib
 
-Ce dossier contient une encapsulation complète de Raylib en C++, organisée par fonctionnalités.
+Ce dossier propose une encapsulation complète de Raylib en C++ pour le projet Zappy.
 
-## Structure des sous-dossiers
+## Fonctionnalités principales
+- Gestion de la fenêtre (création, fermeture, drawing)
+- Dessin de formes 2D et 3D (rectangle, cercle, cube, sphère, grille, cylindre, ligne 3D, etc.)
+- Gestion avancée des caméras 2D et 3D (création, modes, manipulation)
+- Gestion des textures 2D et 3D (chargement, binding, déchargement)
+- Gestion des modèles 3D (chargement, dessin, déchargement)
+- Gestion des polices et rendu de texte
+- Gestion de l'audio (sons, musiques, volume)
+- Gestion des entrées clavier/souris
 
-- `window/` : Gestion de la fenêtre et du contexte principal
-- `texture/` : Gestion des textures et images, modèles 3D
-- `audio/` : Gestion de l'audio, musiques et sons
-- `font/` : Gestion des polices
-- `shape/` : Dessin de formes géométriques 2D/3D
-- `input/` : Gestion des entrées clavier/souris
-- `camera/` : Gestion des caméras 2D/3D
-- `utils/` : Utilitaires divers (Vector3, couleurs, etc.)
-
-Chaque sous-dossier contient un header et un fichier source pour la fonctionnalité correspondante.
+## Structure du dossier
+- `window/` : gestion de la fenêtre
+- `shape/` : formes 2D/3D
+- `texture/` : textures 2D/3D et modèles 3D
+- `font/` : polices et texte
+- `audio/` : sons et musiques
+- `input/` : entrées clavier/souris
+- `camera/` : caméras 2D/3D
+- `utils/` : utilitaires (vecteurs, couleurs, etc.)
 
 ## Exemple d'utilisation
-
-Voici un exemple minimal d'utilisation de l'encapsulation RaylibCPP pour une scène 3D :
-
 ```cpp
-#include "raylibcpp.hpp"
-#include "raymath.h"
+#include "RayLib.hpp"
 
 int main() {
-    raylibcpp::Window window(1200, 800, "Demo RaylibCPP");
-    SetTargetFPS(60);
-
-    raylibcpp::Camera3DWrap camera;
-    Vector3 &camPos = camera.get().position;
-    Vector3 &camTarget = camera.get().target;
-    Vector3 &camUp = camera.get().up;
-
-    raylibcpp::Vector3Wrap objPos(0.0f, 1.0f, 0.0f);
-    raylibcpp::ModelWrap model("assets/bugatti.obj");
-    raylibcpp::Font font("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf");
-    DisableCursor();
-
-    while (!window.shouldClose()) {
-        // Contrôles caméra (ZQSD + souris)
-        float moveSpeed = 0.2f;
-        float rotSpeed = 0.03f;
-        Vector3 forward = raylibcpp::Vector3Wrap::normalize(raylibcpp::Vector3Wrap::sub(camTarget, camPos));
-        Vector3 right = raylibcpp::Vector3Wrap::normalize(raylibcpp::Vector3Wrap::cross(forward, camUp));
-        if (raylibcpp::Input::isKeyDown(KEY_W)) camPos = raylibcpp::Vector3Wrap::add(camPos, raylibcpp::Vector3Wrap::scale(forward, moveSpeed));
-        if (raylibcpp::Input::isKeyDown(KEY_S)) camPos = raylibcpp::Vector3Wrap::sub(camPos, raylibcpp::Vector3Wrap::scale(forward, moveSpeed));
-        if (raylibcpp::Input::isKeyDown(KEY_A)) camPos = raylibcpp::Vector3Wrap::sub(camPos, raylibcpp::Vector3Wrap::scale(right, moveSpeed));
-        if (raylibcpp::Input::isKeyDown(KEY_D)) camPos = raylibcpp::Vector3Wrap::add(camPos, raylibcpp::Vector3Wrap::scale(right, moveSpeed));
-        Vector2 mouseDelta = GetMouseDelta();
-        Matrix rotY = MatrixRotateY(-mouseDelta.x * rotSpeed);
-        Matrix rotX = MatrixRotate(raylibcpp::Vector3Wrap::cross(right, camUp), -mouseDelta.y * rotSpeed);
-        Vector3 camDir = raylibcpp::Vector3Wrap::sub(camTarget, camPos);
-        camDir = raylibcpp::Vector3Wrap::transform(camDir, rotY);
-        camDir = raylibcpp::Vector3Wrap::transform(camDir, rotX);
-        camTarget = raylibcpp::Vector3Wrap::add(camPos, camDir);
-
-        window.beginDrawing();
-        window.clear(RAYWHITE);
-        camera.beginMode();
-        raylibcpp::Shape::drawGrid(20, 1.0f);
-        model.draw(objPos.get(), 1.0f, WHITE);
-        camera.endMode();
-        font.drawText("ZQSD: Camera | Souris: Regarder", 10, 10, 20, DARKGRAY);
-        window.endDrawing();
+    RayLib gfx;
+    gfx.InitWindow(800, 600, "Demo RaylibCPP");
+    gfx.CreateCamera3D({0,10,10}, {0,0,0}, {0,1,0}, 45.0f, 0);
+    while (!gfx.WindowShouldClose()) {
+        gfx.BeginDrawing();
+        gfx.ClearBackground({255,255,255,255});
+        gfx.BeginCamera3D();
+        gfx.DrawCube({0,0,0}, 2,2,2, {255,0,0,255});
+        gfx.EndCamera3D();
+        gfx.EndDrawing();
     }
+    gfx.CloseWindow();
     return 0;
 }
 ```
 
-## Dépendances
-- raylib (https://www.raylib.com/)
+## Intégration dynamique (DLLoader)
 
-## Compilation
+Cette bibliothèque est conçue pour être chargée dynamiquement via le système DLLoader de Zappy.
 
-```sh
-g++ -std=c++20 -I. -Ilibs/RaylibCPP \
-    libs/RaylibCPP/test_raylibcpp.cpp \
-    libs/RaylibCPP/window/Window.cpp \
-    libs/RaylibCPP/font/Font.cpp \
-    libs/RaylibCPP/texture/Texture.cpp \
-    libs/RaylibCPP/shape/Shape.cpp \
-    libs/RaylibCPP/input/Input.cpp \
-    libs/RaylibCPP/utils/Utils.cpp \
-    libs/RaylibCPP/camera/Camera.cpp \
-    -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 \
-    -o test_raylibcpp
+- Implémente l'interface `IGraphicsLib` (voir `src/Shared/IGraphicsLib.hpp`).
+- Exporte la fonction suivante pour l'intégration dynamique :
+
+```cpp
+extern "C" {
+    std::shared_ptr<IGraphicsLib> createGraphicsLib();
+}
 ```
 
-Adaptez les flags selon votre système.
+- À compiler en bibliothèque partagée (`libraylibcpp.so`) et placer dans le dossier `plugins/`.
+- À charger via le `LibraryManager` de Zappy (voir README dans `src/Shared/`).
 
-## Extension
-Ajoutez d'autres classes pour encapsuler davantage de fonctionnalités raylib (sons, polices, modèles, etc).
+## Exemple d'utilisation avec DLLoader
+
+Voir `src/GUI/test_dlloader.cpp` pour un exemple d'utilisation dynamique.
+
+## Notes avancées
+- Toute nouvelle fonctionnalité Raylib doit être encapsulée dans une classe dédiée (voir structure du dossier).
+- Pour étendre, suivez le modèle des classes existantes et exposez les méthodes via l'interface.
+
+---
+Pour toute question, contactez l'équipe Zappy !

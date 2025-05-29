@@ -18,6 +18,7 @@
 #include "font/Font.hpp"
 #include "input/Input.hpp"
 #include "audio/Audio.hpp"
+#include "camera/Camera.hpp"
 
 class RayLib : public IGraphicsLib {
 public:
@@ -66,11 +67,31 @@ public:
     void SetMusicVolume(float volume) override;
     void UpdateMusic() override;
 
+    // Caméras
+    void CreateCamera2D() override;
+    void CreateCamera3D(ZappyTypes::Vector3 position, ZappyTypes::Vector3 target, ZappyTypes::Vector3 up, float fovy, int projection) override;
+    void BeginCamera3D() override;
+    void EndCamera3D() override;
+
+    // Textures 3D
+    void LoadTexture3D(const std::string& path) override;
+    void BindTexture3D(int unit = 0) override;
+    void UnloadTexture3D() override;
+
+    // Modèles 3D
+    void LoadModel3D(const std::string& path) override;
+    void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override;
+    void UnloadModel3D() override;
+
 private:
     std::unique_ptr<raylibcpp::Window> _window;
     std::optional<raylibcpp::Texture> _texture;
     std::optional<raylibcpp::Font> _font;
     std::optional<raylibcpp::SoundWrap> _sound;
     std::optional<raylibcpp::MusicWrap> _music;
+    std::optional<raylibcpp::Camera2DWrap> _camera2D;
+    std::optional<raylibcpp::Camera3DWrap> _camera3D;
+    std::optional<raylibcpp::Texture3DWrap> _texture3D;
+    std::optional<raylibcpp::ModelWrap> _model3D;
     bool _initialized = false;
 };

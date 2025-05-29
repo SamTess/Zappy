@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 #include "RayLib.hpp"
 #include "../TypeAdapter.hpp"
 
@@ -160,6 +161,72 @@ void RayLib::SetMusicVolume(float volume) {
 void RayLib::UpdateMusic() {
     if (_music)
         _music->update();
+}
+
+// Caméras
+void RayLib::CreateCamera2D() {
+    _camera2D.emplace();
+}
+
+void RayLib::CreateCamera3D(ZappyTypes::Vector3 position, ZappyTypes::Vector3 target,
+    ZappyTypes::Vector3 up, float fovy, int projection) {
+    try {
+        Vector3 rayPos = TypeAdapter::ToRaylib(position);
+        Vector3 rayTarget = TypeAdapter::ToRaylib(target);
+        Vector3 rayUp = TypeAdapter::ToRaylib(up);
+        _camera3D = raylibcpp::Camera3DWrap(rayPos, rayTarget, rayUp, fovy, projection);
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur création caméra 3D: " << e.what() << std::endl;
+        throw;
+    }
+}
+
+void RayLib::BeginCamera3D() {
+    if (_camera3D.has_value()) {
+        try {
+            _camera3D->beginMode();
+        } catch (const std::exception& e) {
+            std::cerr << "Erreur BeginCamera3D: " << e.what() << std::endl;
+        }
+    }
+}
+
+void RayLib::EndCamera3D() {
+    if (_camera3D.has_value()) {
+        try {
+            _camera3D->endMode();
+        } catch (const std::exception& e) {
+            std::cerr << "Erreur EndCamera3D: " << e.what() << std::endl;
+        }
+    }
+}
+
+// Textures 3D
+void RayLib::LoadTexture3D(const std::string& path) {
+    _texture3D.emplace(path);
+}
+
+void RayLib::BindTexture3D(int unit) {
+    if (_texture3D)
+        _texture3D->bind(unit);
+}
+
+void RayLib::UnloadTexture3D() {
+    _texture3D.reset();
+}
+
+// Modèles 3D
+void RayLib::LoadModel3D(const std::string& path) {
+    _model3D.emplace(path);
+}
+
+void RayLib::DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
+    if (_model3D)
+        _model3D->draw(TypeAdapter::ToRaylib(position), scale, TypeAdapter::ToRaylib(color));
+}
+
+void RayLib::UnloadModel3D() {
+    _model3D.reset();
 }
 
 extern "C" {
