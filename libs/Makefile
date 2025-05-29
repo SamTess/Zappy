@@ -49,7 +49,14 @@ $(BUILD_DIR)/Audio.o: $(RAYLIB_DIR)/audio/Audio.cpp | $(BUILD_DIR)
 	@echo -e "$(YELLOW)Compilation Audio.cpp...$(RESET)"
 	@$(CXX) -c $(CXXFLAGS) $< -o $@
 
-$(PLUGINS_DIR)/libraylibcpp.so: $(BUILD_DIR)/RayLib.o $(BUILD_DIR)/Window.o $(BUILD_DIR)/Shape.o $(BUILD_DIR)/Texture.o $(BUILD_DIR)/Font.o $(BUILD_DIR)/Input.o $(BUILD_DIR)/Audio.o | $(PLUGINS_DIR)
+$(BUILD_DIR)/Camera.o: $(RAYLIB_DIR)/camera/Camera.cpp | $(BUILD_DIR)
+	@echo -e "$(YELLOW)Compilation Camera.cpp...$(RESET)"
+	@$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(PLUGINS_DIR)/libraylibcpp.so: $(BUILD_DIR)/RayLib.o $(BUILD_DIR)/Window.o \
+	$(BUILD_DIR)/Shape.o $(BUILD_DIR)/Texture.o $(BUILD_DIR)/Font.o \
+	$(BUILD_DIR)/Input.o $(BUILD_DIR)/Audio.o \
+	$(BUILD_DIR)/Camera.o | $(PLUGINS_DIR)
 	@echo -e "$(BLUE)Linkage de libraylibcpp.so...$(RESET)"
 	@$(CXX) $(CXXFLAGS) -o $@ $^ -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 	@echo -e "$(GREEN)[OK] libraylibcpp.so généré dans plugins.$(RESET)"
