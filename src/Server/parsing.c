@@ -41,8 +41,9 @@ static int parse_coordinates(char **av, int i, parsing_info_t *parsed_info)
     if (check_zero(av[i + 1]))
         parsing_error("coordinates arg can't be null", parsed_info);
     res = atoi(av[i + 1]);
-    if (res < 1)
-        parsing_error("coordinates can't be less than 1", parsed_info);
+    if (res < 1 || res > 100)
+        parsing_error("coordinates can't be less than 1 and more than 100",
+            parsed_info);
     return res;
 }
 
