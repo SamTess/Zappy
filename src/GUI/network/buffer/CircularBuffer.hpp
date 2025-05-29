@@ -13,7 +13,7 @@
 
 class CircularBuffer {
     public:
-        CircularBuffer(size_t capacity = 10);
+        explicit CircularBuffer(size_t capacity = 10);
         ~CircularBuffer() = default;
 
         void write(const char* data, size_t size);
@@ -22,6 +22,7 @@ class CircularBuffer {
         bool isEmpty() const;
         bool isFull() const;
         void clear();
+        void resize(size_t newCapacity);
 
     private:
         std::vector<char> _buffer;
