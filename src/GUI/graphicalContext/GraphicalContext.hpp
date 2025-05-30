@@ -8,15 +8,17 @@
 #ifndef GRAPHICAL_CONTEXT_HPP_
 #define GRAPHICAL_CONTEXT_HPP_
 
-#include "../network/protocol/Message.hpp"
-#include "../network/protocol/messageData/MessageDataAll.hpp"
-#include "../network/protocol/HeaderMessage.hpp"
-
 #include <map>
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <functional>
+#include <string>
+
+#include "../network/protocol/Message.hpp"
+#include "../network/protocol/messageData/MessageDataAll.hpp"
+#include "../network/protocol/HeaderMessage.hpp"
+
 
 class GraphicalContext {
 public:
@@ -27,7 +29,6 @@ public:
     void updateContext(const Message& message);
 
 private:
-
     void updateMapSize(std::shared_ptr<MapSizeData> data);
     void updateTileContent(std::shared_ptr<TileContentData> data);
     void updateTeamName(std::shared_ptr<TeamNameData> data);

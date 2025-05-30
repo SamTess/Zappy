@@ -8,8 +8,8 @@
 #ifndef BROADCAST_DATA_HPP_
 #define BROADCAST_DATA_HPP_
 
-#include "IMessageData.hpp"
 #include <string>
+#include "IMessageData.hpp"
 
 class BroadcastData : public IMessageData {
     public:

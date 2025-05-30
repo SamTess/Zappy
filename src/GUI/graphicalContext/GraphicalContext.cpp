@@ -5,10 +5,10 @@
 ** GraphicalContext
 */
 
+#include <iostream>
 #include "GraphicalContext.hpp"
 
-GraphicalContext::GraphicalContext()
-{
+GraphicalContext::GraphicalContext() {
     _updateFunctions = {
         {MessageType::MapSize, [this](std::shared_ptr<IMessageData> data)
             { updateMapSize(std::static_pointer_cast<MapSizeData>(data)); }},
@@ -36,8 +36,7 @@ GraphicalContext::GraphicalContext()
 }
 
 
-void GraphicalContext::updateContext(const Message& message)
-{
+void GraphicalContext::updateContext(const Message& message) {
     MessageType data;
 
     if (!message.getStructuredData()) {
@@ -53,13 +52,11 @@ void GraphicalContext::updateContext(const Message& message)
     }
 }
 
-void GraphicalContext::updateMapSize(std::shared_ptr<MapSizeData> data)
-{
+void GraphicalContext::updateMapSize(std::shared_ptr<MapSizeData> data) {
     std::cout << "Map size updated to: " << data->getWidth() << "x" << data->getHeight() << std::endl;
 }
 
-void GraphicalContext::updateTileContent(std::shared_ptr<TileContentData> data)
-{
+void GraphicalContext::updateTileContent(std::shared_ptr<TileContentData> data) {
     std::cout << "Tile at (" << data->getX() << "," << data->getY() << ") has resources: "
               << "Food: " << data->getFood() << ", "
               << "Linemate: " << data->getLinemate() << ", "
@@ -70,8 +67,7 @@ void GraphicalContext::updateTileContent(std::shared_ptr<TileContentData> data)
               << "Thystame: " << data->getThystame() << std::endl;
 }
 
-void GraphicalContext::updateTeamName(std::shared_ptr<TeamNameData> data)
-{
+void GraphicalContext::updateTeamName(std::shared_ptr<TeamNameData> data) {
     _teamNames = data->getNames();
     std::cout << "Team names updated: ";
     for (const auto& name : _teamNames) {
@@ -80,96 +76,80 @@ void GraphicalContext::updateTeamName(std::shared_ptr<TeamNameData> data)
     std::cout << std::endl;
 }
 
-void GraphicalContext::updatePlayerInfo(std::shared_ptr<PlayerInfoData> data)
-{
+void GraphicalContext::updatePlayerInfo(std::shared_ptr<PlayerInfoData> data) {
     _players[data->getId()] = *data;
     std::cout << "Player " << data->getId() << " (" << data->getTeamName() << ") at position ("
               << data->getX() << "," << data->getY() << ") with orientation " << data->getOrientation()
               << " and level " << data->getLevel() << std::endl;
 }
 
-void GraphicalContext::updatePlayerInventory(std::shared_ptr<PlayerInventoryData> data)
-{
+void GraphicalContext::updatePlayerInventory(std::shared_ptr<PlayerInventoryData> data) {
     _inventories[data->getId()] = *data;
     std::cout << "Updated inventory for player " << data->getId() << std::endl;
 }
 
-void GraphicalContext::updatePlayerExpulsion(std::shared_ptr<PlayerInfoData> data)
-{
+void GraphicalContext::updatePlayerExpulsion(std::shared_ptr<PlayerInfoData> data) {
     std::cout << "Player " << data->getId() << " expelled" << std::endl;
 }
 
-void GraphicalContext::updatePlayerBroadcast(std::shared_ptr<BroadcastData> data)
-{
+void GraphicalContext::updatePlayerBroadcast(std::shared_ptr<BroadcastData> data) {
     std::cout << "Player " << data->getPlayerId() << " broadcast: " << data->getMessage() << std::endl;
 }
 
-void GraphicalContext::updateResourceDrop(std::shared_ptr<ResourceData> data)
-{
+void GraphicalContext::updateResourceDrop(std::shared_ptr<ResourceData> data) {
     std::cout << "Player " << data->getPlayerId() << " dropped resource type " << data->getResourceType() << std::endl;
 }
 
-void GraphicalContext::updateResourceCollect(std::shared_ptr<ResourceData> data)
-{
+void GraphicalContext::updateResourceCollect(std::shared_ptr<ResourceData> data) {
     std::cout << "Player " << data->getPlayerId() << " collected resource type " << data->getResourceType() << std::endl;
 }
 
-void GraphicalContext::updatePlayerDeath(std::shared_ptr<PlayerInfoData> data)
-{
+void GraphicalContext::updatePlayerDeath(std::shared_ptr<PlayerInfoData> data) {
     std::cout << "Player " << data->getId() << " died" << std::endl;
     _players.erase(data->getId());
     _inventories.erase(data->getId());
 }
 
-void GraphicalContext::updateIncantationStart(std::shared_ptr<IncantationData> data)
-{
+void GraphicalContext::updateIncantationStart(std::shared_ptr<IncantationData> data) {
     std::cout << "Incantation started at (" << data->getX() << "," << data->getY() << ") for level " << data->getLevel() << std::endl;
 }
 
-void GraphicalContext::updateIncantationEnd(std::shared_ptr<IncantationEndData> data)
-{
+void GraphicalContext::updateIncantationEnd(std::shared_ptr<IncantationEndData> data) {
     std::cout << "Incantation at (" << data->getX() << "," << data->getY() << ") ended with "
               << (data->isSuccess() ? "success" : "failure") << std::endl;
 }
 
-void GraphicalContext::updateEggLaying(std::shared_ptr<EggData> data)
-{
+void GraphicalContext::updateEggLaying(std::shared_ptr<EggData> data) {
     std::cout << "Player " << data->getPlayerId() << " is laying an egg" << std::endl;
 }
 
-void GraphicalContext::updateEggDrop(std::shared_ptr<EggData> data)
-{
+void GraphicalContext::updateEggDrop(std::shared_ptr<EggData> data) {
     _eggs[data->getEggId()] = *data;
     std::cout << "Egg " << data->getEggId() << " laid by player " << data->getPlayerId() << " at ("
               << data->getX() << "," << data->getY() << ")" << std::endl;
 }
 
-void GraphicalContext::updateEggConnection(std::shared_ptr<EggData> data)
-{
+void GraphicalContext::updateEggConnection(std::shared_ptr<EggData> data) {
     std::cout << "Player connected from egg " << data->getEggId() << std::endl;
     _eggs.erase(data->getEggId());
 }
 
-void GraphicalContext::updateEggDeath(std::shared_ptr<EggData> data)
-{
+void GraphicalContext::updateEggDeath(std::shared_ptr<EggData> data) {
     std::cout << "Egg " << data->getEggId() << " died" << std::endl;
     _eggs.erase(data->getEggId());
 }
 
-void GraphicalContext::updateTimeUnit(std::shared_ptr<TimeUnitData> data)
-{
+void GraphicalContext::updateTimeUnit(std::shared_ptr<TimeUnitData> data) {
     _timeUnit = data->getTimeUnit();
     std::cout << "Time unit updated to: " << _timeUnit << std::endl;
 }
 
-void GraphicalContext::updateEndGame(std::shared_ptr<EndGameData> data)
-{
+void GraphicalContext::updateEndGame(std::shared_ptr<EndGameData> data) {
     _gameEnded = true;
     _winningTeam = data->getTeamName();
     std::cout << "Game ended. Winning team: " << _winningTeam << std::endl;
 }
 
-void GraphicalContext::updateServerMessage(std::shared_ptr<ServerMessageData> data)
-{
+void GraphicalContext::updateServerMessage(std::shared_ptr<ServerMessageData> data) {
     std::cout << "Server message: " << data->getMessage() << std::endl;
 }

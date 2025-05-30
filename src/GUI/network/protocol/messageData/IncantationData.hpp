@@ -8,8 +8,8 @@
 #ifndef INCANTATION_DATA_HPP_
 #define INCANTATION_DATA_HPP_
 
-#include "IMessageData.hpp"
 #include <vector>
+#include "IMessageData.hpp"
 
 class IncantationData : public IMessageData {
     public:

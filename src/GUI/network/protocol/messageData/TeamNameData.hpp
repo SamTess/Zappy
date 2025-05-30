@@ -8,9 +8,9 @@
 #ifndef TEAM_NAME_DATA_HPP_
 #define TEAM_NAME_DATA_HPP_
 
-#include "IMessageData.hpp"
 #include <string>
 #include <vector>
+#include "IMessageData.hpp"
 
 class TeamNameData : public IMessageData {
     public:

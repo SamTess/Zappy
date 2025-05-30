@@ -8,8 +8,8 @@
 #ifndef END_GAME_DATA_HPP_
 #define END_GAME_DATA_HPP_
 
-#include "IMessageData.hpp"
 #include <string>
+#include "IMessageData.hpp"
 
 class EndGameData : public IMessageData {
     public:

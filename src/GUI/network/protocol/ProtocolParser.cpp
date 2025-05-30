@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <vector>
 #include <string>
+#include <memory>
 
 ProtocolParser::ProtocolParser() {
     _headerHandlers = {

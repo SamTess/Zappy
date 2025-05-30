@@ -8,8 +8,8 @@
 #ifndef SERVER_MESSAGE_DATA_HPP_
 #define SERVER_MESSAGE_DATA_HPP_
 
-#include "IMessageData.hpp"
 #include <string>
+#include "IMessageData.hpp"
 
 class ServerMessageData : public IMessageData {
     public:

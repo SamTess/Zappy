@@ -8,8 +8,8 @@
 #ifndef PLAYER_INFO_DATA_HPP_
 #define PLAYER_INFO_DATA_HPP_
 
-#include "IMessageData.hpp"
 #include <string>
+#include "IMessageData.hpp"
 
 class PlayerInfoData : public IMessageData {
     public:

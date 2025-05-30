@@ -8,10 +8,10 @@
 #ifndef MESSAGE_HPP_
 #define MESSAGE_HPP_
 
-#include "messageData/MessageDataAll.hpp"
 #include <string>
 #include <memory>
 #include <vector>
+#include "messageData/MessageDataAll.hpp"
 #include "HeaderMessage.hpp"
 
 class Message {

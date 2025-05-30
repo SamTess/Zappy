@@ -11,6 +11,7 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
+#include <memory>
 
 Message::Message() {
     std::cout << "creating empty message" << std::endl;
