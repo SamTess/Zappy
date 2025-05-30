@@ -11,26 +11,32 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <utility>
+#include <memory>
+#include <functional>
+#include "../buffer/CircularBuffer.hpp"
 #include "Message.hpp"
 #include "HeaderMessage.hpp"
 #include "../../shared/exception/AException.hpp"
 
 class ProtocolParser {
     public:
-        typedef Message (ProtocolParser::*ParseFunction)(const std::string &);
+        typedef std::function<Message(const std::string&)> ParseFunction;
 
         ProtocolParser();
         ~ProtocolParser() = default;
 
+        std::string extractMessage(std::shared_ptr<CircularBuffer> buffer);
         Message parseMessage(const std::string &message);
+        std::pair<std::string, std::string> parseMessage(const std::string &message) const;
         std::string getCommandName(const std::string &message);
-        bool isValidHeader(const std::string &message);
         bool messageComplete(const std::string &buffer);
         std::vector<std::string> splitMessage(const std::string &message);
         std::vector<std::string> extractMessageParameters(const std::string &message);
         int parseIntParameter(const std::string &param);
 
         void handleProtocol(const std::string &protocol);
+
         // Parsing des informations de la map
         Message parseMapSize(const std::string &message);          // msz X Y\n
         Message parseTileContent(const std::string &message);      // bct X Y q0-q6
@@ -49,33 +55,35 @@ class ProtocolParser {
         Message parsePlayerDeath(const std::string &message);      // pdi
 
         // Parsing des ressources
-        Message parseRessourceDrop(const std::string &message);   // pdr
-        Message parseRessourceCollect(const std::string &message); // pgt
+        Message parseRessourceDrop(const std::string &message);     // pdr
+        Message parseRessourceCollect(const std::string &message);  // pgt
 
         // Parsing des incantations
         Message parseIncantationStart(const std::string &message); // pic
         Message parseIncantationEnd(const std::string &message);   // pie
 
         // Parsing des oeufs
-        Message parseEggLaying(const std::string &message);        // pfk
-        Message parseEggDrop(const std::string &message);          // enw
+        Message parseEggDrop(const std::string &message);         // enw
         Message parseEggConnection(const std::string &message);    // ebo
-        Message parseEggDeath(const std::string &message);         // edi
+        Message parseEggDeath(const std::string &message);        // edi
+        Message parseEggLaying(const std::string &message);        // pfk
 
-        // Autres messages
-        Message parseTimeUnit(const std::string &message);         // sgt/sst
-        Message parseEndGame(const std::string &message);          // seg
-        Message parseServerMessage(const std::string &message);    // smg
-        Message parseUnknownCommand(const std::string &message);   // suc
+        // Parsing du temps
+        Message parseTimeUnit(const std::string &message);        // sgt/sst
+
+        // Parsing de la fin de partie
+        Message parseEndGame(const std::string &message);         // seg
+
+        // Messages serveur
+        Message parseServerMessage(const std::string &message);   // smg
+        Message parseUnknownCommand(const std::string &message);  // suc/sbp
 
     private:
-        Message _currentMessage;
         std::map<std::string, ParseFunction> _headerHandlers;
-
         class ProtocolParserException : public AException {
             public:
                 explicit ProtocolParserException(const std::string &message)
-                : AException("ProtocolParserException", message) {}
+                    : AException("ProtocolParserException", message) {}
         };
 };
 

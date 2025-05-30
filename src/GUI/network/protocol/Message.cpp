@@ -27,6 +27,21 @@ Message::Message(std::string header, std::string data) {
     _messageType = HeaderMessage::UNKNOWN;
 }
 
+Message::Message(MessageType type) {
+    _messageString = "";
+    _messageHeader = "";
+    _messageData = "";
+    _messageType = HeaderMessage::UNKNOWN;
+}
+
+void Message::addIntParam(int value) {
+    _parameters.push_back(std::to_string(value));
+}
+
+void Message::addStringParam(const std::string &value) {
+    _parameters.push_back(value);
+}
+
 void Message::setMessage(const std::string &data) {
     _messageString = data;
 }

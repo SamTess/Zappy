@@ -13,6 +13,8 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <atomic>
+#include <condition_variable>
 #include "../connection/TcpConnection.hpp"
 #include "../protocol/ProtocolParser.hpp"
 #include "../protocol/HeaderMessage.hpp"
@@ -30,24 +32,36 @@ class NetworkManager {
         bool connect(const std::string& host, int port);
         void disconnect();
         bool isConnected() const;
-
         void sendCommand(const std::string& command);
         void processIncomingMessages();
+        void addObserver(NetworkObserver* observer);
+        void removeObserver(NetworkObserver* observer);
 
     private:
-        std::unique_ptr<TcpConnection> _connection;
-        std::unique_ptr<ProtocolParser> _protocolParser;
-        std::unique_ptr<NetworkThread> _networkThread;
-        std::unique_ptr<MessageQueue> _incomingQueue;
-        std::unique_ptr<CircularBuffer> _receiveBuffer;
+        std::shared_ptr<TcpConnection> _connection;
+        std::shared_ptr<ProtocolParser> _protocolParser;
+        std::shared_ptr<NetworkThread> _networkThread;
+        std::shared_ptr<MessageQueue> _incomingQueue;
+        std::shared_ptr<CircularBuffer> _receiveBuffer;
 
-        bool _isConnected;
-        std::mutex _logMutex;
+        std::atomic<bool> _isConnected;
+        mutable std::mutex _mutex;
+        std::condition_variable _cv;
 
         std::vector<NetworkObserver*> _observers;
+        mutable std::mutex _observersMutex;
 
         void networkThreadLoop();
         void processIncomingMessage(const std::string& message);
+        void notifyObservers(const std::string& header, const std::string& data);
+};
+
+// Interface Observer pour recevoir des notifications
+class NetworkObserver {
+    public:
+        virtual ~NetworkObserver() = default;
+        virtual void onMessage(const std::string& header, const std::string& data) = 0;
+        virtual void onConnectionStatusChanged(bool connected) = 0;
 };
 
 #endif /* !NETWORKMANAGER_HPP_ */
