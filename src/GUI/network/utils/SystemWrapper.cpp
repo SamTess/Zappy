@@ -130,7 +130,6 @@ int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout) {
     for (const auto& pfd : pollfds)
         rawPollfds.push_back(pfd.getPollFd());
     int result = poll(rawPollfds.data(), rawPollfds.size(), timeout);
-    // Impossible de modifier revents ici car pollfds est const, mais c'est le prix à payer pour respecter le linter.
     return result;
 }
 

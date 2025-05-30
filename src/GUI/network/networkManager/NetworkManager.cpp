@@ -72,7 +72,7 @@ void NetworkManager::disconnect() {
 }
 
 bool NetworkManager::isConnected() const {
-    return _isConnected;
+    return _isConnected && _connection->isConnected();
 }
 
 void NetworkManager::sendCommand(const std::string& command) {
@@ -91,8 +91,6 @@ void NetworkManager::sendCommand(const std::string& command) {
 }
 
 void NetworkManager::networkThreadLoop() {
-    const int maxBufferSize = 4096;
-    auto buffer = std::make_unique<SystemWrapper::SafeBuffer>(maxBufferSize);
     while (_networkThread->isRunning() && _isConnected) {
         try {
             if (_connection->hasData()) {
