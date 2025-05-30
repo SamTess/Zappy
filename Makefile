@@ -18,7 +18,7 @@ AI_DIR=src/AI
 TESTS_DIR=tests
 BUILD_DIR=build
 DOCS_DIR=docs
-
+PLUGINS_DIR=plugins
 # Documentation
 DOCS_NAME=ZappyDocumation
 
@@ -106,6 +106,7 @@ fclean: clean
 	@rm -f *.html
 	@rm -f *.css
 	@rm -f *.js
+	@rm -rf $(PLUGINS_DIR)/*.so
 
 re: fclean all
 
@@ -142,6 +143,7 @@ style_cpp: fclean
 	@python3 tools/cpplint.py $(GUI_DIR)
 	@echo "$(GREEN)Cpplint checks done$(RESET)"
 
-.PHONY: all zappy_server zappy_gui zappy_ai tests tests_run debug install_ai init clean fclean re \
+.PHONY: all zappy_server zappy_gui zappy_ai tests tests_run \
+debug install_ai init clean fclean re \
 docs docusaurus-build docusaurus-serve docusaurus-start docusaurus-deploy \
 style style_cpp

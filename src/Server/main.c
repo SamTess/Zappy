@@ -41,10 +41,10 @@ static void disp_args(parsing_info_t *parsed_info)
     printf("\n");
 }
 
-static void server_loop(server_t *server)
+static void server_loop(server_t *server, parsing_info_t *parsed_info)
 {
     while (1) {
-        check_client(server);
+        check_client(server, parsed_info);
     }
     close(server->s_fd);
 }
@@ -79,6 +79,6 @@ int main(int ac, char **av)
     create_server(&server, &parsed_info);
     set_rdm_seed();
     create_map(&server, &parsed_info);
-    server_loop(&server);
+    server_loop(&server, &parsed_info);
     return 0;
 }
