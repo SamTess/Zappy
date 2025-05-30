@@ -22,32 +22,32 @@
 
 class GraphicalContext {
 public:
-    typedef std::function<void(std::shared_ptr<IMessageData>)> UpdateFunction;
+    typedef void (GraphicalContext::*UpdateFunction)(std::shared_ptr<IMessageData>);
     GraphicalContext();
     ~GraphicalContext() = default;
 
     void updateContext(const Message& message);
 
 private:
-    void updateMapSize(std::shared_ptr<MapSizeData> data);
-    void updateTileContent(std::shared_ptr<TileContentData> data);
-    void updateTeamName(std::shared_ptr<TeamNameData> data);
-    void updatePlayerInfo(std::shared_ptr<PlayerInfoData> data);
-    void updatePlayerInventory(std::shared_ptr<PlayerInventoryData> data);
-    void updatePlayerExpulsion(std::shared_ptr<PlayerInfoData> data);
-    void updatePlayerBroadcast(std::shared_ptr<BroadcastData> data);
-    void updateResourceDrop(std::shared_ptr<ResourceData> data);
-    void updateResourceCollect(std::shared_ptr<ResourceData> data);
-    void updatePlayerDeath(std::shared_ptr<PlayerInfoData> data);
-    void updateIncantationStart(std::shared_ptr<IncantationData> data);
-    void updateIncantationEnd(std::shared_ptr<IncantationEndData> data);
-    void updateEggLaying(std::shared_ptr<EggData> data);
-    void updateEggDrop(std::shared_ptr<EggData> data);
-    void updateEggConnection(std::shared_ptr<EggData> data);
-    void updateEggDeath(std::shared_ptr<EggData> data);
-    void updateTimeUnit(std::shared_ptr<TimeUnitData> data);
-    void updateEndGame(std::shared_ptr<EndGameData> data);
-    void updateServerMessage(std::shared_ptr<ServerMessageData> data);
+    void updateMapSize(std::shared_ptr<IMessageData> data);
+    void updateTileContent(std::shared_ptr<IMessageData> data);
+    void updateTeamName(std::shared_ptr<IMessageData> data);
+    void updatePlayerInfo(std::shared_ptr<IMessageData> data);
+    void updatePlayerInventory(std::shared_ptr<IMessageData> data);
+    void updatePlayerExpulsion(std::shared_ptr<IMessageData> data);
+    void updatePlayerBroadcast(std::shared_ptr<IMessageData> data);
+    void updateResourceDrop(std::shared_ptr<IMessageData> data);
+    void updateResourceCollect(std::shared_ptr<IMessageData> data);
+    void updatePlayerDeath(std::shared_ptr<IMessageData> data);
+    void updateIncantationStart(std::shared_ptr<IMessageData> data);
+    void updateIncantationEnd(std::shared_ptr<IMessageData> data);
+    void updateEggLaying(std::shared_ptr<IMessageData> data);
+    void updateEggDrop(std::shared_ptr<IMessageData> data);
+    void updateEggConnection(std::shared_ptr<IMessageData> data);
+    void updateEggDeath(std::shared_ptr<IMessageData> data);
+    void updateTimeUnit(std::shared_ptr<IMessageData> data);
+    void updateEndGame(std::shared_ptr<IMessageData> data);
+    void updateServerMessage(std::shared_ptr<IMessageData> data);
 
 
     std::vector<std::string> _teamNames;
