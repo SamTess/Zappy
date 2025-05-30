@@ -53,7 +53,7 @@ void TcpConnection::connect(const std::string &host, int port) {
             throw TcpConnectionException("Connection timeout or poll error");
         }
         int error = 0;
-        if (SystemWrapper::getSocketOption(_socket, SOL_SOCKET, SO_ERROR, error) < 0 || error != 0) {
+        if (SystemWrapper::getSocketOption(_socket, SOL_SOCKET, SO_ERROR, &error) < 0 || error != 0) {
             close();
             throw TcpConnectionException("Connection failed: " + std::string(strerror(error)));
         }
@@ -102,7 +102,7 @@ std::string TcpConnection::receive() {
     if (!(_pollfd->getRevents() & POLLIN))
         throw TcpConnectionException("No data available");
 
-    ssize_t bytesReceived = SystemWrapper::readSocket(_socket, *_recvBuffer, _recvBuffer->size() - 1);
+    ssize_t bytesReceived = SystemWrapper::readSocket(_socket, _recvBuffer.get(), _recvBuffer->size() - 1);
     if (bytesReceived < 0) {
         if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
             return "";

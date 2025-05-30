@@ -154,137 +154,160 @@ Message ProtocolParser::parseMapSize(const std::string &message) {
 }
 
 Message ProtocolParser::parseTileContent(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::TILE_CONTENT);
     return msg;
 }
 
 Message ProtocolParser::parseAllTilesContent(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::ALL_TILES_CONTENT);
     return msg;
 }
 
 Message ProtocolParser::parseTeamNames(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::TEAM_NAMES);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_CONNECTED);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerPosition(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_POSITION);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerLevel(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_LEVEL);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerInventory(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_INVENTORY);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerExpulsion(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_EXPELLED);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerBroadcast(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_BROADCAST);
     return msg;
 }
 
 Message ProtocolParser::parsePlayerDeath(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::PLAYER_DIED);
     return msg;
 }
 
 Message ProtocolParser::parseRessourceDrop(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::RESOURCE_DROPPED);
     return msg;
 }
 
 Message ProtocolParser::parseRessourceCollect(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::RESOURCE_COLLECTED);
     return msg;
 }
 
 Message ProtocolParser::parseIncantationStart(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::INCANTATION_STARTED);
     return msg;
 }
 
 Message ProtocolParser::parseIncantationEnd(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::INCANTATION_ENDED);
     return msg;
 }
 
 Message ProtocolParser::parseEggDrop(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::EGG_LAID);
     return msg;
 }
 
 Message ProtocolParser::parseEggConnection(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::EGG_HATCHED);
     return msg;
 }
 
 Message ProtocolParser::parseEggDeath(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::EGG_DIED);
     return msg;
 }
 
 Message ProtocolParser::parseEggLaying(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::EGG_LAYING);
     return msg;
 }
 
 Message ProtocolParser::parseTimeUnit(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::TIME_UNIT);
     return msg;
 }
 
 Message ProtocolParser::parseEndGame(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::GAME_ENDED);
     return msg;
 }
 
 Message ProtocolParser::parseServerMessage(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::SERVER_MESSAGE);
     return msg;
 }
 
 Message ProtocolParser::parseUnknownCommand(const std::string &message) {
+    (void)message;
     // TODO(Marin): Implement full parsing logic
     Message msg(Message::UNKNOWN_COMMAND);
     return msg;
 }
 
 void ProtocolParser::handleProtocol(const std::string &protocol) {
+    (void)protocol;
     // TODO(Marin): Implement protocol handling
 }

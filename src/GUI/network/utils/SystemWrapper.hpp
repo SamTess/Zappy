@@ -44,6 +44,7 @@ class SafePollFd {
             pollfd& getPollFd();
             const pollfd& getPollFd() const;
             pollfd* getPollPtr();
+            const pollfd* getPollPtr() const;
             int getFd() const;
             int16_t getEvents() const;
             int16_t getRevents() const;
@@ -64,7 +65,7 @@ int createSocket(int domain, int type, int protocol);
 class SafeBuffer;
 ssize_t readSocket(int fd, SafeBuffer* buffer, size_t count);
 ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count);
-int pollSocket(const SafePollFd& pollfd, int timeout);
+int pollSocket(SafePollFd& pfd, int timeout);
 int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout);
 template<typename T>
 int getSocketOption(int sockfd, int level, int optname, T* optval) {

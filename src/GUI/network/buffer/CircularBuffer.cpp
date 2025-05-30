@@ -40,21 +40,6 @@ void CircularBuffer::write(const SystemWrapper::SafeBuffer& buffer, size_t size)
     write(buffer.data().substr(0, std::min(size, buffer.size())));
 }
 
-size_t CircularBuffer::read(SystemWrapper::SafeBuffer* buffer, size_t maxSize) {
-    if (!buffer || isEmpty() || maxSize == 0)
-        return 0;
-    size_t bytesToRead = std::min({maxSize, _size, buffer->size()});
-    size_t bytesRead = 0;
-
-    while (bytesRead < bytesToRead) {
-        buffer->data()[bytesRead] = _buffer[_head];
-        _head = (_head + 1) % _capacity;
-        bytesRead++;
-    }
-    _size -= bytesRead;
-    return bytesRead;
-}
-
 std::string CircularBuffer::readString(size_t maxSize) {
     if (isEmpty() || maxSize == 0)
         return "";
@@ -76,20 +61,8 @@ SystemWrapper::SafeBuffer CircularBuffer::readSafeBuffer(size_t maxSize) {
     return buf;
 }
 
-size_t CircularBuffer::read(std::string* buffer, size_t maxSize) {
-    if (!buffer || isEmpty() || maxSize == 0)
-        return 0;
-    size_t bytesToRead = std::min(maxSize, _size);
-    buffer->resize(bytesToRead);
-    size_t bytesRead = 0;
-
-    while (bytesRead < bytesToRead) {
-        (*buffer)[bytesRead] = _buffer[_head];
-        _head = (_head + 1) % _capacity;
-        bytesRead++;
-    }
-    _size -= bytesRead;
-    return bytesRead;
+std::string CircularBuffer::readAsString(size_t maxSize) {
+    return readString(maxSize);
 }
 
 size_t CircularBuffer::available() const {

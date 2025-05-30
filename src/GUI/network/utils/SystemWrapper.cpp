@@ -60,6 +60,9 @@ const pollfd& SafePollFd::getPollFd() const {
 pollfd* SafePollFd::getPollPtr() {
     return &_pollfd;
 }
+const pollfd* SafePollFd::getPollPtr() const {
+    return &_pollfd;
+}
 
 int SafePollFd::getFd() const {
     return _pollfd.fd;
@@ -117,8 +120,8 @@ ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count) {
     return write(fd, buffer.data().c_str(), minSize);
 }
 
-int pollSocket(const SafePollFd& pollfd, int timeout) {
-    return poll(const_cast<pollfd*>(pollfd.getPollPtr()), 1, timeout);
+int pollSocket(SafePollFd& pfd, int timeout) {
+    return poll(pfd.getPollPtr(), 1, timeout);
 }
 
 int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout) {

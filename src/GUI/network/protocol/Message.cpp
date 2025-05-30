@@ -28,6 +28,7 @@ Message::Message(std::string header, std::string data) {
 }
 
 Message::Message(MessageType type) {
+    (void)type;
     _messageString = "";
     _messageHeader = "";
     _messageData = "";
