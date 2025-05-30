@@ -16,6 +16,8 @@ env:
   GITHUB_URL: git@github.com:EpitechPromo2028/B-YEP-400-NAN-4-1-zappy-samuel.tesson.git
   BINARIES: "zappy_gui, zappy_server"
   LIBRARIES: "libgui.a, libserver.a"
+  DYNAMIC: "libraygui.so, libraylibcpp.so"
+
 
 jobs:
   build:
@@ -31,7 +33,17 @@ jobs:
         timeout-minutes: 5
         run: |
           sudo apt-get update
-          sudo apt-get install -y make g++ libsfml-dev libcriterion-dev build-essential cmake gcovr
+          sudo apt-get install -y make g++ libsfml-dev libcriterion-dev build-essential cmake gcovr \
+            libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libgl1-mesa-dev \
+            libglu1-mesa-dev libasound2-dev libwayland-dev libxkbcommon-dev xorg-dev
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DBUILD_SHARED_LIBS=ON -DUSE_EXTERNAL_GLFW=OFF -DCMAKE_BUILD_TYPE=Release ..
+          make -j$(nproc)
+          sudo make install
+          cd ../..
+          sudo ldconfig
 
       - name: Build project
         timeout-minutes: 10
@@ -56,6 +68,7 @@ jobs:
       - name: Check Libraries
         timeout-minutes: 2
         run: |
+          # Vérification des bibliothèques statiques
           for library in $(echo ${{ env.LIBRARIES }} | tr "," "\n"); do
             if [ ! -f "./build/$library" ]; then
               echo "❌ Library $library not found in ./build"
@@ -65,6 +78,21 @@ jobs:
               exit 1
             else
               echo "✅ Library $library found in ./build"
+            fi
+          done
+
+      - name: Check Dynamic Libraries
+        timeout-minutes: 2
+        run: |
+          for library in $(echo ${{ env.DYNAMIC }} | tr "," "\n"); do
+            if [ ! -f "./plugins/$library" ]; then
+              echo "❌ Library $library not found in ./plugins"
+              exit 1
+            elif [[ ! "./plugins/$library" =~ \.(so|a|dylib)$ ]]; then
+              echo "❌ $library is not a recognized library file (expected .so, .a, or .dylib)"
+              exit 1
+            else
+              echo "✅ Library $library found in ./plugins"
             fi
           done
 
