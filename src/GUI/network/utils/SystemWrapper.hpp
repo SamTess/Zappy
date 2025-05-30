@@ -62,14 +62,14 @@ int createSocket(int domain, int type, int protocol);
     int setNonBlocking(int fd);
 
 class SafeBuffer;
-ssize_t readSocket(int fd, SafeBuffer& buffer, size_t count);
+ssize_t readSocket(int fd, SafeBuffer* buffer, size_t count);
 ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count);
-int pollSocket(SafePollFd& pollfd, int timeout);
-int pollSocket(std::vector<SafePollFd>& pollfds, int timeout);
+int pollSocket(const SafePollFd& pollfd, int timeout);
+int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout);
 template<typename T>
-int getSocketOption(int sockfd, int level, int optname, T& optval) {
+int getSocketOption(int sockfd, int level, int optname, T* optval) {
     socklen_t optlen = sizeof(T);
-    return getsockopt(sockfd, level, optname, &optval, &optlen);
+    return getsockopt(sockfd, level, optname, optval, &optlen);
 }
 bool inetPton(int af, const std::string& src, void* dst);
 std::string inetNtop(int af, const void* src);

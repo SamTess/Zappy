@@ -12,6 +12,7 @@
 #include <mutex>
 #include <utility>
 #include <string>
+#include <memory>
 #include "NetworkManager.hpp"
 #include "NetworkLogger.hpp"
 

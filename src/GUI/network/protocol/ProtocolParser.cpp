@@ -8,6 +8,7 @@
 #include "ProtocolParser.hpp"
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <stdexcept>
 #include <vector>
 #include <string>

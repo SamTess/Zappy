@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <utility>
 #include <memory>
+#include <string>
 
 CircularBuffer::CircularBuffer(size_t capacity)
     : _buffer(capacity, '\0'),
@@ -39,14 +40,14 @@ void CircularBuffer::write(const SystemWrapper::SafeBuffer& buffer, size_t size)
     write(buffer.data().substr(0, std::min(size, buffer.size())));
 }
 
-size_t CircularBuffer::read(SystemWrapper::SafeBuffer& buffer, size_t maxSize) {
-    if (isEmpty() || maxSize == 0)
+size_t CircularBuffer::read(SystemWrapper::SafeBuffer* buffer, size_t maxSize) {
+    if (!buffer || isEmpty() || maxSize == 0)
         return 0;
-    size_t bytesToRead = std::min({maxSize, _size, buffer.size()});
+    size_t bytesToRead = std::min({maxSize, _size, buffer->size()});
     size_t bytesRead = 0;
 
     while (bytesRead < bytesToRead) {
-        buffer.data()[bytesRead] = _buffer[_head];
+        buffer->data()[bytesRead] = _buffer[_head];
         _head = (_head + 1) % _capacity;
         bytesRead++;
     }
@@ -54,7 +55,7 @@ size_t CircularBuffer::read(SystemWrapper::SafeBuffer& buffer, size_t maxSize) {
     return bytesRead;
 }
 
-std::string CircularBuffer::readAsString(size_t maxSize) {
+std::string CircularBuffer::readString(size_t maxSize) {
     if (isEmpty() || maxSize == 0)
         return "";
     size_t bytesToRead = std::min(maxSize, _size);
@@ -68,15 +69,22 @@ std::string CircularBuffer::readAsString(size_t maxSize) {
     return result;
 }
 
-size_t CircularBuffer::read(std::string& buffer, size_t maxSize) {
-    if (isEmpty() || maxSize == 0)
+SystemWrapper::SafeBuffer CircularBuffer::readSafeBuffer(size_t maxSize) {
+    std::string str = readString(maxSize);
+    SystemWrapper::SafeBuffer buf(str.size());
+    buf.data() = str;
+    return buf;
+}
+
+size_t CircularBuffer::read(std::string* buffer, size_t maxSize) {
+    if (!buffer || isEmpty() || maxSize == 0)
         return 0;
     size_t bytesToRead = std::min(maxSize, _size);
-    buffer.resize(bytesToRead);
+    buffer->resize(bytesToRead);
     size_t bytesRead = 0;
 
     while (bytesRead < bytesToRead) {
-        buffer[bytesRead] = _buffer[_head];
+        (*buffer)[bytesRead] = _buffer[_head];
         _head = (_head + 1) % _capacity;
         bytesRead++;
     }

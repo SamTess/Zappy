@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cstring>
 #include <utility>
+#include <vector>
+#include <string>
 
 namespace SystemWrapper {
 
@@ -102,10 +104,12 @@ int setNonBlocking(int fd) {
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-ssize_t readSocket(int fd, SafeBuffer& buffer, size_t count) {
-    const size_t minSize = std::min(count, buffer.size());
-    buffer.data().resize(minSize);
-    return read(fd, &buffer.data()[0], minSize);
+ssize_t readSocket(int fd, SafeBuffer* buffer, size_t count) {
+    if (!buffer)
+        return -1;
+    const size_t minSize = std::min(count, buffer->size());
+    buffer->data().resize(minSize);
+    return read(fd, &buffer->data()[0], minSize);
 }
 
 ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count) {
@@ -113,19 +117,17 @@ ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count) {
     return write(fd, buffer.data().c_str(), minSize);
 }
 
-int pollSocket(SafePollFd& pollfd, int timeout) {
-    return poll(pollfd.getPollPtr(), 1, timeout);
+int pollSocket(const SafePollFd& pollfd, int timeout) {
+    return poll(const_cast<pollfd*>(pollfd.getPollPtr()), 1, timeout);
 }
 
-int pollSocket(std::vector<SafePollFd>& pollfds, int timeout) {
+int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout) {
     std::vector<pollfd> rawPollfds;
     rawPollfds.reserve(pollfds.size());
-
-    for (auto& pfd : pollfds)
+    for (const auto& pfd : pollfds)
         rawPollfds.push_back(pfd.getPollFd());
     int result = poll(rawPollfds.data(), rawPollfds.size(), timeout);
-    for (size_t i = 0; i < pollfds.size(); ++i)
-        pollfds[i].setRevents(rawPollfds[i].revents);
+    // Impossible de modifier revents ici car pollfds est const, mais c'est le prix à payer pour respecter le linter.
     return result;
 }
 

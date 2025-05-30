@@ -8,6 +8,7 @@
 #include "TcpConnection.hpp"
 #include <memory>
 #include <functional>
+#include <string>
 
 TcpConnection::TcpConnection() : _socket(-1) {
     _pollfd = std::make_unique<SystemWrapper::SafePollFd>(-1);

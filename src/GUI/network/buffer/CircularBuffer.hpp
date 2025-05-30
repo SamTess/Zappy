@@ -22,8 +22,8 @@ class CircularBuffer {
         void write(const std::string_view& data);
         void write(const std::string& data);
         void write(const SystemWrapper::SafeBuffer& buffer, size_t size);
-        size_t read(SystemWrapper::SafeBuffer& buffer, size_t maxSize);
-        size_t read(std::string& buffer, size_t maxSize);
+        std::string readString(size_t maxSize);
+        SystemWrapper::SafeBuffer readSafeBuffer(size_t maxSize);
         std::string readAsString(size_t maxSize);
         size_t available() const;
         bool isEmpty() const;

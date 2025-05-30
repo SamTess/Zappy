@@ -39,10 +39,9 @@ class Message {
             SERVER_MESSAGE,
             UNKNOWN_COMMAND
         };
-        
         Message();
-        Message(std::string header, std::string data);
-        Message(MessageType type);
+        explicit Message(std::string header, std::string data);
+        explicit Message(MessageType type);
         ~Message() = default;
 
         void setMessage(const std::string &data);
@@ -55,11 +54,9 @@ class Message {
 
         HeaderMessage::MessageType getType() const;
         void setType(HeaderMessage::MessageType type);
-        
         // Additional methods for parameter management
         void addIntParam(int value);
         void addStringParam(const std::string &value);
-        
         const std::vector<std::string> &getParameters() const;
         void setParameters(const std::vector<std::string> &params);
         int getIntParam(size_t index) const;
