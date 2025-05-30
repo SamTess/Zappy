@@ -18,10 +18,17 @@ SHARED_INCLUDE		=	../Shared/include
 BUILD_DIR			= ../../build
 PLUGINS_DIR			= ../../plugins
 
-MAIN_FILE 			= 	main.cpp
+MAIN_FILE 		= 	main.cpp
 
-SRCS				=	shared/exception/AException.cpp \
-						parsing/ParsingCLI.cpp \
+SRCS			=	shared/exception/AException.cpp \
+					parsing/ParsingCLI.cpp \
+					network/buffer/CircularBuffer.cpp \
+					network/buffer/MessageQueue.cpp \
+					network/connection/TcpConnection.cpp \
+					network/networkManager/NetworkManager.cpp \
+					network/networkThread/NetworkThread.cpp \
+					network/protocol/Message.cpp \
+					network/protocol/ProtocolParser.cpp \
 
 OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME			= $(BUILD_DIR)/libgui.a
