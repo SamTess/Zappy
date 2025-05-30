@@ -43,16 +43,71 @@ static void disp_args(parsing_info_t *parsed_info)
 
 static void server_loop(server_t *server)
 {
+    exit(0);
     while (1) {
         check_client(server);
     }
     close(server->s_fd);
 }
 
+static void print_tile_resources(const tile_t *tile)
+{
+    static const char *resource_names[7] = {
+        "FOOD",
+        "LINEMATE",
+        "DERAUMERE",
+        "SIBUR",
+        "MENDIANE",
+        "PHIRAS",
+        "THYSTAME"
+    };
+
+    for (int r = 0; r < 7; ++r) {
+        printf("%s: %d ", resource_names[r], tile->resources[r]);
+    }
+}
+
+static void print_map(tile_t **map, int width, int height)
+{
+    int x, y;
+    for (y = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x) {
+            printf("Tile (%d,%d): ", x, y);
+            print_tile_resources(&map[y][x]);
+            printf("| Players: %d\n", map[y][x].player_count);
+        }
+    }
+}
+
+static void print_resource_totals(tile_t **map, int width, int height)
+{
+    int totals[7] = {0};
+    int x, y, r;
+    for (y = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x) {
+            for (r = 0; r < 7; ++r) {
+                totals[r] += map[y][x].resources[r];
+            }
+        }
+    }
+    static const char *resource_names[7] = {
+        "FOOD",
+        "LINEMATE",
+        "DERAUMERE",
+        "SIBUR",
+        "MENDIANE",
+        "PHIRAS",
+        "THYSTAME"
+    };
+    printf("Resource totals for the map (%dx%d):\n", width, height);
+    for (r = 0; r < 7; ++r) {
+        printf("%s: %d\n", resource_names[r], totals[r]);
+    }
+}
+
 static void set_rdm_seed(void)
 {
     unsigned long seed = (unsigned long)time(NULL);
-
     seed ^= (unsigned long)getpid();
     seed ^= (unsigned long)(uintptr_t)&seed;
     seed *= 0x5DEECE66DULL;
@@ -79,6 +134,8 @@ int main(int ac, char **av)
     create_server(&server, &parsed_info);
     set_rdm_seed();
     create_map(&server, &parsed_info);
+    print_map(server.map, parsed_info.width, parsed_info.height);
+    print_resource_totals(server.map, parsed_info.width, parsed_info.height);
     server_loop(&server);
     return 0;
 }
