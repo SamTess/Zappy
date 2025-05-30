@@ -31,7 +31,7 @@ SRCS			=	help.c								\
 					map/map_creation.c					\
 					map/tile.c							\
 					command/parse_command.c				\
-					command/parsing_command_utils.c		\
+					command/parse_command_utils.c		\
 					command/forward.c					\
 					command/right.c						\
 					command/left.c						\
