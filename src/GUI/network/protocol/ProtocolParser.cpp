@@ -145,7 +145,6 @@ int ProtocolParser::parseIntParameter(const std::string &param) {
 
 // Parsing des informations de la map
 Message ProtocolParser::parseMapSize(const std::string &message) {
-    Message result(MSZ_HEADER, "");
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() != 2)
         throw ProtocolParserException("Invalid map size parameters: " + message);
