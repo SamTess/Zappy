@@ -39,7 +39,7 @@ bool NetworkManager::connect(const std::string& host, int port) {
     try {
         _connection->connect(host, port);
         _isConnected = true;
-        startNetworkThread();
+        _networkThread->start([this]() { this->networkThreadLoop(); });
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Connection error: " << e.what() << std::endl;
@@ -50,7 +50,7 @@ bool NetworkManager::connect(const std::string& host, int port) {
 
 void NetworkManager::disconnect() {
     if (_isConnected) {
-        stopNetworkThread();
+        _networkThread->stop();
         _connection->close();
         _isConnected = false;
     }
@@ -60,23 +60,8 @@ bool NetworkManager::isConnected() const {
     return _isConnected && _connection->isConnected();
 }
 
-void NetworkManager::startNetworkThread() {
-    if (!_isRunning) {
-        _isRunning = true;
-        _networkThreadObj = std::thread([this]() { this->networkThreadLoop(); });
-    }
-}
-
-void NetworkManager::stopNetworkThread() {
-    if (_isRunning) {
-        _isRunning = false;
-        if (_networkThreadObj.joinable())
-            _networkThreadObj.join();
-    }
-}
-
 void NetworkManager::networkThreadLoop() {
-    while (_isRunning && _isConnected) {
+    while (_networkThread->isRunning() && _isConnected) {
         try {
             if (_connection->hasData()) {
                 std::string data = _connection->receive();

@@ -12,7 +12,6 @@
 #include <vector>
 #include <functional>
 #include <memory>
-#include <thread>
 #include <mutex>
 #include "../connection/TcpConnection.hpp"
 #include "../protocol/ProtocolParser.hpp"
@@ -44,8 +43,6 @@ class NetworkManager {
         std::unique_ptr<GraphicalContext> _graphicalContext;
 
         bool _isConnected;
-        bool _isRunning;
-        std::thread _networkThreadObj;
         std::mutex _logMutex;
 
         void startNetworkThread();

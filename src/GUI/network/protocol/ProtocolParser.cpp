@@ -96,13 +96,16 @@ std::vector<std::string> ProtocolParser::splitMessage(const std::string &message
     std::vector<std::string> params;
     std::string::size_type start = 0;
     std::string::size_type end = message.find(' ');
+    std::string processedMessage = message;
 
+    if (!processedMessage.empty() && processedMessage.back() == '\n')
+        processedMessage.pop_back();
     while (end != std::string::npos) {
-        params.push_back(message.substr(start, end - start));
+        params.push_back(processedMessage.substr(start, end - start));
         start = end + 1;
-        end = message.find(' ', start);
+        end = processedMessage.find(' ', start);
     }
-    params.push_back(message.substr(start));
+    params.push_back(processedMessage.substr(start));
     return params;
 }
 
@@ -142,6 +145,7 @@ int ProtocolParser::parseIntParameter(const std::string &param) {
 
 // Parsing des informations de la map
 Message ProtocolParser::parseMapSize(const std::string &message) {
+    Message result(MSZ_HEADER, "");
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() != 2)
         throw ProtocolParserException("Invalid map size parameters: " + message);

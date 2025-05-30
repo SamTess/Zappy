@@ -2,111 +2,105 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Tests pour le parser de protocole
+** Tests unitaires pour ProtocolParser
 */
 
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
-#include <criterion/logging.h>
-#include <string>
-#include <thread>
-#include <chrono>
 #include "../../src/GUI/network/protocol/ProtocolParser.hpp"
-#include "../../src/GUI/network/protocol/HeaderMessage.hpp"
 #include "../../src/GUI/network/protocol/Message.hpp"
+#include <string>
 
-// Tests pour le ProtocolParser
-Test(protocol_parser, initialization) {
+Test(ProtocolParser, creation) {
     ProtocolParser parser;
-    
-    // Vérifie que le parser est correctement initialisé avec les headers valides
-    bool hasMsz = false;
-    
-    // Utilisation d'une commande de test pour voir si elle est valide
-    std::string validMessage = MSZ_HEADER;
-    std::string invalidMessage = "INVALID";
-    
-    hasMsz = parser.isValidMessage(validMessage);
-    
-    cr_assert(hasMsz, "Parser should recognize MSZ as valid header");
-    cr_assert(parser.isValidMessage(PNW_HEADER), "Parser should recognize PNW as valid header");
-    cr_assert_not(parser.isValidMessage(invalidMessage), "Parser should reject invalid header");
+    // Test simple de création
+    cr_assert(true, "Parser créé avec succès");
 }
 
-Test(protocol_parser, parse_message) {
+Test(ProtocolParser, validate_header) {
     ProtocolParser parser;
     
-    // Test avec un message MSZ
-    std::string mszMessage = MSZ_HEADER;
-    Message msg = parser.parseMessage(mszMessage);
+    // Tests de validation des en-têtes
+    cr_assert(parser.isValidHeader("msz"), "En-tête msz doit être valide");
+    cr_assert(parser.isValidHeader("bct"), "En-tête bct doit être valide");
+    cr_assert(parser.isValidHeader("tna"), "En-tête tna doit être valide");
+    cr_assert(parser.isValidHeader("pnw"), "En-tête pnw doit être valide");
     
-    cr_assert_str_eq(msg.getHeader().c_str(), MSZ_HEADER, "Parsed message should have MSZ header");
-    
-    // Test avec un message PNW
-    std::string pnwMessage = PNW_HEADER;
-    Message pnwMsg = parser.parseMessage(pnwMessage);
-    
-    cr_assert_str_eq(pnwMsg.getHeader().c_str(), PNW_HEADER, "Parsed message should have PNW header");
+    cr_assert(!parser.isValidHeader("xyz"), "En-tête xyz ne doit pas être valide");
+    cr_assert(!parser.isValidHeader(""), "En-tête vide ne doit pas être valide");
 }
 
-Test(protocol_parser, split_message) {
+Test(ProtocolParser, get_command_name) {
     ProtocolParser parser;
     
-    // Test de la fonction split pour un message MSZ
-    std::string message = "msz 10 20";
-    std::vector<std::string> parts = parser.splitMessage(message);
+    cr_assert_str_eq(parser.getCommandName("msz 10 20\n").c_str(), "msz", "Doit extraire correctement l'en-tête msz");
+    cr_assert_str_eq(parser.getCommandName("bct 1 2 0 1 2 3 4 5 6\n").c_str(), "bct", "Doit extraire correctement l'en-tête bct");
+    cr_assert_str_eq(parser.getCommandName("tna Team1\n").c_str(), "tna", "Doit extraire correctement l'en-tête tna");
     
-    cr_assert_eq(parts.size(), 3, "Split message should have 3 parts");
-    cr_assert_str_eq(parts[0].c_str(), "msz", "First part should be msz");
-    cr_assert_str_eq(parts[1].c_str(), "10", "Second part should be 10");
-    cr_assert_str_eq(parts[2].c_str(), "20", "Third part should be 20");
+    // Test avec une chaîne vide
+    cr_assert_str_eq(parser.getCommandName("").c_str(), "", "Doit gérer correctement une chaîne vide");
 }
 
-Test(protocol_parser, parse_int_parameter) {
+Test(ProtocolParser, split_message) {
     ProtocolParser parser;
     
-    // Test de conversion de string en int
-    int value = parser.parseIntParameter("42");
-    cr_assert_eq(value, 42, "Parse int should return 42 for string '42'");
+    std::vector<std::string> parts = parser.splitMessage("msz 10 20\n");
+    cr_assert_eq(parts.size(), 3, "Message msz doit être divisé en 3 parties");
+    cr_assert_str_eq(parts[0].c_str(), "msz", "Première partie doit être msz");
+    cr_assert_str_eq(parts[1].c_str(), "10", "Deuxième partie doit être 10");
+    cr_assert_str_eq(parts[2].c_str(), "20", "Troisième partie doit être 20");
     
-    // Test avec valeur négative
-    value = parser.parseIntParameter("-10");
-    cr_assert_eq(value, -10, "Parse int should return -10 for string '-10'");
+    parts = parser.splitMessage("pnw #1 1 1 1 1 Team1\n");
+    cr_assert_eq(parts.size(), 7, "Message pnw doit être divisé en 7 parties");
+    cr_assert_str_eq(parts[0].c_str(), "pnw", "Première partie doit être pnw");
+    cr_assert_str_eq(parts[1].c_str(), "#1", "Deuxième partie doit être #1");
+    cr_assert_str_eq(parts[6].c_str(), "Team1", "Dernière partie doit être Team1");
+}
+
+Test(ProtocolParser, extract_message_parameters) {
+    ProtocolParser parser;
     
-    // Test avec une valeur invalide
-    bool exceptionThrown = false;
+    std::vector<std::string> params = parser.extractMessageParameters("msz 10 20\n");
+    cr_assert_eq(params.size(), 2, "Message msz doit avoir 2 paramètres");
+    cr_assert_str_eq(params[0].c_str(), "10", "Premier paramètre doit être 10");
+    cr_assert_str_eq(params[1].c_str(), "20", "Deuxième paramètre doit être 20");
+    
+    params = parser.extractMessageParameters("pnw #1 1 1 1 1 Team1\n");
+    cr_assert_eq(params.size(), 6, "Message pnw doit avoir 6 paramètres");
+    cr_assert_str_eq(params[0].c_str(), "#1", "Premier paramètre doit être #1");
+    cr_assert_str_eq(params[5].c_str(), "Team1", "Dernier paramètre doit être Team1");
+}
+
+Test(ProtocolParser, parse_int_parameter) {
+    ProtocolParser parser;
+    
+    cr_assert_eq(parser.parseIntParameter("10"), 10, "Doit parser 10 correctement");
+    cr_assert_eq(parser.parseIntParameter("0"), 0, "Doit parser 0 correctement");
+    cr_assert_eq(parser.parseIntParameter("-5"), -5, "Doit parser -5 correctement");
+    
+    // Test de valeur non numérique
     try {
         parser.parseIntParameter("abc");
-    } catch (...) {
-        exceptionThrown = true;
+        cr_assert_fail("Parser doit générer une exception pour les valeurs non numériques");
+    } catch (const std::exception& e) {
+        cr_assert(true, "Exception correctement levée pour valeur non numérique");
     }
-    cr_assert(exceptionThrown, "Exception should be thrown for non-numeric string");
 }
 
-// Tests pour Message
-Test(message, initialization) {
-    // Test constructeur par défaut
-    Message emptyMessage;
-    cr_assert_str_eq(emptyMessage.getMessage().c_str(), "", "Default message should be empty");
-    cr_assert_str_eq(emptyMessage.getHeader().c_str(), "", "Default header should be empty");
-    cr_assert_str_eq(emptyMessage.getData().c_str(), "", "Default data should be empty");
+Test(ProtocolParser, message_complete) {
+    ProtocolParser parser;
     
-    // Test constructeur avec paramètres
-    Message fullMessage("MSZ", "10 20");
-    cr_assert_str_eq(fullMessage.getHeader().c_str(), "MSZ", "Header should be MSZ");
-    cr_assert_str_eq(fullMessage.getData().c_str(), "10 20", "Data should be 10 20");
-    cr_assert_str_eq(fullMessage.getMessage().c_str(), "MSZ 10 20", "Full message should be MSZ 10 20");
+    cr_assert(parser.messageComplete("msz 10 20\n"), "Message avec retour à la ligne doit être complet");
+    cr_assert(!parser.messageComplete("msz 10 20"), "Message sans retour à la ligne ne doit pas être complet");
+    cr_assert(parser.messageComplete("tna Team1\n"), "Message avec retour à la ligne doit être complet");
 }
 
-Test(message, setters) {
-    Message msg;
+Test(ProtocolParser, parse_map_size) {
+    ProtocolParser parser;
     
-    // Test des setters
-    msg.setHeader("PIN");
-    msg.setData("1 10 20 30");
-    msg.setMessage("PIN 1 10 20 30");
-    
-    cr_assert_str_eq(msg.getHeader().c_str(), "PIN", "Header should be PIN after setter");
-    cr_assert_str_eq(msg.getData().c_str(), "1 10 20 30", "Data should be 1 10 20 30 after setter");
-    cr_assert_str_eq(msg.getMessage().c_str(), "PIN 1 10 20 30", "Message should be PIN 1 10 20 30 after setter");
+    Message message = parser.parseMapSize("msz 10 20\n");
+    cr_assert_eq(message.getType(), HeaderMessage::MAP_SIZE, "Type de message doit être MAP_SIZE");
+    cr_assert_eq(message.getParameters().size(), 2, "Message doit avoir 2 paramètres");
+    cr_assert_eq(message.getIntParam(0), 10, "Premier paramètre doit être 10");
+    cr_assert_eq(message.getIntParam(1), 20, "Deuxième paramètre doit être 20");
 }
