@@ -106,8 +106,6 @@ fclean: clean
 	@rm -f *.html
 	@rm -f *.css
 	@rm -f *.js
-	@rm -f *.gcda
-	@rm -f *.gcno
 	@rm -rf $(PLUGINS_DIR)/*.so
 
 re: fclean all
