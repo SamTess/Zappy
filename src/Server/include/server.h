@@ -18,6 +18,7 @@ typedef struct server_s {
     struct sockaddr_in *serv_add;
     client_t *client;
     tile_t **map;
+    int current_tick;
 } server_t;
 
 void display_help(void);
@@ -28,7 +29,7 @@ void malloc_failed(int i);
 void server_err(char *msg);
 void print_co(char *client_ip, struct sockaddr_in *client_addr,
     client_t *new_client);
-void check_client(server_t *server);
+void check_client(server_t *server, parsing_info_t *parsed_info);
 void create_map(server_t *server, parsing_info_t *parsed_info);
 
 #endif /* !SERVER_H_ */

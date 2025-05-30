@@ -10,6 +10,12 @@
     #include <stdbool.h>
     #include "tile.h"
 
+enum rotation_e {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+};
 
 typedef struct player_inventory_s {
     ResourceType_t type;
@@ -20,11 +26,15 @@ typedef struct player_inventory_s {
 typedef struct player_s {
     int pos_x;
     int pos_y;
+    enum rotation_e rotation;
     int level;
     int life;
     char *team_name;
     player_inventory_t *inventory;
     int inventory_size;
+    int busy_until;
+    char **command_queue;
+    int queue_size;
 } player_t;
 
 void init_player(player_t *player, char *playerTeam);

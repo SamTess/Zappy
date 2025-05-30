@@ -10,11 +10,67 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
+
+void add_to_command_queue(client_t *client, char *command)
+{
+    if (!client || !client->player || !command)
+        return;
+    if (client->player->queue_size >= 10)
+        return;
+    if (!client->player->command_queue)
+        return;
+    client->player->command_queue[client->player->queue_size] =
+        strdup(command);
+    client->player->queue_size++;
+}
+
+void process_next_queued_command(server_t *server, client_t *client)
+{
+    char *next_command;
+
+    if (!client || !client->player || !server)
+        return;
+    if (client->player->queue_size <= 0 || !client->player->command_queue)
+        return;
+    next_command = client->player->command_queue[0];
+    for (int i = 0; i < client->player->queue_size - 1; i++) {
+        client->player->command_queue[i] =
+            client->player->command_queue[i + 1];
+    }
+    client->player->command_queue[client->player->queue_size - 1] = NULL;
+    client->player->queue_size--;
+    if (next_command) {
+        execute_com(server, client, next_command);
+        free(next_command);
+        next_command = NULL;
+    }
+}
+
+void update_game_tick(server_t *server)
+{
+    client_t *current = server->client;
+    client_t *next;
+
+    server->current_tick++;
+    if (current != NULL)
+        current = current->next;
+    while (current != NULL) {
+        next = current->next;
+        if (current->player &&
+            current->player->busy_until <= server->current_tick &&
+            current->player->queue_size > 0)
+            process_next_queued_command(server, current);
+        current = next;
+    }
+}
 
 client_t *find_client_by_socket(server_t *server, int socket_fd)
 {
     client_t *temp = server->client;
 
+    if (temp && temp->client_fd == server->s_fd)
+        temp = temp->next;
     while (temp) {
         if (temp->client_fd == socket_fd)
             return temp;
@@ -57,6 +113,8 @@ static void check_client_message(server_t *server)
     client_t *temp = server->client;
     client_t *next = NULL;
 
+    if (temp != NULL)
+        temp = temp->next;
     while (temp != NULL) {
         next = temp->next;
         if (temp->client_poll != NULL && temp->client_poll->revents != 0
@@ -95,13 +153,23 @@ static void helper_function(server_t *server, int nfds, struct pollfd *fds)
         poll_fds(server, current, nfds, fds);
 }
 
-void check_client(server_t *server)
+void check_client(server_t *server, parsing_info_t *parsed_info)
 {
     struct pollfd *fds = calloc((server->nfds + 1), sizeof(struct pollfd));
+    static struct timeval last_tick = {0, 0};
+    struct timeval current_time;
+    long time_diff;
 
     if (!fds) {
         perror("Poll array allocation failed");
         exit(84);
+    }
+    gettimeofday(&current_time, NULL);
+    time_diff = (current_time.tv_sec - last_tick.tv_sec) * 1000 +
+        (current_time.tv_usec - last_tick.tv_usec) / 1000;
+    if (time_diff >= (1000 / parsed_info->frequence)) {
+        update_game_tick(server);
+        last_tick = current_time;
     }
     fds[0] = *(server->client->client_poll);
     helper_function(server, server->nfds + 1, fds);

@@ -16,6 +16,7 @@ static int check_disconnect(int bytes_read, client_t *user,
 {
     if (bytes_read <= 0) {
         if (bytes_read == 0){
+            cleanup_client(user);
             remove_fd(server, user->client_poll->fd);
             free(buffer);
             return 1;
@@ -52,20 +53,54 @@ static int check_buffer_size(int b_size, char *buffer, client_t *user)
     return 0;
 }
 
-static void execute_com(server_t *server, client_t *user, char *buffer,
-    bool found)
+static command_data_t get_command_data(void)
 {
-    const char *comm_char[] = {};
-    void *(*comm_func[])(server_t *, client_t *, char *) = {};
+    static const char *comm_char[] = {"Forward", "Right", "Left", NULL};
+    static void (*comm_func[])(server_t *, client_t *, char *) =
+        {forward, right, left, NULL};
+    static int comm_times[] = {7, 7, 7};
+    command_data_t data = {comm_char, comm_func, comm_times};
 
-    for (int i = 0; comm_char[i] != NULL; i++){
-        if (strncmp(buffer, comm_char[i], 4) == 0){
-            comm_func[i](server, user, buffer);
-            found = true;
-        }
+    return data;
+}
+
+static bool execute_if_free(server_t *server, client_t *user,
+    char *buffer, int cmd_index)
+{
+    command_data_t data = get_command_data();
+
+    if (user->player->busy_until <= server->current_tick) {
+        data.functions[cmd_index](server, user, buffer);
+        if (data.times[cmd_index] > 0)
+            user->player->busy_until =
+                server->current_tick + data.times[cmd_index];
+        return true;
+    } else {
+        if (user->player->queue_size < 10) {
+            add_to_command_queue(user, buffer);
+            return true;
+        } else
+            return true;
     }
-    if (!found)
-        write(user->client_fd, "Unknown Command", strlen("Unknown Command"));
+}
+
+static bool find_and_execute(server_t *server, client_t *user, char *buffer)
+{
+    command_data_t data = get_command_data();
+
+    for (int i = 0; data.commands[i] != NULL; i++) {
+        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0)
+            return execute_if_free(server, user, buffer, i);
+    }
+    return false;
+}
+
+void execute_com(server_t *server, client_t *user, char *buffer)
+{
+    if (!user || !user->player)
+        return;
+    if (!find_and_execute(server, user, buffer))
+        write_command_output(user->client_fd, "ko\n");
 }
 
 void get_message(server_t *server, client_t *user)
@@ -85,6 +120,6 @@ void get_message(server_t *server, client_t *user)
             return;
     }
     buffer[b_size] = '\0';
-    execute_com(server, user, buffer, false);
+    execute_com(server, user, buffer);
     free(buffer);
 }

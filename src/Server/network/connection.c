@@ -154,6 +154,8 @@ static void init_server(server_t *server)
     server->client = NULL;
     server->s_fd = 0;
     server->serv_add = NULL;
+    server->current_tick = 0;
+    server->map = NULL;
 }
 
 void create_server(server_t *server, parsing_info_t *parsed_info)

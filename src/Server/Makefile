@@ -6,7 +6,7 @@
 ##
 
 CC				=	gcc
-CFLAGS			=	-Wextra -Wall -Werror -std=gnu17
+CFLAGS			=	-Wextra -Wall -Werror -std=gnu17 -g
 DEBUGFLAGS		=	-ggdb -fsanitize=address
 
 # Directories
@@ -22,18 +22,22 @@ BINARY_NAME		= ../../zappy_server
 # Source files
 MAIN_FILE 		= 	main.c
 
-SRCS			=	help.c						\
-					parsing_err.c				\
-					parsing.c					\
-					network/connection_err.c	\
-					network/connection.c		\
-					network/server_run.c		\
-					map/map_creation.c			\
-					map/tile.c					\
-					command/parse_command.c		\
-					player/player_init.c		\
-					player/player_inventory.c	\
-					player/player_inventory_utils.c	\
+SRCS			=	help.c								\
+					parsing_err.c						\
+					parsing.c							\
+					network/connection_err.c			\
+					network/connection.c				\
+					network/server_run.c				\
+					map/map_creation.c					\
+					map/tile.c							\
+					command/parse_command.c				\
+					command/parsing_command_utils.c		\
+					command/forward.c					\
+					command/right.c						\
+					command/left.c						\
+					player/player_init.c				\
+					player/player_inventory.c			\
+					player/player_inventory_utils.c		\
 					player/player_inventory_display.c	\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
