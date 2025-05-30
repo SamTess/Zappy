@@ -22,8 +22,7 @@ NetworkManager::NetworkManager()
       _outgoingQueue(std::make_unique<MessageQueue>()),
       _receiveBuffer(std::make_unique<CircularBuffer>()),
       _graphicalContext(std::make_unique<GraphicalContext>()),
-      _isConnected(false),
-      _isRunning(false) {
+      _isConnected(false) {
 }
 
 NetworkManager::~NetworkManager() {
