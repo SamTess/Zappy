@@ -28,11 +28,10 @@ Message::Message(std::string header, std::string data) {
 }
 
 Message::Message(MessageType type) {
-    (void)type;
+    _messageType = static_cast<HeaderMessage::MessageType>(type);
     _messageString = "";
     _messageHeader = "";
     _messageData = "";
-    _messageType = HeaderMessage::UNKNOWN;
 }
 
 void Message::addIntParam(int value) {
