@@ -10,23 +10,25 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include "Message.hpp"
 #include "HeaderMessage.hpp"
 #include "../../shared/exception/AException.hpp"
 
 class ProtocolParser {
     public:
+        typedef Message (ProtocolParser::*ParseFunction)(const std::string &);
+
         ProtocolParser();
         ~ProtocolParser() = default;
 
         Message parseMessage(const std::string &message);
         std::string getCommandName(const std::string &message);
-        bool isValidMessage(const std::string &message);
+        bool isValidHeader(const std::string &message);
         bool messageComplete(const std::string &buffer);
         std::vector<std::string> splitMessage(const std::string &message);
         std::vector<std::string> extractMessageParameters(const std::string &message);
         int parseIntParameter(const std::string &param);
-        std::vector<int> parseResourceQuantities(const std::string &message);
 
         void handleProtocol(const std::string &protocol);
         // Parsing des informations de la map
@@ -46,6 +48,10 @@ class ProtocolParser {
         Message parsePlayerBroadcast(const std::string &message);  // pbc
         Message parsePlayerDeath(const std::string &message);      // pdi
 
+        // Parsing des ressources
+        Message parseRessourceDrop(const std::string &message);   // pdr
+        Message parseRessourceCollect(const std::string &message); // pgt
+
         // Parsing des incantations
         Message parseIncantationStart(const std::string &message); // pic
         Message parseIncantationEnd(const std::string &message);   // pie
@@ -64,7 +70,7 @@ class ProtocolParser {
 
     private:
         Message _currentMessage;
-        std::vector<std::string> _validHeaders;
+        std::map<std::string, ParseFunction> _headerHandlers;
 
         class ProtocolParserException : public AException {
             public:

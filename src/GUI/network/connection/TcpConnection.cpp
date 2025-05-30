@@ -92,7 +92,7 @@ void TcpConnection::send(const std::string &message) {
         if (!(_pollfd.revents & POLLOUT))
             throw TcpConnectionException("Socket not ready for writing");
 
-        ssize_t sent = ::write(_socket, buffer + totalSent, size - totalSent);
+        ssize_t sent = write(_socket, buffer + totalSent, size - totalSent);
         if (sent < 0) {
             if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
                 continue;
@@ -118,7 +118,7 @@ std::string TcpConnection::receive() {
         throw TcpConnectionException("No data available");
 
     char buffer[1024];
-    ssize_t bytesReceived = ::read(_socket, buffer, sizeof(buffer) - 1);
+    ssize_t bytesReceived = read(_socket, buffer, sizeof(buffer) - 1);
     if (bytesReceived < 0) {
         if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
             return "";

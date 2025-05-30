@@ -23,6 +23,7 @@
 #define PIN_HEADER "pin"  // Player's inventory
 #define PEX_HEADER "pex"  // Expulsion
 #define PBC_HEADER "pbc"  // Broadcast
+
 #define PDR_HEADER "pdr"  // Resource dropping
 #define PGT_HEADER "pgt"  // Resource collecting
 #define PDI_HEADER "pdi"  // Death of a player
