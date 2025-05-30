@@ -96,13 +96,16 @@ std::vector<std::string> ProtocolParser::splitMessage(const std::string &message
     std::vector<std::string> params;
     std::string::size_type start = 0;
     std::string::size_type end = message.find(' ');
+    std::string processedMessage = message;
 
+    if (!processedMessage.empty() && processedMessage.back() == '\n')
+        processedMessage.pop_back();
     while (end != std::string::npos) {
-        params.push_back(message.substr(start, end - start));
+        params.push_back(processedMessage.substr(start, end - start));
         start = end + 1;
-        end = message.find(' ', start);
+        end = processedMessage.find(' ', start);
     }
-    params.push_back(message.substr(start));
+    params.push_back(processedMessage.substr(start));
     return params;
 }
 
@@ -135,25 +138,29 @@ void ProtocolParser::handleProtocol(const std::string &protocol) {
     return;
 }
 
-// Parsing des informations de la map
 Message ProtocolParser::parseMapSize(const std::string &message) {
+    Message result(MSZ_HEADER, "");
     std::vector<std::string> params = extractMessageParameters(message);
-    (void)params;
-    //TODO faire la commande
-    return Message(MSZ_HEADER, "");
+
+    if (params.size() < 2) {
+        throw ProtocolParserException("Nombre de paramètres incorrect pour msz");
+    }
+    result.setType(HeaderMessage::MAP_SIZE);
+    result.setParameters(params);
+    return result;
 }
 
 Message ProtocolParser::parseTileContent(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(BCT_HEADER, "");
 }
 
 Message ProtocolParser::parseAllTilesContent(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(MCT_HEADER, "");
 }
 
@@ -161,7 +168,7 @@ Message ProtocolParser::parseAllTilesContent(const std::string &message) {
 Message ProtocolParser::parseTeamNames(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(TNA_HEADER, "");
 }
 
@@ -169,49 +176,49 @@ Message ProtocolParser::parseTeamNames(const std::string &message) {
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PNW_HEADER, "");
 }
 
 Message ProtocolParser::parsePlayerPosition(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PPO_HEADER, "");
 }
 
 Message ProtocolParser::parsePlayerLevel(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PLV_HEADER, "");
 }
 
 Message ProtocolParser::parsePlayerInventory(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PIN_HEADER, "");
 }
 
 Message ProtocolParser::parsePlayerExpulsion(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PEX_HEADER, "");
 }
 
 Message ProtocolParser::parsePlayerBroadcast(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PBC_HEADER, "");
 }
 
 Message ProtocolParser::parsePlayerDeath(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PDI_HEADER, "");
 }
 
@@ -219,14 +226,14 @@ Message ProtocolParser::parsePlayerDeath(const std::string &message) {
 Message ProtocolParser::parseRessourceDrop(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PDR_HEADER, "");
 }
 
 Message ProtocolParser::parseRessourceCollect(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PGT_HEADER, "");
 }
 
@@ -234,14 +241,14 @@ Message ProtocolParser::parseRessourceCollect(const std::string &message) {
 Message ProtocolParser::parseIncantationStart(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PIC_HEADER, "");
 }
 
 Message ProtocolParser::parseIncantationEnd(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PIE_HEADER, "");
 }
 
@@ -249,28 +256,28 @@ Message ProtocolParser::parseIncantationEnd(const std::string &message) {
 Message ProtocolParser::parseEggLaying(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(PFK_HEADER, "");
 }
 
 Message ProtocolParser::parseEggDrop(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(ENW_HEADER, "");
 }
 
 Message ProtocolParser::parseEggConnection(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(EBO_HEADER, "");
 }
 
 Message ProtocolParser::parseEggDeath(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(EDI_HEADER, "");
 }
 
@@ -278,27 +285,27 @@ Message ProtocolParser::parseEggDeath(const std::string &message) {
 Message ProtocolParser::parseTimeUnit(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(SGT_HEADER, "");
 }
 
 Message ProtocolParser::parseEndGame(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(SEG_HEADER, "");
 }
 
 Message ProtocolParser::parseServerMessage(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     (void)params;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     return Message(SMG_HEADER, "");
 }
 
 Message ProtocolParser::parseUnknownCommand(const std::string &message) {
     (void)message;
-    //TODO faire la commande
+    //TODO(Marin): faire la commande
     std::cout << "Unknown command received: " << message << std::endl;
     return Message(SUC_HEADER, "");
 }

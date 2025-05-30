@@ -50,4 +50,34 @@
 #define SUC_HEADER "suc"  // Unknown command
 #define SBP_HEADER "sbp"  // Command parameter
 
+// Enumération des types de messages
+namespace HeaderMessage {
+    enum MessageType {
+        UNKNOWN = 0,
+        MAP_SIZE,
+        TILE_CONTENT,
+        ALL_TILES_CONTENT,
+        TEAM_NAMES,
+        PLAYER_CONNECTION,
+        PLAYER_POSITION,
+        PLAYER_LEVEL,
+        PLAYER_INVENTORY,
+        PLAYER_EXPULSION,
+        PLAYER_BROADCAST,
+        PLAYER_DEATH,
+        RESOURCE_DROP,
+        RESOURCE_COLLECT,
+        INCANTATION_START,
+        INCANTATION_END,
+        EGG_LAYING,
+        EGG_DROP,
+        EGG_CONNECTION,
+        EGG_DEATH,
+        TIME_UNIT,
+        END_GAME,
+        SERVER_MESSAGE,
+        UNKNOWN_COMMAND
+    };
+}
+
 #endif /* !HEADERMESSAGE_HPP_ */

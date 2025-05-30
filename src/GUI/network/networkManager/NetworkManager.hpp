@@ -12,7 +12,6 @@
 #include <vector>
 #include <functional>
 #include <memory>
-#include <thread>
 #include <mutex>
 #include "../connection/TcpConnection.hpp"
 #include "../protocol/ProtocolParser.hpp"
@@ -43,14 +42,10 @@ class NetworkManager {
         std::unique_ptr<CircularBuffer> _receiveBuffer;
 
         bool _isConnected;
-        bool _isRunning;
-        std::thread _networkThreadObj;
         std::mutex _logMutex;
 
         std::vector<NetworkObserver*> _observers;
 
-        void startNetworkThread();
-        void stopNetworkThread();
         void networkThreadLoop();
         void processIncomingMessage(const std::string& message);
 };
