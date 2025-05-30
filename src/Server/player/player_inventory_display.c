@@ -22,7 +22,7 @@ static char *get_one_item_content(player_inventory_t item)
     return content;
 }
 
-static void prosses_one_item(player_inventory_t item, char **content,
+static void process_one_item(player_inventory_t item, char **content,
     size_t *content_length, bool is_last)
 {
     char *item_str = get_one_item_content(item);
@@ -54,10 +54,10 @@ char *get_inventory_content(player_t *player)
         return strdup("[]");
     for (int i = 0; i < player->inventory_size; i++) {
         if (i == player->inventory_size - 1)
-            prosses_one_item(player->inventory[i], &content,
+            process_one_item(player->inventory[i], &content,
                 &content_length, true);
         else
-            prosses_one_item(player->inventory[i], &content,
+            process_one_item(player->inventory[i], &content,
                 &content_length, false);
         if (!content)
             return NULL;
