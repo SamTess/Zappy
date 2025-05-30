@@ -30,6 +30,7 @@ SRCS			=	help.c						\
 					network/server_run.c		\
 					map/map_creation.c			\
 					map/tile.c					\
+					command/parse_command.c		\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 

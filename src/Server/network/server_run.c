@@ -5,6 +5,7 @@
 ** server_run
 */
 #include "../include/server.h"
+#include "../include/command.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,24 +52,6 @@ static void check_new_connection(server_t *server)
         new_connection(server);
 }
 
-static void temporary_function(client_t *temp, server_t *server)
-{
-    char buffer[1024];
-    ssize_t bytes_read;
-
-    memset(buffer, 0, sizeof(buffer));
-    bytes_read = recv(temp->client_fd, buffer, sizeof(buffer) - 1, 0);
-    if (bytes_read > 0) {
-        buffer[bytes_read] = '\0';
-        printf("Client %d sent: %s\n", temp->client_fd, buffer);
-    }
-    if (bytes_read <= 0) {
-        printf("Client %d disconnected\n", temp->client_fd);
-        if (temp->client_fd != 0)
-            remove_fd(server, temp->client_fd);
-    }
-}
-
 static void check_client_message(server_t *server)
 {
     client_t *temp = server->client;
@@ -77,9 +60,8 @@ static void check_client_message(server_t *server)
     while (temp != NULL) {
         next = temp->next;
         if (temp->client_poll != NULL && temp->client_poll->revents != 0
-            && (temp->client_poll->revents & POLLIN)){
-                temporary_function(temp, server);
-        }
+            && (temp->client_poll->revents & POLLIN))
+                get_message(server, temp);
         temp = next;
     }
 }

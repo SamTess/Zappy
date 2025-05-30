@@ -42,5 +42,4 @@ void print_co(char *client_ip, struct sockaddr_in *client_addr,
     inet_ntop(AF_INET, &(client_addr->sin_addr), client_ip, INET_ADDRSTRLEN);
     printf("New client connected from %s:%d with ID %d.",
             client_ip, ntohs(client_addr->sin_port), new_client->client_id);
-    printf(" Waiting for HELLO packet.\n");
 }
