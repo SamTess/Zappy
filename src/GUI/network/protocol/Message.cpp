@@ -15,12 +15,16 @@ Message::Message() {
     _messageString = "";
     _messageHeader = "";
     _messageData = "";
+    _structuredData = nullptr;
 }
 
-Message::Message(std::string header, std::string data) {
-    _messageHeader = std::move(header);
-    _messageData = std::move(data);
+Message::Message(const std::string& header, const std::string& data, std::shared_ptr<IMessageData> structuredData) {
+    _messageHeader = header;
+    _messageData = data;
+    if (data[data.size() - 1] != '\n')
+        _messageData += '\n';
     _messageString = _messageHeader + " " + _messageData;
+    _structuredData = structuredData;
 }
 
 void Message::setMessage(const std::string &data) {
@@ -33,6 +37,11 @@ void Message::setHeader(const std::string &header) {
 
 void Message::setData(const std::string &data) {
     _messageData = data;
+    _structuredData = nullptr;
+}
+
+void Message::setData(std::shared_ptr<IMessageData> data) {
+    _structuredData = data;
 }
 
 const std::string &Message::getMessage() const {
@@ -45,4 +54,8 @@ const std::string &Message::getHeader() const {
 
 const std::string &Message::getData() const {
     return _messageData;
+}
+
+bool Message::hasStructuredData() const {
+    return _structuredData != nullptr;
 }
