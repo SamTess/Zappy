@@ -28,6 +28,10 @@ void malloc_failed(int i)
         perror("Failed to allocate player");
         exit(84);
     }
+    if (i == 4){
+        perror("Strdup failed for player team name");
+        exit(84);
+    }
 }
 
 void server_err(char *msg)
