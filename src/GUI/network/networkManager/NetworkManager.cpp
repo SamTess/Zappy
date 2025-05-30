@@ -19,7 +19,9 @@ NetworkManager::NetworkManager()
       _protocolParser(std::make_unique<ProtocolParser>()),
       _networkThread(std::make_unique<NetworkThread>()),
       _incomingQueue(std::make_unique<MessageQueue>()),
+      _outgoingQueue(std::make_unique<MessageQueue>()),
       _receiveBuffer(std::make_unique<CircularBuffer>()),
+      _graphicalContext(std::make_unique<GraphicalContext>()),
       _isConnected(false),
       _isRunning(false) {
 }
@@ -103,8 +105,18 @@ void NetworkManager::processIncomingMessages() {
     }
 }
 
+void NetworkManager::processOutgoingMessages() {
+    while (!_outgoingQueue->isEmpty()) {
+        std::string message = _outgoingQueue->dequeue();
+        if (!message.empty()) {
+            sendCommand(message);
+        }
+    }
+}
+
 void NetworkManager::processIncomingMessage(const std::string& message) {
     NetworkLogger::get().log(std::string("[RECV] ") + message);
+    _graphicalContext->updateContext(_protocolParser->parseMessage(message));
 }
 
 void NetworkManager::sendCommand(const std::string& command) {

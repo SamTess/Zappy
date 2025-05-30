@@ -20,8 +20,7 @@
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
 #include "../buffer/CircularBuffer.hpp"
-
-class NetworkObserver;
+#include "../../graphicalContext/GraphicalContext.hpp"
 
 class NetworkManager {
     public:
@@ -40,19 +39,20 @@ class NetworkManager {
         std::unique_ptr<ProtocolParser> _protocolParser;
         std::unique_ptr<NetworkThread> _networkThread;
         std::unique_ptr<MessageQueue> _incomingQueue;
+        std::unique_ptr<MessageQueue> _outgoingQueue;
         std::unique_ptr<CircularBuffer> _receiveBuffer;
+        std::unique_ptr<GraphicalContext> _graphicalContext;
 
         bool _isConnected;
         bool _isRunning;
         std::thread _networkThreadObj;
         std::mutex _logMutex;
 
-        std::vector<NetworkObserver*> _observers;
-
         void startNetworkThread();
         void stopNetworkThread();
         void networkThreadLoop();
         void processIncomingMessage(const std::string& message);
+        void processOutgoingMessages();
 };
 
 #endif /* !NETWORKMANAGER_HPP_ */
