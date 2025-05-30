@@ -31,6 +31,10 @@ SRCS			=	help.c						\
 					map/map_creation.c			\
 					map/tile.c					\
 					command/parse_command.c		\
+					player/player_init.c		\
+					player/player_inventory.c	\
+					player/player_inventory_utils.c	\
+					player/player_inventory_display.c	\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 

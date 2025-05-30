@@ -77,12 +77,6 @@ void remove_fd(server_t *server, int fd)
     remove_other_client(server, fd);
 }
 
-static void init_player(player_t *player)
-{
-    player->pos_x = 0;
-    player->pos_y = 0;
-}
-
 static client_t *init_new_client(int fd, server_t *server)
 {
     client_t *new_c = calloc(1, sizeof(client_t));
@@ -103,7 +97,7 @@ static client_t *init_new_client(int fd, server_t *server)
     new_c->player = calloc(1, sizeof(player_t));
     if (new_c->player == NULL)
         malloc_failed(3);
-    init_player(new_c->player);
+    init_player(new_c->player, NULL);
     return new_c;
 }
 
