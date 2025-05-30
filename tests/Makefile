@@ -19,15 +19,15 @@ GUI_LIB			=	../build/libgui.a
 
 SERVER_TESTS	=	server/test_server.c
 CLIENT_TESTS	=	client/test_client.cpp \
-					client/test_network.cpp \
+					client/test_circular_buffer.cpp \
+					client/test_message_queue.cpp \
 					client/test_network_manager.cpp \
 					client/test_protocol_parser.cpp \
-					client/test_network_integration.cpp \
 					client/test_tcp_connection.cpp \
-					client/test_network_buffer.cpp \
-					client/test_protocol_parser_detailed.cpp \
+					client/test_network_thread.cpp \
 					client/test_network_manager_integration.cpp \
-					client/test_ticket_validation.cpp
+					client/test_network_manager_detailed.cpp \
+					client/test_network_manager_mocking.cpp
 ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS)
 
 SERVER_TEST_OBJS = $(SERVER_TESTS:%.c=$(BUILD_DIR)/%.o)
