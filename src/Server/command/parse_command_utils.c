@@ -6,6 +6,8 @@
 */
 #include "../include/command.h"
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 void cleanup_player_queue(player_t *player)
 {
