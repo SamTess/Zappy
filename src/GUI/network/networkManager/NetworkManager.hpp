@@ -48,7 +48,7 @@ class NetworkManager {
         mutable std::mutex _mutex;
         std::condition_variable _cv;
 
-        std::vector<NetworkObserver*> _observers;
+        std::vector<NetworkObserver*> _observers; // Utilisation de pointeurs bruts : la durée de vie des observers est gérée à l'extérieur du NetworkManager (pattern observer). On ne doit pas prendre la propriété ni gérer la destruction ici.
         mutable std::mutex _observersMutex;
 
         void networkThreadLoop();
