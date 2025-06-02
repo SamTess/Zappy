@@ -30,6 +30,7 @@ if __name__ == "__main__":
         thread.start()
         print(f"Started agent {i}")
         sleep(0.1)
+    print("IA started successfully!")
 
     try:
         for thread in threads:
@@ -38,6 +39,4 @@ if __name__ == "__main__":
         print("\nShutting down all agents...")
         sys.exit(0)
 
-
-    print("IA started successfully!")
     exit(0)

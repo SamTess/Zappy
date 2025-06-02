@@ -14,13 +14,11 @@ class ClientAI:
         self.sock.connect((self.ip, self.port))
         print(f"Connected to {self.ip}:{self.port}")
 
-        sleep(0.2)
-        welcome_msg = inputs.read_line(self.sock)
+        welcome_msg = inputs.read_line_blocking(self.sock)
         print(f"Welcome message: {welcome_msg}")
         self.sock.send(f"{self.team}\n".encode('utf-8'))
         print("Joining team:", self.team)
-        sleep(0.2)
-        server_response = inputs.read_line(self.sock)
+        server_response = inputs.read_line_blocking(self.sock)
         if (server_response == "ko"):
             print("Failed to join team. Please check the team name and try again.")
             sys.exit(1)
@@ -50,16 +48,20 @@ class ClientAI:
       return has_item
 
     def take_next_decision(self, inventory, surroundings):
-      print(f"Agent {self.agent_id}: Surroundings: {surroundings}")
-      print(f"Agent {self.agent_id}: Inventory: {inventory}")
+      # print(f"Agent {self.agent_id}: Surroundings: {surroundings}")
+      # print(f"Agent {self.agent_id}: Inventory: {inventory}")
 
-      if utils.parse_inventory(inventory).get("food", 0) < 10:
-          result = self.send_command(utils.go_get_item(surroundings, "food"))
-          print(f"Agent {self.agent_id}: getFood > Command result: {result}")
+      result = None
+      nb_food = utils.parse_inventory(inventory).get("food", 0)
+      if nb_food < 10:
+        result = self.send_command(utils.go_get_item(surroundings, "food"))
       else:
-          self.take_items_on_ground(surroundings)
-          result = self.send_command(utils.go_get_item(surroundings, utils.get_best_available_resource(surroundings)))
-          print(f"Agent {self.agent_id}: getRessource > Command result: {result}")
+        self.take_items_on_ground(surroundings)
+        result = self.send_command(utils.go_get_item(surroundings, utils.get_best_available_resource(surroundings)))
+
+      if result.startswith("ko"):
+          print(f"Agent {self.agent_id}: Command failed: {result}")
+      # print(f"Agent {self.agent_id}: Command sent: {result}")
 
     def run(self):
         while True:
@@ -68,12 +70,9 @@ class ClientAI:
             surroundings = self.send_command("Look")
             inventory = self.send_command("Inventory")
             self.take_next_decision(inventory, surroundings)
-            sleep(0.01)
 
           except BrokenPipeError:
               print(f"Agent {self.agent_id}: Connection closed by server.")
               break
           except Exception as e:
               print(f"Agent {self.agent_id}: Error: {e}")
-
-

@@ -1,7 +1,5 @@
-import sys
 import random
-
-from defs.zappy import resources
+from constants.resources import resources
 
 # transforms inventory string into a list of pair ressource - amount
 def parse_inventory(inventory_str):
@@ -50,7 +48,7 @@ def get_best_available_resource(surroundings):
     for resource in resources:
         if get_closest_of_item(surroundings, resource) != -1:
             resource_priority = resources[resource]
-            if resource_priority < best_priority:
+            if resource_priority > best_priority:
                 best_priority = resource_priority
                 best_available_resource = resource
 
