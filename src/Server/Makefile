@@ -35,6 +35,7 @@ SRCS			=	help.c								\
 					command/forward.c					\
 					command/right.c						\
 					command/left.c						\
+					command/inventory.c					\
 					command/look.c						\
 					command/tile_to_str.c				\
 					command/eject.c						\

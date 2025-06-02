@@ -26,6 +26,7 @@ void write_command_output(int client_fd, char *msg);
 void forward(server_t *server, client_t *client, char *buffer);
 void right(server_t *server, client_t *client, char *buffer);
 void left(server_t *server, client_t *client, char *buffer);
+void inventory(server_t *server, client_t *client, char *buffer);
 void look(server_t *server, client_t *client, char *buffer);
 void eject(server_t *server, client_t *client, char *buffer);
 
