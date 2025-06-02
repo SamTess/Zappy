@@ -30,6 +30,21 @@ Message::Message(const std::string& header, const std::string& data, std::shared
     _structuredData = structuredData;
 }
 
+Message::Message(MessageType type) {
+    _messageType = static_cast<HeaderMessage::MessageType>(type);
+    _messageString = "";
+    _messageHeader = "";
+    _messageData = "";
+}
+
+void Message::addIntParam(int value) {
+    _parameters.push_back(std::to_string(value));
+}
+
+void Message::addStringParam(const std::string &value) {
+    _parameters.push_back(value);
+}
+
 void Message::setMessage(const std::string &data) {
     _messageString = data;
 }

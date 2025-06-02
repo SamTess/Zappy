@@ -8,39 +8,59 @@
 #include "ProtocolParser.hpp"
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <stdexcept>
 #include <vector>
 #include <string>
 #include <memory>
+#include <utility>
 
 ProtocolParser::ProtocolParser() {
-    _headerHandlers = {
-        {MSZ_HEADER, &ProtocolParser::parseMapSize},
-        {BCT_HEADER, &ProtocolParser::parseTileContent},
-        {MCT_HEADER, &ProtocolParser::parseAllTilesContent},
-        {TNA_HEADER, &ProtocolParser::parseTeamNames},
-        {PNW_HEADER, &ProtocolParser::parsePlayerConnection},
-        {PPO_HEADER, &ProtocolParser::parsePlayerPosition},
-        {PLV_HEADER, &ProtocolParser::parsePlayerLevel},
-        {PIN_HEADER, &ProtocolParser::parsePlayerInventory},
-        {PEX_HEADER, &ProtocolParser::parsePlayerExpulsion},
-        {PBC_HEADER, &ProtocolParser::parsePlayerBroadcast},
-        {PDR_HEADER, &ProtocolParser::parseRessourceDrop},
-        {PGT_HEADER, &ProtocolParser::parseRessourceCollect},
-        {PDI_HEADER, &ProtocolParser::parsePlayerDeath},
-        {PIC_HEADER, &ProtocolParser::parseIncantationStart},
-        {PIE_HEADER, &ProtocolParser::parseIncantationEnd},
-        {ENW_HEADER, &ProtocolParser::parseEggDrop},
-        {EBO_HEADER, &ProtocolParser::parseEggConnection},
-        {EDI_HEADER, &ProtocolParser::parseEggDeath},
-        {PFK_HEADER, &ProtocolParser::parseEggLaying},
-        {SGT_HEADER, &ProtocolParser::parseTimeUnit},
-        {SST_HEADER, &ProtocolParser::parseTimeUnit},
-        {SEG_HEADER, &ProtocolParser::parseEndGame},
-        {SMG_HEADER, &ProtocolParser::parseServerMessage},
-        {SUC_HEADER, &ProtocolParser::parseUnknownCommand},
-        {SBP_HEADER, &ProtocolParser::parseUnknownCommand}
+    using std::placeholders::_1;
+
+    _headerHandlers = std::map<std::string, ParseFunction>{
+        {MSZ_HEADER, [this](const std::string& msg) { return this->parseMapSize(msg); }},
+        {BCT_HEADER, [this](const std::string& msg) { return this->parseTileContent(msg); }},
+        {MCT_HEADER, [this](const std::string& msg) { return this->parseAllTilesContent(msg); }},
+        {TNA_HEADER, [this](const std::string& msg) { return this->parseTeamNames(msg); }},
+        {PNW_HEADER, [this](const std::string& msg) { return this->parsePlayerConnection(msg); }},
+        {PPO_HEADER, [this](const std::string& msg) { return this->parsePlayerPosition(msg); }},
+        {PLV_HEADER, [this](const std::string& msg) { return this->parsePlayerLevel(msg); }},
+        {PIN_HEADER, [this](const std::string& msg) { return this->parsePlayerInventory(msg); }},
+        {PEX_HEADER, [this](const std::string& msg) { return this->parsePlayerExpulsion(msg); }},
+        {PBC_HEADER, [this](const std::string& msg) { return this->parsePlayerBroadcast(msg); }},
+        {PDR_HEADER, [this](const std::string& msg) { return this->parseRessourceDrop(msg); }},
+        {PGT_HEADER, [this](const std::string& msg) { return this->parseRessourceCollect(msg); }},
+        {PDI_HEADER, [this](const std::string& msg) { return this->parsePlayerDeath(msg); }},
+        {PIC_HEADER, [this](const std::string& msg) { return this->parseIncantationStart(msg); }},
+        {PIE_HEADER, [this](const std::string& msg) { return this->parseIncantationEnd(msg); }},
+        {ENW_HEADER, [this](const std::string& msg) { return this->parseEggDrop(msg); }},
+        {EBO_HEADER, [this](const std::string& msg) { return this->parseEggConnection(msg); }},
+        {EDI_HEADER, [this](const std::string& msg) { return this->parseEggDeath(msg); }},
+        {PFK_HEADER, [this](const std::string& msg) { return this->parseEggLaying(msg); }},
+        {SGT_HEADER, [this](const std::string& msg) { return this->parseTimeUnit(msg); }},
+        {SST_HEADER, [this](const std::string& msg) { return this->parseTimeUnit(msg); }},
+        {SEG_HEADER, [this](const std::string& msg) { return this->parseEndGame(msg); }},
+        {SMG_HEADER, [this](const std::string& msg) { return this->parseServerMessage(msg); }},
+        {SUC_HEADER, [this](const std::string& msg) { return this->parseUnknownCommand(msg); }},
+        {SBP_HEADER, [this](const std::string& msg) { return this->parseUnknownCommand(msg); }}
     };
+}
+
+std::string ProtocolParser::extractMessage(std::shared_ptr<CircularBuffer> buffer) {
+    if (!buffer || buffer->isEmpty())
+        return "";
+    std::string tempBuffer = buffer->readAsString(buffer->available());
+    size_t newlinePos = tempBuffer.find('\n');
+    if (newlinePos == std::string::npos) {
+        buffer->write(tempBuffer);
+        return "";
+    }
+    std::string message = tempBuffer.substr(0, newlinePos + 1);
+    if (newlinePos + 1 < tempBuffer.size()) {
+        buffer->write(tempBuffer.substr(newlinePos + 1));
+    }
+    return message;
 }
 
 Message ProtocolParser::parseMessage(const std::string &message) {
@@ -50,78 +70,68 @@ Message ProtocolParser::parseMessage(const std::string &message) {
         throw ProtocolParserException("Incomplete message received: " + message);
     std::string header = getCommandName(message);
     auto handlerIt = _headerHandlers.find(header);
-    if (handlerIt != _headerHandlers.end()) {
-        ParseFunction parseFunc = handlerIt->second;
-        return (this->*parseFunc)(message);
-    }
+    if (handlerIt != _headerHandlers.end())
+        return handlerIt->second(message);
     return parseUnknownCommand(message);
 }
 
-std::string ProtocolParser::getCommandName(const std::string &message) {
+std::pair<std::string, std::string> ProtocolParser::parseMessage(const std::string &message) const {
     std::string header;
+    std::string data;
     size_t spacePos = message.find(' ');
     size_t newlinePos = message.find('\n');
 
     if (spacePos != std::string::npos && (newlinePos == std::string::npos || spacePos < newlinePos)) {
         header = message.substr(0, spacePos);
+        if (newlinePos != std::string::npos)
+            data = message.substr(spacePos + 1, newlinePos - spacePos - 1);
+        else
+            data = message.substr(spacePos + 1);
     } else if (newlinePos != std::string::npos) {
         header = message.substr(0, newlinePos);
+        data = "";
     } else {
         header = message;
+        data = "";
     }
-    return header;
-}
-
-bool ProtocolParser::isValidHeader(const std::string &message) {
-    std::string header;
-    size_t spacePos = message.find(' ');
-    size_t newlinePos = message.find('\n');
-
-    if (spacePos != std::string::npos && (newlinePos == std::string::npos || spacePos < newlinePos)) {
-        header = message.substr(0, spacePos);
-    } else if (newlinePos != std::string::npos) {
-        header = message.substr(0, newlinePos);
-    } else {
-        header = message;
-    }
-    return _headerHandlers.find(header) != _headerHandlers.end();
+    return std::make_pair(header, data);
 }
 
 bool ProtocolParser::messageComplete(const std::string &buffer) {
-    if (buffer.empty() || !isValidHeader(buffer))
-        return false;
-    return buffer.back() == '\n';
+    return buffer.find('\n') != std::string::npos;
+}
+
+std::string ProtocolParser::getCommandName(const std::string &message) {
+    size_t spacePos = message.find(' ');
+    size_t newlinePos = message.find('\n');
+    size_t endPos = std::min(spacePos, newlinePos);
+    if (endPos == std::string::npos)
+        endPos = message.length();
+    return message.substr(0, endPos);
 }
 
 std::vector<std::string> ProtocolParser::splitMessage(const std::string &message) {
-    std::vector<std::string> params;
-    std::string::size_type start = 0;
-    std::string::size_type end = message.find(' ');
-    std::string processedMessage = message;
-
-    if (!processedMessage.empty() && processedMessage.back() == '\n')
-        processedMessage.pop_back();
+    std::vector<std::string> parts;
+    size_t start = 0;
+    size_t end = message.find(' ');
     while (end != std::string::npos) {
-        params.push_back(processedMessage.substr(start, end - start));
+        parts.push_back(message.substr(start, end - start));
         start = end + 1;
-        end = processedMessage.find(' ', start);
+        end = message.find(' ', start);
     }
-    params.push_back(processedMessage.substr(start));
-    return params;
+    std::string lastPart = message.substr(start);
+    if (!lastPart.empty() && lastPart.back() == '\n')
+        lastPart.pop_back();
+    if (!lastPart.empty())
+        parts.push_back(lastPart);
+    return parts;
 }
 
 std::vector<std::string> ProtocolParser::extractMessageParameters(const std::string &message) {
-    std::vector<std::string> params = splitMessage(message);
-
-    if (!params.empty())
-        params.erase(params.begin());
-    if (!params.empty()) {
-        std::string& lastParam = params.back();
-        if (!lastParam.empty() && lastParam.back() == '\n') {
-            lastParam.pop_back();
-        }
-    }
-    return params;
+    auto parts = splitMessage(message);
+    if (!parts.empty())
+        parts.erase(parts.begin());
+    return parts;
 }
 
 std::string ProtocolParser::extractCommandParameter(const std::string &message) {
@@ -137,14 +147,11 @@ std::string ProtocolParser::extractCommandParameter(const std::string &message) 
 int ProtocolParser::parseIntParameter(const std::string &param) {
     try {
         return std::stoi(param);
-    } catch (const std::invalid_argument &e) {
-        throw ProtocolParserException("Invalid integer parameter: " + param);
-    } catch (const std::out_of_range &e) {
-        throw ProtocolParserException("Integer parameter out of range: " + param);
+    } catch (const std::exception &e) {
+        throw ProtocolParserException("Failed to parse integer parameter: " + param);
     }
 }
 
-// Parsing des informations de la map
 Message ProtocolParser::parseMapSize(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() != 2)
@@ -177,7 +184,6 @@ Message ProtocolParser::parseAllTilesContent(const std::string &message) {
     return Message(MCT_HEADER, extractCommandParameter(message), nullptr);
 }
 
-// Parsing des équipes
 Message ProtocolParser::parseTeamNames(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 1)
@@ -186,7 +192,6 @@ Message ProtocolParser::parseTeamNames(const std::string &message) {
     return Message(TNA_HEADER, extractCommandParameter(message), teamNamesData);
 }
 
-// Parsing des joueurs
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 6)
@@ -269,7 +274,6 @@ Message ProtocolParser::parsePlayerDeath(const std::string &message) {
     return Message(PDI_HEADER, extractCommandParameter(message), playerInfoData);
 }
 
-// Parsing des ressources
 Message ProtocolParser::parseRessourceDrop(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 2)
@@ -290,7 +294,6 @@ Message ProtocolParser::parseRessourceCollect(const std::string &message) {
     return Message(PGT_HEADER, extractCommandParameter(message), resourceData);
 }
 
-// Parsing des incantations
 Message ProtocolParser::parseIncantationStart(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 4)
@@ -359,7 +362,6 @@ Message ProtocolParser::parseEggDeath(const std::string &message) {
     return Message(EDI_HEADER, extractCommandParameter(message), eggData);
 }
 
-// Autres messages
 Message ProtocolParser::parseTimeUnit(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 1)

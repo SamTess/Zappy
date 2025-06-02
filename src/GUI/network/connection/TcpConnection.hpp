@@ -8,10 +8,10 @@
 #ifndef TCPCONNECTION_HPP_
 #define TCPCONNECTION_HPP_
 
-#include <netinet/in.h>
-#include <poll.h>
 #include <string>
+#include <memory>
 #include "../../shared/exception/AException.hpp"
+#include "../utils/SystemWrapper.hpp"
 
 class TcpConnection {
     public:
@@ -28,8 +28,9 @@ class TcpConnection {
 
     private:
         int _socket;
-        struct pollfd _pollfd;
-        sockaddr_in _sockaddr;
+        std::unique_ptr<SystemWrapper::SafePollFd> _pollfd;
+        std::unique_ptr<SystemWrapper::SafeSockAddr> _sockaddr;
+        std::unique_ptr<SystemWrapper::SafeBuffer> _recvBuffer;
 
         class TcpConnectionException : public AException {
             public:

@@ -19,63 +19,63 @@ Test(CircularBuffer, creation) {
 
 Test(CircularBuffer, write_read_data) {
     CircularBuffer buffer(10);
-    const char* writeData = "test";
-    size_t writeSize = strlen(writeData);
+    std::string writeData = "test";
+    size_t writeSize = writeData.size();
     
-    buffer.write(writeData, writeSize);
+    buffer.write(writeData);
     
     cr_assert_eq(buffer.available(), writeSize, "Buffer doit avoir les données écrites disponibles");
     cr_assert(!buffer.isEmpty(), "Buffer ne doit pas être vide après écriture");
     
-    char readBuffer[10] = {0};
+    std::string readBuffer;
     size_t bytesRead = buffer.read(readBuffer, 10);
     
     cr_assert_eq(bytesRead, writeSize, "Nombre d'octets lus doit correspondre à ce qui a été écrit");
-    cr_assert_str_eq(readBuffer, writeData, "Données lues doivent être identiques aux données écrites");
+    cr_assert_str_eq(readBuffer.c_str(), writeData.c_str(), "Données lues doivent être identiques aux données écrites");
     cr_assert(buffer.isEmpty(), "Buffer doit être vide après lecture complète");
 }
 
 Test(CircularBuffer, write_past_capacity) {
     CircularBuffer buffer(5);
-    const char* writeData = "123456789";
-    size_t writeSize = strlen(writeData);
+    std::string writeData = "123456789";
+    size_t writeSize = writeData.size();
     
-    buffer.write(writeData, writeSize);
+    buffer.write(writeData);
     
     cr_assert_eq(buffer.available(), writeSize, "Buffer doit avoir les données écrites disponibles");
     cr_assert(!buffer.isEmpty(), "Buffer ne doit pas être vide après écriture");
     
-    char readBuffer[10] = {0};
+    std::string readBuffer;
     size_t bytesRead = buffer.read(readBuffer, 10);
     
     cr_assert_eq(bytesRead, writeSize, "Nombre d'octets lus doit correspondre à ce qui a été écrit");
-    cr_assert_str_eq(readBuffer, writeData, "Données lues doivent être identiques aux données écrites");
+    cr_assert_str_eq(readBuffer.c_str(), writeData.c_str(), "Données lues doivent être identiques aux données écrites");
 }
 
 Test(CircularBuffer, partial_read) {
     CircularBuffer buffer(10);
-    const char* writeData = "0123456789";
-    size_t writeSize = strlen(writeData);
+    std::string writeData = "0123456789";
+    size_t writeSize = writeData.size();
     
-    buffer.write(writeData, writeSize);
+    buffer.write(writeData);
     
-    char readBuffer[5] = {0};
+    std::string readBuffer;
     size_t bytesRead = buffer.read(readBuffer, 4);
     
     cr_assert_eq(bytesRead, 4, "Nombre d'octets lus doit correspondre à la taille demandée");
-    cr_assert_str_eq(readBuffer, "0123", "Les 4 premiers caractères doivent être lus correctement");
+    cr_assert_str_eq(readBuffer.c_str(), "0123", "Les 4 premiers caractères doivent être lus correctement");
     cr_assert_eq(buffer.available(), writeSize - 4, "Buffer doit avoir moins de données disponibles après lecture partielle");
     
     bytesRead = buffer.read(readBuffer, 4);
     cr_assert_eq(bytesRead, 4, "Nombre d'octets lus doit correspondre à la taille demandée");
-    cr_assert_str_eq(readBuffer, "4567", "Les 4 caractères suivants doivent être lus correctement");
+    cr_assert_str_eq(readBuffer.c_str(), "4567", "Les 4 caractères suivants doivent être lus correctement");
 }
 
 Test(CircularBuffer, clear) {
     CircularBuffer buffer(10);
-    const char* writeData = "test";
+    std::string writeData = "test";
     
-    buffer.write(writeData, strlen(writeData));
+    buffer.write(writeData);
     cr_assert(!buffer.isEmpty(), "Buffer ne doit pas être vide après écriture");
     
     buffer.clear();
@@ -85,18 +85,18 @@ Test(CircularBuffer, clear) {
 
 Test(CircularBuffer, resize) {
     CircularBuffer buffer(5);
-    const char* writeData = "12345";
+    std::string writeData = "12345";
     
-    buffer.write(writeData, strlen(writeData));
+    buffer.write(writeData);
     cr_assert(buffer.isFull(), "Buffer doit être plein");
     
     buffer.resize(10);
     cr_assert(!buffer.isFull(), "Buffer ne doit pas être plein après redimensionnement");
     
-    const char* moreData = "67890";
-    buffer.write(moreData, strlen(moreData));
+    std::string moreData = "67890";
+    buffer.write(moreData);
     
-    char readBuffer[11] = {0};
+    std::string readBuffer;
     size_t bytesRead = buffer.read(readBuffer, 10);
     
     cr_assert_eq(bytesRead, 10, "Nombre d'octets lus doit être 10");
@@ -107,16 +107,16 @@ Test(CircularBuffer, wrap_around) {
     CircularBuffer buffer(5);
     
     // Écrire et lire partiellement pour décaler l'index de tête
-    buffer.write("123", 3);
-    char temp[2] = {0};
+    buffer.write(std::string_view("123"));
+    std::string temp;
     buffer.read(temp, 2);
     
     // Maintenant écrire pour forcer le buffer à se chevaucher
-    buffer.write("4567", 4);
+    buffer.write(std::string_view("4567"));
     
-    char readBuffer[10] = {0};
+    std::string readBuffer;
     size_t bytesRead = buffer.read(readBuffer, 10);
     
     cr_assert_eq(bytesRead, 5, "Doit lire 5 octets (1 restant + 4 nouveaux)");
-    cr_assert_str_eq(readBuffer, "34567", "Données doivent être lues correctement après chevauchement");
+    cr_assert_str_eq(readBuffer.c_str(), "34567", "Données doivent être lues correctement après chevauchement");
 }

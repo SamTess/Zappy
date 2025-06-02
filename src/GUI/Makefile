@@ -31,6 +31,7 @@ SRCS			=	shared/exception/AException.cpp \
 					network/protocol/Message.cpp \
 					network/protocol/ProtocolParser.cpp \
 					graphicalContext/GraphicalContext.cpp \
+ 			  	network/utils/SystemWrapper.cpp
 
 OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME			= $(BUILD_DIR)/libgui.a

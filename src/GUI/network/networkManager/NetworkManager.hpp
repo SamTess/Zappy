@@ -6,13 +6,15 @@
 */
 
 #ifndef NETWORKMANAGER_HPP_
-#define NETWORKMANAGER_HPP_
+    #define NETWORKMANAGER_HPP_
 
 #include <string>
 #include <vector>
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <atomic>
+#include <condition_variable>
 #include "../connection/TcpConnection.hpp"
 #include "../protocol/ProtocolParser.hpp"
 #include "../protocol/HeaderMessage.hpp"
@@ -29,7 +31,6 @@ class NetworkManager {
         bool connect(const std::string& host, int port);
         void disconnect();
         bool isConnected() const;
-
         void sendCommand(const std::string& command);
         void processIncomingMessages();
 

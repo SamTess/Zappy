@@ -32,7 +32,7 @@ CYAN=\033[36m
 RESET=\033[0m
 
 all: zappy_server zappy_gui zappy_ai
-	@echo "$(GREEN)All components built successfully!$(RESET)"
+	@echo "$(GREEN)Server component built successfully!$(RESET)"
 
 zappy_server:
 	@echo "$(CYAN)Building Zappy Server...$(RESET)"

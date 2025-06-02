@@ -10,7 +10,9 @@
 #include <thread>
 #include <chrono>
 #include <mutex>
+#include <utility>
 #include <string>
+#include <memory>
 #include "NetworkManager.hpp"
 #include "NetworkLogger.hpp"
 
@@ -30,6 +32,8 @@ NetworkManager::~NetworkManager() {
 }
 
 bool NetworkManager::connect(const std::string& host, int port) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_isConnected) {
         std::cout << "Already connected to " << host << ":" << port << std::endl;
         return true;
@@ -39,6 +43,8 @@ bool NetworkManager::connect(const std::string& host, int port) {
         _connection->connect(host, port);
         _isConnected = true;
         _networkThread->start([this]() { this->networkThreadLoop(); });
+        if (_connectionCallback)
+            _connectionCallback(true);
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Connection error: " << e.what() << std::endl;
@@ -48,15 +54,34 @@ bool NetworkManager::connect(const std::string& host, int port) {
 }
 
 void NetworkManager::disconnect() {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_isConnected) {
         _networkThread->stop();
         _connection->close();
         _isConnected = false;
+        if (_connectionCallback)
+            _connectionCallback(false);
     }
 }
 
 bool NetworkManager::isConnected() const {
     return _isConnected && _connection->isConnected();
+}
+
+void NetworkManager::sendCommand(const std::string& command) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    if (!_isConnected) {
+        std::cerr << "Cannot send command: not connected" << std::endl;
+        return;
+    }
+
+    try {
+        _connection->send(command + "\n");
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to send command: " << e.what() << std::endl;
+        disconnect();
+    }
 }
 
 void NetworkManager::networkThreadLoop() {
@@ -65,28 +90,28 @@ void NetworkManager::networkThreadLoop() {
             if (_connection->hasData()) {
                 std::string data = _connection->receive();
                 if (!data.empty()) {
-                    NetworkLogger::get().log(std::string("Réception: ") + data);
-                    _incomingQueue->enqueue(data);
+                    _receiveBuffer->write(data);
+                    while (true) {
+                        std::string message = _protocolParser->extractMessage(_receiveBuffer);
+                        if (message.empty())
+                            break;
+                        _incomingQueue->enqueue(message);
+                    }
                 }
             }
-            processIncomingMessages();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         } catch (const std::exception& e) {
-            std::cerr << "[ERROR] Network thread: " << e.what() << std::endl;
-            _isConnected = false;
+            std::cerr << "Network thread error: " << e.what() << std::endl;
+            disconnect();
             break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
 void NetworkManager::processIncomingMessages() {
-    while (!_incomingQueue->isEmpty()) {
-        std::string message = _incomingQueue->dequeue();
-        if (!message.empty()) {
-            NetworkLogger::get().log(std::string("Dispatch: ") + message);
-            processIncomingMessage(message);
-        }
-    }
+    std::string message;
+    while (!(message = _incomingQueue->dequeue()).empty())
+        processIncomingMessage(message);
 }
 
 void NetworkManager::processOutgoingMessages() {
@@ -103,14 +128,10 @@ void NetworkManager::processIncomingMessage(const std::string& message) {
     _graphicalContext->updateContext(_protocolParser->parseMessage(message));
 }
 
-void NetworkManager::sendCommand(const std::string& command) {
-    if (_isConnected) {
-        try {
-            NetworkLogger::get().log(std::string("Envoi: ") + command);
-            _connection->send(command);
-        } catch (const std::exception& e) {
-            std::cerr << "[ERROR] Send: " << e.what() << std::endl;
-            _isConnected = false;
-        }
-    }
+void NetworkManager::setMessageCallback(MessageCallback callback) {
+    _messageCallback = callback;
+}
+
+void NetworkManager::setConnectionCallback(ConnectionCallback callback) {
+    _connectionCallback = callback;
 }

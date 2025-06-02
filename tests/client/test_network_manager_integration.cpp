@@ -10,38 +10,43 @@
 #include <memory>
 #include "../../src/GUI/network/networkManager/NetworkManager.hpp"
 
-// Dummy class pour NetworkObserver puisque nous n'avons pas accès à la définition complète
-class NetworkObserver {
-public:
-    virtual ~NetworkObserver() = default;
-    virtual void onMessageReceived(const std::string& message) = 0;
-};
-
 // Mock class pour NetworkObserver
 class MockNetworkObserver : public NetworkObserver {
 public:
     bool messageReceived = false;
-    std::string lastMessage;
+    std::string lastHeader;
+    std::string lastData;
+    bool connectionChanged = false;
+    bool connectionStatus = false;
 
-    void onMessageReceived(const std::string& message) override {
+    void onMessage(const std::string& header, const std::string& data) override {
         messageReceived = true;
-        lastMessage = message;
+        lastHeader = header;
+        lastData = data;
+    }
+    
+    void onConnectionStatusChanged(bool connected) override {
+        connectionChanged = true;
+        connectionStatus = connected;
     }
 };
 
 Test(NetworkManager, mock_interaction) {
-    // Ce test est plus conceptuel car nous n'avons pas accès à la méthode pour ajouter un observer
-    // Dans un environnement réel, nous ajouterions le mock comme observer et vérifierions les interactions
-    
     NetworkManager manager;
     MockNetworkObserver observer;
     
-    // Dans un cas réel, nous aurions quelque chose comme:
-    // manager.addObserver(&observer);
+    // Maintenant nous pouvons utiliser la méthode pour ajouter un observer
+    manager.addObserver(&observer);
+    
+    // Comme nous ne pouvons pas vraiment connecter, nous allons juste vérifier
+    // que le code compile et que l'observer est correctement ajouté
+    
+    // Dans le cas réel avec un mock serveur, nous pourrions faire:
     // manager.connect("localhost", 1234);
-    // manager.mockReceiveData("test");
+    // manager.mockReceiveData("header data");
     // cr_assert(observer.messageReceived, "L'observer doit être notifié");
-    // cr_assert_str_eq(observer.lastMessage.c_str(), "test", "Le message reçu doit être 'test'");
+    // cr_assert_str_eq(observer.lastHeader.c_str(), "header", "L'en-tête doit être 'header'");
+    // cr_assert_str_eq(observer.lastData.c_str(), "data", "Les données doivent être 'data'");
     
     // Pour l'instant, nous nous assurons juste que le code compile
     cr_assert(true);
