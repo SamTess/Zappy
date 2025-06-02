@@ -59,7 +59,6 @@ static command_data_t get_command_data(void)
         "Look", "Eject", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, look, eject, NULL};
-        , NULL};
     static int comm_times[] = {7, 7, 7, 7, 7};
     command_data_t data = {comm_char, comm_func, comm_times};
 
