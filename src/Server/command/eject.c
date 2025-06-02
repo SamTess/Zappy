@@ -13,19 +13,19 @@
 static void convert_rotation_to_vector(client_t *client, float *x, float *y)
 {
     switch (client->player->rotation) {
-        case 1:
+        case RIGHT:
             *x = 1.0;
             *y = 0.0;
             break;
-        case 2:
+        case DOWN:
             *x = 0.0;
             *y = 1.0;
             break;
-        case 3:
+        case LEFT:
             *x = -1.0;
             *y = 0.0;
             break;
-        case 0:
+        case UP:
         default:
             *x = 0.0;
             *y = -1.0;
@@ -85,7 +85,7 @@ void push_client(server_t *server, client_t *client, float x, float y)
                 tmp->player->pos_y = new_y;
                 tile_add_player(&server->map[new_y][new_x], tmp->client_id);
                 write_command_output(client->client_fd, string_to_send);
-            }
+        }
         tmp = tmp->next;
     }
 }
