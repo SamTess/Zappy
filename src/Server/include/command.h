@@ -29,5 +29,6 @@ void left(server_t *server, client_t *client, char *buffer);
 void inventory(server_t *server, client_t *client, char *buffer);
 void look(server_t *server, client_t *client, char *buffer);
 void eject(server_t *server, client_t *client, char *buffer);
+void connect_nbr(server_t *server, client_t *client, char *buffer);
 
 #endif /* !COMMAND_H_ */
