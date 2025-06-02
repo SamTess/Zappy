@@ -56,10 +56,10 @@ static int check_buffer_size(int b_size, char *buffer, client_t *user)
 static command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
-        "Eject", NULL};
+        "Look", "Eject", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
-        {forward, right, left, eject};
-    static int comm_times[] = {7, 7, 7, 7};
+        {forward, right, left, look, eject, NULL};
+    static int comm_times[] = {7, 7, 7, 7, 7};
     command_data_t data = {comm_char, comm_func, comm_times};
 
     return data;
