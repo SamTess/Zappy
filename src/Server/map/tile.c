@@ -14,6 +14,9 @@ void tile_init(tile_t *tile)
     tile->player_ids = NULL;
     tile->player_count = 0;
     tile->player_capacity = 0;
+    tile->egg_ids = NULL;
+    tile->egg_count = 0;
+    tile->egg_capacity = 0;
     memset(tile->resources, 0, sizeof(tile->resources));
 }
 
@@ -23,6 +26,10 @@ void tile_free(tile_t *tile)
     tile->player_ids = NULL;
     tile->player_count = 0;
     tile->player_capacity = 0;
+    free(tile->egg_ids);
+    tile->egg_ids = NULL;
+    tile->egg_count = 0;
+    tile->egg_capacity = 0;
 }
 
 int tile_add_player(tile_t *tile, int player_id)
