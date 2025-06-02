@@ -109,7 +109,7 @@ jobs:
 
       - name: Run coding-style
         timeout-minutes: 5
-        run: check.sh $(pwd)/src $(pwd)
+        run: check.sh $(pwd)/src/Server $(pwd)
 
       - name: Create annotation for coding-style errors
         timeout-minutes: 2

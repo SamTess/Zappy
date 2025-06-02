@@ -31,5 +31,5 @@ void init_player(player_t *player, char *playerTeam)
             malloc_failed(4);
     } else
         player->team_name = NULL;
-    add_item_to_inventory(player, FOOD, 10);
+    init_inventory(player);
 }

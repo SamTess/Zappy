@@ -22,7 +22,6 @@ def create_zipapp():
             if os.path.isdir(item_path) and not item.startswith('.') and item != 'build_zipapp':
                 dest_path = os.path.join(app_dir, item)
                 shutil.copytree(item_path, dest_path)
-                print(f"Copied directory: {item}")
         # Créer l'archive exécutable dans le répertoire racine de Zappy
         output_path = "../../../zappy_ai"
         zipapp.create_archive(app_dir, output_path, interpreter="/usr/bin/env python3")

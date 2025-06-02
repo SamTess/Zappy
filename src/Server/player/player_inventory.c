@@ -10,6 +10,28 @@
 #include <stdio.h>
 #include <string.h>
 
+void init_inventory(player_t *player)
+{
+    add_item_to_inventory(player, FOOD, 10);
+    add_item_to_inventory(player, LINEMATE, 0);
+    add_item_to_inventory(player, DERAUMERE, 0);
+    add_item_to_inventory(player, SIBUR, 0);
+    add_item_to_inventory(player, MENDIANE, 0);
+    add_item_to_inventory(player, PHIRAS, 0);
+    add_item_to_inventory(player, THYSTAME, 0);
+}
+
+void free_inventory(player_t *player)
+{
+    if (!player || !player->inventory)
+        return;
+    for (int i = 0; i < player->inventory_size; i++) {
+        free(player->inventory[i].name);
+    }
+    free(player->inventory);
+    player->inventory = NULL;
+    player->inventory_size = 0;
+}
 
 static bool add_quantity_to_item(player_t *player, ResourceType_t type, int nb)
 {
@@ -46,7 +68,7 @@ static void add_one_to_inventory(player_t *player, ResourceType_t type, int nb)
 
 bool add_item_to_inventory(player_t *player, ResourceType_t type, int quantity)
 {
-    if (!player || quantity <= 0)
+    if (!player || quantity < 0)
         return false;
     if (inventory_has_item(player, type))
         return add_quantity_to_item(player, type, quantity);
@@ -54,35 +76,13 @@ bool add_item_to_inventory(player_t *player, ResourceType_t type, int quantity)
     return true;
 }
 
-static void remove_one_item_from_inventory(player_t *player, int i)
-{
-    void *tmp;
-
-    free(player->inventory[i].name);
-    for (int j = i; j < player->inventory_size - 1; j++)
-        player->inventory[j] = player->inventory[j + 1];
-    player->inventory_size--;
-    if (player->inventory_size > 0) {
-        tmp = realloc(player->inventory,
-            sizeof(player_inventory_t) * player->inventory_size);
-        if (!tmp) {
-            perror("Error: Memory allocation failed for inventory");
-            exit(84);
-        }
-        player->inventory = tmp;
-    } else {
-        free(player->inventory);
-        player->inventory = NULL;
-    }
-}
-
 static void item_to_remove_find(player_t *player, int quantity, int i)
 {
         if (player->inventory[i].quantity < quantity)
             printf("Warning: Not enough quantity to remove, remove all\n");
         player->inventory[i].quantity -= quantity;
-        if (player->inventory[i].quantity <= 0)
-            remove_one_item_from_inventory(player, i);
+        if (player->inventory[i].quantity < 0)
+            player->inventory[i].quantity = 0;
 }
 
 bool remove_item_from_inventory(player_t *player, ResourceType_t type, int nb)
