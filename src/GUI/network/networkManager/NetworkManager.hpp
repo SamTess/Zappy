@@ -6,7 +6,7 @@
 */
 
 #ifndef NETWORKMANAGER_HPP_
-#define NETWORKMANAGER_HPP_
+    #define NETWORKMANAGER_HPP_
 
 #include <string>
 #include <vector>
@@ -22,8 +22,6 @@
 #include "../buffer/MessageQueue.hpp"
 #include "../buffer/CircularBuffer.hpp"
 
-class NetworkObserver;
-
 class NetworkManager {
     public:
         NetworkManager();
@@ -34,8 +32,13 @@ class NetworkManager {
         bool isConnected() const;
         void sendCommand(const std::string& command);
         void processIncomingMessages();
-        void addObserver(NetworkObserver* observer);
-        void removeObserver(NetworkObserver* observer);
+
+        // Callback pour récupérer les messages
+        using MessageCallback = std::function<void(const std::string&, const std::string&)>;
+        void setMessageCallback(MessageCallback callback);
+        // Callback pour les changements de statut de connexion
+        using ConnectionCallback = std::function<void(bool)>;
+        void setConnectionCallback(ConnectionCallback callback);
 
     private:
         std::shared_ptr<TcpConnection> _connection;
@@ -48,20 +51,11 @@ class NetworkManager {
         mutable std::mutex _mutex;
         std::condition_variable _cv;
 
-        std::vector<NetworkObserver*> _observers; // Utilisation de pointeurs bruts : la durée de vie des observers est gérée à l'extérieur du NetworkManager (pattern observer). On ne doit pas prendre la propriété ni gérer la destruction ici.
-        mutable std::mutex _observersMutex;
+        MessageCallback _messageCallback;
+        ConnectionCallback _connectionCallback;
 
         void networkThreadLoop();
         void processIncomingMessage(const std::string& message);
-        void notifyObservers(const std::string& header, const std::string& data);
-};
-
-// Interface Observer pour recevoir des notifications
-class NetworkObserver {
-    public:
-        virtual ~NetworkObserver() = default;
-        virtual void onMessage(const std::string& header, const std::string& data) = 0;
-        virtual void onConnectionStatusChanged(bool connected) = 0;
 };
 
 #endif /* !NETWORKMANAGER_HPP_ */

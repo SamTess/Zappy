@@ -121,8 +121,8 @@ ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count) {
     return write(fd, buffer.data().c_str(), minSize);
 }
 
-int pollSocket(SafePollFd& pfd, int timeout) {
-    return poll(pfd.getPollPtr(), 1, timeout);
+int pollSocket(const SafePollFd& pfd, int timeout) {
+    return poll(const_cast<pollfd*>(pfd.getPollPtr()), 1, timeout);
 }
 
 int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout) {

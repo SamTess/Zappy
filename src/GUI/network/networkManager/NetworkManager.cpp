@@ -41,12 +41,8 @@ bool NetworkManager::connect(const std::string& host, int port) {
         _connection->connect(host, port);
         _isConnected = true;
         _networkThread->start([this]() { this->networkThreadLoop(); });
-        {
-            std::lock_guard<std::mutex> observersLock(_observersMutex);
-            for (auto* observer : _observers) {
-                observer->onConnectionStatusChanged(true);
-            }
-        }
+        if (_connectionCallback)
+            _connectionCallback(true);
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Connection error: " << e.what() << std::endl;
@@ -62,12 +58,8 @@ void NetworkManager::disconnect() {
         _networkThread->stop();
         _connection->close();
         _isConnected = false;
-        {
-            std::lock_guard<std::mutex> observersLock(_observersMutex);
-            for (auto* observer : _observers) {
-                observer->onConnectionStatusChanged(false);
-            }
-        }
+        if (_connectionCallback)
+            _connectionCallback(false);
     }
 }
 
@@ -125,26 +117,14 @@ void NetworkManager::processIncomingMessage(const std::string& message) {
         static_cast<const ProtocolParser*>(_protocolParser.get())->parseMessage(message);
     std::string header = parsedMessage.first;
     std::string data = parsedMessage.second;
-    notifyObservers(header, data);
+    if (_messageCallback)
+        _messageCallback(header, data);
 }
 
-void NetworkManager::notifyObservers(const std::string& header, const std::string& data) {
-    std::lock_guard<std::mutex> lock(_observersMutex);
-    for (auto* observer : _observers) {
-        observer->onMessage(header, data);
-    }
+void NetworkManager::setMessageCallback(MessageCallback callback) {
+    _messageCallback = callback;
 }
 
-void NetworkManager::addObserver(NetworkObserver* observer) {
-    if (!observer) return;
-    std::lock_guard<std::mutex> lock(_observersMutex);
-    if (std::find(_observers.begin(), _observers.end(), observer) == _observers.end()) {
-        _observers.push_back(observer);
-    }
-}
-
-void NetworkManager::removeObserver(NetworkObserver* observer) {
-    if (!observer) return;
-    std::lock_guard<std::mutex> lock(_observersMutex);
-    _observers.erase(std::remove(_observers.begin(), _observers.end(), observer), _observers.end());
+void NetworkManager::setConnectionCallback(ConnectionCallback callback) {
+    _connectionCallback = callback;
 }
