@@ -31,6 +31,9 @@ typedef struct tile_s {
     int player_count;
     int player_capacity;
     int resources[COUNT];
+    int *egg_ids;
+    int egg_count;
+    int egg_capacity;
 } tile_t;
 
 typedef struct resource_dist_s {
@@ -44,6 +47,8 @@ void tile_init(tile_t *tile);
 void tile_free(tile_t *tile);
 int tile_add_player(tile_t *tile, int player_id);
 int tile_remove_player(tile_t *tile, int player_id);
+void add_egg_to_tile(tile_t *tile, int egg_id);
+void remove_egg_from_tile(tile_t *tile, int egg_id);
 void distribute_resources(tile_t **map, int width, int height);
 
 #endif /* !TILE_H_ */
