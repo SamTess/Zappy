@@ -152,7 +152,7 @@ static void copy_names(server_t *server, parsing_info_t *parsed_info)
 {
     int i = 0;
 
-    for (i; parsed_info->names[i] != NULL; i++){
+    for (; parsed_info->names[i] != NULL; i++){
     }
     server->parsed_info->names = calloc(i + 1, sizeof(char *));
     if (server->parsed_info->names == NULL)
