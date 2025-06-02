@@ -35,6 +35,8 @@ SRCS			=	help.c								\
 					command/forward.c					\
 					command/right.c						\
 					command/left.c						\
+					command/look.c						\
+					command/tile_to_str.c				\
 					player/player_init.c				\
 					player/player_inventory.c			\
 					player/player_inventory_utils.c		\
