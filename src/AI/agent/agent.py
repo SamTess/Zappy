@@ -3,8 +3,9 @@ import socket
 from time import sleep
 import utils.input as inputs
 import utils.zappy as utils
+import agent.broadcast as broadcast
 
-class ClientAI:
+class Agent:
     def __init__(self, ip, port, team, agent_id=0):
         self.ip = ip
         self.port = port
@@ -12,24 +13,25 @@ class ClientAI:
         self.agent_id = agent_id
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.ip, self.port))
-        print(f"Connected to {self.ip}:{self.port}")
 
+        print(f"Connected to {self.ip}:{self.port}")
         welcome_msg = inputs.read_line_blocking(self.sock)
         print(f"Welcome message: {welcome_msg}")
         self.sock.send(f"{self.team}\n".encode('utf-8'))
         print("Joining team:", self.team)
         server_response = inputs.read_line_blocking(self.sock)
         if (server_response == "ko"):
-            print("Failed to join team. Please check the team name and try again.")
+            print("Failed to join team. Either the team is full, or its name is incorrect.")
             sys.exit(1)
         print(f"Player's id: {server_response}")
 
     def process_server_messages(self):
         while True:
             server_message = inputs.read_line(self.sock)
-            if server_message == "":
+            if server_message is None or server_message == "":
                 break
-            print(f"Agent {self.agent_id}: Server message: {server_message}")
+            else:
+                print("uknown server message received:" + server_message)
 
     def send_command(self, command):
       self.sock.send(f"{command}\n".encode('utf-8'))
@@ -55,13 +57,15 @@ class ClientAI:
       nb_food = utils.parse_inventory(inventory).get("food", 0)
       if nb_food < 10:
         result = self.send_command(utils.go_get_item(surroundings, "food"))
+      elif nb_food >= 15:
+        result = self.send_command("Broadcast " + broadcast._encrypt_message(f"Agent {self.agent_id} is alive and running."))
+        print(f"Agent {self.agent_id}: Broadcasting alive message.")
       else:
         self.take_items_on_ground(surroundings)
         result = self.send_command(utils.go_get_item(surroundings, utils.get_best_available_resource(surroundings)))
 
-      if result.startswith("ko"):
+      if result and result.startswith("ko"):
           print(f"Agent {self.agent_id}: Command failed: {result}")
-      # print(f"Agent {self.agent_id}: Command sent: {result}")
 
     def run(self):
         while True:

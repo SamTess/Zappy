@@ -2,19 +2,19 @@
 import sys
 import threading
 from time import sleep
-from agent.agent import ClientAI
+from agent.agent import Agent
 from parser.paringArgsClass import parseArgs
 
 def run_agent(ip, port, team, agent_id):
     try:
-        ai = ClientAI(ip, port, team, agent_id)
+        ai = Agent(ip, port, team, agent_id)
         ai.run()
     except Exception as e:
         print(f"Agent {agent_id}: Failed to start: {e}")
 
 if __name__ == "__main__":
     args = parseArgs()
-    num_agents = 10
+    num_agents = 1
     port = args.getPort()
     ip = args.getMachine()
     team = args.getName()
