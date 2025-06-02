@@ -148,7 +148,22 @@ static void init_server_socket(server_t *server, parsing_info_t *parsed_info)
     add_fd(server, server->s_fd);
 }
 
-static void init_server(server_t *server)
+static void copy_names(server_t *server, parsing_info_t *parsed_info)
+{
+    int i = 0;
+
+    for (; parsed_info->names[i] != NULL; i++){
+    }
+    server->parsed_info->names = calloc(i + 1, sizeof(char *));
+    if (server->parsed_info->names == NULL)
+        malloc_failed(6);
+    for (int j = 0; parsed_info->names[j] != NULL; j++){
+        server->parsed_info->names[j] = strdup(parsed_info->names[j]);
+    }
+    server->parsed_info->names[i] = NULL;
+}
+
+static void init_server(server_t *server, parsing_info_t *parsed_info)
 {
     server->nfds = 0;
     server->client = NULL;
@@ -156,10 +171,19 @@ static void init_server(server_t *server)
     server->serv_add = NULL;
     server->current_tick = 0;
     server->map = NULL;
+    server->parsed_info = malloc(sizeof(parsing_info_t));
+    if (server->parsed_info == NULL)
+        malloc_failed(7);
+    server->parsed_info->port = parsed_info->port;
+    server->parsed_info->width = parsed_info->width;
+    server->parsed_info->height = parsed_info->height;
+    server->parsed_info->client_nb = parsed_info->client_nb;
+    server->parsed_info->frequence = parsed_info->frequence;
+    copy_names(server, parsed_info);
 }
 
 void create_server(server_t *server, parsing_info_t *parsed_info)
 {
-    init_server(server);
+    init_server(server, parsed_info);
     init_server_socket(server, parsed_info);
 }
