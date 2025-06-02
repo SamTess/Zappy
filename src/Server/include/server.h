@@ -11,12 +11,14 @@
     #include "client.h"
     #include "parsing.h"
     #include "tile.h"
+    #include "egg.h"
 
 typedef struct server_s {
     int nfds;
     int s_fd;
     struct sockaddr_in *serv_add;
     client_t *client;
+    egg_t *eggs;
     tile_t **map;
     int current_tick;
     parsing_info_t *parsed_info;
