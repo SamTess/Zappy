@@ -172,6 +172,8 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->current_tick = 0;
     server->map = NULL;
     server->parsed_info = malloc(sizeof(parsing_info_t));
+    if (server->parsed_info == NULL)
+        malloc_failed(7);
     server->parsed_info->port = parsed_info->port;
     server->parsed_info->width = parsed_info->width;
     server->parsed_info->height = parsed_info->height;
