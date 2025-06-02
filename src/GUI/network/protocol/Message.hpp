@@ -9,7 +9,9 @@
 #define MESSAGE_HPP_
 
 #include <string>
+#include <memory>
 #include <vector>
+#include "messageData/MessageDataAll.hpp"
 #include "HeaderMessage.hpp"
 
 class Message {
@@ -40,33 +42,30 @@ class Message {
             UNKNOWN_COMMAND
         };
         Message();
-        explicit Message(std::string header, std::string data);
-        explicit Message(MessageType type);
+        Message(const std::string& header, const std::string& data, std::shared_ptr<IMessageData> structuredData);
         ~Message() = default;
 
         void setMessage(const std::string &data);
         void setHeader(const std::string &header);
         void setData(const std::string &data);
+        void setData(std::shared_ptr<IMessageData> data);
 
         const std::string &getMessage() const;
         const std::string &getHeader() const;
         const std::string &getData() const;
 
-        HeaderMessage::MessageType getType() const;
-        void setType(HeaderMessage::MessageType type);
-        // Additional methods for parameter management
-        void addIntParam(int value);
-        void addStringParam(const std::string &value);
-        const std::vector<std::string> &getParameters() const;
-        void setParameters(const std::vector<std::string> &params);
-        int getIntParam(size_t index) const;
+        bool hasStructuredData() const;
+        std::shared_ptr<IMessageData> getStructuredData() const {
+            if (!_structuredData)
+                return nullptr;
+            return _structuredData;
+        }
 
     private:
         std::string _messageString;
         std::string _messageHeader;
         std::string _messageData;
-        HeaderMessage::MessageType _messageType;
-        std::vector<std::string> _parameters;
+        std::shared_ptr<IMessageData> _structuredData;
 };
 
 #endif /* !MESSAGE_HPP_ */

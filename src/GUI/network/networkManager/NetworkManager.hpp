@@ -21,6 +21,7 @@
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
 #include "../buffer/CircularBuffer.hpp"
+#include "../../graphicalContext/GraphicalContext.hpp"
 
 class NetworkManager {
     public:
@@ -33,29 +34,23 @@ class NetworkManager {
         void sendCommand(const std::string& command);
         void processIncomingMessages();
 
-        // Callback pour récupérer les messages
-        using MessageCallback = std::function<void(const std::string&, const std::string&)>;
-        void setMessageCallback(MessageCallback callback);
-        // Callback pour les changements de statut de connexion
-        using ConnectionCallback = std::function<void(bool)>;
-        void setConnectionCallback(ConnectionCallback callback);
-
     private:
-        std::shared_ptr<TcpConnection> _connection;
-        std::shared_ptr<ProtocolParser> _protocolParser;
-        std::shared_ptr<NetworkThread> _networkThread;
-        std::shared_ptr<MessageQueue> _incomingQueue;
-        std::shared_ptr<CircularBuffer> _receiveBuffer;
+        std::unique_ptr<TcpConnection> _connection;
+        std::unique_ptr<ProtocolParser> _protocolParser;
+        std::unique_ptr<NetworkThread> _networkThread;
+        std::unique_ptr<MessageQueue> _incomingQueue;
+        std::unique_ptr<MessageQueue> _outgoingQueue;
+        std::unique_ptr<CircularBuffer> _receiveBuffer;
+        std::unique_ptr<GraphicalContext> _graphicalContext;
 
-        std::atomic<bool> _isConnected;
-        mutable std::mutex _mutex;
-        std::condition_variable _cv;
+        bool _isConnected;
+        std::mutex _logMutex;
 
-        MessageCallback _messageCallback;
-        ConnectionCallback _connectionCallback;
-
+        void startNetworkThread();
+        void stopNetworkThread();
         void networkThreadLoop();
         void processIncomingMessage(const std::string& message);
+        void processOutgoingMessages();
 };
 
 #endif /* !NETWORKMANAGER_HPP_ */

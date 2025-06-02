@@ -11,12 +11,13 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <utility>
 #include <memory>
+#include <utility>
 #include <functional>
 #include "../buffer/CircularBuffer.hpp"
 #include "Message.hpp"
 #include "HeaderMessage.hpp"
+#include "messageData/MessageDataAll.hpp"
 #include "../../shared/exception/AException.hpp"
 
 class ProtocolParser {
@@ -32,12 +33,11 @@ class ProtocolParser {
         std::string getCommandName(const std::string &message);
         bool messageComplete(const std::string &buffer);
         std::vector<std::string> splitMessage(const std::string &message);
+        std::string extractCommandParameter(const std::string &message);
         std::vector<std::string> extractMessageParameters(const std::string &message);
         int parseIntParameter(const std::string &param);
 
         void handleProtocol(const std::string &protocol);
-
-        // Parsing des informations de la map
         Message parseMapSize(const std::string &message);          // msz X Y\n
         Message parseTileContent(const std::string &message);      // bct X Y q0-q6
         Message parseAllTilesContent(const std::string &message);  // mct\n

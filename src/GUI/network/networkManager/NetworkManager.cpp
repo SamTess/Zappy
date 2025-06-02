@@ -17,11 +17,13 @@
 #include "NetworkLogger.hpp"
 
 NetworkManager::NetworkManager()
-    : _connection(std::make_shared<TcpConnection>()),
-      _protocolParser(std::make_shared<ProtocolParser>()),
-      _networkThread(std::make_shared<NetworkThread>()),
-      _incomingQueue(std::make_shared<MessageQueue>()),
-      _receiveBuffer(std::make_shared<CircularBuffer>()),
+    : _connection(std::make_unique<TcpConnection>()),
+      _protocolParser(std::make_unique<ProtocolParser>()),
+      _networkThread(std::make_unique<NetworkThread>()),
+      _incomingQueue(std::make_unique<MessageQueue>()),
+      _outgoingQueue(std::make_unique<MessageQueue>()),
+      _receiveBuffer(std::make_unique<CircularBuffer>()),
+      _graphicalContext(std::make_unique<GraphicalContext>()),
       _isConnected(false) {
 }
 
@@ -112,13 +114,18 @@ void NetworkManager::processIncomingMessages() {
         processIncomingMessage(message);
 }
 
+void NetworkManager::processOutgoingMessages() {
+    while (!_outgoingQueue->isEmpty()) {
+        std::string message = _outgoingQueue->dequeue();
+        if (!message.empty()) {
+            sendCommand(message);
+        }
+    }
+}
+
 void NetworkManager::processIncomingMessage(const std::string& message) {
-    std::pair<std::string, std::string> parsedMessage =
-        static_cast<const ProtocolParser*>(_protocolParser.get())->parseMessage(message);
-    std::string header = parsedMessage.first;
-    std::string data = parsedMessage.second;
-    if (_messageCallback)
-        _messageCallback(header, data);
+    NetworkLogger::get().log(std::string("[RECV] ") + message);
+    _graphicalContext->updateContext(_protocolParser->parseMessage(message));
 }
 
 void NetworkManager::setMessageCallback(MessageCallback callback) {
