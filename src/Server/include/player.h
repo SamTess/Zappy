@@ -30,6 +30,9 @@ typedef struct player_s {
 void init_player(player_t *player, char *playerTeam);
 
 // Inventory management functions
+void init_inventory(player_t *player);
+void free_inventory(player_t *player);
+
 bool add_item_to_inventory(player_t *player, ResourceType_t type, int nb);
 bool remove_item_from_inventory(player_t *player, ResourceType_t type, int nb);
 
