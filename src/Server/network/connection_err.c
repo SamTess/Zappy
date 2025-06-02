@@ -20,6 +20,10 @@ static void malloc_failed_bis(int i)
         perror("Malloc failed for command qeue");
         exit(84);
     }
+    if (i == 6){
+        perror("Malloc failed for parsing info names copy into server");
+        exit(84);
+    }
 }
 
 void malloc_failed(int i)

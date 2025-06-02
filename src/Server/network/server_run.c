@@ -153,7 +153,7 @@ static void helper_function(server_t *server, int nfds, struct pollfd *fds)
         poll_fds(server, current, nfds, fds);
 }
 
-void check_client(server_t *server, parsing_info_t *parsed_info)
+void check_client(server_t *server)
 {
     struct pollfd *fds = calloc((server->nfds + 1), sizeof(struct pollfd));
     static struct timeval last_tick = {0, 0};
@@ -167,7 +167,7 @@ void check_client(server_t *server, parsing_info_t *parsed_info)
     gettimeofday(&current_time, NULL);
     time_diff = (current_time.tv_sec - last_tick.tv_sec) * 1000 +
         (current_time.tv_usec - last_tick.tv_usec) / 1000;
-    if (time_diff >= (1000 / parsed_info->frequence)) {
+    if (time_diff >= (1000 / server->parsed_info->frequence)) {
         update_game_tick(server);
         last_tick = current_time;
     }
