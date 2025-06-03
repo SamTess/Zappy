@@ -48,14 +48,11 @@ void TcpConnection::resolveAddress(const std::string &host, int port) {
     addr.sin_port = htons(port);
 
     if (isalpha(host[0])) {
-        // gethostbyname retourne un pointeur vers une structure statique, donc pas besoin de libérer
-        // mais pour éviter les raw pointers, utilisons une approche avec RAII local
         struct hostent *server = gethostbyname(host.c_str());
         if (server == nullptr) {
             close();
             throw TcpConnectionException("Unknown host: " + host);
         }
-        // Créer une copie locale des données nécessaires pour éviter d'utiliser le pointeur brut
         std::memcpy(&addr.sin_addr.s_addr, server->h_addr, server->h_length);
     } else {
         if (!SystemWrapper::inetPton(AF_INET, host, &addr.sin_addr)) {
