@@ -48,6 +48,7 @@ SRCS			=	help.c								\
 					player/player_inventory.c			\
 					player/player_inventory_utils.c		\
 					player/player_inventory_display.c	\
+					player/player_death.c				\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 
