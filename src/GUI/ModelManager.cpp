@@ -8,6 +8,7 @@
 #include "ModelManager.hpp"
 #include <iostream>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <ctime>
 
