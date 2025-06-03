@@ -35,6 +35,8 @@ typedef struct player_s {
     int busy_until;
     char **command_queue;
     int queue_size;
+    bool is_in_incantation;
+    int incantation_leader_id;
 } player_t;
 
 void init_player(player_t *player, char *playerTeam);
