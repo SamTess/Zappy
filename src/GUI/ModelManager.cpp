@@ -25,8 +25,6 @@ ModelManager::ModelManager()
       m_globalModelScale(1.0f) {
     m_modelPaths = {
         "assets/models/14-girl-obj/girl.obj",
-        "assets/models/bugatti.obj",
-        "assets/models/cartoon.obj"
     };
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
