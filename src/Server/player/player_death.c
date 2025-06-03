@@ -13,12 +13,14 @@
 
 void handle_player_death(server_t *server, client_t *client)
 {
+    tile_t *tile;
+
     if (!client || !client->player)
         return;
     write_command_output(client->client_fd, "dead\n");
     if (server->map && client->player->pos_y < server->parsed_info->height &&
         client->player->pos_x < server->parsed_info->width) {
-        tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
+        tile = &server->map[client->player->pos_y][client->player->pos_x];
         tile_remove_player(tile, client->client_id);
     }
     if (client->player) {
