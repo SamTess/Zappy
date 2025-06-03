@@ -5,6 +5,7 @@
 ** Renderer
 */
 
+#include <memory>
 #include "Renderer.hpp"
 
 Renderer::Renderer()
