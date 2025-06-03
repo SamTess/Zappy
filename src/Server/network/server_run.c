@@ -6,6 +6,7 @@
 */
 #include "../include/server.h"
 #include "../include/command.h"
+#include "../include/player.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -57,6 +58,8 @@ void update_game_tick(server_t *server)
         current = current->next;
     while (current != NULL) {
         next = current->next;
+        if (current->player != NULL)
+            check_player_starvation(server, current);
         if (current->player &&
             current->player->busy_until <= server->current_tick &&
             current->player->queue_size > 0)

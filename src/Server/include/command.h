@@ -36,4 +36,8 @@ void take_object(server_t *server, client_t *client, char *buffer);
 void set_object(server_t *server, client_t *client, char *buffer);
 void fork_c(server_t *server, client_t *client, char *buffer);
 
+// Death and starvation management functions
+void handle_player_death(server_t *server, client_t *client);
+void check_player_starvation(server_t *server, client_t *client);
+
 #endif /* !COMMAND_H_ */
