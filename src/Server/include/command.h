@@ -15,6 +15,8 @@ typedef struct command_data_s {
     int *times;
 } command_data_t;
 
+resource_type_t determine_type(char *resource_string);
+
 void process_next_queued_command(server_t *server, client_t *client);
 void cleanup_player_queue(player_t *player);
 void cleanup_client(client_t *client);
@@ -30,5 +32,7 @@ void inventory(server_t *server, client_t *client, char *buffer);
 void look(server_t *server, client_t *client, char *buffer);
 void eject(server_t *server, client_t *client, char *buffer);
 void connect_nbr(server_t *server, client_t *client, char *buffer);
+void take_object(server_t *server, client_t *client, char *buffer);
+void set_object(server_t *server, client_t *client, char *buffer);
 
 #endif /* !COMMAND_H_ */

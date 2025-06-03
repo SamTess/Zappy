@@ -40,6 +40,8 @@ SRCS			=	help.c								\
 					command/tile_to_str.c				\
 					command/eject.c						\
 					command/connect_nbr.c				\
+					command/take_object.c				\
+					command/set_object.c				\
 					map/egg.c							\
 					player/player_init.c				\
 					player/player_inventory.c			\

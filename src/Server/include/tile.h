@@ -15,7 +15,7 @@
     #define PHIRAS_D 0.08
     #define THYSTAME_D 0.05
 
-typedef enum ResourceType {
+typedef enum resource_type {
     FOOD = 0,
     LINEMATE,
     DERAUMERE,
@@ -24,7 +24,7 @@ typedef enum ResourceType {
     PHIRAS,
     THYSTAME,
     COUNT
-} ResourceType_t;
+} resource_type_t;
 
 typedef struct tile_s {
     int *player_ids;
