@@ -14,7 +14,7 @@
 class ParsingCLI {
     public:
         ParsingCLI(int argc, char **argv);
-        ParsingCLI(bool testMode = false);
+        explicit ParsingCLI(bool testMode = false);
         ~ParsingCLI();
 
         void parse(int argc, char **argv);

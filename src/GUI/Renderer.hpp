@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <memory>
 #include "../Shared/IGraphicsLib.hpp"
 #include "../Shared/IGuiLib.hpp"
 #include "ModelManager.hpp"
@@ -18,13 +19,16 @@ public:
     Renderer();
     ~Renderer() = default;
 
-    void init(IGraphicsLib& graphics);
-    void render(IGraphicsLib& graphics, IGuiLib& gui, ModelManager& modelManager, CameraController& camera, UIRenderer& uiRenderer);
-    
-    void renderBackground(IGraphicsLib& graphics);
-    void renderGrid(IGraphicsLib& graphics);
-    void renderScene(IGraphicsLib& graphics, ModelManager& modelManager);
-    void renderUI(IGraphicsLib& graphics, IGuiLib& gui, CameraController& camera, UIRenderer& uiRenderer);
+    void init(std::shared_ptr<IGraphicsLib> graphics);
+    void render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
+                std::shared_ptr<ModelManager> modelManager, std::shared_ptr<CameraController> camera,
+                std::shared_ptr<UIRenderer> uiRenderer);
+
+    void renderBackground(std::shared_ptr<IGraphicsLib> graphics);
+    void renderGrid(std::shared_ptr<IGraphicsLib> graphics);
+    void renderScene(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<ModelManager> modelManager);
+    void renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
+                 std::shared_ptr<CameraController> camera, std::shared_ptr<UIRenderer> uiRenderer);
 
     int getMapWidth() const { return m_mapWidth; }
     int getMapHeight() const { return m_mapHeight; }

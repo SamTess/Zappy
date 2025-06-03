@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include "../Shared/IGraphicsLib.hpp"
 #include "../Shared/Common.hpp"
 #include "Constants.hpp"
@@ -26,19 +27,19 @@ public:
     ModelManager();
     ~ModelManager() = default;
 
-    bool loadModel3D(IGraphicsLib& graphics, const std::string& modelPath);
-    bool loadGirlModel(IGraphicsLib& graphics);
-    void loadNextModel(IGraphicsLib& graphics);
-    void initializeRandomModels(IGraphicsLib& graphics);
-    void drawModel(IGraphicsLib& graphics);
+    bool loadModel3D(std::shared_ptr<IGraphicsLib> graphics, const std::string& modelPath);
+    bool loadGirlModel(std::shared_ptr<IGraphicsLib> graphics);
+    void loadNextModel(std::shared_ptr<IGraphicsLib> graphics);
+    void initializeRandomModels(std::shared_ptr<IGraphicsLib> graphics);
+    void drawModel(std::shared_ptr<IGraphicsLib> graphics);
     void updateModelRotation(float amount);
-    
+
     bool isModelLoaded() const { return m_modelLoaded; }
     bool isShowModel() const { return m_showModel; }
     void setShowModel(bool show) { m_showModel = show; }
     bool isRandomPlacement() const { return m_randomPlacement; }
     void setRandomPlacement(bool random) { m_randomPlacement = random; }
-    
+
     ZappyTypes::Vector3& position() { return m_modelPosition; }
     float& scale() { return m_modelScale; }
     float& rotation() { return m_modelRotation; }
@@ -63,11 +64,11 @@ private:
     bool m_randomPlacement;
     std::string m_currentModelPath;
     std::string m_currentModelName;
-    
+
     std::vector<std::string> m_modelPaths;
     int m_currentModelIndex;
     float m_globalModelScale;
-    
+
     std::vector<ModelInstance> m_models;
     std::vector<ZappyTypes::Vector3> m_modelPositions;
     std::vector<ZappyTypes::Color> m_modelColors;

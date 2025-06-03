@@ -61,7 +61,6 @@ void ParsingCLI::parse(int argc, char **argv) {
 void ParsingCLI::checkValidityCLI() const {
     if (_testMode)
         return;
-        
     if (_machine.empty())
         throw ParsingCLIException("Machine name cannot be empty");
     if (_port <= 0)

@@ -13,7 +13,7 @@
 
 const int DEFAULT_WIDTH = 1280;
 const int DEFAULT_HEIGHT = 720;
-const std::string DEFAULT_TITLE = "Zappy GUI";
+const char DEFAULT_TITLE[] = "Zappy GUI";
 const int NUM_RANDOM_MODELS = 20;
 
 enum KeyboardKey {
@@ -44,16 +44,16 @@ enum KeyboardKey {
     KEY_X               = 88,
     KEY_Y               = 89,
     KEY_Z               = 90,
-    
+
     KEY_F1              = 290,
     KEY_F2              = 291,
     KEY_F3              = 292,
-    
+
     KEY_RIGHT           = 262,
     KEY_LEFT            = 263,
     KEY_DOWN            = 264,
     KEY_UP              = 265,
-    
+
     KEY_SPACE           = 32,
     KEY_ESCAPE          = 256,
     KEY_ENTER           = 257,
@@ -61,7 +61,7 @@ enum KeyboardKey {
     KEY_BACKSPACE       = 259,
     KEY_INSERT          = 260,
     KEY_DELETE          = 261,
-    
+
     KEY_SHIFT_LEFT      = 340,
     KEY_CONTROL_LEFT    = 341,
     KEY_ALT_LEFT        = 342,

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <memory>
 #include "../Shared/IGraphicsLib.hpp"
 #include "../Shared/IGuiLib.hpp"
 #include "ModelManager.hpp"
@@ -18,11 +19,11 @@ public:
     UIRenderer();
     ~UIRenderer() = default;
 
-    void renderUI(IGraphicsLib& graphics, IGuiLib& gui, CameraController& camera);
-    void renderStatusBar(IGuiLib& gui);
-    void renderCameraInfo(IGuiLib& gui, CameraController& camera);
-    void renderModelControls(IGraphicsLib& graphics, IGuiLib& gui, ModelManager& modelManager);
-    void renderFPS(IGraphicsLib& graphics);
+    void renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui, std::shared_ptr<CameraController> camera);
+    void renderStatusBar(std::shared_ptr<IGuiLib> gui);
+    void renderCameraInfo(std::shared_ptr<IGuiLib> gui, std::shared_ptr<CameraController> camera);
+    void renderModelControls(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui, std::shared_ptr<ModelManager> modelManager);
+    void renderFPS(std::shared_ptr<IGraphicsLib> graphics);
 
     bool& showUI() { return m_showUI; }
     int& fps() { return m_fps; }
