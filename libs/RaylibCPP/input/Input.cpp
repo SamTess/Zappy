@@ -21,4 +21,28 @@ bool Input::isKeyDown(int key) {
     return IsKeyDown(key);
 }
 
+bool Input::isMouseButtonDown(int button) {
+    return IsMouseButtonDown(button);
+}
+
+bool Input::isMouseButtonReleased(int button) {
+    return IsMouseButtonReleased(button);
+}
+
+int Input::getMouseX() {
+    return GetMouseX();
+}
+
+int Input::getMouseY() {
+    return GetMouseY();
+}
+
+Vector2 Input::getMousePosition() {
+    return GetMousePosition();
+}
+
+float Input::getMouseWheelMove() {
+    return GetMouseWheelMove();
+}
+
 }  // namespace raylibcpp
