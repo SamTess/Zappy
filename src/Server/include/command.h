@@ -34,6 +34,6 @@ void eject(server_t *server, client_t *client, char *buffer);
 void connect_nbr(server_t *server, client_t *client, char *buffer);
 void take_object(server_t *server, client_t *client, char *buffer);
 void set_object(server_t *server, client_t *client, char *buffer);
-void fork_command(server_t *server, client_t *client, char *buffer);
+void fork(server_t *server, client_t *client, char *buffer);
 
 #endif /* !COMMAND_H_ */

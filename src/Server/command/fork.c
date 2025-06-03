@@ -23,7 +23,7 @@ static int get_next_egg_id(server_t *server)
     return max_id + 1;
 }
 
-void fork_command(server_t *server, client_t *client, char *buffer)
+void fork(server_t *server, client_t *client, char *buffer)
 {
     egg_t *new_egg;
     int egg_id;

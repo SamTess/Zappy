@@ -48,7 +48,7 @@ Test(fork_integration, test_fork_command_workflow)
     cr_redirect_stdout();
     
     // Test that fork creates an egg
-    fork_command(&server, &client, buffer);
+    fork(&server, &client, buffer);
     
     // Verify egg was created
     cr_assert_not_null(server.eggs);
@@ -58,7 +58,7 @@ Test(fork_integration, test_fork_command_workflow)
     cr_assert_eq(server.eggs->egg_id, 1);
     
     // Test that a second fork creates another egg with different ID
-    fork_command(&server, &client, buffer);
+    fork(&server, &client, buffer);
     cr_assert_not_null(server.eggs);
     cr_assert_eq(server.eggs->egg_id, 2); // Most recent egg should have ID 2
     
