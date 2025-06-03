@@ -77,19 +77,19 @@ bool ModelManager::loadGirlModel(std::shared_ptr<IGraphicsLib> graphics) {
     } catch (const std::exception& e) {
         std::cerr << "Erreur lors du chargement du modèle 3D de la fille: " << e.what() << std::endl;
         try {
-            std::string absPath = "/home/alex/Zappy/assets/models/14-girl-obj/girl.obj";
-            std::cout << "Tentative avec un chemin absolu: " << absPath << std::endl;
-            graphics->LoadModel3D(absPath);
+            std::string altPath = "../assets/models/14-girl-obj/girl.obj";
+            std::cout << "Tentative avec un chemin alternatif: " << altPath << std::endl;
+            graphics->LoadModel3D(altPath);
             m_modelLoaded = true;
-            m_currentModelPath = absPath;
+            m_currentModelPath = altPath;
             m_currentModelName = "girl.obj";
             m_modelPosition = {0.0f, 0.0f, 0.0f};
             m_modelScale = 0.1f;
             m_modelRotation = 0.0f;
-            std::cout << "Modèle 3D de la fille chargé avec succès avec chemin absolu!" << std::endl;
+            std::cout << "Modèle 3D de la fille chargé avec succès avec chemin alternatif!" << std::endl;
             return true;
         } catch (const std::exception& e2) {
-            std::cerr << "Échec avec le chemin absolu: " << e2.what() << std::endl;
+            std::cerr << "Échec avec le chemin alternatif: " << e2.what() << std::endl;
             m_modelLoaded = false;
             return false;
         }

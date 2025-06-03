@@ -41,10 +41,15 @@ void ParsingCLI::setMachine(const std::string &machine) {
 }
 
 void ParsingCLI::parse(int argc, char **argv) {
+    _port = 4242;
+    _machine = "localhost";
+
     if (argc == 1) {
-        displayHelp();
-        throw ParsingCLIException("No arguments provided");
+        std::cout << "Aucun argument fourni, utilisation des valeurs par défaut : port=" << _port
+                  << ", machine=" << _machine << std::endl;
+        return;
     }
+
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-p") == 0 && i + 1 < argc) {
             setPort(std::stoi(argv[++i]));

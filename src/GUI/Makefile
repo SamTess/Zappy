@@ -33,6 +33,7 @@ SRCS			=	shared/exception/AException.cpp \
 					ModelManager.cpp \
 					Renderer.cpp \
 					UIRenderer.cpp \
+					GameLoop.cpp \
 
 OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME			= $(BUILD_DIR)/libgui.a

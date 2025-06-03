@@ -6,60 +6,36 @@
 */
 
 #include <iostream>
-#include <thread>
-#include <chrono>
-#include <memory>
+#include <string>
 #include "parsing/ParsingCLI.hpp"
-#include "../Shared/LibraryManager.hpp"
-#include "Constants.hpp"
-#include "ModelManager.hpp"
-#include "CameraController.hpp"
-#include "UIRenderer.hpp"
-#include "Renderer.hpp"
+#include "GameLoop.hpp"
 
-int main(int, char**) {
+void displayHelp() {
+    std::cout << "USAGE: ./zappy_gui -p port -h machine" << std::endl;
+    std::cout << "\tport\tis the port number" << std::endl;
+    std::cout << "\tmachine\tis the name of the machine; localhost by default" << std::endl;
+}
+
+int main(int argc, char** argv) {
     try {
-        ParsingCLI parser(true);
-
-        auto& libraryManager = LibraryManager::getInstance();
-
-        if (!libraryManager.loadGraphicsLib("plugins/libraylibcpp.so")) {
-            std::cerr << "Erreur de chargement de la bibliothèque graphique: " << libraryManager.getLastError() << std::endl;
+        if (argc == 2 && std::string(argv[1]) == "--help") {
+            displayHelp();
+            return 0;
+        }
+        ParsingCLI parser(argc, argv);
+        std::string host = parser.getMachine();
+        int port = parser.getPort();
+        if (port <= 0 || port > 65535) {
+            std::cerr << "Port number must be between 1 and 65535" << std::endl;
             return 84;
         }
-
-        if (!libraryManager.loadGuiLib("plugins/libraygui.so")) {
-            std::cerr << "Erreur de chargement de la bibliothèque GUI: " << libraryManager.getLastError() << std::endl;
+        GameLoop gameLoop;
+        gameLoop.setServerInfo(host, port);
+        if (!gameLoop.init()) {
+            std::cerr << "Failed to initialize game components" << std::endl;
             return 84;
         }
-
-        // Obtention des shared_ptr pour les interfaces
-        auto graphics = libraryManager.getGraphicsLibPtr();
-        auto gui = libraryManager.getGuiLibPtr();
-
-        auto renderer = std::make_shared<Renderer>();
-        renderer->init(graphics);
-
-        auto modelManager = std::make_shared<ModelManager>();
-        if (!modelManager->loadGirlModel(graphics)) {
-            std::cerr << "Impossible de charger le modèle 3D de la fille" << std::endl;
-        } else {
-            modelManager->paths().clear();
-            modelManager->paths().push_back("assets/models/14-girl-obj/girl.obj");
-            modelManager->currentIndex() = 0;
-            modelManager->initializeRandomModels(graphics);
-        }
-
-        auto camera = std::make_shared<CameraController>();
-        camera->init(graphics);
-        auto uiRenderer = std::make_shared<UIRenderer>();
-
-        while (!graphics->WindowShouldClose()) {
-            camera->update(graphics);
-            renderer->render(graphics, gui, modelManager, camera, uiRenderer);
-            std::this_thread::sleep_for(std::chrono::milliseconds(16));
-        }
-        graphics->CloseWindow();
+        return gameLoop.run();
     } catch (const AException &e) {
         std::cerr << e.getFormattedMessage() << std::endl;
         return 84;
