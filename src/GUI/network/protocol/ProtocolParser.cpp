@@ -14,6 +14,7 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <sstream>
 
 ProtocolParser::ProtocolParser() {
     using std::placeholders::_1;
@@ -112,18 +113,13 @@ std::string ProtocolParser::getCommandName(const std::string &message) {
 
 std::vector<std::string> ProtocolParser::splitMessage(const std::string &message) {
     std::vector<std::string> parts;
-    size_t start = 0;
-    size_t end = message.find(' ');
-    while (end != std::string::npos) {
-        parts.push_back(message.substr(start, end - start));
-        start = end + 1;
-        end = message.find(' ', start);
-    }
-    std::string lastPart = message.substr(start);
-    if (!lastPart.empty() && lastPart.back() == '\n')
-        lastPart.pop_back();
-    if (!lastPart.empty())
-        parts.push_back(lastPart);
+    std::string cleanMessage = message;
+    if (!cleanMessage.empty() && cleanMessage.back() == '\n')
+        cleanMessage.pop_back();
+    std::istringstream ss(cleanMessage);
+    std::string token;
+    while (ss >> token)
+        parts.push_back(token);
     return parts;
 }
 

@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <vector>
 #include <memory>
+#include "HeaderMessage.hpp"
 
 Message::Message() {
     std::cout << "creating empty message" << std::endl;

@@ -54,6 +54,20 @@ std::string CircularBuffer::readString(size_t maxSize) {
     return result;
 }
 
+size_t CircularBuffer::read(std::string& buffer, size_t maxSize) {
+    if (isEmpty() || maxSize == 0)
+        return 0;
+    size_t bytesToRead = std::min(maxSize, _size);
+    buffer.clear();
+    buffer.reserve(bytesToRead);
+    for (size_t i = 0; i < bytesToRead; ++i) {
+        buffer.push_back(_buffer[_head]);
+        _head = (_head + 1) % _capacity;
+    }
+    _size -= bytesToRead;
+    return bytesToRead;
+}
+
 SystemWrapper::SafeBuffer CircularBuffer::readSafeBuffer(size_t maxSize) {
     std::string str = readString(maxSize);
     SystemWrapper::SafeBuffer buf(str.size());

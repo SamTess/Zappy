@@ -34,23 +34,51 @@ class NetworkManager {
         void sendCommand(const std::string& command);
         void processIncomingMessages();
 
+        // Callback pour récupérer les messages
+        using MessageCallback = std::function<void(const std::string&, const std::string&)>;
+        void setMessageCallback(MessageCallback callback);
+        // Callback pour les changements de statut de connexion
+        using ConnectionCallback = std::function<void(bool)>;
+        void setConnectionCallback(ConnectionCallback callback);
+
     private:
         std::unique_ptr<TcpConnection> _connection;
         std::unique_ptr<ProtocolParser> _protocolParser;
         std::unique_ptr<NetworkThread> _networkThread;
         std::unique_ptr<MessageQueue> _incomingQueue;
         std::unique_ptr<MessageQueue> _outgoingQueue;
-        std::unique_ptr<CircularBuffer> _receiveBuffer;
+        std::shared_ptr<CircularBuffer> _receiveBuffer;
         std::unique_ptr<GraphicalContext> _graphicalContext;
 
         bool _isConnected;
         std::mutex _logMutex;
+        mutable std::mutex _mutex;
+        std::condition_variable _cv;
 
-        void startNetworkThread();
-        void stopNetworkThread();
+        MessageCallback _messageCallback;
+        ConnectionCallback _connectionCallback;
+        
+        // Méthodes de gestion du thread réseau
         void networkThreadLoop();
+        void tryReceiveInitialWelcome(bool& welcomeReceived);
+        int receiveAndProcessData(int errorCount, int maxErrors, bool& welcomeReceived);
+        void processReceivedData(bool& welcomeReceived);
+        int handleReceiveError(int errorCount, int maxErrors, const std::exception& e);
+        int processPendingOutgoingMessages(int errorCount, int maxErrors);
+        int handleNetworkThreadError(int errorCount, int maxErrors, const std::exception& e);
+        
+        // Méthodes de traitement des messages entrants
         void processIncomingMessage(const std::string& message);
-        void processOutgoingMessages();
+        void handleWelcomeMessage(const std::string& message);
+        void handleRegularMessage(const std::string& message);
+        void executeMessageCallback(const std::string& message);
+        void handleInvalidMessage(const std::string& message, const std::exception& e);
+        
+        // Méthodes pour l'envoi des commandes
+        bool validateConnectionForSending();
+        std::string formatCommand(const std::string& command);
+        void logOutgoingCommand(const std::string& formattedCommand);
+        void queueCommandForSending(const std::string& formattedCommand);
 };
 
 #endif /* !NETWORKMANAGER_HPP_ */

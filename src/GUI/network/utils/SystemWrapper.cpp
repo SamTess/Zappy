@@ -108,12 +108,18 @@ int setNonBlocking(int fd) {
 }
 
 ssize_t readSocket(int fd, SafeBuffer* buffer, size_t count) {
-    // Utilisation d'un pointeur brut : la fonction doit être compatible avec l'API C (read) et ne prend pas la propriété du buffer, qui est géré ailleurs.
     if (!buffer)
         return -1;
-    const size_t minSize = std::min(count, buffer->size());
-    buffer->data().resize(minSize);
-    return read(fd, &buffer->data()[0], minSize);
+    if (buffer->size() < count) {
+        buffer->resize(count);
+    }
+    std::vector<char> tempBuffer(count + 1, 0);
+    ssize_t bytesRead = read(fd, tempBuffer.data(), count);
+    if (bytesRead > 0) {
+        tempBuffer[bytesRead] = '\0';
+        buffer->data().assign(tempBuffer.data(), bytesRead);
+    }
+    return bytesRead;
 }
 
 ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count) {

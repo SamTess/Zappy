@@ -54,6 +54,10 @@ tests_run: tests
 	@echo "$(MAGENTA)Running tests...$(RESET)"
 	@$(MAKE) -C $(TESTS_DIR) tests_run
 
+test_network_gui: zappy_gui
+	@echo "$(MAGENTA)Running network tests for zappy_gui...$(RESET)"
+	@$(MAKE) -C $(TESTS_DIR) network_gui_tests
+
 debug:
 	@echo "$(CYAN)Building all components in debug mode...$(RESET)"
 	@$(MAKE) -C $(SERVER_DIR) debug
@@ -148,4 +152,18 @@ style_cpp: fclean
 .PHONY: all zappy_server zappy_gui zappy_ai tests tests_run \
 debug install_ai init clean fclean re \
 docs docusaurus-build docusaurus-serve docusaurus-start docusaurus-deploy \
-style style_cpp
+style style_cpp test_network_gui
+
+# Règle pour tester les fonctionnalités réseau du GUI
+test_network_gui: zappy_gui
+	@if [ ! -f tests/zappy_server_ref ]; then \
+		echo "[ERREUR] Le binaire zappy_server_ref est requis pour les tests réseau."; \
+		echo "Téléchargez ou placez zappy_server_ref à la racine du projet."; \
+		exit 1; \
+	fi
+	@echo "[INFO] Exécution des tests fonctionnels réseau GUI..."
+	@cd tests/client/network && for t in test_*.py; do \
+		echo "$(MAGENTA)[TEST]$(RESET) $$t"; \
+		python3 "$$t" || exit 1; \
+	done
+	@echo "$(GREEN)[OK]$(RESET)Tous les tests réseau GUI sont passés."

@@ -43,6 +43,7 @@ class Message {
         };
         Message();
         Message(const std::string& header, const std::string& data, std::shared_ptr<IMessageData> structuredData);
+        explicit Message(MessageType type);
         ~Message() = default;
 
         void setMessage(const std::string &data);
@@ -60,12 +61,16 @@ class Message {
                 return nullptr;
             return _structuredData;
         }
+        void addIntParam(int value);
+        void addStringParam(const std::string &value);
 
     private:
         std::string _messageString;
         std::string _messageHeader;
         std::string _messageData;
         std::shared_ptr<IMessageData> _structuredData;
+        HeaderMessage::MessageType _messageType;
+        std::vector<std::string> _parameters;
 };
 
 #endif /* !MESSAGE_HPP_ */
