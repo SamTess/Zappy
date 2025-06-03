@@ -43,7 +43,7 @@ void check_player_starvation(server_t *server, client_t *client)
         food_amount = how_many_in_inventory(client->player, FOOD);
         if (food_amount > 0) {
             remove_item_from_inventory(client->player, FOOD, 1);
-            client->player->life = 126;
+            client->player->life = MAX_LIFE_AFTER_FOOD;
         } else
             handle_player_death(server, client);
     }

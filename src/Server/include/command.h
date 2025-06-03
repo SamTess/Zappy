@@ -7,6 +7,7 @@
 
 #ifndef COMMAND_H_
     #define COMMAND_H_
+    #define MAX_LIFE_AFTER_FOOD 126
     #include "server.h"
 
 typedef struct command_data_s {
