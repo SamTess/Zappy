@@ -33,10 +33,8 @@ void take_object(server_t *server, client_t *client, char *buffer)
     char *resource_name = buffer + 5;
     resource_type_t resource_type = determine_type(resource_name);
 
-    if (client == NULL || client->player == NULL || resource_type == COUNT) {
-        write_command_output(client->client_fd, "ko\n");
-        return;
-    }
+    if (client == NULL || client->player == NULL || resource_type == COUNT)
+        return write_command_output(client->client_fd, "ko\n");
     if (server->map[client->player->pos_y]
         [client->player->pos_x].resources[resource_type] > 0) {
         server->map[client->player->pos_y]
