@@ -28,6 +28,7 @@ SRCS			=	help.c								\
 					network/connection_err.c			\
 					network/connection.c				\
 					network/server_run.c				\
+					network/queue_connection.c			\
 					map/map_creation.c					\
 					map/tile.c							\
 					command/parse_command.c				\
@@ -43,6 +44,7 @@ SRCS			=	help.c								\
 					command/take_object.c				\
 					command/set_object.c				\
 					command/fork.c						\
+					command/start_incantation.c			\
 					map/egg.c							\
 					player/player_init.c				\
 					player/player_inventory.c			\
