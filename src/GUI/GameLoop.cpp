@@ -8,6 +8,8 @@
 #include "GameLoop.hpp"
 #include <iostream>
 #include <thread>
+#include <memory>
+#include <string>
 #include <chrono>
 #include "Constants.hpp"
 
