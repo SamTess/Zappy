@@ -27,9 +27,42 @@ static int count_team_clients(server_t *server, char *team_name)
     return count;
 }
 
+static int count_client_egg(client_t *creator, egg_t *current, char *team_name)
+{
+    int count = 0;
+
+    if (creator)
+        creator = creator->next;
+    while (creator) {
+        if (creator->client_id == current->creator_id &&
+            creator->player && creator->player->team_name &&
+            strcmp(creator->player->team_name, team_name) == 0) {
+            count++;
+            break;
+        }
+        creator = creator->next;
+    }
+    return count;
+}
+
+static int count_team_eggs(server_t *server, char *team_name)
+{
+    egg_t *current = server->eggs;
+    client_t *creator;
+    int count = 0;
+
+    while (current) {
+        creator = server->client;
+        count += count_client_egg(creator, current, team_name);
+        current = current->next;
+    }
+    return count;
+}
+
 void connect_nbr(server_t *server, client_t *client, char *buffer)
 {
     int current_team_clients;
+    int team_eggs;
     int available_slots;
     char response[16];
 
@@ -40,7 +73,9 @@ void connect_nbr(server_t *server, client_t *client, char *buffer)
     }
     current_team_clients = count_team_clients(server,
         client->player->team_name);
-    available_slots = server->parsed_info->client_nb - current_team_clients;
+    team_eggs = count_team_eggs(server, client->player->team_name);
+    available_slots = (server->parsed_info->client_nb + team_eggs)
+        - current_team_clients;
     if (available_slots < 0)
         available_slots = 0;
     snprintf(response, sizeof(response), "%d\n", available_slots);

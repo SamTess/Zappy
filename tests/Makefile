@@ -18,7 +18,8 @@ BUILD_DIR		=	../build/tests
 SERVER_LIB		=	../build/libserver.a
 GUI_LIB			=	../build/libgui.a
 
-SERVER_TESTS	=	server/test_server.c server/test_player_inventory.c
+SERVER_TESTS	=	server/test_server.c server/test_player_inventory.c \
+					server/test_fork_command.c server/test_connect_nbr.c
 CLIENT_TESTS	=	client/test_client.cpp \
 					client/test_circular_buffer.cpp \
 					client/test_message_queue.cpp \

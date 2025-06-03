@@ -42,6 +42,7 @@ SRCS			=	help.c								\
 					command/connect_nbr.c				\
 					command/take_object.c				\
 					command/set_object.c				\
+					command/fork.c						\
 					map/egg.c							\
 					player/player_init.c				\
 					player/player_inventory.c			\
