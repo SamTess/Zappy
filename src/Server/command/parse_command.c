@@ -60,7 +60,7 @@ static command_data_t get_command_data(void)
         "Take", "Set", "Fork", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, inventory, look, eject,
-            connect_nbr, take_object, set_object, fork, NULL};
+            connect_nbr, take_object, set_object, fork_c, NULL};
     static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 42};
     command_data_t data = {comm_char, comm_func, comm_times};
 
