@@ -46,6 +46,12 @@ public:
     virtual bool IsKeyPressed(int key) = 0;
     virtual bool IsKeyDown(int key) = 0;
     virtual bool IsMouseButtonPressed(int button) = 0;
+    virtual bool IsMouseButtonDown(int button) = 0;
+    virtual bool IsMouseButtonReleased(int button) = 0;
+    virtual int GetMouseX() = 0;
+    virtual int GetMouseY() = 0;
+    virtual ZappyTypes::Vector2 GetMousePosition() = 0;
+    virtual float GetMouseWheelMove() = 0;
 
     // Audio (optionnel)
     virtual void PlaySound(const std::string& path) = 0;
@@ -70,5 +76,6 @@ public:
     // Modèles 3D
     virtual void LoadModel3D(const std::string& path) = 0;
     virtual void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) = 0;
+    virtual void DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) = 0;
     virtual void UnloadModel3D() = 0;
 };

@@ -29,6 +29,10 @@ SRCS			=	shared/exception/AException.cpp \
 					network/networkThread/NetworkThread.cpp \
 					network/protocol/Message.cpp \
 					network/protocol/ProtocolParser.cpp \
+					CameraController.cpp \
+					ModelManager.cpp \
+					Renderer.cpp \
+					UIRenderer.cpp \
 
 OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME			= $(BUILD_DIR)/libgui.a
@@ -63,7 +67,7 @@ $(LIB_NAME): $(OBJ_FILES)
 $(BINARY_NAME): $(LIB_NAME)
 	@echo -e "$(GREEN)Compiling GUI binary...$(RESET)"
 	@$(CXX) -o $(BINARY_NAME) $(MAIN_FILE) $(LIB_NAME) \
-		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS)
+		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS) -ldl
 
 $(BUILD_DIR)/GUI/%.o: %.cpp
 	@mkdir -p $(dir $@)

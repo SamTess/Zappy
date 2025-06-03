@@ -6,38 +6,62 @@
 */
 
 #include <iostream>
-#include <string>
 #include <thread>
-#include <atomic>
+#include <chrono>
 #include "parsing/ParsingCLI.hpp"
-#include "network/networkManager/NetworkManager.hpp"
-#include "network/networkManager/NetworkLogger.hpp"
+#include "../Shared/LibraryManager.hpp"
+#include "Constants.hpp"
+#include "ModelManager.hpp"
+#include "CameraController.hpp"
+#include "UIRenderer.hpp"
+#include "Renderer.hpp"
 
-void display_help();
-
-/**
- * @brief Main function for the zappy GUI client
- * @param argc Number of arguments
- * @param argv Array of arguments
- * @return 0 on success, 84 on error
- */
-int main(int argc, char **argv) {
+int main(int, char**)
+{
     try {
-        ParsingCLI parser(argc, argv);
-        std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
-        NetworkLogger::get().setEnabled(true);
-        NetworkManager networkManager;
-        if (!networkManager.connect(parser.getMachine(), parser.getPort())) {
-            std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
+        ParsingCLI parser(true);
+        
+        auto& libraryManager = LibraryManager::getInstance();
+
+        if (!libraryManager.loadGraphicsLib("plugins/libraylibcpp.so")) {
+            std::cerr << "Erreur de chargement de la bibliothèque graphique: " << libraryManager.getLastError() << std::endl;
             return 84;
         }
-        NetworkLogger::get().log("Connexion établie. Envoi de GRAPHIC\\n...");
-        networkManager.sendCommand("GRAPHIC\n");
-        while (networkManager.isConnected()) {
-            networkManager.processIncomingMessages();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        
+        if (!libraryManager.loadGuiLib("plugins/libraygui.so")) {
+            std::cerr << "Erreur de chargement de la bibliothèque GUI: " << libraryManager.getLastError() << std::endl;
+            return 84;
         }
-        std::cerr << "[INFO] Déconnecté du serveur." << std::endl;
+
+        auto& graphics = libraryManager.getGraphicsLib();
+        auto& gui = libraryManager.getGuiLib();
+
+        Renderer renderer;
+        renderer.init(graphics);
+        
+        ModelManager modelManager;
+        if (!modelManager.loadGirlModel(graphics)) {
+            std::cerr << "Impossible de charger le modèle 3D de la fille" << std::endl;
+        } else {
+            modelManager.paths().clear();
+            modelManager.paths().push_back("assets/models/14-girl-obj/girl.obj");
+            modelManager.currentIndex() = 0;
+            modelManager.initializeRandomModels(graphics);
+        }
+        
+        CameraController camera;
+        camera.init(graphics);
+        
+        UIRenderer uiRenderer;
+        
+        while (!graphics.WindowShouldClose()) {
+            camera.update(graphics);
+            renderer.render(graphics, gui, modelManager, camera, uiRenderer);
+            std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        }
+        
+        graphics.CloseWindow();
+        
     } catch (const AException &e) {
         std::cerr << e.getFormattedMessage() << std::endl;
         return 84;
