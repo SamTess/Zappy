@@ -30,9 +30,12 @@ resource_type_t determine_type(char *resource_string)
 
 void take_object(server_t *server, client_t *client, char *buffer)
 {
-    char *resource_name = buffer + 5;
+    char *resource_name;
     resource_type_t resource_type = determine_type(resource_name);
 
+    if (strlen(buffer) <= 5)
+        return write_command_output(client->client_fd, "ko\n");
+    resource_name = buffer + 5;
     if (client == NULL || client->player == NULL || resource_type == COUNT)
         return write_command_output(client->client_fd, "ko\n");
     if (server->map[client->player->pos_y]
