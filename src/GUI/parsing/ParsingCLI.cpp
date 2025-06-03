@@ -10,9 +10,12 @@
 #include <cstring>
 #include "ParsingCLI.hpp"
 
-ParsingCLI::ParsingCLI(int argc, char **argv) {
-    _port = 0;
+ParsingCLI::ParsingCLI(int argc, char **argv) : _port(0), _testMode(false) {
     parse(argc, argv);
+}
+
+ParsingCLI::ParsingCLI(bool testMode) : _port(4242), _machine("localhost"), _testMode(testMode) {
+    std::cout << "Mode test activé : port=" << _port << ", machine=" << _machine << std::endl;
 }
 
 ParsingCLI::~ParsingCLI() {
@@ -56,6 +59,9 @@ void ParsingCLI::parse(int argc, char **argv) {
 }
 
 void ParsingCLI::checkValidityCLI() const {
+    if (_testMode)
+        return;
+        
     if (_machine.empty())
         throw ParsingCLIException("Machine name cannot be empty");
     if (_port <= 0)
