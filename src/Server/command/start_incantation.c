@@ -89,27 +89,7 @@ static int how_many_players_needed(int level)
     return required_players[level - 1];
 }
 
-static bool remove_resources(tile_t *tile, int level)
-{
-    int required_resources[7][COUNT] = {
-        {1, 0, 0, 0, 0, 0, 0},
-        {1, 1, 0, 0, 0, 0, 0},
-        {2, 1, 1, 0, 0, 0, 0},
-        {2, 2, 1, 1, 0, 0, 0},
-        {4, 1, 1, 2, 1, 0, 0},
-        {4, 3, 2, 1, 1, 1, 0},
-        {6, 1, 2, 3, 2, 2, 1}
-    };
-
-    for (int i = FOOD; i < COUNT; i++) {
-        tile->resources[i] -= required_resources[level - 1][i];
-        if (tile->resources[i] < 0)
-            return false;
-    }
-    return true;
-}
-
-static bool can_start_incantation(server_t *server, client_t *client)
+bool can_start_incantation(server_t *server, client_t *client)
 {
     int required_players = 0;
     int prerequisite_level = client->player->level + 1;
@@ -125,30 +105,6 @@ static bool can_start_incantation(server_t *server, client_t *client)
     if (current_players < required_players)
         return false;
     return true;
-}
-
-void finish_incantation(server_t *server, client_t *client)
-{
-    char *level_str;
-    tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
-    int old_level;
-
-    if (!client || !client->player || !client->player->is_in_incantation ||
-        client->player->busy_until > server->current_tick)
-        return;
-    old_level = client->player->level;
-    client->player->is_in_incantation = false;
-    if (!can_start_incantation(server, client)) {
-        client->player->incantation_leader_id = -1;
-        return write_command_output(client->client_fd, "ko\n");
-    }
-    client->player->level++;
-    level_str = malloc(20 * sizeof(char));
-    if (client->player->incantation_leader_id == client->client_id)
-        remove_resources(tile, old_level + 1);
-    client->player->incantation_leader_id = -1;
-    sprintf(level_str, "Current level: %d\n", client->player->level);
-    return write_command_output(client->client_fd, level_str);
 }
 
 void start_incantation(server_t *server, client_t *client, char *buffer)

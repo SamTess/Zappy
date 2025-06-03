@@ -45,6 +45,7 @@ SRCS			=	help.c								\
 					command/set_object.c				\
 					command/fork.c						\
 					command/start_incantation.c			\
+					command/finish_incantation.c		\
 					map/egg.c							\
 					player/player_init.c				\
 					player/player_inventory.c			\
