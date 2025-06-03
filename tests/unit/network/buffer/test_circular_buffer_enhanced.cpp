@@ -11,6 +11,7 @@
 #include <string>
 #include <memory>
 #include <cstring>
+#include <iostream>
 
 // Tests directs sur la classe C++ CircularBuffer
 
@@ -32,11 +33,11 @@ Test(CircularBufferCPP, write_read_string) {
     cr_assert_eq(buffer.available(), test_data.size(), "La taille disponible doit correspondre aux données écrites");
     
     // Lire des données
-    std::string read_data;
+    auto read_data = std::make_shared<std::string>();
     size_t read_size = buffer.read(read_data, test_data.size());
     
     cr_assert_eq(read_size, test_data.size(), "La taille lue doit correspondre à la taille écrite");
-    cr_assert_eq(read_data, test_data, "Les données lues doivent correspondre aux données écrites");
+    cr_assert_eq(*read_data, test_data, "Les données lues doivent correspondre aux données écrites");
     cr_assert(buffer.isEmpty(), "Le buffer doit être vide après lecture");
 }
 
@@ -78,18 +79,18 @@ Test(CircularBufferCPP, partial_read_write) {
     cr_assert_eq(buffer.available(), 12, "La taille disponible doit être la somme des écritures");
     
     // Lire une partie des données
-    std::string read_data;
+    auto read_data = std::make_shared<std::string>();
     size_t read_size = buffer.read(read_data, 6);
     
     cr_assert_eq(read_size, 6, "La taille lue doit correspondre à la demande");
-    cr_assert_eq(read_data, "First ", "Les données lues doivent correspondre");
+    cr_assert_eq(*read_data, "First ", "Les données lues doivent correspondre");
     cr_assert_eq(buffer.available(), 6, "Le buffer doit contenir le reste des données");
     
     // Lire le reste
-    read_data.clear();
+    read_data->clear();
     read_size = buffer.read(read_data, 10);
     cr_assert_eq(read_size, 6, "La taille lue doit correspondre aux données restantes");
-    cr_assert_eq(read_data, "Second", "Les données lues doivent correspondre");
+    cr_assert_eq(*read_data, "Second", "Les données lues doivent correspondre");
 }
 
 Test(CircularBufferCPP, buffer_full_empty) {
@@ -108,7 +109,7 @@ Test(CircularBufferCPP, buffer_full_empty) {
     cr_assert(buffer.isFull(), "Le buffer doit être plein");
     
     // Lire partiellement
-    std::string read_data;
+    auto read_data = std::make_shared<std::string>();
     buffer.read(read_data, 5);
     
     // Vérifier qu'il n'est ni vide ni plein
@@ -116,7 +117,7 @@ Test(CircularBufferCPP, buffer_full_empty) {
     cr_assert(!buffer.isFull(), "Le buffer ne doit pas être plein après lecture partielle");
     
     // Vider le buffer
-    read_data.clear();
+    read_data->clear();
     buffer.read(read_data, 5);
     
     // Vérifier qu'il est vide
@@ -167,7 +168,8 @@ Test(CircularBufferCPP, read_safe_buffer) {
     // Lire comme SafeBuffer
     SystemWrapper::SafeBuffer safe_buffer = buffer.readSafeBuffer(test_data.size());
     
-    // Vérifier le contenu
+    std::cout << "SafeBuffer content: " << safe_buffer.toString() << std::endl;
+    std::cout << "test_data: " << test_data << std::endl;
     cr_assert_eq(safe_buffer.toString(), test_data, "readSafeBuffer doit retourner les données dans un SafeBuffer");
     
     // Vérifier que le buffer est vide

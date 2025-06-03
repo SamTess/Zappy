@@ -30,7 +30,7 @@ class TcpConnection {
         int _socket;
         std::unique_ptr<SystemWrapper::SafePollFd> _pollfd;
         std::unique_ptr<SystemWrapper::SafeSockAddr> _sockaddr;
-        std::unique_ptr<SystemWrapper::SafeBuffer> _recvBuffer;
+        std::shared_ptr<SystemWrapper::SafeBuffer> _recvBuffer;
         size_t _initialBufferSize;
 
         void createAndConfigureSocket();

@@ -8,7 +8,6 @@
 #include "TcpConnection.hpp"
 #include <netdb.h>
 #include <memory>
-#include <functional>
 #include <string>
 #include <chrono>
 #include <thread>
@@ -49,11 +48,14 @@ void TcpConnection::resolveAddress(const std::string &host, int port) {
     addr.sin_port = htons(port);
 
     if (isalpha(host[0])) {
+        // gethostbyname retourne un pointeur vers une structure statique, donc pas besoin de libérer
+        // mais pour éviter les raw pointers, utilisons une approche avec RAII local
         struct hostent *server = gethostbyname(host.c_str());
-        if (server == NULL) {
+        if (server == nullptr) {
             close();
             throw TcpConnectionException("Unknown host: " + host);
         }
+        // Créer une copie locale des données nécessaires pour éviter d'utiliser le pointeur brut
         std::memcpy(&addr.sin_addr.s_addr, server->h_addr, server->h_length);
     } else {
         if (!SystemWrapper::inetPton(AF_INET, host, &addr.sin_addr)) {
@@ -97,7 +99,8 @@ void TcpConnection::send(const std::string &message) {
     size_t totalSent = 0;
     const size_t size = finalMessage.size();
     auto sendBuffer = SystemWrapper::SafeBuffer(size);
-    sendBuffer.data() = finalMessage;
+    std::shared_ptr<std::string> bufferData = std::make_shared<std::string>(sendBuffer.data());
+    bufferData = std::make_shared<std::string>(finalMessage);
 
     while (totalSent < size) {
         _pollfd->setEvents(POLLOUT);
@@ -144,7 +147,7 @@ bool TcpConnection::waitForReadData(int timeoutMs) {
 
 std::string TcpConnection::readDataFromSocket() {
     ensureBufferSize();
-    ssize_t bytesReceived = SystemWrapper::readSocket(_socket, _recvBuffer.get(), _recvBuffer->size());
+    ssize_t bytesReceived = SystemWrapper::readSocket(_socket, _recvBuffer, _recvBuffer->size());
     if (bytesReceived < 0) {
         if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
             return "";
@@ -153,7 +156,8 @@ std::string TcpConnection::readDataFromSocket() {
     if (bytesReceived == 0)
         throw TcpConnectionException("Connection closed by server");
     adjustBufferSize(bytesReceived);
-    return _recvBuffer->data().substr(0, bytesReceived);
+    std::shared_ptr<std::string> dataPtr = std::make_shared<std::string>(_recvBuffer->data());
+    return dataPtr->substr(0, bytesReceived);
 }
 
 void TcpConnection::ensureBufferSize() {

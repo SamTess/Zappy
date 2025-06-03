@@ -12,6 +12,7 @@
 #include <cstring>
 #include <utility>
 #include <vector>
+#include <memory>
 #include <string>
 
 namespace SystemWrapper {
@@ -107,7 +108,7 @@ int setNonBlocking(int fd) {
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-ssize_t readSocket(int fd, SafeBuffer* buffer, size_t count) {
+ssize_t readSocket(int fd, std::shared_ptr<SafeBuffer> buffer, size_t count) {
     if (!buffer)
         return -1;
     if (buffer->size() < count) {
@@ -157,8 +158,7 @@ std::string getErrorString() {
 }
 
 SafeBuffer::SafeBuffer(size_t size)
-    : _buffer(size, '\0') {
-}
+    : _buffer(size, '\0') {}
 
 std::string& SafeBuffer::data() {
     return _buffer;

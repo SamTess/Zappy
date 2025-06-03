@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
+#include <iostream>
 
 // Port utilisé pour les tests (port non privilégié > 1024)
 #define TEST_PORT 8765
@@ -143,6 +144,7 @@ Test(TcpConnection, connect_to_valid_server) {
     
     // Vérifier la réception des données
     std::string received = connection.receive();
+    std::cout << "Received content: " << received.c_str() << std::endl;
     cr_assert_str_eq(received.c_str(), "TEST_MESSAGE\n", "Les données reçues doivent correspondre à celles envoyées");
     
     // Envoyer une réponse

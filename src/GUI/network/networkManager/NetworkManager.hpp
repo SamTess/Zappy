@@ -57,23 +57,23 @@ class NetworkManager {
 
         MessageCallback _messageCallback;
         ConnectionCallback _connectionCallback;
-        
+
         // Méthodes de gestion du thread réseau
         void networkThreadLoop();
-        void tryReceiveInitialWelcome(bool& welcomeReceived);
-        int receiveAndProcessData(int errorCount, int maxErrors, bool& welcomeReceived);
-        void processReceivedData(bool& welcomeReceived);
+        void tryReceiveInitialWelcome(std::shared_ptr<bool> welcomeReceived);
+        int receiveAndProcessData(int errorCount, int maxErrors, std::shared_ptr<bool> welcomeReceived);
+        void processReceivedData(std::shared_ptr<bool> welcomeReceived);
         int handleReceiveError(int errorCount, int maxErrors, const std::exception& e);
         int processPendingOutgoingMessages(int errorCount, int maxErrors);
         int handleNetworkThreadError(int errorCount, int maxErrors, const std::exception& e);
-        
+
         // Méthodes de traitement des messages entrants
         void processIncomingMessage(const std::string& message);
         void handleWelcomeMessage(const std::string& message);
         void handleRegularMessage(const std::string& message);
         void executeMessageCallback(const std::string& message);
         void handleInvalidMessage(const std::string& message, const std::exception& e);
-        
+
         // Méthodes pour l'envoi des commandes
         bool validateConnectionForSending();
         std::string formatCommand(const std::string& command);

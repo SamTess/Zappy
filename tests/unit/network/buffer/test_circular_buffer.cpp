@@ -41,10 +41,10 @@ void circular_buffer_write(void *buffer, const void *data, size_t size)
 
 size_t circular_buffer_read(void *buffer, void *dst, size_t size)
 {
-    std::string str_data;
+    auto str_data = std::make_shared<std::string>();
     size_t bytesRead = static_cast<CircularBuffer *>(buffer)->read(str_data, size);
     if (bytesRead > 0 && dst) {
-        std::memcpy(dst, str_data.data(), bytesRead);
+        std::memcpy(dst, str_data->data(), bytesRead);
     }
     return bytesRead;
 }

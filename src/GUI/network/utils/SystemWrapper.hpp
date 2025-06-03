@@ -63,7 +63,7 @@ int createSocket(int domain, int type, int protocol);
     int setNonBlocking(int fd);
 
 class SafeBuffer;
-ssize_t readSocket(int fd, SafeBuffer* buffer, size_t count);
+ssize_t readSocket(int fd, std::shared_ptr<SafeBuffer> buffer, size_t count);
 ssize_t writeSocket(int fd, const SafeBuffer& buffer, size_t count);
 int pollSocket(const SafePollFd& pfd, int timeout);
 int pollSocket(const std::vector<SafePollFd>& pollfds, int timeout);
