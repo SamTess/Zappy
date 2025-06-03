@@ -19,18 +19,18 @@ SERVER_LIB		=	../build/libserver.a
 GUI_LIB			=	../build/libgui.a
 
 SERVER_TESTS	=	server/test_server.c server/test_player_inventory.c
-CLIENT_TESTS	=	client/test_client.cpp \
-					client/test_circular_buffer.cpp \
-					client/test_message_queue.cpp \
-					client/test_network_manager.cpp \
-					client/test_protocol_parser.cpp \
-					client/test_tcp_connection.cpp \
-					client/test_network_thread.cpp \
-					client/test_network_manager_integration.cpp \
-					client/test_network_manager_detailed.cpp \
-					client/test_network_manager_mocking.cpp
+CLIENT_TESTS	=	
 
-ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS)
+# Tests unitaires réseau GUI
+NETWORK_TESTS	=	unit/network/buffer/test_circular_buffer.cpp \
+					unit/network/buffer/test_circular_buffer_enhanced.cpp \
+					unit/network/connection/test_tcp_connection.cpp \
+					unit/network/networkManager/test_network_manager.cpp \
+					unit/network/networkThread/test_network_thread.cpp \
+					unit/network/protocol/test_protocol_parser.cpp \
+					unit/network/utils/test_system_wrapper.cpp
+
+ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS) $(NETWORK_TESTS)
 
 SERVER_TEST_OBJS = $(SERVER_TESTS:%.c=$(BUILD_DIR)/%.o)
 CLIENT_TEST_OBJS = $(CLIENT_TESTS:%.cpp=$(BUILD_DIR)/%.o)
@@ -54,19 +54,18 @@ MAGENTA			=	\033[0;95m
 CYAN			=	\033[0;96m
 RESET			=	\033[0m
 
-all: $(SERVER_TESTS_NAME) # $(CLIENT_TESTS_NAME)
+all: $(SERVER_TESTS_NAME) $(CLIENT_TESTS_NAME) $(NETWORK_TESTS_NAME)
 
 $(SERVER_TESTS_NAME): $(SERVER_TEST_OBJS) $(SERVER_LIB)
 	@echo -e "$(GREEN)Compiling server test binary...$(RESET)"
 	@$(CC) -o $(SERVER_TESTS_NAME) $(SERVER_TEST_OBJS) $(SERVER_LIB) \
 		$(CFLAGS) $(SERVER_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS)
 
-# Temporarily disable client tests due to API changes
-$(CLIENT_TESTS_NAME): $(GUI_LIB)
+$(CLIENT_TESTS_NAME): $(CLIENT_TEST_OBJS) $(GUI_LIB)
 	@echo -e "$(GREEN)Compiling client test binary...$(RESET)"
 	@mkdir -p $(dir $(BUILD_DIR)/client/)
-	@$(CXX) -o $(CLIENT_TESTS_NAME) $(CLIENT_TESTS) $(GUI_LIB) \
-		$(CPP_TEST_FLAGS) $(GUI_INCLUDE) $(SHARED_INCLUDE) $(SFMLFLAGS)
+	@$(CXX) -o $(CLIENT_TESTS_NAME) $(CLIENT_TEST_OBJS) $(GUI_LIB) \
+		$(CXXFLAGS) $(GUI_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
@@ -86,14 +85,27 @@ $(GUI_LIB):
 	@echo -e "$(CYAN)Building GUI library for tests...$(RESET)"
 	@$(MAKE) ../../build/libgui.a -C  ../src/GUI
 
-tests_run: $(SERVER_TESTS_NAME) # $(CLIENT_TESTS_NAME)
+NETWORK_TESTS_NAME = ../network_tests
+
+$(NETWORK_TESTS_NAME): $(NETWORK_TESTS:%.cpp=$(BUILD_DIR)/%.o) $(GUI_LIB)
+	@echo -e "$(GREEN)Compiling network test binary...$(RESET)"
+	@$(CXX) -o $(NETWORK_TESTS_NAME) $(NETWORK_TESTS:%.cpp=$(BUILD_DIR)/%.o) \
+		$(GUI_LIB) $(CXXFLAGS) $(GUI_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS) $(SFMLFLAGS) -Wl,--allow-multiple-definition
+
+network_tests: $(NETWORK_TESTS_NAME)
+	@echo -e "$(MAGENTA)Running network unit tests only...$(RESET)"
+	@./$(NETWORK_TESTS_NAME)
+
+network_gui_tests: network_tests
+	@echo -e "$(GREEN)All network tests completed!$(RESET)"
+
+tests_run: $(SERVER_TESTS_NAME) $(NETWORK_TESTS_NAME)
 	@echo -e "$(MAGENTA)Running server unit tests...$(RESET)"
 	@./$(SERVER_TESTS_NAME)
-	@# echo -e "$(MAGENTA)Running client unit tests...$(RESET)"
-	@# ./$(CLIENT_TESTS_NAME)
+	@echo -e "$(MAGENTA)Running network unit tests...$(RESET)"
+	@./$(NETWORK_TESTS_NAME)
 	@echo -e "$(CYAN)Generating coverage report...$(RESET)"
 	@mkdir -p $(COVERAGE_DIR)
-
 	@echo -e "$(GREEN)Coverage report generated at $(COVERAGE_DIR)/coverage.html$(RESET)"
 
 server_tests: $(SERVER_TESTS_NAME)
@@ -109,8 +121,10 @@ clean:
 	@rm -rf $(BUILD_DIR)
 	@rm -f *.gcda *.gcno
 	@rm -f */*.gcda */*.gcno
-	@rm -f ../client_tests-*.gc*
-	@rm -f ../server_tests-*.gc*
+	@rm -f ../*_tests-*.gc*
+	@rm -f ../client_tests
+	@rm -f ../server_tests
+	@rm -f ../network_tests
 
 fclean: clean
 	@echo -e "$(RED)Cleaning test binaries...$(RESET)"
