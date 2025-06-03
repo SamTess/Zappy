@@ -37,13 +37,11 @@ bool GameLoop::init() {
     m_renderer->init(m_graphics);
 
     m_modelManager = std::make_shared<ModelManager>();
-    if (!m_modelManager->loadGirlModel(m_graphics)) {
-        std::cerr << "Impossible de charger le modèle 3D de la fille" << std::endl;
+    int girlModelId = m_modelManager->addObjFile(m_graphics, "assets/models/14-girl-obj/girl.obj");
+    if (girlModelId != -1) {
+        std::cout << "Modèle girl.obj chargé avec succès en utilisant le système ObjFile (ID: " << girlModelId << ")" << std::endl;
     } else {
-        m_modelManager->paths().clear();
-        m_modelManager->paths().push_back("assets/models/14-girl-obj/girl.obj");
-        m_modelManager->currentIndex() = 0;
-        m_modelManager->initializeRandomModels(m_graphics);
+        std::cerr << "Impossible de charger le modèle girl.obj" << std::endl;
     }
 
     m_camera = std::make_shared<CameraController>();

@@ -40,7 +40,7 @@ void Renderer::renderGrid(std::shared_ptr<IGraphicsLib> graphics) {
 }
 
 void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<ModelManager> modelManager) {
-    modelManager->drawModel(graphics);
+    modelManager->renderAll(graphics);
 }
 
 void Renderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,

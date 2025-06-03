@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <memory>
+#include <unordered_map>
 
 namespace raylibcpp {
 
@@ -41,6 +43,32 @@ class ModelWrap {
         Model& get();
     private:
         Model model;
+};
+
+class ObjFile {
+    public:
+        explicit ObjFile(const std::string& objPath);
+        ~ObjFile();
+        void load(const std::string& objPath);
+        const std::string& path() const;
+        void display(Vector3 position, float scale = 1.0f, Color tint = WHITE) const;
+        Model& getModel();
+    private:
+        Model model;
+        std::string filePath;
+};
+
+class ObjManager {
+    public:
+        ObjManager() = default;
+        ~ObjManager();
+        int addObjFile(const std::string& path);
+        void deleteObj(int id);
+        void renderAll() const;
+        ObjFile* getObj(int id);
+    private:
+        std::unordered_map<int, std::unique_ptr<ObjFile>> objFiles;
+        int nextId = 0;
 };
 
 }  // namespace raylibcpp
