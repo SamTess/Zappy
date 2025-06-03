@@ -12,6 +12,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+void init_new_player_pos(server_t *server, client_t *new_client)
+{
+    int random_x = rand() % server->parsed_info->width;
+    int random_y = rand() % server->parsed_info->height;
+
+    new_client->player->pos_x = random_x;
+    new_client->player->pos_y = random_y;
+    tile_add_player(&server->map[random_y][random_x], new_client->client_id);
+    printf("New player from client with id %d", new_client->client_id);
+    printf("was spawned at position x: %d and y: %d\n", random_x, random_y);
+}
 
 void init_player(player_t *player, char *playerTeam)
 {
