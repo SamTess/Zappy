@@ -18,7 +18,6 @@
 
 ProtocolParser::ProtocolParser() {
     using std::placeholders::_1;
-
     _headerHandlers = std::map<std::string, ParseFunction>{
         {MSZ_HEADER, [this](const std::string& msg) { return this->parseMapSize(msg); }},
         {BCT_HEADER, [this](const std::string& msg) { return this->parseTileContent(msg); }},

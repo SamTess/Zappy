@@ -15,7 +15,6 @@
 #include "HeaderMessage.hpp"
 
 Message::Message() {
-    std::cout << "creating empty message" << std::endl;
     _messageString = "";
     _messageHeader = "";
     _messageData = "";
@@ -25,25 +24,10 @@ Message::Message() {
 Message::Message(const std::string& header, const std::string& data, std::shared_ptr<IMessageData> structuredData) {
     _messageHeader = header;
     _messageData = data;
-    if (data[data.size() - 1] != '\n')
+    if (_messageData.empty() || _messageData.back() != '\n')
         _messageData += '\n';
     _messageString = _messageHeader + " " + _messageData;
     _structuredData = structuredData;
-}
-
-Message::Message(MessageType type) {
-    _messageType = static_cast<HeaderMessage::MessageType>(type);
-    _messageString = "";
-    _messageHeader = "";
-    _messageData = "";
-}
-
-void Message::addIntParam(int value) {
-    _parameters.push_back(std::to_string(value));
-}
-
-void Message::addStringParam(const std::string &value) {
-    _parameters.push_back(value);
 }
 
 void Message::setMessage(const std::string &data) {
@@ -56,6 +40,8 @@ void Message::setHeader(const std::string &header) {
 
 void Message::setData(const std::string &data) {
     _messageData = data;
+    if (_messageData.empty() || _messageData.back() != '\n')
+        _messageData += '\n';
     _structuredData = nullptr;
 }
 

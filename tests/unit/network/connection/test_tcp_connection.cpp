@@ -144,7 +144,6 @@ Test(TcpConnection, connect_to_valid_server) {
     
     // Vérifier la réception des données
     std::string received = connection.receive();
-    std::cout << "Received content: " << received.c_str() << std::endl;
     cr_assert_str_eq(received.c_str(), "TEST_MESSAGE\n", "Les données reçues doivent correspondre à celles envoyées");
     
     // Envoyer une réponse

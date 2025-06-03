@@ -168,8 +168,6 @@ Test(CircularBufferCPP, read_safe_buffer) {
     // Lire comme SafeBuffer
     SystemWrapper::SafeBuffer safe_buffer = buffer.readSafeBuffer(test_data.size());
     
-    std::cout << "SafeBuffer content: " << safe_buffer.toString() << std::endl;
-    std::cout << "test_data: " << test_data << std::endl;
     cr_assert_eq(safe_buffer.toString(), test_data, "readSafeBuffer doit retourner les données dans un SafeBuffer");
     
     // Vérifier que le buffer est vide

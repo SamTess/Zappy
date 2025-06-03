@@ -147,10 +147,10 @@ void NetworkManager::networkThreadLoop() {
 
 void NetworkManager::tryReceiveInitialWelcome(std::shared_ptr<bool> welcomeReceived) {
     try {
-        if (!welcomeReceived) {
+        if (!*welcomeReceived) {
             return;
         }
-        for (int i = 0; i < 30 && _networkThread->isRunning() && !(*welcomeReceived); ++i) {
+        for (int i = 0; i < 30 && _networkThread->isRunning() && !*welcomeReceived; ++i) {
             std::string data = _connection->receive();
             if (!data.empty()) {
                 NetworkLogger::get().log(std::string("Initial data received: ") + data);
