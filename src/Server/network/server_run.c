@@ -101,8 +101,10 @@ static void new_connection(server_t *server)
     add_fd(server, client_fd);
     server->nfds += 1;
     new_client = find_client_by_socket(server, client_fd);
-    if (new_client != NULL)
+    if (new_client != NULL){
+        init_new_player_pos(server, new_client);
         print_co(client_ip, &client_addr, new_client);
+    }
 }
 
 static void check_new_connection(server_t *server)

@@ -34,5 +34,6 @@ void print_co(char *client_ip, struct sockaddr_in *client_addr,
     client_t *new_client);
 void check_client(server_t *server);
 void create_map(server_t *server, parsing_info_t *parsed_info);
+void init_new_player_pos(server_t *server, client_t *new_client);
 
 #endif /* !SERVER_H_ */
