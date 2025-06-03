@@ -13,39 +13,25 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-void add_to_command_queue(client_t *client, char *command)
+static bool is_client_valid(server_t *server, client_t *target)
 {
-    if (!client || !client->player || !command)
-        return;
-    if (client->player->queue_size >= 10)
-        return;
-    if (!client->player->command_queue)
-        return;
-    client->player->command_queue[client->player->queue_size] =
-        strdup(command);
-    client->player->queue_size++;
+    client_t *current = server->client;
+
+    while (current != NULL) {
+        if (current == target)
+            return true;
+        current = current->next;
+    }
+    return false;
 }
 
-void process_next_queued_command(server_t *server, client_t *client)
+static void tick_check(server_t *server, client_t *current)
 {
-    char *next_command;
-
-    if (!client || !client->player || !server)
-        return;
-    if (client->player->queue_size <= 0 || !client->player->command_queue)
-        return;
-    next_command = client->player->command_queue[0];
-    for (int i = 0; i < client->player->queue_size - 1; i++) {
-        client->player->command_queue[i] =
-            client->player->command_queue[i + 1];
-    }
-    client->player->command_queue[client->player->queue_size - 1] = NULL;
-    client->player->queue_size--;
-    if (next_command) {
-        execute_com(server, client, next_command);
-        free(next_command);
-        next_command = NULL;
-    }
+    if (current != NULL && current->player != NULL)
+        check_player_starvation(server, current);
+    if (is_client_valid(server, current) && current != NULL &&
+        current->player != NULL)
+        finish_incantation(server, current);
 }
 
 void update_game_tick(server_t *server)
@@ -58,9 +44,8 @@ void update_game_tick(server_t *server)
         current = current->next;
     while (current != NULL) {
         next = current->next;
-        if (current->player != NULL)
-            check_player_starvation(server, current);
-        if (current->player &&
+        tick_check(server, current);
+        if (is_client_valid(server, current) && current->player &&
             current->player->busy_until <= server->current_tick &&
             current->player->queue_size > 0)
             process_next_queued_command(server, current);
