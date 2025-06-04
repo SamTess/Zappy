@@ -12,10 +12,10 @@
 #include "../Shared/LibraryManager.hpp"
 #include "../Shared/IGraphicsLib.hpp"
 #include "../Shared/IGuiLib.hpp"
-#include "ModelManager.hpp"
-#include "CameraController.hpp"
-#include "UIRenderer.hpp"
-#include "Renderer.hpp"
+#include "cameraController/CameraController.hpp"
+#include "renderer/UIRenderer.hpp"
+#include "renderer/Renderer.hpp"
+#include "obj/ObjManager.hpp"
 
 class GameLoop {
 public:
@@ -32,7 +32,7 @@ private:
     std::shared_ptr<IGraphicsLib> m_graphics;
     std::shared_ptr<IGuiLib> m_gui;
     std::shared_ptr<Renderer> m_renderer;
-    std::shared_ptr<ModelManager> m_modelManager;
+    std::shared_ptr<ObjManager> m_modelManager;
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
 };

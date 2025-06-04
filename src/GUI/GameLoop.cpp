@@ -36,7 +36,7 @@ bool GameLoop::init() {
     m_renderer = std::make_shared<Renderer>();
     m_renderer->init(m_graphics);
 
-    m_modelManager = std::make_shared<ModelManager>();
+    m_modelManager = std::make_shared<ObjManager>();
     int girlModelId = m_modelManager->addObjFile(m_graphics, "assets/models/14-girl-obj/girl.obj");
     if (girlModelId != -1) {
         std::cout << "Modèle girl.obj chargé avec succès en utilisant le système ObjFile (ID: " << girlModelId << ")" << std::endl;
