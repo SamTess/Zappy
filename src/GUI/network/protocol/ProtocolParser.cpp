@@ -168,6 +168,7 @@ Message ProtocolParser::parseTileContent(const std::string &message) {
     int mendiane = parseIntParameter(params[6]);
     int phiras = parseIntParameter(params[7]);
     int thystame = parseIntParameter(params[8]);
+
     auto tileContentData = std::make_shared<TileContentData>(x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame);
     return Message(BCT_HEADER, extractCommandParameter(message), tileContentData);
 }
@@ -197,6 +198,7 @@ Message ProtocolParser::parsePlayerConnection(const std::string &message) {
     int orientation = parseIntParameter(params[3]);
     int level = parseIntParameter(params[4]);
     std::string teamName = params[5];
+
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, x, y, orientation, level, teamName);
     return Message(PNW_HEADER, extractCommandParameter(message), playerInfoData);
 }
@@ -209,6 +211,7 @@ Message ProtocolParser::parsePlayerPosition(const std::string &message) {
     int x = parseIntParameter(params[1]);
     int y = parseIntParameter(params[2]);
     int orientation = parseIntParameter(params[3]);
+
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, x, y, orientation, 0);
     return Message(PPO_HEADER, extractCommandParameter(message), playerInfoData);
 }
@@ -219,6 +222,7 @@ Message ProtocolParser::parsePlayerLevel(const std::string &message) {
         throw ProtocolParserException("Invalid player level parameters: " + message);
     int id = parseIntParameter(params[0]);
     int level = parseIntParameter(params[1]);
+
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, level);
     return Message(PLV_HEADER, extractCommandParameter(message), playerInfoData);
 }
@@ -237,6 +241,7 @@ Message ProtocolParser::parsePlayerInventory(const std::string &message) {
     int mendiane = parseIntParameter(params[7]);
     int phiras = parseIntParameter(params[8]);
     int thystame = parseIntParameter(params[9]);
+
     auto inventoryData = std::make_shared<PlayerInventoryData>(id, x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame);
     return Message(PIN_HEADER, extractCommandParameter(message), inventoryData);
 }
@@ -246,6 +251,7 @@ Message ProtocolParser::parsePlayerExpulsion(const std::string &message) {
     if (params.size() < 1)
         throw ProtocolParserException("Invalid player expulsion parameters: " + message);
     int id = parseIntParameter(params[0]);
+
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
     return Message(PEX_HEADER, extractCommandParameter(message), playerInfoData);
 }
@@ -256,6 +262,7 @@ Message ProtocolParser::parsePlayerBroadcast(const std::string &message) {
         throw ProtocolParserException("Invalid player broadcast parameters: " + message);
     int id = parseIntParameter(params[0]);
     std::string broadcastMessage = params[1];
+
     auto broadcastData = std::make_shared<BroadcastData>(id, broadcastMessage);
     return Message(PBC_HEADER, extractCommandParameter(message), broadcastData);
 }
@@ -265,6 +272,7 @@ Message ProtocolParser::parsePlayerDeath(const std::string &message) {
     if (params.size() < 1)
         throw ProtocolParserException("Invalid player death parameters: " + message);
     int id = parseIntParameter(params[0]);
+
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
     return Message(PDI_HEADER, extractCommandParameter(message), playerInfoData);
 }
@@ -275,6 +283,7 @@ Message ProtocolParser::parseRessourceDrop(const std::string &message) {
         throw ProtocolParserException("Invalid resource drop parameters: " + message);
     int playerId = parseIntParameter(params[0]);
     int resourceType = parseIntParameter(params[1]);
+
     auto resourceData = std::make_shared<ResourceData>(playerId, resourceType);
     return Message(PDR_HEADER, extractCommandParameter(message), resourceData);
 }
@@ -285,6 +294,7 @@ Message ProtocolParser::parseRessourceCollect(const std::string &message) {
         throw ProtocolParserException("Invalid resource collection parameters: " + message);
     int playerId = parseIntParameter(params[0]);
     int resourceType = parseIntParameter(params[1]);
+
     auto resourceData = std::make_shared<ResourceData>(playerId, resourceType);
     return Message(PGT_HEADER, extractCommandParameter(message), resourceData);
 }
@@ -298,6 +308,7 @@ Message ProtocolParser::parseIncantationStart(const std::string &message) {
     int y = parseIntParameter(params[1]);
     int level = parseIntParameter(params[2]);
     std::vector<int> playerIds;
+
     for (size_t i = 3; i < params.size(); i++)
         playerIds.push_back(parseIntParameter(params[i]));
     auto incantationData = std::make_shared<IncantationData>(x, y, level, playerIds);
@@ -323,6 +334,7 @@ Message ProtocolParser::parseEggLaying(const std::string &message) {
     if (params.size() < 1)
         throw ProtocolParserException("Invalid egg laying parameters: " + message);
     int playerId = parseIntParameter(params[0]);
+
     auto playerInfoData = std::make_shared<PlayerInfoData>(playerId, 0, 0, 0, 0);
     return Message(PFK_HEADER, extractCommandParameter(message), playerInfoData);
 }
@@ -335,6 +347,7 @@ Message ProtocolParser::parseEggDrop(const std::string &message) {
     int playerId = parseIntParameter(params[1]);
     int x = parseIntParameter(params[2]);
     int y = parseIntParameter(params[3]);
+
     auto eggData = std::make_shared<EggData>(eggId, playerId, x, y);
     return Message(ENW_HEADER, extractCommandParameter(message), eggData);
 }
@@ -344,6 +357,7 @@ Message ProtocolParser::parseEggConnection(const std::string &message) {
     if (params.size() < 1)
         throw ProtocolParserException("Invalid egg connection parameters: " + message);
     int eggId = parseIntParameter(params[0]);
+
     auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0);
     return Message(EBO_HEADER, extractCommandParameter(message), eggData);
 }
@@ -353,6 +367,7 @@ Message ProtocolParser::parseEggDeath(const std::string &message) {
     if (params.size() < 1)
         throw ProtocolParserException("Invalid egg death parameters: " + message);
     int eggId = parseIntParameter(params[0]);
+
     auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0);
     return Message(EDI_HEADER, extractCommandParameter(message), eggData);
 }
@@ -363,6 +378,7 @@ Message ProtocolParser::parseTimeUnit(const std::string &message) {
         throw ProtocolParserException("Invalid time unit parameters: " + message);
     int timeUnit = parseIntParameter(params[0]);
     std::string header = getCommandName(message);
+
     auto timeUnitData = std::make_shared<TimeUnitData>(timeUnit);
     return Message(header, extractCommandParameter(message), timeUnitData);
 }
@@ -372,6 +388,7 @@ Message ProtocolParser::parseEndGame(const std::string &message) {
     if (params.size() < 1)
         throw ProtocolParserException("Invalid end game parameters: " + message);
     std::string teamName = params[0];
+
     auto endGameData = std::make_shared<EndGameData>(teamName);
     return Message(SEG_HEADER, extractCommandParameter(message), endGameData);
 }
@@ -381,12 +398,14 @@ Message ProtocolParser::parseServerMessage(const std::string &message) {
     if (params.empty())
         throw ProtocolParserException("Invalid server message parameters: " + message);
     std::string serverMessage = params[0];
+
     auto serverMessageData = std::make_shared<ServerMessageData>(serverMessage);
     return Message(SMG_HEADER, extractCommandParameter(message), serverMessageData);
 }
 
 Message ProtocolParser::parseUnknownCommand(const std::string &message) {
     std::cout << "Unknown command received: " << message << std::endl;
+
     auto serverMessageData = std::make_shared<ServerMessageData>("Unknown command: " + message);
     return Message(SUC_HEADER, "", serverMessageData);
 }
