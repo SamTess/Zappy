@@ -52,7 +52,6 @@ void RayLib::ClearBackground(ZappyTypes::Color color) {
         _window->clear(TypeAdapter::ToRaylib(color));
 }
 
-// Formes 2D
 void RayLib::DrawRectangle(int x, int y, int width, int height, ZappyTypes::Color color) {
     raylibcpp::Shape::drawRectangle(x, y, width, height, TypeAdapter::ToRaylib(color));
 }
@@ -61,7 +60,6 @@ void RayLib::DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Colo
     raylibcpp::Shape::drawCircle(centerX, centerY, radius, TypeAdapter::ToRaylib(color));
 }
 
-// Formes 3D
 void RayLib::DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) {
     raylibcpp::Shape::drawCube(TypeAdapter::ToRaylib(position), width, height, length, TypeAdapter::ToRaylib(color));
 }
@@ -127,7 +125,31 @@ bool RayLib::IsMouseButtonPressed(int button) {
     return raylibcpp::Input::isMouseButtonPressed(button);
 }
 
-// Audio
+bool RayLib::IsMouseButtonDown(int button) {
+    return raylibcpp::Input::isMouseButtonDown(button);
+}
+
+bool RayLib::IsMouseButtonReleased(int button) {
+    return raylibcpp::Input::isMouseButtonReleased(button);
+}
+
+int RayLib::GetMouseX() {
+    return raylibcpp::Input::getMouseX();
+}
+
+int RayLib::GetMouseY() {
+    return raylibcpp::Input::getMouseY();
+}
+
+ZappyTypes::Vector2 RayLib::GetMousePosition() {
+    Vector2 pos = raylibcpp::Input::getMousePosition();
+    return TypeAdapter::FromRaylib(pos);
+}
+
+float RayLib::GetMouseWheelMove() {
+    return raylibcpp::Input::getMouseWheelMove();
+}
+
 void RayLib::PlaySound(const std::string& path) {
     _sound.emplace(path);
     _sound->play();
@@ -223,6 +245,19 @@ void RayLib::LoadModel3D(const std::string& path) {
 void RayLib::DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
     if (_model3D)
         _model3D->draw(TypeAdapter::ToRaylib(position), scale, TypeAdapter::ToRaylib(color));
+}
+
+void RayLib::DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) {
+    if (_model3D) {
+        ::DrawModelEx(
+            _model3D->get(),
+            TypeAdapter::ToRaylib(position),
+            TypeAdapter::ToRaylib(rotationAxis),
+            rotationAngle,
+            Vector3{scale, scale, scale},
+            WHITE
+        );
+    }
 }
 
 void RayLib::UnloadModel3D() {
