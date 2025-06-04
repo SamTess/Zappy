@@ -6,7 +6,7 @@
 */
 #include "../include/command.h"
 #include "../include/server.h"
-#include "../include/scheduled_command.h"
+#include "../include/pending_cmd.h"
 #include "../include/circular_buffer.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -47,10 +47,8 @@ static bool execute_if_free(server_t *server, client_t *user,
     command_data_t data = get_command_data();
 
     if (user->player->busy_until <= server->current_tick) {
-        user->player->pending_command->args = strdup(buffer);
-        user->player->pending_command->func = data.functions[cmd_index];
-        user->player->pending_command->execute_at_tick = server->current_tick
-            + data.times[cmd_index];
+        user->player->pending_cmd->args = strdup(buffer);
+        user->player->pending_cmd->func = data.functions[cmd_index];
         if (data.times[cmd_index] > 0)
             user->player->busy_until =
                 server->current_tick + data.times[cmd_index];

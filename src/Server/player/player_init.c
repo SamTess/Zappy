@@ -24,10 +24,9 @@ void init_new_player_pos(server_t *server, client_t *new_client)
 
 static void init_pending(player_t *player)
 {
-    player->pending_command = calloc(1, sizeof(scheduled_command_t));
-    player->pending_command->args = NULL;
-    player->pending_command->execute_at_tick = 0;
-    player->pending_command->func = NULL;
+    player->pending_cmd = calloc(1, sizeof(pending_cmd_t));
+    player->pending_cmd->args = NULL;
+    player->pending_cmd->func = NULL;
 }
 
 void init_player(player_t *player, char *playerTeam)

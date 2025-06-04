@@ -9,7 +9,7 @@
     #define PLAYER_H_
     #include <stdbool.h>
     #include "tile.h"
-    #include "scheduled_command.h"
+    #include "pending_cmd.h"
 
 enum rotation_e {
     UP,
@@ -38,7 +38,7 @@ typedef struct player_s {
     int queue_size;
     bool is_in_incantation;
     int incantation_leader_id;
-    scheduled_command_t *pending_command;
+    pending_cmd_t *pending_cmd;
 } player_t;
 
 void init_player(player_t *player, char *playerTeam);

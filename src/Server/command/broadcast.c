@@ -89,8 +89,8 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     int dx = 0;
     int dy = 0;
     int direction = 0;
-    char *response = calloc((strlen(message) + 17), sizeof(char));
-    size_t res_size = strlen(message) + 17;
+    size_t res_size = snprintf(NULL, 0, "message %d, %s\n", 0, message) + 1;
+    char *response = calloc(res_size, sizeof(char));
 
     if (!receiver || !receiver->player || receiver == sender)
         return;

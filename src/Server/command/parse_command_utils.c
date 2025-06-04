@@ -9,6 +9,15 @@
 #include <string.h>
 #include <stdlib.h>
 
+static void cleanup_pending(player_t *player)
+{
+    if (!player || !player->pending_cmd)
+        return;
+    free(player->pending_cmd->args);
+    free(player->pending_cmd);
+    player->pending_cmd = NULL;
+}
+
 void cleanup_player_queue(player_t *player)
 {
     if (!player || !player->command_queue)
@@ -30,6 +39,7 @@ void cleanup_client(client_t *client)
         return;
     if (client->player) {
         cleanup_player_queue(client->player);
+        cleanup_pending(client->player);
         free(client->player);
         client->player = NULL;
     }
