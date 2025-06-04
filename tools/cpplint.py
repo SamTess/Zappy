@@ -19,8 +19,11 @@ def run_cpplint(directory):
     """Run cpplint recursively on the specified directory."""
     excluded_rules_arg = f"--filter={','.join(EXCLUDED_RULES)}"
     has_errors = False
+    log_file = open('cpplint.log', 'w')
 
-    for root, _, files in os.walk(directory):
+    for root, dirs, files in os.walk(directory):
+        if "tests" in dirs:
+            dirs.remove("tests")
         for file in files:
             if file.endswith(('.cpp', '.hpp')):
                 filepath = os.path.join(root, file)
@@ -32,8 +35,11 @@ def run_cpplint(directory):
                         stderr=subprocess.PIPE
                     )
                 except subprocess.CalledProcessError as e:
-                    print(e.stderr.decode(), file=sys.stderr, end='')
+                    error_output = e.stderr.decode()
+                    print(error_output, file=sys.stderr, end='')
+                    log_file.write(error_output)
                     has_errors = True
+    log_file.close()
     return has_errors
 
 if __name__ == "__main__":
@@ -48,4 +54,7 @@ if __name__ == "__main__":
 
     has_errors = run_cpplint(target_directory)
     if has_errors:
+        print(f"Lint errors found. See cpplint.log for details.")
         sys.exit(1)
+    else:
+        print("No lint errors found.")

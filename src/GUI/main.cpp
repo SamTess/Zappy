@@ -26,7 +26,8 @@ int main(int argc, char **argv) {
         ParsingCLI parser(argc, argv);
         std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
         NetworkLogger::get().setEnabled(true);
-        NetworkManager networkManager;
+        NetworkManager networkManager = NetworkManager();
+
         if (!networkManager.connect(parser.getMachine(), parser.getPort())) {
             std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
