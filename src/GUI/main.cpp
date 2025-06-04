@@ -25,7 +25,6 @@ int main(int argc, char** argv) {
         ParsingCLI parser(argc, argv);
         std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
 
-        // Partie réseau commentée pour éviter les erreurs de connexion
         /*
         NetworkManager networkManager;
 

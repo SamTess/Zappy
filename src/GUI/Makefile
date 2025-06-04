@@ -30,15 +30,14 @@ SRCS			=	shared/exception/AException.cpp \
 					network/networkThread/NetworkThread.cpp \
 					network/protocol/Message.cpp \
 					network/protocol/ProtocolParser.cpp \
+					network/utils/SystemWrapper.cpp \
 					obj/ObjFile.cpp \
 					obj/ObjManager.cpp \
-					CameraController.cpp \
-					ModelManager.cpp \
-					Renderer.cpp \
-					UIRenderer.cpp \
-					GameLoop.cpp \
+					renderer/Renderer.cpp \
+					renderer/UIRenderer.cpp \
+					cameraController/CameraController.cpp \
 					graphicalContext/GraphicalContext.cpp \
- 			  	network/utils/SystemWrapper.cpp
+					GameLoop.cpp
 
 OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME			= $(BUILD_DIR)/libgui.a
@@ -85,7 +84,7 @@ debug: all
 
 clean:
 	@echo -e "$(YELLOW)Cleaning GUI objects...$(RESET)"
-	@rm -f $(BUILD_DIR)/GUI/*.o
+	@rm -rf $(BUILD_DIR)/GUI
 
 fclean: clean
 	@echo -e "$(RED)Cleaning GUI binary and library...$(RESET)"
