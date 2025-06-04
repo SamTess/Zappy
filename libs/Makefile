@@ -30,8 +30,10 @@ RAYGUI_CPP_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(RAYGUI_CPP_SRC))
 RAYGUI_CPP_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(RAYGUI_CPP_SRC))
 
 # Libraries
-RAYLIB_CPP_LIB = ../build/libraylib_cpp.a
-RAYGUI_CPP_LIB = ../build/libraygui_cpp.a
+RAYLIB_CPP_LIB_STATIC = ../build/libraylib_cpp.a
+RAYGUI_CPP_LIB_STATIC = ../build/libraygui_cpp.a
+RAYLIB_CPP_LIB_SHARED = ../plugins/libraylibcpp.so
+RAYGUI_CPP_LIB_SHARED = ../plugins/libraygui.so
 
 # Include directories
 INCLUDE_DIRS = -I. -I../src/Shared -IRaylibCPP -IRayGUICPP
@@ -59,9 +61,13 @@ BOLD = \033[1m
 RESET = \033[0m
 
 # Main target
-all: setup_dirs display_banner $(RAYLIB_CPP_LIB) $(RAYGUI_CPP_LIB)
+all: setup_dirs display_banner static shared
 	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Toutes \
 	les bibliothèques ont été compilées !$(RESET)"
+
+static: $(RAYLIB_CPP_LIB_STATIC) $(RAYGUI_CPP_LIB_STATIC)
+
+shared: $(RAYLIB_CPP_LIB_SHARED) $(RAYGUI_CPP_LIB_SHARED)
 
 # Create the necessary build directories
 setup_dirs:
@@ -75,6 +81,7 @@ setup_dirs:
 	@mkdir -p $(BUILD_DIR)/RaylibCPP/utils
 	@mkdir -p $(BUILD_DIR)/RayGUICPP
 	@mkdir -p ../build
+	@mkdir -p ../plugins
 
 # Display a fancy banner for the build process
 display_banner:
@@ -88,11 +95,11 @@ display_banner:
 	des bibliothèques...$(RESET)"
 	@sleep 0.3
 
-# Build the RaylibCPP library
-$(RAYLIB_CPP_LIB): $(RAYLIB_CPP_OBJ)
+# Build the RaylibCPP static library
+$(RAYLIB_CPP_LIB_STATIC): $(RAYLIB_CPP_OBJ)
 	@echo ""
 	@echo "$(GREEN)[$(BOLD)LIBRARY$(RESET)$(GREEN)]$(RESET) $(BOLD)Création \
-	de la bibliothèque RaylibCPP...$(RESET)"
+	de la bibliothèque statique RaylibCPP...$(RESET)"
 	@for i in `seq 1 21`; do \
 		progress=$$(( i > 20 ? 20 : i )); \
 		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
@@ -102,16 +109,16 @@ $(RAYLIB_CPP_LIB): $(RAYLIB_CPP_OBJ)
 		sleep 0.05; \
 	done
 	@echo ""
-	@ar rc $(RAYLIB_CPP_LIB) $(RAYLIB_CPP_OBJ)
-	@ranlib $(RAYLIB_CPP_LIB)
+	@ar rc $(RAYLIB_CPP_LIB_STATIC) $(RAYLIB_CPP_OBJ)
+	@ranlib $(RAYLIB_CPP_LIB_STATIC)
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Bibliothèque \
-	RaylibCPP créée : $(RAYLIB_CPP_LIB)$(RESET)"
+	statique RaylibCPP créée : $(RAYLIB_CPP_LIB_STATIC)$(RESET)"
 
-# Build the RayGUICPP library
-$(RAYGUI_CPP_LIB): $(RAYGUI_CPP_OBJ)
+# Build the RaylibCPP shared library
+$(RAYLIB_CPP_LIB_SHARED): $(RAYLIB_CPP_OBJ)
 	@echo ""
 	@echo "$(GREEN)[$(BOLD)LIBRARY$(RESET)$(GREEN)]$(RESET) $(BOLD)Création \
-	de la bibliothèque RayGUICPP...$(RESET)"
+	de la bibliothèque partagée RaylibCPP...$(RESET)"
 	@for i in `seq 1 21`; do \
 		progress=$$(( i > 20 ? 20 : i )); \
 		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
@@ -121,10 +128,46 @@ $(RAYGUI_CPP_LIB): $(RAYGUI_CPP_OBJ)
 		sleep 0.05; \
 	done
 	@echo ""
-	@ar rc $(RAYGUI_CPP_LIB) $(RAYGUI_CPP_OBJ)
-	@ranlib $(RAYGUI_CPP_LIB)
+	@$(CXX) -shared -o $(RAYLIB_CPP_LIB_SHARED) $(RAYLIB_CPP_OBJ) $(LDFLAGS)
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Bibliothèque \
-	RayGUICPP créée : $(RAYGUI_CPP_LIB)$(RESET)"
+	partagée RaylibCPP créée : $(RAYLIB_CPP_LIB_SHARED)$(RESET)"
+
+# Build the RayGUICPP static library
+$(RAYGUI_CPP_LIB_STATIC): $(RAYGUI_CPP_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)LIBRARY$(RESET)$(GREEN)]$(RESET) $(BOLD)Création \
+	de la bibliothèque statique RayGUICPP...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@ar rc $(RAYGUI_CPP_LIB_STATIC) $(RAYGUI_CPP_OBJ)
+	@ranlib $(RAYGUI_CPP_LIB_STATIC)
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Bibliothèque \
+	statique RayGUICPP créée : $(RAYGUI_CPP_LIB_STATIC)$(RESET)"
+
+# Build the RayGUICPP shared library
+$(RAYGUI_CPP_LIB_SHARED): $(RAYGUI_CPP_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)LIBRARY$(RESET)$(GREEN)]$(RESET) $(BOLD)Création \
+	de la bibliothèque partagée RayGUICPP...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@$(CXX) -shared -o $(RAYGUI_CPP_LIB_SHARED) $(RAYGUI_CPP_OBJ) $(LDFLAGS)
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Bibliothèque \
+	partagée RayGUICPP créée : $(RAYGUI_CPP_LIB_SHARED)$(RESET)"
 
 # Rule for object files
 $(BUILD_DIR)/RayGUICPP/%.o: RayGUICPP/%.cpp
@@ -169,8 +212,10 @@ clean:
 fclean: clean
 	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) $(BOLD)Suppression \
 	des bibliothèques...$(RESET)"
-	@rm -f $(RAYLIB_CPP_LIB)
-	@rm -f $(RAYGUI_CPP_LIB)
+	@rm -f $(RAYLIB_CPP_LIB_STATIC)
+	@rm -f $(RAYGUI_CPP_LIB_STATIC)
+	@rm -f $(RAYLIB_CPP_LIB_SHARED)
+	@rm -f $(RAYGUI_CPP_LIB_SHARED)
 	@sleep 0.5
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Nettoyage \
 	complet effectué !$(RESET)"
@@ -181,4 +226,5 @@ re: fclean all
 # Include dependency files
 -include $(RAYLIB_CPP_DEP) $(RAYGUI_CPP_DEP)
 
-.PHONY: all clean fclean re debug coverage setup_dirs display_banner
+.PHONY: all static shared clean fclean re debug coverage setup_dirs \
+display_banner

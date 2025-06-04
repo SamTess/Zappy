@@ -42,7 +42,7 @@ all: display_banner
 	de tous les composants...$(RESET)"
 	@sleep 0.3
 	@$(MAKE) -C $(SERVER_DIR)
-	@$(MAKE) -C $(LIBS_DIR)
+	@$(MAKE) -C $(LIBS_DIR) static shared
 	@$(MAKE) -C $(GUI_DIR)
 	@$(MAKE) -C $(AI_DIR)
 	@echo ""
@@ -88,7 +88,9 @@ zappy_server:
 	compilé avec succès !$(RESET)"
 
 zappy_gui:
-	@$(MAKE) -C $(LIBS_DIR)
+	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
+	des bibliothèques partagées...$(RESET)"
+	@$(MAKE) -C $(LIBS_DIR) shared
 	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de la GUI...$(RESET)"
 	@$(MAKE) -C $(GUI_DIR)
@@ -138,14 +140,18 @@ init:
 	@touch .gitignore
 	@echo ".vscode" >> .gitignore
 	@echo "*.o" >> .gitignore
+	@echo "*.so" >> .gitignore
+	@echo "*.a" >> .gitignore
 	@echo "*.gcda" >> .gitignore
 	@echo "*.gcno" >> .gitignore
 	@echo "coding-style-reports.log" >> .gitignore
 	@echo "$(BUILD_DIR)/" >> .gitignore
+	@echo "$(PLUGINS_DIR)/" >> .gitignore
 	@echo "$(SERVER_NAME)" >> .gitignore
 	@echo "$(GUI_NAME)" >> .gitignore
 	@echo "$(AI_NAME)" >> .gitignore
 	@echo "$(UNIT_TESTS_NAME)" >> .gitignore
+	@mkdir -p $(PLUGINS_DIR)
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Projet\
 	 initialisé avec succès !$(RESET)"
 
