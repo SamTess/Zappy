@@ -11,7 +11,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-static int calculate_shortest_distance_x(int sender_x, int receiver_x, int width)
+static int calculate_shortest_distance_x(int sender_x,
+    int receiver_x, int width)
 {
     int direct_distance = receiver_x - sender_x;
     int wrap_distance_right = (receiver_x + width) - sender_x;
@@ -25,7 +26,8 @@ static int calculate_shortest_distance_x(int sender_x, int receiver_x, int width
     return wrap_distance_left;
 }
 
-static int calculate_shortest_distance_y(int sender_y, int receiver_y, int height)
+static int calculate_shortest_distance_y(int sender_y,
+    int receiver_y, int height)
 {
     int direct_distance = receiver_y - sender_y;
     int wrap_distance_down = (receiver_y + height) - sender_y;
@@ -77,7 +79,8 @@ static int calculate_direction(client_t *receiver, int dx, int dy)
 
     if (base_direction == 0)
         return 0;
-    return adjust_direction_for_rotation(base_direction, receiver->player->rotation);
+    return adjust_direction_for_rotation(base_direction,
+        receiver->player->rotation);
 }
 
 static void send_broadcast_to_client(server_t *server, client_t *sender,

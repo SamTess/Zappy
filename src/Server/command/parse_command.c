@@ -6,6 +6,7 @@
 */
 #include "../include/command.h"
 #include "../include/server.h"
+#include "../include/scheduled_command.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,7 +54,7 @@ static int check_buffer_size(int b_size, char *buffer, client_t *user)
     return 0;
 }
 
-static command_data_t get_command_data(void)
+command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
@@ -74,7 +75,10 @@ static bool execute_if_free(server_t *server, client_t *user,
     command_data_t data = get_command_data();
 
     if (user->player->busy_until <= server->current_tick) {
-        data.functions[cmd_index](server, user, buffer);
+        user->player->pending_command->args = strdup(buffer);
+        user->player->pending_command->func = data.functions[cmd_index];
+        user->player->pending_command->execute_at_tick = server->current_tick
+            + data.times[cmd_index];
         if (data.times[cmd_index] > 0)
             user->player->busy_until =
                 server->current_tick + data.times[cmd_index];
