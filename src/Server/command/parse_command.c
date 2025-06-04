@@ -26,48 +26,6 @@ static int check_disconnect(int bytes_read, client_t *user, server_t *server)
     return 0;
 }
 
-// static int check_disconnect(int bytes_read, client_t *user,
-//     server_t *server, char *buffer)
-// {
-//     if (bytes_read <= 0) {
-//         if (bytes_read == 0){
-//             cleanup_client(user);
-//             remove_fd(server, user->client_poll->fd);
-//             free(buffer);
-//             return 1;
-//         }
-//         return 1;
-//     }
-//     return 0;
-// }
-
-// static int manage_buffer(char **buffer, int *b_size, char byte)
-// {
-//     char *new_buffer = realloc(*buffer, (*b_size + 2) * sizeof(char));
-
-//     if (!new_buffer){
-//         perror("Realloc failed");
-//         exit(84);
-//     }
-//     *buffer = new_buffer;
-//     (*buffer)[*b_size] = byte;
-//     *b_size += 1;
-//     if (*b_size >= 2 && (*buffer)[*b_size - 2] == '\r' &&
-//         (*buffer)[*b_size - 1] == '\n')
-//         return 1;
-//     return 0;
-// }
-
-// static int check_buffer_size(int b_size, char *buffer, client_t *user)
-// {
-//     if (b_size > 8192) {
-//         write(user->client_fd, "trop long", strlen("trop long"));
-//         free(buffer);
-//         return 1;
-//     }
-//     return 0;
-// }
-
 command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
@@ -124,27 +82,6 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     if (!find_and_execute(server, user, buffer))
         write_command_output(user->client_fd, "ko\n");
 }
-
-// void get_message(server_t *server, client_t *user)
-// {
-//     char *buffer = calloc(2, sizeof(char));
-//     int b_size = 0;
-//     char byte;
-//     int bytes_read;
-
-//     while (1){
-//         bytes_read = read(user->client_poll->fd, &byte, 1);
-//         if (check_disconnect(bytes_read, user, server, buffer) == 1)
-//             return;
-//         if (manage_buffer(&buffer, &b_size, byte) == 1)
-//             break;
-//         if (check_buffer_size(b_size, buffer, user) == 1)
-//             return;
-//     }
-//     buffer[b_size] = '\0';
-//     execute_com(server, user, buffer);
-//     free(buffer);
-// }
 
 static void check_command(circular_buffer_t *temp_buffer, int cmd_length,
     server_t *server, client_t *user)
