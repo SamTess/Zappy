@@ -2,7 +2,6 @@ import threading
 import queue
 import socket
 import uuid
-import time
 
 class SocketManager:
   def __init__(self, sock):

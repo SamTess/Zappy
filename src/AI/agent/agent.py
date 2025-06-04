@@ -33,9 +33,9 @@ class Agent:
 
 
   def start(self):
-    welcome_msg = self.socketManager.get_message(timeout=2)
-    team_slots = self.socketManager.send_command(self.team)
-    map_size = self.socketManager.get_message(timeout=2)
+    welcome_msg = self.get_message(timeout=2)
+    team_slots = self.send_command(self.team)
+    map_size = self.get_message(timeout=2)
 
     if welcome_msg == "WELCOME":
       print(f"Welcome message {welcome_msg}")
@@ -65,14 +65,8 @@ class Agent:
     while self.socketManager.running:
       try:
 
-        if self.socketManager.has_messages():
-          message = self.socketManager.get_message()
-          self.decisionManager.process_server_message(message)
-
-        else:
-          surroundings = self.socketManager.send_command("Look")
-          inventory = self.socketManager.send_command("Inventory")
-          self.decisionManager.take_next_decision(inventory, surroundings)
+        self.decisionManager.process_server_message()
+        self.decisionManager.take_next_decision()
 
         sleep(0.1)
 
@@ -81,7 +75,14 @@ class Agent:
         self.stop()
         break
 
+  def send_command(self, command):
+    return self.socketManager.send_command(command)
 
+  def get_message(self, timeout=None):
+    return self.socketManager.get_message(timeout=timeout)
+
+  def has_messages(self):
+    return self.socketManager.has_messages()
     # def process_server_messages(self):
     #     while True:
     #         server_message = inputs.read_line(self.sock)
