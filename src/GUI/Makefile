@@ -29,6 +29,8 @@ SRCS			=	shared/exception/AException.cpp \
 					network/networkThread/NetworkThread.cpp \
 					network/protocol/Message.cpp \
 					network/protocol/ProtocolParser.cpp \
+					obj/ObjFile.cpp \
+					obj/ObjManager.cpp \
 					CameraController.cpp \
 					ModelManager.cpp \
 					Renderer.cpp \

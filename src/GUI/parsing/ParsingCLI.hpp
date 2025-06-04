@@ -14,7 +14,6 @@
 class ParsingCLI {
     public:
         ParsingCLI(int argc, char **argv);
-        explicit ParsingCLI(bool testMode = false);
         ~ParsingCLI();
 
         void parse(int argc, char **argv);
@@ -32,7 +31,6 @@ class ParsingCLI {
     private:
         int _port;
         std::string _machine;
-        bool _testMode;
 
         class ParsingCLIException : public AException {
             public:

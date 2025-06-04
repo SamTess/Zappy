@@ -10,24 +10,10 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <unordered_map>
+#include "obj/ObjManager.hpp"
 #include "../Shared/IGraphicsLib.hpp"
 #include "../Shared/Common.hpp"
 #include "Constants.hpp"
-
-class ObjFile {
-public:
-    explicit ObjFile(std::shared_ptr<IGraphicsLib> graphics, const std::string& objPath);
-    ~ObjFile() = default;
-
-    void load(std::shared_ptr<IGraphicsLib> graphics, const std::string& objPath);
-    const std::string& path() const;
-    void display(std::shared_ptr<IGraphicsLib> graphics, ZappyTypes::Vector3 position, float scale = 1.0f, ZappyTypes::Color color = {255, 255, 255, 255}) const;
-
-private:
-    std::string m_filePath;
-    bool m_isLoaded;
-};
 
 class ModelManager {
 public:
@@ -46,6 +32,5 @@ public:
 
 private:
     bool m_showModel;
-    std::unordered_map<int, std::unique_ptr<ObjFile>> m_objFiles;
-    int m_nextId = 0;
+    std::unique_ptr<ObjManager> m_objManager;
 };
