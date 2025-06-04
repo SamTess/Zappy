@@ -28,6 +28,10 @@ static void malloc_failed_bis(int i)
         perror("Malloc failed for allocating parsed_info in server");
         exit(84);
     }
+    if (i == 8){
+        perror("Malloc failed for allocating response for broadcast");
+        exit(84);
+    }
 }
 
 void malloc_failed(int i)

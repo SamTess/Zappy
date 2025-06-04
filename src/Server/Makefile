@@ -46,6 +46,7 @@ SRCS			=	help.c								\
 					command/fork.c						\
 					command/start_incantation.c			\
 					command/finish_incantation.c		\
+					command/broadcast.c					\
 					map/egg.c							\
 					player/player_init.c				\
 					player/player_inventory.c			\

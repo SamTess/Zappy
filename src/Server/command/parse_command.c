@@ -57,12 +57,12 @@ static command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
-        "Incantation", "Fork", NULL};
+        "Incantation", "Fork", "Broadcast", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
-        fork_c, NULL};
-    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42};
+        fork_c, broadcast, NULL};
+    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7};
     command_data_t data = {comm_char, comm_func, comm_times};
 
     return data;
