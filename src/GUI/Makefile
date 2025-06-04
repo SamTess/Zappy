@@ -20,6 +20,7 @@ PLUGINS_DIR			= ../../plugins
 
 MAIN_FILE 		= 	main.cpp
 
+# Source files
 SRCS			=	shared/exception/AException.cpp \
 					parsing/ParsingCLI.cpp \
 					network/buffer/CircularBuffer.cpp \
@@ -29,6 +30,8 @@ SRCS			=	shared/exception/AException.cpp \
 					network/networkThread/NetworkThread.cpp \
 					network/protocol/Message.cpp \
 					network/protocol/ProtocolParser.cpp \
+					graphicalContext/GraphicalContext.cpp \
+ 			  	network/utils/SystemWrapper.cpp
 
 OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
 LIB_NAME			= $(BUILD_DIR)/libgui.a
