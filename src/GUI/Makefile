@@ -1,96 +1,196 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy GUI
+## Zappy GUI Makefile
 ## File description:
-## GUI Makefile
+## Builds the Zappy graphical interface binary
 ##
 
-CXX					= 	g++
-CXXFLAGS			=	-Wextra -Wall -Werror -std=c++20
-DEBUGFLAGS			=	-ggdb -fsanitize=address
-SFMLFLAGS			=	-lsfml-graphics -lsfml-window -lsfml-system \
-						-lsfml-audio -lsfml-network
+# Binary name
+NAME = ../../zappy_gui
+BUILD_DIR = ../../build/GUI
+
+MAIN = main.cpp
+# Source files
+SRC = graphicalContext/GraphicalContext.cpp \
+	  parsing/ParsingCLI.cpp \
+	  shared/exception/AException.cpp \
+	  network/buffer/CircularBuffer.cpp \
+	  network/buffer/MessageQueue.cpp \
+	  network/connection/TcpConnection.cpp \
+	  network/networkThread/NetworkThread.cpp \
+	  network/protocol/Message.cpp \
+	  network/protocol/ProtocolParser.cpp \
+	  network/utils/SystemWrapper.cpp \
+	  network/networkManager/NetworkManager.cpp \
+	  obj/ObjFile.cpp \
+	  obj/ObjManager.cpp \
+	  renderer/Renderer.cpp \
+	  renderer/UIRenderer.cpp \
+	  cameraController/CameraController.cpp \
+	  GameLoop.cpp
+
+OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(SRC))
+DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(SRC))
+
+# Exclude test_dlloader from main build but keep it for specific targets
+TEST_SRC = test_dlloader.cpp
+TEST_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(TEST_SRC))
 
 # Directories
-SRC_DIR				=	.
-INCLUDE_DIR			=	include
-SHARED_INCLUDE		=	../Shared/include
-BUILD_DIR			= ../../build
-PLUGINS_DIR			= ../../plugins
+INCLUDE_DIRS = -I. -I../../libs -I../../src/Shared -I../../libs/RaylibCPP \
+	-I../../libs/RayGUICPP
 
-MAIN_FILE 		= 	main.cpp
+# Libraries
+LIBS = -L../../build -lraylib -lraylib_cpp -lraygui_cpp -lm -lpthread -ldl
 
-# Source files
-SRCS			=	shared/exception/AException.cpp \
-					parsing/ParsingCLI.cpp \
-					network/buffer/CircularBuffer.cpp \
-					network/buffer/MessageQueue.cpp \
-					network/connection/TcpConnection.cpp \
-					network/networkManager/NetworkManager.cpp \
-					network/networkThread/NetworkThread.cpp \
-					network/protocol/Message.cpp \
-					network/protocol/ProtocolParser.cpp \
-					network/utils/SystemWrapper.cpp \
-					obj/ObjFile.cpp \
-					obj/ObjManager.cpp \
-					renderer/Renderer.cpp \
-					renderer/UIRenderer.cpp \
-					cameraController/CameraController.cpp \
-					graphicalContext/GraphicalContext.cpp \
-					GameLoop.cpp
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror $(INCLUDE_DIRS) -fPIC
+LDFLAGS = $(LIBS)
+DEBUG_FLAGS = -g3 -ggdb
 
-OBJ_FILES			= $(SRCS:%.cpp=$(BUILD_DIR)/GUI/%.o)
-LIB_NAME			= $(BUILD_DIR)/libgui.a
-BINARY_NAME			= ../../zappy_gui
-GRAPHIC_LIB_NAME	= $(PLUGINS_DIR)/libraylibcpp.so
-GUI_LIB_NAME		= $(PLUGINS_DIR)/libraygui.so
+# Colors and animations
+RED = \033[31m
+GREEN = \033[32m
+YELLOW = \033[33m
+BLUE = \033[34m
+MAGENTA = \033[35m
+CYAN = \033[36m
+WHITE = \033[37m
+BOLD = \033[1m
+RESET = \033[0m
+BG_BLACK = \033[40m
 
-INCLUDES			=	-Iinclude -I../Shared/include
+# Animation frames for compilation progress
+COMPILE_MSG = "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)"
+LINKING_MSG = "$(GREEN)[$(BOLD)LINKING$(RESET)$(GREEN)]$(RESET)"
+SUCCESS_MSG = "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET)"
+RAINBOW = "$(RED)Z$(YELLOW)a$(GREEN)p$(CYAN)p$(BLUE)y$(MAGENTA) GUI$(RESET)"
 
-RED					=	\033[0;91m
-GREEN				=	\033[0;92m
-YELLOW				=	\033[0;93m
-BLUE				=	\033[0;94m
-CYAN				=	\033[0;96m
-RESET				=	\033[0m
+# Main target
+all: setup_dirs display_banner $(NAME)
 
-all: libs_so $(LIB_NAME) $(BINARY_NAME)
+# Create the necessary build directories
+setup_dirs:
+	@mkdir -p $(BUILD_DIR)/graphicalContext
+	@mkdir -p $(BUILD_DIR)/parsing
+	@mkdir -p $(BUILD_DIR)/shared/exception
+	@mkdir -p $(BUILD_DIR)/network/buffer
+	@mkdir -p $(BUILD_DIR)/network/connection
+	@mkdir -p $(BUILD_DIR)/network/networkThread
+	@mkdir -p $(BUILD_DIR)/network/protocol
+	@mkdir -p $(BUILD_DIR)/network/utils
+	@mkdir -p $(BUILD_DIR)/network/networkManager
+	@mkdir -p ../../build
 
-libs_so:
-	@$(MAKE) -C ../../libs
+# Display a fancy banner for the build process
+display_banner:
+	@clear
+	@echo "$(CYAN)╔═════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(MAGENTA)$(BOLD)Z A P P Y   G U I   \
+	B U I L D E R$(RESET)  $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════╝$(RESET)"
+	@echo ""
+	@echo "$(BLUE)[$(BOLD)INFO$(RESET)$(BLUE)]$(RESET) $(BOLD)Préparation \
+	de l'interface graphique...$(RESET)"
+	@sleep 0.3
 
+# Build the GUI
+$(NAME): $(OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Liaison \
+	de l'interface graphique...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@$(CXX) $(CXXFLAGS) -o $(NAME) $(MAIN) $(OBJ) $(LDFLAGS)
+	@echo "$(CYAN)[$(BOLD)LIB$(RESET)$(CYAN)]$(RESET) $(BOLD)Création de \
+	la bibliothèque statique...$(RESET)"
+	@ar rc ../../build/libgui.a $(OBJ)
+	@ranlib ../../build/libgui.a
+	@sleep 0.2
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Interface \
+	graphique compilée avec succès : $(NAME)$(RESET)"
+	@echo "$(CYAN)╔═════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)L'interface graphique est \
+	prête !$(RESET)      $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════════╝$(RESET)"
 
-$(BUILD_DIR)/Shared/%.o: ../Shared/%.cpp
-	@mkdir -p $(BUILD_DIR)/Shared
-	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+# Test DLLoader build
+test_dlloader: setup_dirs $(TEST_OBJ) $(filter-out $(BUILD_DIR)/main.o, $(OBJ))
+	@echo "$(LINKING_MSG) $(BOLD)Création du programme de test \
+	DLLoader...$(RESET)"
+	@$(CXX) $(CXXFLAGS) -o ../../test_dlloader $(TEST_OBJ) \
+	$(filter-out $(BUILD_DIR)/main.o, $(OBJ)) $(LDFLAGS)
+	@echo "$(SUCCESS_MSG) $(BOLD)Test DLLoader compilé avec succès$(RESET)"
 
-$(LIB_NAME): $(OBJ_FILES)
-	@mkdir -p $(BUILD_DIR)
-	@ar rcs $(LIB_NAME) $(OBJ_FILES)
-
-$(BINARY_NAME): $(LIB_NAME)
-	@echo -e "$(GREEN)Compiling GUI binary...$(RESET)"
-	@$(CXX) -o $(BINARY_NAME) $(MAIN_FILE) $(LIB_NAME) \
-		$(CXXFLAGS) $(INCLUDES) $(SFMLFLAGS) -ldl
-
-$(BUILD_DIR)/GUI/%.o: %.cpp
+# Rule for object files
+$(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@echo -n "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)\
+	 $(notdir $<)... "
+	@$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
+	@echo "$(GREEN)✓$(RESET)"
 
-debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: all
+# Debug build
+debug: CXXFLAGS += $(DEBUG_FLAGS)
+debug: clean all
+	@echo "$(MAGENTA)[$(BOLD)DEBUG$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
+	debug activé !$(RESET)"
 
+# Coverage build for tests
+coverage: CXXFLAGS += --coverage -fprofile-arcs -ftest-coverage
+coverage: LDFLAGS += --coverage -lgcov
+coverage: clean all
+	@echo "$(MAGENTA)[$(BOLD)COVERAGE$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
+	couverture activé pour l'interface graphique !$(RESET)"
+	@echo "$(CYAN)╔══════════════════════════════════════════\
+	═══════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Interface graphique compilée avec \
+	instrumentation$(RESET)  $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚══════════════════════════════════════════\
+	═══════════╝$(RESET)"
+
+# Clean object files
 clean:
-	@echo -e "$(YELLOW)Cleaning GUI objects...$(RESET)"
-	@rm -rf $(BUILD_DIR)/GUI
+	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Suppression des fichiers objets...$(RESET)"
+	@rm -rf $(BUILD_DIR)
+	@sleep 0.3
+	@for i in `seq 1 10`; do \
+		echo -n "$(YELLOW)[$(BOLD)CLEAN$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Progression: ["; \
+		for j in `seq 1 $$i`; do echo -n "▓"; done; \
+		for j in `seq $$i 10`; do echo -n "░"; done; \
+		echo -n "]$(RESET)\r"; \
+		sleep 0.1; \
+	done
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Nettoyage effectué !$(RESET)       "
 
+# Clean everything (including binary)
 fclean: clean
-	@echo -e "$(RED)Cleaning GUI binary and library...$(RESET)"
-	@rm -f $(BINARY_NAME)
-	@rm -f $(LIB_NAME)
+	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) \
+	$(BOLD)Suppression du binaire...$(RESET)"
+	@rm -f $(NAME)
+	@rm -f ../../test_dlloader
+	@rm -f ../../build/libgui.a
+	@sleep 0.3
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Nettoyage complet effectué !$(RESET)"
 
+# Clean and rebuild
 re: fclean all
 
-.PHONY: all debug clean fclean re
+# Include dependency files
+-include $(DEP)
+
+.PHONY: all clean fclean re debug coverage test_dlloader \
+compile_animation setup_dirs
