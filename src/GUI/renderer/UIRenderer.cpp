@@ -5,12 +5,12 @@
 ** UIRenderer
 */
 
-#include "UIRenderer.hpp"
-#include "../Constants.hpp"
 #include <string>
 #include <memory>
 #include <sstream>
 #include <cmath>
+#include "UIRenderer.hpp"
+#include "../Constants.hpp"
 
 UIRenderer::UIRenderer()
     : m_showUI(true),
