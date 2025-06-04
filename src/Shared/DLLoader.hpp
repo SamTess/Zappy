@@ -4,6 +4,7 @@
 ** File description:
 ** DLLoader
 */
+
 #pragma once
 
 #include <dlfcn.h>
@@ -63,7 +64,7 @@ public:
                 throw std::runtime_error("La fonction de création a retourné un pointeur null");
             return std::unique_ptr<T, std::function<void(T*)>>(
                 sharedInstance.get(),
-                [](T* ptr) { }
+                [](T* /*ptr*/) { }  // Utilisation de commentaire pour indiquer un paramètre intentionnellement non utilisé
             );
         } catch (const std::exception& e) {
             using RawCreatorFunc = T* (*)();
