@@ -9,14 +9,15 @@ class LogLevel(IntEnum):
     CRITICAL = 50
 
 class Logger:
-    def __init__(self, fileName: str = "AI.log"):
+    def __init__(self, fileName: str = "AI.log", message_prefix: str = ""):
         self.file = fileName
+        self.message_prefix = message_prefix
         self.file_handle = open(fileName, "a")
 
     def log(self, message: str, level: LogLevel):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         level_name = level.name
-        self.file_handle.write(f"[{timestamp}] {level_name}: {message}\n")
+        self.file_handle.write(f"[{timestamp}] {level_name}: {self.message_prefix} {message}\n")
         self.file_handle.flush()
 
     def debug(self, message: str):
