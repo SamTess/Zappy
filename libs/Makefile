@@ -1,78 +1,184 @@
-# Compilation des librairies Raylib et Raygui en .so
+##
+## EPITECH PROJECT, 2025
+## Zappy Libraries Makefile
+## File description:
+## Builds the libraries for the Zappy project
+##
 
-RAYLIB_DIR=RaylibCPP
-RAYGUI_DIR=RayGUICPP
-BUILD_DIR=../build/libs
-PLUGINS_DIR=../plugins
-INCLUDE=-I$(RAYLIB_DIR) -I$(RAYGUI_DIR) -I$(RAYGUI_DIR)/include -I$(RAYGUI_DIR)/raygui-4.0/src
-CXX=g++
-CXXFLAGS=-fPIC -shared -O2 $(INCLUDE)
+# Build directory
+BUILD_DIR = ../build/libs
 
-RED=\033[31m
-GREEN=\033[32m
-YELLOW=\033[33m
-BLUE=\033[34m
-MAGENTA=\033[35m
-CYAN=\033[36m
-RESET=\033[0m
+# RaylibCPP source files
+RAYLIB_CPP_SRC = RaylibCPP/RayLib.cpp \
+				 RaylibCPP/window/Window.cpp \
+				 RaylibCPP/texture/Texture.cpp \
+				 RaylibCPP/shape/Shape.cpp \
+				 RaylibCPP/input/Input.cpp \
+				 RaylibCPP/font/Font.cpp \
+				 RaylibCPP/camera/Camera.cpp \
+				 RaylibCPP/audio/Audio.cpp \
+				 RaylibCPP/utils/Utils.cpp
 
-all: $(PLUGINS_DIR)/libraylibcpp.so $(PLUGINS_DIR)/libraygui.so
-	@mkdir -p ../plugins
-	@echo -e "$(GREEN)[OK] Compilation des librairies Raylib et Raygui terminée.$(RESET)"
+RAYLIB_CPP_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(RAYLIB_CPP_SRC))
+RAYLIB_CPP_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(RAYLIB_CPP_SRC))
 
-$(BUILD_DIR):
-	@mkdir -p $(BUILD_DIR)
-	@echo -e "$(CYAN)[INFO] Création du dossier build/libs.$(RESET)"
-$(PLUGINS_DIR):
-	@mkdir -p $(PLUGINS_DIR)
-	@echo -e "$(CYAN)[INFO] Création du dossier plugins.$(RESET)"
+# RayGUICPP source files
+RAYGUI_CPP_SRC = RayGUICPP/RayGui.cpp \
+				 RayGUICPP/raygui_impl.cpp
 
-$(BUILD_DIR)/RayLib.o: $(RAYLIB_DIR)/RayLib.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation RayLib.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/Window.o: $(RAYLIB_DIR)/window/Window.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Window.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/Shape.o: $(RAYLIB_DIR)/shape/Shape.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Shape.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/Texture.o: $(RAYLIB_DIR)/texture/Texture.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Texture.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/Font.o: $(RAYLIB_DIR)/font/Font.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Font.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/Input.o: $(RAYLIB_DIR)/input/Input.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Input.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/Audio.o: $(RAYLIB_DIR)/audio/Audio.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Audio.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
+RAYGUI_CPP_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(RAYGUI_CPP_SRC))
+RAYGUI_CPP_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(RAYGUI_CPP_SRC))
 
-$(BUILD_DIR)/Camera.o: $(RAYLIB_DIR)/camera/Camera.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation Camera.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
+# Libraries
+RAYLIB_CPP_LIB = ../build/libraylib_cpp.a
+RAYGUI_CPP_LIB = ../build/libraygui_cpp.a
 
-$(PLUGINS_DIR)/libraylibcpp.so: $(BUILD_DIR)/RayLib.o $(BUILD_DIR)/Window.o \
-	$(BUILD_DIR)/Shape.o $(BUILD_DIR)/Texture.o $(BUILD_DIR)/Font.o \
-	$(BUILD_DIR)/Input.o $(BUILD_DIR)/Audio.o \
-	$(BUILD_DIR)/Camera.o | $(PLUGINS_DIR)
-	@echo -e "$(BLUE)Linkage de libraylibcpp.so...$(RESET)"
-	@$(CXX) $(CXXFLAGS) -o $@ $^ -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-	@echo -e "$(GREEN)[OK] libraylibcpp.so généré dans plugins.$(RESET)"
+# Include directories
+INCLUDE_DIRS = -I. -I../src/Shared -IRaylibCPP -IRayGUICPP
 
-$(BUILD_DIR)/RayGui.o: $(RAYGUI_DIR)/RayGui.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation RayGui.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
-$(BUILD_DIR)/raygui_impl.o: $(RAYGUI_DIR)/raygui_impl.cpp | $(BUILD_DIR)
-	@echo -e "$(YELLOW)Compilation raygui_impl.cpp...$(RESET)"
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
+# External libraries
+LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-$(PLUGINS_DIR)/libraygui.so: $(BUILD_DIR)/RayGui.o $(BUILD_DIR)/raygui_impl.o | $(PLUGINS_DIR)
-	@echo -e "$(BLUE)Linkage de libraygui.so...$(RESET)"
-	@$(CXX) $(CXXFLAGS) -o $@ $^ -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-	@echo -e "$(GREEN)[OK] libraygui.so généré dans plugins.$(RESET)"
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror $(INCLUDE_DIRS) -fPIC
+RAYGUI_CXXFLAGS = -std=c++17 -Wall -Wextra $(INCLUDE_DIRS) -fPIC \
+	-Wno-missing-field-initializers -Wno-unused-parameter -Wno-enum-compare
+LDFLAGS = $(LIBS)
+DEBUG_FLAGS = -g3 -ggdb
 
+# Colors and animations
+RED = \033[31m
+GREEN = \033[32m
+YELLOW = \033[33m
+BLUE = \033[34m
+MAGENTA = \033[35m
+CYAN = \033[36m
+WHITE = \033[37m
+BOLD = \033[1m
+RESET = \033[0m
+
+# Main target
+all: setup_dirs display_banner $(RAYLIB_CPP_LIB) $(RAYGUI_CPP_LIB)
+	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Toutes \
+	les bibliothèques ont été compilées !$(RESET)"
+
+# Create the necessary build directories
+setup_dirs:
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/window
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/texture
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/shape
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/input
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/font
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/camera
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/audio
+	@mkdir -p $(BUILD_DIR)/RaylibCPP/utils
+	@mkdir -p $(BUILD_DIR)/RayGUICPP
+	@mkdir -p ../build
+
+# Display a fancy banner for the build process
+display_banner:
+	@clear
+	@echo "$(CYAN)╔══════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(MAGENTA)$(BOLD)Z A P P Y   L I B R A R Y \
+		B U I L D E R$(RESET)  $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚══════════════════════════════════════════════╝$(RESET)"
+	@echo ""
+	@echo "$(BLUE)[$(BOLD)INFO$(RESET)$(BLUE)]$(RESET) $(BOLD)Compilation \
+	des bibliothèques...$(RESET)"
+	@sleep 0.3
+
+# Build the RaylibCPP library
+$(RAYLIB_CPP_LIB): $(RAYLIB_CPP_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)LIBRARY$(RESET)$(GREEN)]$(RESET) $(BOLD)Création \
+	de la bibliothèque RaylibCPP...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@ar rc $(RAYLIB_CPP_LIB) $(RAYLIB_CPP_OBJ)
+	@ranlib $(RAYLIB_CPP_LIB)
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Bibliothèque \
+	RaylibCPP créée : $(RAYLIB_CPP_LIB)$(RESET)"
+
+# Build the RayGUICPP library
+$(RAYGUI_CPP_LIB): $(RAYGUI_CPP_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)LIBRARY$(RESET)$(GREEN)]$(RESET) $(BOLD)Création \
+	de la bibliothèque RayGUICPP...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@ar rc $(RAYGUI_CPP_LIB) $(RAYGUI_CPP_OBJ)
+	@ranlib $(RAYGUI_CPP_LIB)
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Bibliothèque \
+	RayGUICPP créée : $(RAYGUI_CPP_LIB)$(RESET)"
+
+# Rule for object files
+$(BUILD_DIR)/RayGUICPP/%.o: RayGUICPP/%.cpp
+	@mkdir -p $(dir $@)
+	@echo -n "$(CYAN)[$(BOLD)COMPILING$(RESET)$(CYAN)]$(RESET) $(notdir $<)... "
+	@$(CXX) $(RAYGUI_CXXFLAGS) -MMD -MP -c $< -o $@
+	@echo "$(GREEN)✓$(RESET)"
+
+$(BUILD_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@echo -n "$(CYAN)[$(BOLD)COMPILING$(RESET)$(CYAN)]$(RESET) $(notdir $<)... "
+	@$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
+	@echo "$(GREEN)✓$(RESET)"
+
+# Debug build
+debug: CXXFLAGS += $(DEBUG_FLAGS)
+debug: clean all
+	@echo "$(MAGENTA)[$(BOLD)DEBUG$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
+	debug activé pour les bibliothèques !$(RESET)"
+
+# Coverage build
+coverage: CXXFLAGS += --coverage -fprofile-arcs -ftest-coverage
+coverage: LDFLAGS += --coverage -lgcov
+coverage: clean all
+	@echo "$(MAGENTA)[$(BOLD)COVERAGE$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
+	couverture activé pour les bibliothèques !$(RESET)"
+	@echo "$(CYAN)╔═══════════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Bibliothèques compilées avec \
+	instrumentation$(RESET)   $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════════════════════╝$(RESET)"
+
+# Clean object files
 clean:
-	@rm -f $(BUILD_DIR)/*.o $(PLUGINS_DIR)/libraylibcpp.so $(PLUGINS_DIR)/libraygui.so
-	@echo -e "$(MAGENTA)Nettoyage terminé.$(RESET)"
+	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Suppression des fichiers objets...$(RESET)"
+	@rm -rf $(BUILD_DIR)
+	@sleep 0.5
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Nettoyage \
+	effectué !$(RESET)"
+
+# Clean everything (including binary)
+fclean: clean
+	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) $(BOLD)Suppression \
+	des bibliothèques...$(RESET)"
+	@rm -f $(RAYLIB_CPP_LIB)
+	@rm -f $(RAYGUI_CPP_LIB)
+	@sleep 0.5
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Nettoyage \
+	complet effectué !$(RESET)"
+
+# Clean and rebuild
+re: fclean all
+
+# Include dependency files
+-include $(RAYLIB_CPP_DEP) $(RAYGUI_CPP_DEP)
+
+.PHONY: all clean fclean re debug coverage setup_dirs display_banner
