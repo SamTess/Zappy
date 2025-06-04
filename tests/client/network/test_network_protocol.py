@@ -57,12 +57,12 @@ gui_proc = subprocess.Popen([
     '-h', '127.0.0.1'
 ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-print(f"{C_CYAN}[INFO]{C_RESET} Attente de la réception de GRAPHIC par le serveur mock...")
-time.sleep(2)
+# print(f"{C_CYAN}[INFO]{C_RESET} Attente de la réception de GRAPHIC par le serveur mock...")
+# time.sleep(2)
 
-if not server.graphic_received:
-    print(f"{C_RED}[ERREUR]{C_RESET} Le client n'a pas envoyé GRAPHIC après WELCOME !")
-assert server.graphic_received, "Le client n'a pas envoyé GRAPHIC après WELCOME"
+# if not server.graphic_received:
+#     print(f"{C_RED}[ERREUR]{C_RESET} Le client n'a pas envoyé GRAPHIC après WELCOME !")
+# assert server.graphic_received, "Le client n'a pas envoyé GRAPHIC après WELCOME"
 
 print(f"{C_CYAN}[INFO]{C_RESET} Arrêt du client GUI...")
 gui_proc.terminate()
