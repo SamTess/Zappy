@@ -29,6 +29,8 @@ SRC = graphicalContext/GraphicalContext.cpp \
 	  cameraController/CameraController.cpp \
 	  GameLoop.cpp
 
+MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
+MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
 OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(SRC))
 DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(SRC))
 
@@ -96,7 +98,7 @@ display_banner:
 	@sleep 0.3
 
 # Build the GUI
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo ""
 	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Liaison \
 	de l'interface graphique...$(RESET)"
@@ -109,7 +111,7 @@ $(NAME): $(OBJ)
 		sleep 0.05; \
 	done
 	@echo ""
-	@$(CXX) $(CXXFLAGS) -o $(NAME) $(MAIN) $(OBJ) $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(LDFLAGS)
 	@echo "$(CYAN)[$(BOLD)LIB$(RESET)$(CYAN)]$(RESET) $(BOLD)Création de \
 	la bibliothèque statique...$(RESET)"
 	@ar rc ../../build/libgui.a $(OBJ)
@@ -191,6 +193,7 @@ re: fclean all
 
 # Include dependency files
 -include $(DEP)
+-include $(MAIN_DEP)
 
 .PHONY: all clean fclean re debug coverage test_dlloader \
 compile_animation setup_dirs

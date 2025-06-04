@@ -24,6 +24,8 @@ SRC = parsing.c \
 	  map/map_creation.c \
 	  map/tile.c
 
+MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
+MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))
 OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SRC))
 DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(SRC))
 
@@ -77,7 +79,7 @@ display_banner:
 	@sleep 0.3
 
 # Build the server
-$(NAME): $(OBJ)
+$(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo ""
 	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Liaison \
 	du serveur Zappy...$(RESET)"
@@ -90,7 +92,7 @@ $(NAME): $(OBJ)
 		sleep 0.05; \
 	done
 	@echo ""
-	@$(CC) $(CFLAGS) -o $(NAME) $(MAIN) $(OBJ) $(LDFLAGS)
+	@$(CC) $(CFLAGS) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(LDFLAGS)
 	@echo "$(CYAN)[$(BOLD)LIB$(RESET)$(CYAN)]$(RESET) $(BOLD)Création de \
 	la bibliothèque statique...$(RESET)"
 	@ar rc ../../build/libserver.a $(OBJ)
@@ -163,5 +165,6 @@ re: fclean all
 
 # Include dependency files
 -include $(DEP)
+-include $(MAIN_DEP)
 
 .PHONY: all clean fclean re debug coverage setup_dirs

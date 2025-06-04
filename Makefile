@@ -83,7 +83,7 @@ display_banner:
 zappy_server:
 	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	du serveur...$(RESET)"
-	@$(MAKE) -C $(SERVER_DIR) all
+	@$(MAKE) -C $(SERVER_DIR)
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Serveur \
 	compilé avec succès !$(RESET)"
 
@@ -91,14 +91,14 @@ zappy_gui:
 	@$(MAKE) -C $(LIBS_DIR)
 	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de la GUI...$(RESET)"
-	@$(MAKE) -C $(GUI_DIR) all
+	@$(MAKE) -C $(GUI_DIR)
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)GUI compilée \
 	avec succès !$(RESET)"
 
 zappy_ai:
 	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de l'IA...$(RESET)"
-	@$(MAKE) -C $(AI_DIR) all
+	@$(MAKE) -C $(AI_DIR)
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)IA compilée \
 	avec succès !$(RESET)"
 
