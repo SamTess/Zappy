@@ -88,6 +88,7 @@ static void new_connection(server_t *server)
     new_client = find_client_by_socket(server, client_fd);
     if (new_client != NULL){
         init_new_player_pos(server, new_client);
+        write_command_output(new_client->client_fd, "WELCOME\n");
         print_co(client_ip, &client_addr, new_client);
     }
 }

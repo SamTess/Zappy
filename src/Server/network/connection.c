@@ -95,6 +95,7 @@ static client_t *init_new_client(int fd, server_t *server)
     new_c->client_add = NULL;
     new_c->client_id = -1;
     new_c->player = calloc(1, sizeof(player_t));
+    new_c->is_fully_connected = false;
     if (new_c->player == NULL)
         malloc_failed(3);
     init_player(new_c->player, NULL);

@@ -19,6 +19,7 @@ typedef struct client_s {
     char *team;
     player_t *player;
     struct client_s *next;
+    bool is_fully_connected;
 } client_t;
 
 #endif /* !CLIENT_H_ */
