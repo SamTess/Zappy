@@ -7,6 +7,8 @@
 
 #include "ObjManager.hpp"
 #include <iostream>
+#include <memory>
+#include <string>
 
 ObjManager::~ObjManager() {
     m_objFiles.clear();
@@ -33,7 +35,6 @@ void ObjManager::deleteObj(int id) {
 
 void ObjManager::renderAll(std::shared_ptr<IGraphicsLib> graphics) const {
     for (const auto& pair : m_objFiles) {
-        // Par défaut, on affiche le modèle à sa position (0,0,0)
         pair.second->display(graphics, {0, 0, 0}, 1.0f);
     }
 }

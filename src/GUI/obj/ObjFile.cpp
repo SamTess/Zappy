@@ -8,7 +8,7 @@
 #include "ObjFile.hpp"
 #include <iostream>
 
-ObjFile::ObjFile(std::shared_ptr<IGraphicsLib> graphics, const std::string& objPath) 
+ObjFile::ObjFile(std::shared_ptr<IGraphicsLib> graphics, const std::string& objPath)
     : m_filePath(""), m_isLoaded(false) {
     load(graphics, objPath);
 }
