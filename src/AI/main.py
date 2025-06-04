@@ -15,8 +15,6 @@ def run_agent(ip, port, team, agent_id):
     sys.exit(1)
 
 def signal_handler(sig, frame):
-  print("\nShutting down all agents...")
-
   for pid in child_pids:
     try:
       os.kill(pid, signal.SIGTERM)
@@ -55,6 +53,5 @@ if __name__ == "__main__":
     for pid in child_pids:
       os.waitpid(pid, 0)
   except KeyboardInterrupt:
-    signal_handler(signal.SIGINT, None)
-
+    pass
   print("All agents completed")

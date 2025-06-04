@@ -1,54 +1,72 @@
 import socket
 import sys
+from time import sleep
 from agent.socketManager import SocketManager
+from agent.decisionManager import DecisionManager
+from logger.logger import Logger
 
 class Agent:
-    def __init__(self, ip, port, team, agent_id=0):
+  def __init__(self, ip, port, team, agent_id=0):
+    try:
+      self.ip = ip
+      self.port = port
+      self.team = team
+      self.agent_id = agent_id
+
+      self.decisionManager = DecisionManager()
+      self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.agent_id}): ")
+
+      self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      self.sock.connect((self.ip, self.port))
+      print(f"Connected to {self.ip}:{self.port}")
+
+      self.socketManager = SocketManager(self.sock)
+      self.socketManager.start()
+
+    except socket.error as e:
+      print(f"Error connecting to server: {e}")
+      sys.exit(1)
+    except Exception as e:
+      print(f"Unexpected error: {e}")
+      sys.exit(1)
+
+
+  def start(self):
+    welcome_msg = self.socketManager.get_message(timeout=5)
+    team_slots = self.socketManager.send_command(self.team)
+
+    if welcome_msg == "WELCOME":
+      print(f"Welcome message {welcome_msg}")
+    else:
+      print(f"Unexpected welcome message: {welcome_msg}")
+      sys.exit(1)
+    print("Joining the team", self.team)
+    if (team_slots == "ko"):
+        print("Failed to join team. Either the team is full, or its name is incorrect.")
+        sys.exit(1)
+    else:
+      print(f"Joined {self.team} successfully, {team_slots} slots left in the team.")
+
+    self.run()
+
+
+  def stop(self):
+    self.logger.info(f"Stopping agent {self.agent_id}...")
+    self.socketManager.stop()
+    self.sock.close()
+    print(f"Agent {self.agent_id} stopped.")
+
+  def run(self):
+    while self.socketManager.running:
       try:
-        self.ip = ip
-        self.port = port
-        self.team = team
-        self.agent_id = agent_id
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if self.socketManager.has_messages():
+          message = self.socketManager.get_message()
+          self.decisionManager.make_decision(message)
 
-        self.sock.connect((self.ip, self.port))
-        print(f"Connected to {self.ip}:{self.port}")
-
-        self.socketManager = SocketManager(self.sock)
-        self.socketManager.start()
-
-      except socket.error as e:
-        print(f"Error connecting to server: {e}")
-        sys.exit(1)
       except Exception as e:
-        print(f"Unexpected error: {e}")
-        sys.exit(1)
-
-    def start(self):
-      self.socketManager.send_command(self.team)
-      welcome_msg = self.socketManager.get_message(timeout=5)
-      team_slots = self.socketManager.get_message(timeout=5)
-
-      if welcome_msg == "WELCOME":
-        print(f"Welcome message {welcome_msg}")
-      else:
-        print(f"Unexpected welcome message: {welcome_msg}")
-        sys.exit(1)
-      print("Joining the team", self.team)
-      if (team_slots == "ko"):
-          print("Failed to join team. Either the team is full, or its name is incorrect.")
-          sys.exit(1)
-      else:
-        print(f"Joined {self.team} successfully, {team_slots} slots left in the team.")
-
-      self.run()
-
-
-    def run(self):
-      while True:
-        print("Waiting for server messages...")
-
-
+        print(f"Agent {self.agent_id}: Error: {e}")
+        self.stop()
+        break
     # def process_server_messages(self):
     #     while True:
     #         server_message = inputs.read_line(self.sock)

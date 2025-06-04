@@ -9,7 +9,7 @@ try:
 except (ImportError, AssertionError):
   pass
 
-class EncryptionManager:
+class EncryptionService:
   def __init__(self):
     self.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
 
