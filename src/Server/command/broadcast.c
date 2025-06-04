@@ -87,6 +87,7 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     int dy = 0;
     int direction = 0;
     char *response = calloc((strlen(message) + 17), sizeof(char));
+    size_t res_size = strlen(message) + 17;
 
     if (!receiver || !receiver->player || receiver == sender)
         return;
@@ -97,7 +98,7 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     dy = calculate_shortest_distance_y(sender->player->pos_y,
         receiver->player->pos_y, server->parsed_info->height);
     direction = calculate_direction(receiver, dx, dy);
-    snprintf(response, sizeof(response), "message %d, %s\n", direction, message);
+    snprintf(response, res_size, "message %d, %s\n", direction, message);
     write_command_output(receiver->client_fd, response);
 }
 
