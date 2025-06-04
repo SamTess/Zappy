@@ -6,19 +6,16 @@
 */
 
 #include "TcpConnection.hpp"
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <cerrno>
+#include <netdb.h>
+#include <memory>
 #include <string>
-#include <cstring>
+#include <chrono>
+#include <thread>
 
-TcpConnection::TcpConnection() : _socket(-1) {
-    _pollfd.fd = -1;
-    _pollfd.events = 0;
-    _pollfd.revents = 0;
-    _sockaddr = {};
+TcpConnection::TcpConnection(size_t initialBufferSize) : _socket(-1), _initialBufferSize(initialBufferSize) {
+    _pollfd = std::make_unique<SystemWrapper::SafePollFd>(-1);
+    _sockaddr = std::make_unique<SystemWrapper::SafeSockAddr>();
+    _recvBuffer = std::make_unique<SystemWrapper::SafeBuffer>(_initialBufferSize);
 }
 
 TcpConnection::~TcpConnection() {
@@ -26,77 +23,94 @@ TcpConnection::~TcpConnection() {
 }
 
 void TcpConnection::connect(const std::string &host, int port) {
-    _socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_socket >= 0)
+        close();
+    createAndConfigureSocket();
+    resolveAddress(host, port);
+    performConnect();
+    waitForConnection(5000);
+    _pollfd = std::make_unique<SystemWrapper::SafePollFd>(_socket, POLLIN | POLLOUT);
+}
+
+void TcpConnection::createAndConfigureSocket() {
+    _socket = SystemWrapper::createSocket(AF_INET, SOCK_STREAM, 0);
     if (_socket < 0)
-        throw TcpConnectionException("Failed to create socket: " + std::string(strerror(errno)));
-
-    int flags = fcntl(_socket, F_GETFL, 0);
-    if (flags == -1 || fcntl(_socket, F_SETFL, flags | O_NONBLOCK) == -1) {
+        throw TcpConnectionException("Failed to create socket: " + SystemWrapper::getErrorString());
+    if (SystemWrapper::setNonBlocking(_socket) < 0) {
         close();
-        throw TcpConnectionException("Failed to set socket non-blocking: " + std::string(strerror(errno)));
+        throw TcpConnectionException("Failed to set socket non-blocking: " + SystemWrapper::getErrorString());
     }
+}
 
-    _sockaddr.sin_family = AF_INET;
-    _sockaddr.sin_port = htons(port);
-    if (inet_pton(AF_INET, host.c_str(), &_sockaddr.sin_addr) <= 0) {
-        close();
-        throw TcpConnectionException("Invalid IP address: " + host);
+void TcpConnection::resolveAddress(const std::string &host, int port) {
+    auto& addr = _sockaddr->getAddr();
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+
+    if (isalpha(host[0])) {
+        struct hostent *server = gethostbyname(host.c_str());
+        if (server == nullptr) {
+            close();
+            throw TcpConnectionException("Unknown host: " + host);
+        }
+        std::memcpy(&addr.sin_addr.s_addr, server->h_addr, server->h_length);
+    } else {
+        if (!SystemWrapper::inetPton(AF_INET, host, &addr.sin_addr)) {
+            close();
+            throw TcpConnectionException("Invalid IP address: " + host);
+        }
     }
+}
 
-    int connectResult = ::connect(_socket, reinterpret_cast<struct sockaddr*>(&_sockaddr), sizeof(_sockaddr));
+void TcpConnection::performConnect() {
+    int connectResult = SystemWrapper::connectSocket(_socket, *_sockaddr);
     if (connectResult < 0 && errno != EINPROGRESS) {
         close();
-        throw TcpConnectionException("Connection failed: " + std::string(strerror(errno)));
+        throw TcpConnectionException("Connection failed: " + SystemWrapper::getErrorString());
     }
+}
 
-
+void TcpConnection::waitForConnection(int timeoutMs) {
     if (errno == EINPROGRESS) {
-        struct pollfd tempPollfd;
-        tempPollfd.fd = _socket;
-        tempPollfd.events = POLLOUT;
-        tempPollfd.revents = 0;
-
-        int pollResult = poll(&tempPollfd, 1, 5000); // 5 seconds timeout
+        auto tempPollfd = SystemWrapper::SafePollFd(_socket, POLLOUT);
+        int pollResult = SystemWrapper::pollSocket(tempPollfd, timeoutMs);
         if (pollResult <= 0) {
             close();
             throw TcpConnectionException("Connection timeout or poll error");
         }
         int error = 0;
-        socklen_t len = sizeof(error);
-        if (getsockopt(_socket, SOL_SOCKET, SO_ERROR, &error, &len) < 0 || error != 0) {
+        if (SystemWrapper::getSocketOption(_socket, SOL_SOCKET, SO_ERROR, &error) < 0 || error != 0) {
             close();
             throw TcpConnectionException("Connection failed: " + std::string(strerror(error)));
         }
     }
-    _pollfd.fd = _socket;
-    _pollfd.events = POLLIN | POLLOUT;
-    _pollfd.revents = 0;
 }
 
 void TcpConnection::send(const std::string &message) {
     if (_socket < 0)
         throw TcpConnectionException("Socket is not connected");
-
+    std::string finalMessage = message;
+    if (finalMessage.empty() || finalMessage.back() != '\n') {
+        finalMessage += '\n';
+    }
     size_t totalSent = 0;
-    const char* buffer = message.c_str();
-    size_t size = message.size();
+    const size_t size = finalMessage.size();
+    auto sendBuffer = SystemWrapper::SafeBuffer(size);
+    std::shared_ptr<std::string> bufferData = std::make_shared<std::string>(sendBuffer.data());
+    bufferData = std::make_shared<std::string>(finalMessage);
 
     while (totalSent < size) {
-        _pollfd.events = POLLOUT;
-        _pollfd.revents = 0;
-
-        int pollResult = poll(&_pollfd, 1, 5000);
+        _pollfd->setEvents(POLLOUT);
+        int pollResult = SystemWrapper::pollSocket(*_pollfd, 5000);
         if (pollResult <= 0)
             throw TcpConnectionException("Send timeout or poll error");
-
-        if (!(_pollfd.revents & POLLOUT))
+        if (!(_pollfd->getRevents() & POLLOUT))
             throw TcpConnectionException("Socket not ready for writing");
-
-        ssize_t sent = write(_socket, buffer + totalSent, size - totalSent);
+        ssize_t sent = SystemWrapper::writeSocket(_socket, sendBuffer, size - totalSent);
         if (sent < 0) {
             if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
                 continue;
-            throw TcpConnectionException("Send error: " + std::string(strerror(errno)));
+            throw TcpConnectionException("Send error: " + SystemWrapper::getErrorString());
         }
 
         totalSent += sent;
@@ -106,55 +120,70 @@ void TcpConnection::send(const std::string &message) {
 std::string TcpConnection::receive() {
     if (_socket < 0)
         throw TcpConnectionException("Socket is not connected");
+    try {
+        if (!waitForReadData(500))
+            return "";
+        return readDataFromSocket();
+    } catch (const std::exception& e) {
+        throw TcpConnectionException(std::string("Receive failed: ") + e.what());
+    }
+}
 
-    _pollfd.events = POLLIN;
-    _pollfd.revents = 0;
+bool TcpConnection::waitForReadData(int timeoutMs) {
+    _pollfd->setEvents(POLLIN);
+    int pollResult = SystemWrapper::pollSocket(*_pollfd, timeoutMs);
+    if (pollResult == 0)
+        return false;
+    if (pollResult < 0) {
+        if (errno == EINTR)
+            return false;
+        throw TcpConnectionException("Poll error: " + SystemWrapper::getErrorString());
+    }
+    return (_pollfd->getRevents() & POLLIN);
+}
 
-    int pollResult = poll(&_pollfd, 1, 5000);
-    if (pollResult <= 0)
-        throw TcpConnectionException("Receive timeout or poll error");
-
-    if (!(_pollfd.revents & POLLIN))
-        throw TcpConnectionException("No data available");
-
-    char buffer[1024];
-    ssize_t bytesReceived = read(_socket, buffer, sizeof(buffer) - 1);
+std::string TcpConnection::readDataFromSocket() {
+    ensureBufferSize();
+    ssize_t bytesReceived = SystemWrapper::readSocket(_socket, _recvBuffer, _recvBuffer->size());
     if (bytesReceived < 0) {
         if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
             return "";
-        throw TcpConnectionException("Receive error: " + std::string(strerror(errno)));
+        throw TcpConnectionException("Receive error: " + SystemWrapper::getErrorString());
     }
-
     if (bytesReceived == 0)
         throw TcpConnectionException("Connection closed by server");
+    adjustBufferSize(bytesReceived);
+    std::shared_ptr<std::string> dataPtr = std::make_shared<std::string>(_recvBuffer->data());
+    return dataPtr->substr(0, bytesReceived);
+}
 
-    buffer[bytesReceived] = '\0';
-    return std::string(buffer, bytesReceived);
+void TcpConnection::ensureBufferSize() {
+    size_t currentSize = _recvBuffer->size();
+    if (currentSize < _initialBufferSize)
+        _recvBuffer->resize(_initialBufferSize);
+}
+
+void TcpConnection::adjustBufferSize(ssize_t bytesReceived) {
+    if (bytesReceived > static_cast<ssize_t>(_recvBuffer->size() * 0.8)) {
+        _recvBuffer->resize(_recvBuffer->size() * 2);
+    } else if (bytesReceived < static_cast<ssize_t>(_recvBuffer->size() * 0.3) &&
+               _recvBuffer->size() > _initialBufferSize * 2) {
+        _recvBuffer->resize(_recvBuffer->size() / 2);
+    }
 }
 
 void TcpConnection::close() {
     if (_socket >= 0) {
-        ::close(_socket);
+        SystemWrapper::closeSocket(_socket);
         _socket = -1;
-        _pollfd.fd = -1;
-        _pollfd.events = 0;
-        _pollfd.revents = 0;
+        _pollfd = std::make_unique<SystemWrapper::SafePollFd>(-1);
     }
-}
-
-bool TcpConnection::hasData() const {
-    if (_socket < 0)
-        return false;
-
-    struct pollfd tempPollfd;
-    tempPollfd.fd = _socket;
-    tempPollfd.events = POLLIN;
-    tempPollfd.revents = 0;
-
-    int pollResult = poll(&tempPollfd, 1, 0);  // a changer si on veux faire un poll inteligent
-    return pollResult > 0 && (tempPollfd.revents & POLLIN);
 }
 
 bool TcpConnection::isConnected() const {
     return _socket >= 0;
+}
+
+bool TcpConnection::hasData() const {
+    return true;
 }

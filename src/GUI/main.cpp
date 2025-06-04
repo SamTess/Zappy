@@ -23,10 +23,12 @@ int main(int argc, char** argv) {
             return 0;
         }
         ParsingCLI parser(argc, argv);
-        std::string host = parser.getMachine();
-        int port = parser.getPort();
-        if (port <= 0 || port > 65535) {
-            std::cerr << "Port number must be between 1 and 65535" << std::endl;
+        std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
+        NetworkLogger::get().setEnabled(true);
+        NetworkManager networkManager = NetworkManager();
+
+        if (!networkManager.connect(parser.getMachine(), parser.getPort())) {
+            std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
         }
         GameLoop gameLoop;

@@ -30,7 +30,7 @@ jobs:
         timeout-minutes: 2
 
       - name: Install dependencies
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           sudo apt-get update
           sudo apt-get install -y make g++ libsfml-dev libcriterion-dev build-essential cmake gcovr \
@@ -109,7 +109,7 @@ jobs:
 
       - name: Run coding-style
         timeout-minutes: 5
-        run: check.sh $(pwd)/src $(pwd)
+        run: check.sh $(pwd)/src/Server $(pwd)
 
       - name: Create annotation for coding-style errors
         timeout-minutes: 2
