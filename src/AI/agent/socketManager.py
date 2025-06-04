@@ -14,15 +14,18 @@ class SocketManager:
     self.buffer = ""
     self.lock = threading.Lock()
 
+
   def start(self):
     self.running = True
     self.thread = threading.Thread(target=self._listen_loop, daemon=True)
     self.thread.start()
 
+
   def stop(self):
     self.running = False
     if self.thread:
       self.thread.join()
+
 
 # fonction bloquante
   def _read_line(self):
@@ -37,6 +40,7 @@ class SocketManager:
     line, self.buffer = self.buffer.split('\n', 1)
     return line.strip()
 
+
 # détermine si le message est une réponse à une requête ou un message du serveur
   def _handle_message(self, message):
     with self.lock:
@@ -46,8 +50,8 @@ class SocketManager:
         response_queue = self.pending_requests.pop(request_id)
         response_queue.put(message)
       else:
-        # Aucune requête en attente, c'est un message non sollicité
         self.message_queue.put(message)
+
 
   def _listen_loop(self):
     while self.running:
@@ -57,12 +61,15 @@ class SocketManager:
           self._handle_message(message)
         elif message is None:
           break
+
       except Exception as e:
         print(f"Communication error: {e}")
+        self.running = False
         break
 
+
 # envoie une commande et attend une réponse
-  def send_command(self, command, timeout=5.0):
+  def send_command(self, command, timeout=2.0):
     if command is None:
       print("Command is None, not sending.")
       return None
@@ -87,13 +94,16 @@ class SocketManager:
       with self.lock:
         self.pending_requests.pop(request_id, None)
       print(f"Error sending command '{command}': {e}")
+      self.running = False
       return None
+
 
   def get_message(self, timeout=None):
     try:
       return self.message_queue.get(timeout=timeout)
     except queue.Empty:
       return None
+
 
   def has_messages(self):
     return not self.message_queue.empty()

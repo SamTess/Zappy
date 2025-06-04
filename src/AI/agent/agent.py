@@ -13,7 +13,7 @@ class Agent:
       self.team = team
       self.agent_id = agent_id
 
-      self.decisionManager = DecisionManager()
+      self.decisionManager = DecisionManager(self)
       self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.agent_id}): ")
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,26 +26,30 @@ class Agent:
     except socket.error as e:
       print(f"Error connecting to server: {e}")
       sys.exit(1)
+
     except Exception as e:
       print(f"Unexpected error: {e}")
       sys.exit(1)
 
 
   def start(self):
-    welcome_msg = self.socketManager.get_message(timeout=5)
+    welcome_msg = self.socketManager.get_message(timeout=2)
     team_slots = self.socketManager.send_command(self.team)
+    map_size = self.socketManager.get_message(timeout=2)
 
     if welcome_msg == "WELCOME":
       print(f"Welcome message {welcome_msg}")
     else:
       print(f"Unexpected welcome message: {welcome_msg}")
       sys.exit(1)
-    print("Joining the team", self.team)
+
     if (team_slots == "ko"):
         print("Failed to join team. Either the team is full, or its name is incorrect.")
         sys.exit(1)
     else:
-      print(f"Joined {self.team} successfully, {team_slots} slots left in the team.")
+      print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
+
+    print(f"Map size: {map_size}")
 
     self.run()
 
@@ -56,17 +60,28 @@ class Agent:
     self.sock.close()
     print(f"Agent {self.agent_id} stopped.")
 
+
   def run(self):
     while self.socketManager.running:
       try:
+
         if self.socketManager.has_messages():
           message = self.socketManager.get_message()
-          self.decisionManager.make_decision(message)
+          self.decisionManager.process_server_message(message)
+
+        else:
+          surroundings = self.socketManager.send_command("Look")
+          inventory = self.socketManager.send_command("Inventory")
+          self.decisionManager.take_next_decision(inventory, surroundings)
+
+        sleep(0.1)
 
       except Exception as e:
         print(f"Agent {self.agent_id}: Error: {e}")
         self.stop()
         break
+
+
     # def process_server_messages(self):
     #     while True:
     #         server_message = inputs.read_line(self.sock)
