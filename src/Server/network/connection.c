@@ -16,17 +16,6 @@
 #include "../include/server.h"
 #include "../include/parsing.h"
 
-static void free_node(client_t *node)
-{
-    if (node->client_poll)
-        free(node->client_poll);
-    if (node->client_add)
-        free(node->client_add);
-    if (node->player)
-        free(node->player);
-    free(node);
-}
-
 static bool remove_head_client(server_t *server, int fd)
 {
     client_t *current = server->client;
@@ -163,6 +152,18 @@ static void copy_names(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->names[i] = NULL;
 }
 
+void init_server_resources(server_t *server)
+{
+    server->total_resources = malloc(sizeof(int) * COUNT);
+    server->current_resources = malloc(sizeof(int) * COUNT);
+    if (server->total_resources == NULL || server->current_resources == NULL)
+        malloc_failed(9);
+    for (int i = 0; i < COUNT; i++) {
+        server->total_resources[i] = 0;
+        server->current_resources[i] = 0;
+    }
+}
+
 static void init_server(server_t *server, parsing_info_t *parsed_info)
 {
     server->nfds = 0;
@@ -179,6 +180,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->height = parsed_info->height;
     server->parsed_info->client_nb = parsed_info->client_nb;
     server->parsed_info->frequence = parsed_info->frequence;
+    init_server_resources(server);
     copy_names(server, parsed_info);
 }
 

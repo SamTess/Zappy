@@ -9,6 +9,7 @@
 #include "../include/command.h"
 #include "../include/player.h"
 #include "../include/pending_cmd_utils.h"
+#include "../include/tile.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,6 +32,9 @@ void update_game_tick(server_t *server)
     client_t *next;
 
     server->current_tick++;
+    if (server->current_tick % 20 == 0)
+        respawn_resources(server->map, server, server->total_resources,
+            server->current_resources);
     if (current != NULL)
         current = current->next;
     while (current != NULL) {

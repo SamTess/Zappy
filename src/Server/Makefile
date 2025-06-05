@@ -29,9 +29,11 @@ SRCS			=	help.c								\
 					network/connection.c				\
 					network/server_run.c				\
 					network/queue_connection.c			\
+					network/client_node.c 				\
 					map/map_creation.c					\
 					map/tile.c							\
 					map/tick_update.c					\
+					map/resources_map.c 				\
 					command/parse_command.c				\
 					command/parse_command_utils.c		\
 					command/forward.c					\

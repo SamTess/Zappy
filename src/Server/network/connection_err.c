@@ -14,8 +14,19 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
+
+static void malloc_failed_tres(int i)
+{
+    if (i == 9){
+        perror("Malloc failed for allocating resource counters");
+        exit(84);
+    }
+}
+
 static void malloc_failed_bis(int i)
 {
+    if (i > 8)
+        return malloc_failed_tres(i);
     if (i == 5){
         perror("Malloc failed for command qeue");
         exit(84);
@@ -37,7 +48,7 @@ static void malloc_failed_bis(int i)
 void malloc_failed(int i)
 {
     if (i > 5)
-        malloc_failed_bis(i);
+        return malloc_failed_bis(i);
     if (i == 1){
         perror("New client allocation failed");
         exit(84);

@@ -15,6 +15,7 @@
     #define PHIRAS_D 0.08
     #define THYSTAME_D 0.05
 
+typedef struct server_s server_t;
 typedef enum resource_type {
     FOOD = 0,
     LINEMATE,
@@ -49,6 +50,9 @@ int tile_add_player(tile_t *tile, int player_id);
 int tile_remove_player(tile_t *tile, int player_id);
 void add_egg_to_tile(tile_t *tile, int egg_id);
 void remove_egg_from_tile(tile_t *tile, int egg_id);
-void distribute_resources(tile_t **map, int width, int height);
+void distribute_resources(tile_t **map, server_t *server,
+    int *total_resources, int *current_resources);
+void respawn_resources(tile_t **map, server_t *server,
+    int *total_resources, int *current_resources);
 
 #endif /* !TILE_H_ */

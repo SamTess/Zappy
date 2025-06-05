@@ -25,5 +25,6 @@ void set_object(server_t *server, client_t *client, char *buffer)
     remove_item_from_inventory(client->player, resource_type, 1);
     server->map[client->player->pos_y]
         [client->player->pos_x].resources[resource_type]++;
+    server->current_resources[resource_type]++;
     write_command_output(client->client_fd, "ok\n");
 }
