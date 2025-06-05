@@ -25,7 +25,7 @@ class UpgradeBehavior(Behavior):
     else:
       self.agent.level += 1
       print("Upgrade done: " + str(result))
-      res = self.agent.send_command("Broadcast " + encryption.encrypt_message(f"Agent {self.agent.agent_id} upgraded to level {self.agent.level}."))
+      res = self.agent.send_command("Broadcast a.")
       print(f"Broadcasting upgrade message: {res}")
 
 class GetMineralsBehavior(Behavior):

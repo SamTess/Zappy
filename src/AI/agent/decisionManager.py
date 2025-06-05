@@ -14,6 +14,7 @@ class DecisionManager:
       "Dyson": behaviors.DysonBehavior(agent)
     }
 
+
   def process_server_message(self):
     if not self.agent.has_messages():
       return
