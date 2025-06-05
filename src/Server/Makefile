@@ -11,18 +11,43 @@ BUILD_DIR = ../../build/Server
 
 MAIN = main.c
 # Source files
-SRC = parsing.c \
-	  parsing_err.c \
-	  help.c \
-	  player/player_init.c \
-	  player/player_inventory.c \
-	  player/player_inventory_utils.c \
-	  player/player_inventory_display.c \
-	  network/connection.c \
-	  network/connection_err.c \
-	  network/server_run.c \
-	  map/map_creation.c \
-	  map/tile.c
+SRC = 	help.c								\
+		parsing_err.c						\
+		parsing.c							\
+		network/connection_err.c			\
+		network/connection.c				\
+		network/server_run.c				\
+		network/queue_connection.c			\
+		network/client_node.c 				\
+		map/map_creation.c					\
+		map/tile.c							\
+		map/tick_update.c					\
+		map/resources_map.c					\
+		command/parse_command.c				\
+		command/parse_command_utils.c		\
+		command/forward.c					\
+		command/right.c						\
+		command/left.c						\
+		command/inventory.c					\
+		command/look.c						\
+		command/look_utils.c				\
+		command/tile_to_str.c				\
+		command/eject.c						\
+		command/connect_nbr.c				\
+		command/take_object.c				\
+		command/set_object.c				\
+		command/fork.c						\
+		command/start_incantation.c			\
+		command/finish_incantation.c		\
+		command/broadcast.c					\
+		command/pending_cmd_utils.c			\
+		map/egg.c							\
+		player/player_init.c				\
+		player/player_inventory.c			\
+		player/player_inventory_utils.c		\
+		player/player_inventory_display.c	\
+		player/player_death.c				\
+		buffer/circular_buffer.c			\
 
 MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))

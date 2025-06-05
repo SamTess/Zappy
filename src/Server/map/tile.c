@@ -6,14 +6,19 @@
 */
 
 #include "../include/tile.h"
+#include "../include/server.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void tile_init(tile_t *tile)
 {
     tile->player_ids = NULL;
     tile->player_count = 0;
     tile->player_capacity = 0;
+    tile->egg_ids = NULL;
+    tile->egg_count = 0;
+    tile->egg_capacity = 0;
     memset(tile->resources, 0, sizeof(tile->resources));
 }
 
@@ -23,6 +28,10 @@ void tile_free(tile_t *tile)
     tile->player_ids = NULL;
     tile->player_count = 0;
     tile->player_capacity = 0;
+    free(tile->egg_ids);
+    tile->egg_ids = NULL;
+    tile->egg_count = 0;
+    tile->egg_capacity = 0;
 }
 
 int tile_add_player(tile_t *tile, int player_id)
@@ -56,64 +65,4 @@ int tile_remove_player(tile_t *tile, int player_id)
         }
     }
     return -1;
-}
-
-static void shuffle_indices(int *indices, int total_tiles)
-{
-    int j;
-    int tmp;
-
-    for (int i = total_tiles - 1; i > 0; --i) {
-        j = rand() % (i + 1);
-        tmp = indices[i];
-        indices[i] = indices[j];
-        indices[j] = tmp;
-    }
-}
-
-static void distribute_one_resource(resource_dist_t *dist, int res, int total)
-{
-    int idx;
-    int y;
-    int x;
-
-    shuffle_indices(dist->tile_indices, dist->width * dist->height);
-    for (int i = 0; i < total; ++i) {
-        idx = dist->tile_indices[i];
-        y = idx / dist->width;
-        x = idx % dist->width;
-        dist->map[y][x].resources[res]++;
-    }
-}
-
-static void init_resource_dist(int width, int height,
-    tile_t **map, resource_dist_t *dist)
-{
-    int total_tiles = width * height;
-
-    dist->tile_indices = malloc(sizeof(int) * total_tiles);
-    if (dist->tile_indices == NULL)
-        exit(84);
-    for (int i = 0; i < total_tiles; ++i)
-        dist->tile_indices[i] = i;
-    dist->map = map;
-    dist->width = width;
-    dist->height = height;
-}
-
-void distribute_resources(tile_t **map, int width, int height)
-{
-    int total;
-    resource_dist_t dist;
-    static double resource_densities[COUNT] = {FOOD_D, LINEMATE_D, DERAUMERE_D,
-        SIBUR_D, MENDIANE_D, PHIRAS_D, THYSTAME_D};
-
-    init_resource_dist(width, height, map, &dist);
-    for (int res = 0; res < COUNT; ++res) {
-        total = (int)(width * height * resource_densities[res] + 0.5);
-        if (total < 1)
-            total = 1;
-        distribute_one_resource(&dist, res, total);
-    }
-    free(dist.tile_indices);
 }

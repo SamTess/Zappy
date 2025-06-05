@@ -14,8 +14,88 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
+static void malloc_failed_cinq(int i)
+{
+    if (i == 17){
+        perror("Realloc failed for res in add_resources");
+        exit(84);
+    }
+    if (i == 18){
+        perror("Malloc failed in get_string_to_send");
+        exit(84);
+    }
+}
+
+static void malloc_failed_quat(int i)
+{
+    if (i > 16)
+        malloc_failed_cinq(i);
+    if (i == 13){
+        perror("Malloc failed for res final look");
+        exit(84);
+    }
+    if (i == 14){
+        perror("Malloc failed for res repeat_word");
+        exit(84);
+    }
+    if (i == 15){
+        perror("Malloc failed res add_resources");
+        exit(84);
+    }
+    if (i == 16){
+        perror("Malloc failed res tile_to_str");
+        exit(84);
+    }
+}
+
+static void malloc_failed_tres(int i)
+{
+    if (i > 12)
+        return malloc_failed_quat(i);
+    if (i == 9){
+        perror("Malloc failed for allocating resource counters");
+        exit(84);
+    }
+    if (i == 10){
+        perror("Malloc failed for tiles array");
+        exit(84);
+    }
+    if (i == 11){
+        perror("Malloc failed for res formatting");
+        exit(84);
+    }
+    if (i == 12){
+        perror("Malloc failed for tiles allocation");
+        exit(84);
+    }
+}
+
+static void malloc_failed_bis(int i)
+{
+    if (i > 8)
+        return malloc_failed_tres(i);
+    if (i == 5){
+        perror("Malloc failed for command qeue");
+        exit(84);
+    }
+    if (i == 6){
+        perror("Malloc failed for parsing info names copy into server");
+        exit(84);
+    }
+    if (i == 7){
+        perror("Malloc failed for allocating parsed_info in server");
+        exit(84);
+    }
+    if (i == 8){
+        perror("Malloc failed for allocating response for broadcast");
+        exit(84);
+    }
+}
+
 void malloc_failed(int i)
 {
+    if (i > 5)
+        return malloc_failed_bis(i);
     if (i == 1){
         perror("New client allocation failed");
         exit(84);
@@ -44,7 +124,6 @@ void print_co(char *client_ip, struct sockaddr_in *client_addr,
     client_t *new_client)
 {
     inet_ntop(AF_INET, &(client_addr->sin_addr), client_ip, INET_ADDRSTRLEN);
-    printf("New client connected from %s:%d with ID %d.",
+    printf("New client connected from %s:%d with ID %d.\n",
             client_ip, ntohs(client_addr->sin_port), new_client->client_id);
-    printf(" Waiting for HELLO packet.\n");
 }

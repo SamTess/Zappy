@@ -15,7 +15,6 @@ BUILD_DIR = ../build/tests
 BUILD_DIR_C = $(BUILD_DIR)/server
 BUILD_DIR_CPP = $(BUILD_DIR)/client
 
-# Unit test source files
 UNIT_SRC = server/test_server.c \
 		   server/test_player_inventory.c
 

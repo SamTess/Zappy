@@ -5,15 +5,21 @@
 ** server_run
 */
 #include "../include/server.h"
+#include "../include/command.h"
+#include "../include/player.h"
+#include "../include/pending_cmd_utils.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 client_t *find_client_by_socket(server_t *server, int socket_fd)
 {
     client_t *temp = server->client;
 
+    if (temp && temp->client_fd == server->s_fd)
+        temp = temp->next;
     while (temp) {
         if (temp->client_fd == socket_fd)
             return temp;
@@ -27,7 +33,6 @@ static void new_connection(server_t *server)
 {
     struct sockaddr_in client_addr;
     socklen_t addr_len = sizeof(client_addr);
-    char client_ip[INET_ADDRSTRLEN];
     int client_fd;
     client_t *new_client;
 
@@ -41,8 +46,10 @@ static void new_connection(server_t *server)
     add_fd(server, client_fd);
     server->nfds += 1;
     new_client = find_client_by_socket(server, client_fd);
-    if (new_client != NULL)
-        print_co(client_ip, &client_addr, new_client);
+    if (new_client != NULL){
+        init_new_player_pos(server, new_client);
+        write_command_output(new_client->client_fd, "WELCOME\n");
+    }
 }
 
 static void check_new_connection(server_t *server)
@@ -51,35 +58,18 @@ static void check_new_connection(server_t *server)
         new_connection(server);
 }
 
-static void temporary_function(client_t *temp, server_t *server)
-{
-    char buffer[1024];
-    ssize_t bytes_read;
-
-    memset(buffer, 0, sizeof(buffer));
-    bytes_read = recv(temp->client_fd, buffer, sizeof(buffer) - 1, 0);
-    if (bytes_read > 0) {
-        buffer[bytes_read] = '\0';
-        printf("Client %d sent: %s\n", temp->client_fd, buffer);
-    }
-    if (bytes_read <= 0) {
-        printf("Client %d disconnected\n", temp->client_fd);
-        if (temp->client_fd != 0)
-            remove_fd(server, temp->client_fd);
-    }
-}
-
 static void check_client_message(server_t *server)
 {
     client_t *temp = server->client;
     client_t *next = NULL;
 
+    if (temp != NULL)
+        temp = temp->next;
     while (temp != NULL) {
         next = temp->next;
         if (temp->client_poll != NULL && temp->client_poll->revents != 0
-            && (temp->client_poll->revents & POLLIN)){
-                temporary_function(temp, server);
-        }
+            && (temp->client_poll->revents & POLLIN))
+                get_message(server, temp);
         temp = next;
     }
 }
@@ -116,10 +106,20 @@ static void helper_function(server_t *server, int nfds, struct pollfd *fds)
 void check_client(server_t *server)
 {
     struct pollfd *fds = calloc((server->nfds + 1), sizeof(struct pollfd));
+    static struct timeval last_tick = {0, 0};
+    struct timeval current_time;
+    long time_diff;
 
     if (!fds) {
         perror("Poll array allocation failed");
         exit(84);
+    }
+    gettimeofday(&current_time, NULL);
+    time_diff = (current_time.tv_sec - last_tick.tv_sec) * 1000 +
+        (current_time.tv_usec - last_tick.tv_usec) / 1000;
+    if (time_diff >= (1000 / server->parsed_info->frequence)) {
+        update_game_tick(server);
+        last_tick = current_time;
     }
     fds[0] = *(server->client->client_poll);
     helper_function(server, server->nfds + 1, fds);
