@@ -8,14 +8,14 @@ Ce dossier fournit une encapsulation moderne de la bibliothèque raygui (UI pour
 
 ## Structure
 - `include/RayGuiEncap.hpp` : encapsulation C++ de raygui
-- `raygui-4.0/src/raygui.h` : header raygui (fourni)
+- `raygui/src/raygui.h` : header raygui (fourni)
 - `RayGui.cpp` et `raygui_impl.cpp` : implémentation C++ et pont avec raygui
 - `test_rayguicpp.cpp` : exemple d'utilisation
 
 ## Compilation
 Placez-vous dans `libs/RayGUICPP` puis compilez avec :
 ```sh
-g++ -Iinclude -Iraygui-4.0/src -o test_rayguicpp test_rayguicpp.cpp raygui_impl.cpp RayGui.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+g++ -Iinclude -Iraygui/src -o test_rayguicpp test_rayguicpp.cpp raygui_impl.cpp RayGui.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 ```
 
 ## Exemple minimal

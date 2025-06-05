@@ -1,135 +1,271 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy Tests
+## Zappy Tests Makefile
 ## File description:
-## Tests Makefile
+## Builds and runs the tests for the Zappy project
 ##
 
-CC				=	gcc
-CXX				=	g++
-CFLAGS			=	-Wextra -Wall -Werror -std=gnu17 --coverage
-CXXFLAGS		=	-Wextra -Wall -Werror -std=c++20 --coverage
-CPP_TEST_FLAGS	=	--coverage -lcriterion -include cstdint
-LDFLAGS			=	-lcriterion --coverage
-SFMLFLAGS		=	-lsfml-graphics -lsfml-window -lsfml-system \
-					-lsfml-audio -lsfml-network
+# Test binaries
+C_UNIT_TESTS_NAME = ../c_unit_tests
+CPP_UNIT_TESTS_NAME = ../cpp_unit_tests
+FUNCTIONAL_TESTS_NAME = ../functional_tests
 
-BUILD_DIR		=	../build/tests
-SERVER_LIB		=	../build/libserver.a
-GUI_LIB			=	../build/libgui.a
+# Build directory
+BUILD_DIR = ../build/tests
+BUILD_DIR_C = $(BUILD_DIR)/server
+BUILD_DIR_CPP = $(BUILD_DIR)/client
 
-SERVER_TESTS	=	server/test_server.c server/test_player_inventory.c
-CLIENT_TESTS	=	
+# Unit test source files
+UNIT_SRC = server/test_server.c \
+		   server/test_player_inventory.c
 
-# Tests unitaires réseau GUI
-NETWORK_TESTS	=	unit/network/buffer/test_circular_buffer.cpp \
-					unit/network/buffer/test_circular_buffer_enhanced.cpp \
-					unit/network/connection/test_tcp_connection.cpp \
-					unit/network/networkManager/test_network_manager.cpp \
-					unit/network/networkThread/test_network_thread.cpp \
-					unit/network/protocol/test_protocol_parser.cpp \
-					unit/network/utils/test_system_wrapper.cpp
+CLIENT_SRC = unit/network/buffer/test_circular_buffer.cpp \
+			 unit/network/buffer/test_circular_buffer_enhanced.cpp \
+			 unit/network/connection/test_tcp_connection.cpp \
+			 unit/network/protocol/test_protocol_parser.cpp \
+			 unit/network/utils/test_system_wrapper.cpp \
+			 unit/network/networkManager/test_network_manager.cpp \
+			 unit/network/networkThread/test_network_thread.cpp
 
-ALL_TESTS		=	$(SERVER_TESTS) $(CLIENT_TESTS) $(NETWORK_TESTS)
 
-SERVER_TEST_OBJS = $(SERVER_TESTS:%.c=$(BUILD_DIR)/%.o)
-CLIENT_TEST_OBJS = $(CLIENT_TESTS:%.cpp=$(BUILD_DIR)/%.o)
-ALL_TEST_OBJS	=	$(SERVER_TEST_OBJS) $(CLIENT_TEST_OBJS)
+UNIT_OBJ = $(patsubst %.c, $(BUILD_DIR_C)/%.o, $(UNIT_SRC))
+CLIENT_OBJ = $(patsubst %.cpp, $(BUILD_DIR_CPP)/%.o, $(CLIENT_SRC))
+UNIT_DEP = $(patsubst %.c, $(BUILD_DIR_C)/%.d, $(UNIT_SRC))
+CLIENT_DEP = $(patsubst %.cpp, $(BUILD_DIR_CPP)/%.d, $(CLIENT_SRC))
 
-SERVER_INCLUDE	=	-I../src/Server/include
-GUI_INCLUDE		=	-I../src/GUI
-SHARED_INCLUDE	=	-I../src/Shared
-ALL_INCLUDES	=	$(SERVER_INCLUDE) $(GUI_INCLUDE) $(SHARED_INCLUDE)
+# Directories
+SERVER_DIR = ../src/Server
+GUI_DIR = ../src/GUI
+INCLUDES = -I$(SERVER_DIR)/include -I../src/Shared -I$(GUI_DIR) -I$(GUI_DIR)/network -I../libs -I../libs/RaylibCPP -I../libs/RayGUICPP
 
-SERVER_TESTS_NAME = ../server_tests
-CLIENT_TESTS_NAME = ../client_tests
-COVERAGE_DIR	=	$(BUILD_DIR)/coverage
+# Libraries
+SERVER_LIB = ../build/libserver.a
+GUI_LIB = ../build/libgui.a
 
-# Colors
-RED				=	\033[0;91m
-GREEN			=	\033[0;92m
-YELLOW			=	\033[0;93m
-BLUE			=	\033[0;94m
-MAGENTA			=	\033[0;95m
-CYAN			=	\033[0;96m
-RESET			=	\033[0m
+# Compiler and flags
+CC = gcc
+CXX = g++
+CFLAGS = -Wall -Wextra $(INCLUDES)
+CXXFLAGS = -Wall -Wextra -std=c++17 $(INCLUDES)
+LDFLAGS_C = -L../build -lserver -lcriterion -lgcov --coverage -lstdc++ -pthread -lm -ldl
+LDFLAGS_CPP = -L../build -lgui -lraylib_cpp -lraygui_cpp -lcriterion -lgcov --coverage -lstdc++ -pthread -lm -ldl
+DEBUG_FLAGS = -g3 -ggdb
+TEST_FLAGS = --coverage -fprofile-arcs -ftest-coverage
 
-all: $(SERVER_TESTS_NAME) $(CLIENT_TESTS_NAME) $(NETWORK_TESTS_NAME)
+# Colors and animations
+RED = \033[31m
+GREEN = \033[32m
+YELLOW = \033[33m
+BLUE = \033[34m
+MAGENTA = \033[35m
+CYAN = \033[36m
+WHITE = \033[37m
+BOLD = \033[1m
+RESET = \033[0m
+BG_BLACK = \033[40m
 
-$(SERVER_TESTS_NAME): $(SERVER_TEST_OBJS) $(SERVER_LIB)
-	@echo -e "$(GREEN)Compiling server test binary...$(RESET)"
-	@$(CC) -o $(SERVER_TESTS_NAME) $(SERVER_TEST_OBJS) $(SERVER_LIB) \
-		$(CFLAGS) $(SERVER_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS)
+# Main test target
+tests_run: setup_dirs display_test_banner $(C_UNIT_TESTS_NAME) $(CPP_UNIT_TESTS_NAME) $(GUI_LIB)
+	@echo ""
+	@echo "$(MAGENTA)[$(BOLD)TESTING$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Lancement des tests unitaires...$(RESET)"
+	@echo ""
+	@sleep 0.5
+	@./$(C_UNIT_TESTS_NAME)
+	@./$(CPP_UNIT_TESTS_NAME)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)COVERAGE$(RESET)$(GREEN)]$(RESET) $(BOLD)Génération du rapport de couverture...$(RESET)"
+	@gcovr --exclude tests/ --html-details -o coverage.html
+	@mkdir -p coverage_html
+	@echo ""
+	@echo "$(CYAN)╔═══════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(MAGENTA)$(BOLD)R É S U L T A T   C O V E R A G E$(RESET)      $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════════════════╝$(RESET)"
+	@echo ""
+	@gcovr --exclude tests/
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Le rapport de couverture est disponible dans coverage.html$(RESET)"
+	@echo "$(BLUE)[$(BOLD)INFO$(RESET)$(BLUE)]$(RESET) $(BOLD)Ouvrez coverage.html dans un navigateur pour voir les détails.$(RESET)"
+	@echo "$(CYAN)╔═══════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Génération rapport HTML...$(RESET)       $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════════════════╝$(RESET)"
+	@gcovr --exclude tests/ --html -o coverage_html/index.html
+	@echo "$(CYAN)╔═══════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Tests unitaires terminés avec succès !$(RESET)       $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════════════════╝$(RESET)"
+	@echo "$(GREEN)[$(BOLD)FINISHED$(RESET)$(GREEN)]$(RESET) $(BOLD)Tous les tests unitaires ont été exécutés avec succès !$(RESET)"
 
-$(CLIENT_TESTS_NAME): $(CLIENT_TEST_OBJS) $(GUI_LIB)
-	@echo -e "$(GREEN)Compiling client test binary...$(RESET)"
-	@mkdir -p $(dir $(BUILD_DIR)/client/)
-	@$(CXX) -o $(CLIENT_TESTS_NAME) $(CLIENT_TEST_OBJS) $(GUI_LIB) \
-		$(CXXFLAGS) $(GUI_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS)
+# Functional tests target - runs Python scripts in tests/client/network
+functional_tests: setup_dirs
+	@echo ""
+	@echo "$(MAGENTA)[$(BOLD)TESTING$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Lancement des tests fonctionnels...$(RESET)"
+	@echo ""
+	@if command -v python3 >/dev/null 2>&1; then \
+		echo "$(GREEN)[$(BOLD)INFO$(RESET)$(GREEN)]$(RESET) $(BOLD)Python 3 trouvé. Exécution des tests...$(RESET)"; \
+		python_scripts=$$(find client -name "*.py"); \
+		for script in $$python_scripts; do \
+			echo "$(CYAN)[$(BOLD)RUNNING$(RESET)$(CYAN)]$(RESET) $(BOLD)$$script$(RESET)"; \
+			python3 $$script; \
+			if [ $$? -eq 0 ]; then \
+				echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Test réussi !$(RESET)"; \
+			else \
+				echo "$(RED)[$(BOLD)FAILED$(RESET)$(RED)]$(RESET) $(BOLD)Le test a échoué !$(RESET)"; \
+			fi; \
+			echo ""; \
+		done; \
+	else \
+		echo "$(RED)[$(BOLD)ERROR$(RESET)$(RED)]$(RESET) $(BOLD)Python 3 n'est pas installé.$(RESET)"; \
+		exit 1; \
+	fi
+	@echo "$(CYAN)╔═══════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Tests fonctionnels terminés !$(RESET)        $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════════════════╝$(RESET)"
 
-$(BUILD_DIR)/%.o: %.c
-	@mkdir -p $(dir $@)
-	@echo -e "$(BLUE)Compiling C test file $< into $@...$(RESET)"
-	@$(CC) $(CFLAGS) -fprofile-abs-path $(SERVER_INCLUDE) $(SHARED_INCLUDE) -c $< -o $@
+# Create the necessary build directories
+setup_dirs:
+	@mkdir -p $(BUILD_DIR)/server
+	@mkdir -p $(BUILD_DIR)/client
+	@mkdir -p $(BUILD_DIR)/unit/network/buffer
+	@mkdir -p $(BUILD_DIR)/unit/network/connection
+	@mkdir -p $(BUILD_DIR)/unit/network/networkManager
+	@mkdir -p $(BUILD_DIR)/unit/network/networkThread
+	@mkdir -p $(BUILD_DIR)/unit/network/protocol
+	@mkdir -p $(BUILD_DIR)/unit/network/utils
+	@mkdir -p ../build
 
-$(BUILD_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	@echo -e "$(BLUE)Compiling C++ test file $< into $@...$(RESET)"
-	@$(CXX) $(CXXFLAGS) -fprofile-abs-path $(GUI_INCLUDE) $(SHARED_INCLUDE) -c $< -o $@
+# Display fancy test banner
+display_test_banner:
+	@clear
+	@echo "$(CYAN)╔═══════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(YELLOW)$(BOLD)Z A P P Y   T E S T   S U I T E$(RESET)  $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════╝$(RESET)"
+	@echo ""
+	@echo "$(BLUE)[$(BOLD)INFO$(RESET)$(BLUE)]$(RESET) $(BOLD)Préparation de l'environnement de test...$(RESET)"
+	@sleep 0.3
 
-$(SERVER_LIB):
-	@echo -e "$(CYAN)Building server library for tests...$(RESET)"
-	@$(MAKE) ../../build/libserver.a -C ../src/Server
-
+# Ensure GUI library is built
 $(GUI_LIB):
-	@echo -e "$(CYAN)Building GUI library for tests...$(RESET)"
-	@$(MAKE) ../../build/libgui.a -C  ../src/GUI
+	@echo "$(BLUE)[$(BOLD)BUILD$(RESET)$(BLUE)]$(RESET) $(BOLD)Construction de la bibliothèque GUI...$(RESET)"
+	@$(MAKE) -C ../src/GUI
 
-NETWORK_TESTS_NAME = ../network_tests
+# Build c unit tests
+$(C_UNIT_TESTS_NAME): check_criterion $(SERVER_LIB) $(UNIT_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Compilation des tests unitaires C...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@$(CC) $(CFLAGS) $(TEST_FLAGS) -o $(C_UNIT_TESTS_NAME) $(UNIT_OBJ) $(LDFLAGS_C)
+	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Tests unitaires compilés avec succès$(RESET)"
+	@echo "$(CYAN)╔═════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Tests serveur prêts à être exécutés !$(RESET)         $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════════════╝$(RESET)"
+	@echo "$(GREEN)[$(BOLD)READY$(RESET)$(GREEN)]$(RESET) $(BOLD)Tests unitaires compilés avec succès$(RESET)"
 
-$(NETWORK_TESTS_NAME): $(NETWORK_TESTS:%.cpp=$(BUILD_DIR)/%.o) $(GUI_LIB)
-	@echo -e "$(GREEN)Compiling network test binary...$(RESET)"
-	@$(CXX) -o $(NETWORK_TESTS_NAME) $(NETWORK_TESTS:%.cpp=$(BUILD_DIR)/%.o) \
-		$(GUI_LIB) $(CXXFLAGS) $(GUI_INCLUDE) $(SHARED_INCLUDE) $(LDFLAGS) $(SFMLFLAGS) -Wl,--allow-multiple-definition
+# Build cpp unit tests
+$(CPP_UNIT_TESTS_NAME): check_criterion $(GUI_LIB) $(CLIENT_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Compilation des tests unitaires...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -o $(CPP_UNIT_TESTS_NAME) $(CLIENT_OBJ) $(LDFLAGS_CPP)
+	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Tests unitaires compilés avec succès$(RESET)"
+	@echo "$(CYAN)╔═════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Tests client prêts à être exécutés !$(RESET)         $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════════════╝$(RESET)"
+	@echo "$(GREEN)[$(BOLD)READY$(RESET)$(GREEN)]$(RESET) $(BOLD)Tests unitaires compilés avec succès$(RESET)"
 
-network_tests: $(NETWORK_TESTS_NAME)
-	@echo -e "$(MAGENTA)Running network unit tests only...$(RESET)"
-	@./$(NETWORK_TESTS_NAME)
 
-network_gui_tests: network_tests
-	@echo -e "$(GREEN)All network tests completed!$(RESET)"
+# Check if criterion is installed
+check_criterion:
+	@echo -n "$(BLUE)[$(BOLD)CHECK$(RESET)$(BLUE)]$(RESET) $(BOLD)Vérification de la présence de Criterion...$(RESET) "
+	@if ! pkg-config --exists criterion; then \
+		echo "$(RED)NON TROUVÉ$(RESET)"; \
+		echo "$(RED)[$(BOLD)ERROR$(RESET)$(RED)]$(RESET) $(BOLD)La bibliothèque Criterion est requise pour les tests.$(RESET)"; \
+		echo "$(YELLOW)[$(BOLD)TIP$(RESET)$(YELLOW)]$(RESET) $(BOLD)Installez-la avec: sudo apt-get install libcriterion-dev$(RESET)"; \
+		exit 1; \
+	else \
+		echo "$(GREEN)OK$(RESET)"; \
+	fi
 
-tests_run: $(SERVER_TESTS_NAME) $(NETWORK_TESTS_NAME)
-	@echo -e "$(MAGENTA)Running server unit tests...$(RESET)"
-	@./$(SERVER_TESTS_NAME)
-	@echo -e "$(MAGENTA)Running network unit tests...$(RESET)"
-	@./$(NETWORK_TESTS_NAME)
-	@echo -e "$(CYAN)Generating coverage report...$(RESET)"
-	@mkdir -p $(COVERAGE_DIR)
-	@echo -e "$(GREEN)Coverage report generated at $(COVERAGE_DIR)/coverage.html$(RESET)"
+# Rules for object files
+$(BUILD_DIR_C)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@echo -n "$(CYAN)[$(BOLD)COMPILING C$(RESET)$(CYAN)]$(RESET) $(notdir $<)... "
+	@$(CC) $(CFLAGS) $(TEST_FLAGS) -MMD -MP -c $< -o $@
+	@echo "$(GREEN)✓$(RESET)"
 
-server_tests: $(SERVER_TESTS_NAME)
-	@echo -e "$(MAGENTA)Running server unit tests only...$(RESET)"
-	@./$(SERVER_TESTS_NAME)
+$(BUILD_DIR_CPP)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@echo -n "$(CYAN)[$(BOLD)COMPILING C++$(RESET)$(CYAN)]$(RESET) $(notdir $<)... "
+	@$(CXX) $(CXXFLAGS) $(TEST_FLAGS) -MMD -MP -c $< -o $@
+	@echo "$(GREEN)✓$(RESET)"
 
-client_tests: $(CLIENT_TESTS_NAME)
-	@echo -e "$(MAGENTA)Running client unit tests only...$(RESET)"
-	@./$(CLIENT_TESTS_NAME)
-
+# Clean object files
 clean:
-	@echo -e "$(YELLOW)Cleaning test objects...$(RESET)"
+	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) $(BOLD)Suppression des fichiers objets des tests...$(RESET)"
 	@rm -rf $(BUILD_DIR)
-	@rm -f *.gcda *.gcno
-	@rm -f */*.gcda */*.gcno
-	@rm -f ../*_tests-*.gc*
-	@rm -f ../client_tests
-	@rm -f ../server_tests
-	@rm -f ../network_tests
+	@rm -f *.gcno *.gcda
+	@sleep 0.3
+	@for i in `seq 1 11`; do \
+		progress=$$(( i > 10 ? 10 : i )); \
+		echo -n "$(YELLOW)[$(BOLD)CLEAN$(RESET)$(YELLOW)]$(RESET) $(BOLD)Progression: ["; \
+		for j in `seq 1 $$progress`; do echo -n "▓"; done; \
+		for j in `seq $$progress 9`; do echo -n "░"; done; \
+		echo -n "]$(RESET)\r"; \
+		sleep 0.1; \
+	done
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Nettoyage effectué !$(RESET)       "
 
+# Clean everything (including binary)
 fclean: clean
-	@echo -e "$(RED)Cleaning test binaries...$(RESET)"
-	@rm -f $(SERVER_TESTS_NAME) $(CLIENT_TESTS_NAME)
+	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) $(BOLD)Suppression des binaires de test...$(RESET)"
+	@rm -f $(C_UNIT_TESTS_NAME) $(CPP_UNIT_TESTS_NAME) $(FUNCTIONAL_TESTS_NAME)
+	@rm -f coverage.html coverage_cpp.html
+	@rm -rf coverage_html
+	@sleep 0.3
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Nettoyage complet effectué !$(RESET)"
 
-re: fclean all
+# Cible spécifique pour les tests C++ uniquement
+cpp_tests: setup_dirs display_test_banner $(CPP_UNIT_TESTS_NAME) $(GUI_LIB)
+	@echo ""
+	@echo "$(MAGENTA)[$(BOLD)TESTING$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Lancement des tests unitaires C++...$(RESET)"
+	@echo ""
+	@sleep 0.5
+	@./$(CPP_UNIT_TESTS_NAME)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)COVERAGE$(RESET)$(GREEN)]$(RESET) $(BOLD)Génération du rapport de couverture C++...$(RESET)"
+	@gcovr -r .. --exclude-directories='tests|build' --gcov-ignore-errors=no_working_dir_found --html-details -o coverage_cpp.html
+	@mkdir -p coverage_html
+	@echo ""
+	@echo "$(CYAN)╔═════════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(MAGENTA)$(BOLD)R É S U L T A T   C O V E R A G E   C + +$(RESET)  $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════════════════╝$(RESET)"
+	@echo ""
+	@gcovr -r .. --exclude-directories='tests|build' --gcov-ignore-errors=no_working_dir_found --print-summary
+	@echo ""
+	@echo "$(CYAN)╔═════════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Tests C++ terminés avec succès !$(RESET)          $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════════════════╝$(RESET)"
+	@echo "$(GREEN)[$(BOLD)FINISHED$(RESET)$(GREEN)]$(RESET) $(BOLD)Tous les tests C++ ont été exécutés !$(RESET)"
 
-.PHONY: all tests_run server_tests client_tests clean fclean re
+# Clean and rebuild
+re: fclean tests_run
+
+# Include dependency files
+-include $(UNIT_DEP)
+-include $(CLIENT_DEP)
+
+.PHONY: tests_run functional_tests cpp_tests clean fclean re debug setup_dirs display_test_banner check_criterion coverage
