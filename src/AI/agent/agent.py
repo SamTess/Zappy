@@ -15,6 +15,8 @@ class Agent:
       self.level = 1
       self.team = team
       self.agent_id = agent_id
+      self.map_size_x = None
+      self.map_size_y = None
 
       self.decisionManager = DecisionManager(self)
       self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.agent_id}): ")
@@ -39,6 +41,9 @@ class Agent:
     welcome_msg = self.get_message(timeout=4)
     team_slots = self.send_command(self.team)
     map_size = self.get_message(timeout=4)
+
+    self.map_size_x = int(map_size.split()[0])
+    self.map_size_y = int(map_size.split()[1])
 
     if welcome_msg == "WELCOME":
       print(f"Welcome message {welcome_msg}")

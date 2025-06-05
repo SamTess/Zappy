@@ -11,6 +11,7 @@ class DecisionManager:
       "GetFood": behaviors.GetFoodBehavior(agent),
       "GetMinerals": behaviors.GetMineralsBehavior(agent),
       "Upgrade": behaviors.UpgradeBehavior(agent),
+      "Dyson": behaviors.DysonBehavior(agent)
     }
 
   def process_server_message(self):
@@ -31,13 +32,9 @@ class DecisionManager:
 
   def take_action(self):
     inventory = self.agent.send_command("Inventory")
-    # surroundings = self.agent.send_command("Look")
     print(inventory)
-    self.behaviors["GetFood"].execute()
 
-    if (zappy.parse_inventory(inventory).get("food", 0) >= 15):
-      self.behaviors["GetMinerals"].execute()
+    self.behaviors["Dyson"].execute()
 
     if zappy.can_upgrade(inventory, self.agent.level):
       self.behaviors["Upgrade"].execute()
-

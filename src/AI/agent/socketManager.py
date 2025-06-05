@@ -44,7 +44,7 @@ class SocketManager:
   def _handle_message(self, message):
     with self.lock:
       # si il y a des requêtes en attente on considère que c'est une réponse
-      if self.pending_requests:
+      if self.pending_requests or (message.startswith("ko") or message.startswith("ok") or message.startswith("[")):
         request_id = next(iter(self.pending_requests))
         response_queue = self.pending_requests.pop(request_id)
         response_queue.put(message)

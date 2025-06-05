@@ -26,6 +26,16 @@ def take_all_of_item_here(agent, item):
       break
     surroundings = agent.send_command("Look")
 
+def take_everything_here(agent):
+  surroundings = agent.send_command("Look")
+  items_on_ground = surroundings.strip("[ ]").split(", ")[0].strip().split()
+
+  for item in items_on_ground:
+    if item.endswith(","):
+      item = item[:-1]
+    if item != "player":
+      take_all_of_item_here(agent, item)
+
 def go_take_item(agent, item):
   nb_turns = 0
   i = 0
