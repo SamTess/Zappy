@@ -66,6 +66,7 @@ static void format_response(int available_slots, client_t *client)
 
     snprintf(response, res_size, "%d\n", available_slots);
     write_command_output(client->client_fd, response);
+    free(response);
 }
 
 void connect_nbr(server_t *server, client_t *client, char *buffer)
