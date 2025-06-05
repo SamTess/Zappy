@@ -15,10 +15,44 @@
 #include <arpa/inet.h>
 
 
+static void malloc_failed_quat(int i)
+{
+    if (i == 13){
+        perror("Malloc failed for res final look");
+        exit(84);
+    }
+    if (i == 14){
+        perror("Malloc failed for res repeat_word");
+        exit(84);
+    }
+    if (i == 15){
+        perror("Malloc failed res add_resources");
+        exit(84);
+    }
+    if (i == 16){
+        perror("Malloc failed res tile_to_str");
+        exit(84);
+    }
+}
+
 static void malloc_failed_tres(int i)
 {
+    if (i > 12)
+        return malloc_failed_quat(i);
     if (i == 9){
         perror("Malloc failed for allocating resource counters");
+        exit(84);
+    }
+    if (i == 10){
+        perror("Malloc failed for tiles array");
+        exit(84);
+    }
+    if (i == 11){
+        perror("Malloc failed for res formatting");
+        exit(84);
+    }
+    if (i == 12){
+        perror("Malloc failed for tiles allocation");
         exit(84);
     }
 }
