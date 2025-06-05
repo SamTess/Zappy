@@ -90,7 +90,7 @@ zappy_server:
 zappy_gui:
 	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	des bibliothèques partagées...$(RESET)"
-	@$(MAKE) -C $(LIBS_DIR) shared
+	@$(MAKE) -C $(LIBS_DIR) static shared
 	@echo "$(CYAN)[$(BOLD)INFO$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de la GUI...$(RESET)"
 	@$(MAKE) -C $(GUI_DIR)
