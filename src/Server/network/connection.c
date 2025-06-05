@@ -16,17 +16,6 @@
 #include "../include/server.h"
 #include "../include/parsing.h"
 
-static void free_node(client_t *node)
-{
-    if (node->client_poll)
-        free(node->client_poll);
-    if (node->client_add)
-        free(node->client_add);
-    if (node->player)
-        free(node->player);
-    free(node);
-}
-
 static bool remove_head_client(server_t *server, int fd)
 {
     client_t *current = server->client;
@@ -77,11 +66,10 @@ void remove_fd(server_t *server, int fd)
     remove_other_client(server, fd);
 }
 
-static client_t *init_new_client(int fd, server_t *server)
+static client_t *init_new_client(int fd)
 {
     client_t *new_c = calloc(1, sizeof(client_t));
 
-    (void)server;
     if (!new_c)
         malloc_failed(1);
     new_c->client_poll = calloc(1, sizeof(struct pollfd));
@@ -95,6 +83,7 @@ static client_t *init_new_client(int fd, server_t *server)
     new_c->client_add = NULL;
     new_c->client_id = -1;
     new_c->player = calloc(1, sizeof(player_t));
+    new_c->is_fully_connected = false;
     if (new_c->player == NULL)
         malloc_failed(3);
     init_player(new_c->player, NULL);
@@ -103,7 +92,7 @@ static client_t *init_new_client(int fd, server_t *server)
 
 void add_fd(server_t *server, int fd)
 {
-    client_t *new_c = init_new_client(fd, server);
+    client_t *new_c = init_new_client(fd);
     client_t *current;
     int next_id = 0;
 
@@ -148,16 +137,55 @@ static void init_server_socket(server_t *server, parsing_info_t *parsed_info)
     add_fd(server, server->s_fd);
 }
 
-static void init_server(server_t *server)
+static void copy_names(server_t *server, parsing_info_t *parsed_info)
+{
+    int i = 0;
+
+    for (; parsed_info->names[i] != NULL; i++){
+    }
+    server->parsed_info->names = calloc(i + 1, sizeof(char *));
+    if (server->parsed_info->names == NULL)
+        malloc_failed(6);
+    for (int j = 0; parsed_info->names[j] != NULL; j++){
+        server->parsed_info->names[j] = strdup(parsed_info->names[j]);
+    }
+    server->parsed_info->names[i] = NULL;
+}
+
+void init_server_resources(server_t *server)
+{
+    server->total_resources = malloc(sizeof(int) * COUNT);
+    server->current_resources = malloc(sizeof(int) * COUNT);
+    if (server->total_resources == NULL || server->current_resources == NULL)
+        malloc_failed(9);
+    for (int i = 0; i < COUNT; i++) {
+        server->total_resources[i] = 0;
+        server->current_resources[i] = 0;
+    }
+}
+
+static void init_server(server_t *server, parsing_info_t *parsed_info)
 {
     server->nfds = 0;
     server->client = NULL;
     server->s_fd = 0;
     server->serv_add = NULL;
+    server->current_tick = 0;
+    server->map = NULL;
+    server->parsed_info = malloc(sizeof(parsing_info_t));
+    if (server->parsed_info == NULL)
+        malloc_failed(7);
+    server->parsed_info->port = parsed_info->port;
+    server->parsed_info->width = parsed_info->width;
+    server->parsed_info->height = parsed_info->height;
+    server->parsed_info->client_nb = parsed_info->client_nb;
+    server->parsed_info->frequence = parsed_info->frequence;
+    init_server_resources(server);
+    copy_names(server, parsed_info);
 }
 
 void create_server(server_t *server, parsing_info_t *parsed_info)
 {
-    init_server(server);
+    init_server(server, parsed_info);
     init_server_socket(server, parsed_info);
 }

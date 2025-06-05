@@ -33,10 +33,10 @@ void free_inventory(player_t *player)
     player->inventory_size = 0;
 }
 
-static bool add_quantity_to_item(player_t *player, ResourceType_t type, int nb)
+static bool add_quantity_to_item(player_t *player, resource_type_t t, int nb)
 {
     for (int i = 0; i < player->inventory_size; i++) {
-        if (player->inventory[i].type == type) {
+        if (player->inventory[i].type == t) {
             player->inventory[i].quantity += nb;
             return true;
         }
@@ -44,12 +44,12 @@ static bool add_quantity_to_item(player_t *player, ResourceType_t type, int nb)
     return false;
 }
 
-static void add_one_to_inventory(player_t *player, ResourceType_t type, int nb)
+static void add_one_to_inventory(player_t *player, resource_type_t t, int nb)
 {
     player_inventory_t *new_item = malloc(sizeof(player_inventory_t));
 
-    new_item->type = type;
-    new_item->name = get_resource_name(type);
+    new_item->type = t;
+    new_item->name = get_resource_name(t);
     if (!new_item->name) {
         free(new_item);
         return;
@@ -66,13 +66,13 @@ static void add_one_to_inventory(player_t *player, ResourceType_t type, int nb)
     player->inventory[player->inventory_size - 1] = *new_item;
 }
 
-bool add_item_to_inventory(player_t *player, ResourceType_t type, int quantity)
+bool add_item_to_inventory(player_t *player, resource_type_t type, int q)
 {
-    if (!player || quantity < 0)
+    if (!player || q < 0)
         return false;
     if (inventory_has_item(player, type))
-        return add_quantity_to_item(player, type, quantity);
-    add_one_to_inventory(player, type, quantity);
+        return add_quantity_to_item(player, type, q);
+    add_one_to_inventory(player, type, q);
     return true;
 }
 
@@ -85,7 +85,7 @@ static void item_to_remove_find(player_t *player, int quantity, int i)
             player->inventory[i].quantity = 0;
 }
 
-bool remove_item_from_inventory(player_t *player, ResourceType_t type, int nb)
+bool remove_item_from_inventory(player_t *player, resource_type_t type, int nb)
 {
     if (!player || nb <= 0)
         return false;

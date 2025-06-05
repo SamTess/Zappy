@@ -23,5 +23,6 @@ void create_map(server_t *server, parsing_info_t *parsed_info)
             tile_init(&server->map[y][x]);
         }
     }
-    distribute_resources(server->map, parsed_info->width, parsed_info->height);
+    distribute_resources(server->map, server,
+        server->total_resources, server->current_resources);
 }

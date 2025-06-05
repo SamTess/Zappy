@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *get_resource_name(ResourceType_t type)
+char *get_resource_name(resource_type_t type)
 {
     switch (type) {
         case FOOD:
@@ -31,7 +31,7 @@ char *get_resource_name(ResourceType_t type)
     }
 }
 
-bool inventory_has_item(player_t *player, ResourceType_t type)
+bool inventory_has_item(player_t *player, resource_type_t type)
 {
     if (!player || !player->inventory)
         return false;
@@ -42,7 +42,7 @@ bool inventory_has_item(player_t *player, ResourceType_t type)
     return false;
 }
 
-int how_many_in_inventory(player_t *player, ResourceType_t type)
+int how_many_in_inventory(player_t *player, resource_type_t type)
 {
     if (!player)
         return 0;
