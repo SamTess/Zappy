@@ -13,46 +13,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-static bool is_client_valid(server_t *server, client_t *target)
-{
-    client_t *current = server->client;
-
-    while (current != NULL) {
-        if (current == target)
-            return true;
-        current = current->next;
-    }
-    return false;
-}
-
-static void tick_check(server_t *server, client_t *current)
-{
-    if (current != NULL && current->player != NULL)
-        check_player_starvation(server, current);
-    if (is_client_valid(server, current) && current != NULL &&
-        current->player != NULL)
-        finish_incantation(server, current);
-}
-
-void update_game_tick(server_t *server)
-{
-    client_t *current = server->client;
-    client_t *next;
-
-    server->current_tick++;
-    if (current != NULL)
-        current = current->next;
-    while (current != NULL) {
-        next = current->next;
-        tick_check(server, current);
-        if (is_client_valid(server, current) && current->player &&
-            current->player->busy_until <= server->current_tick &&
-            current->player->queue_size > 0)
-            process_next_queued_command(server, current);
-        current = next;
-    }
-}
-
 client_t *find_client_by_socket(server_t *server, int socket_fd)
 {
     client_t *temp = server->client;
@@ -72,7 +32,6 @@ static void new_connection(server_t *server)
 {
     struct sockaddr_in client_addr;
     socklen_t addr_len = sizeof(client_addr);
-    char client_ip[INET_ADDRSTRLEN];
     int client_fd;
     client_t *new_client;
 
@@ -88,7 +47,7 @@ static void new_connection(server_t *server)
     new_client = find_client_by_socket(server, client_fd);
     if (new_client != NULL){
         init_new_player_pos(server, new_client);
-        print_co(client_ip, &client_addr, new_client);
+        write_command_output(new_client->client_fd, "WELCOME\n");
     }
 }
 

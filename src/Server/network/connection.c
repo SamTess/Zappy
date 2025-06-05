@@ -77,11 +77,10 @@ void remove_fd(server_t *server, int fd)
     remove_other_client(server, fd);
 }
 
-static client_t *init_new_client(int fd, server_t *server)
+static client_t *init_new_client(int fd)
 {
     client_t *new_c = calloc(1, sizeof(client_t));
 
-    (void)server;
     if (!new_c)
         malloc_failed(1);
     new_c->client_poll = calloc(1, sizeof(struct pollfd));
@@ -95,6 +94,7 @@ static client_t *init_new_client(int fd, server_t *server)
     new_c->client_add = NULL;
     new_c->client_id = -1;
     new_c->player = calloc(1, sizeof(player_t));
+    new_c->is_fully_connected = false;
     if (new_c->player == NULL)
         malloc_failed(3);
     init_player(new_c->player, NULL);
@@ -103,7 +103,7 @@ static client_t *init_new_client(int fd, server_t *server)
 
 void add_fd(server_t *server, int fd)
 {
-    client_t *new_c = init_new_client(fd, server);
+    client_t *new_c = init_new_client(fd);
     client_t *current;
     int next_id = 0;
 
