@@ -59,12 +59,20 @@ static int count_team_eggs(server_t *server, char *team_name)
     return count;
 }
 
+static void format_response(int available_slots, client_t *client)
+{
+    size_t res_size = sprintf(NULL, "%d\n", available_slots);
+    char *response = malloc(sizeof(char) * res_size);
+
+    snprintf(response, res_size, "%d\n", available_slots);
+    write_command_output(client->client_fd, response);
+}
+
 void connect_nbr(server_t *server, client_t *client, char *buffer)
 {
     int current_team_clients;
     int team_eggs;
     int available_slots;
-    char response[16];
 
     (void)buffer;
     if (!client || !client->player || !client->player->team_name) {
@@ -78,6 +86,5 @@ void connect_nbr(server_t *server, client_t *client, char *buffer)
         - current_team_clients;
     if (available_slots < 0)
         available_slots = 0;
-    snprintf(response, sizeof(response), "%d\n", available_slots);
-    write_command_output(client->client_fd, response);
+    format_response(available_slots, client);
 }
