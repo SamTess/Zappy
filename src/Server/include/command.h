@@ -46,5 +46,6 @@ void start_incantation(server_t *server, client_t *client, char *buffer);
 void finish_incantation(server_t *server, client_t *client);
 bool can_start_incantation(server_t *server, client_t *client);
 command_data_t get_command_data(void);
+char *check_rota_tiles(client_t *user, server_t *server, int i, int j);
 
 #endif /* !COMMAND_H_ */

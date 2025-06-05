@@ -27,17 +27,14 @@ int add_to_circular_buffer(circular_buffer_t *cb, char byte)
 
 int find_command_end(circular_buffer_t *cb)
 {
-    int pos = 0;
-    int next_pos = 0;
+    int pos = cb->start;
 
-    if (cb->count < 2)
+    if (cb->count < 1)
         return -1;
-    pos = cb->start;
-    for (int i = 0; i < cb->count - 1; i++) {
-        next_pos = (pos + 1) % BUFFER_SIZE;
-        if (cb->buffer[pos] == '\r' && cb->buffer[next_pos] == '\n')
-            return i + 2;
-        pos = next_pos;
+    for (int i = 0; i < cb->count; i++) {
+        if (cb->buffer[pos] == '\n')
+            return i + 1;
+        pos = (pos + 1) % BUFFER_SIZE;
     }
     return -1;
 }

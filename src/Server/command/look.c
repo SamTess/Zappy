@@ -9,104 +9,112 @@
 #include <string.h>
 #include <stdio.h>
 
-static char *check_up(client_t *user, int i, int j, server_t *server)
+static int get_total_size_tile(int i, char ***tiles,
+    client_t *user, server_t *server)
 {
-    int y = (user->player->pos_y - i + server->parsed_info->height)
-        % server->parsed_info->height;
-    int x = (user->player->pos_x - i + j + server->parsed_info->width)
-        % server->parsed_info->width;
+    size_t total_len = 1;
+    int num_tiles = 2 * i + 1;
 
-    return tile_to_str(&server->map[y][x]);
-}
-
-static char *check_down(client_t *user, int i, int j, server_t *server)
-{
-    int y = (user->player->pos_y + i) % server->parsed_info->height;
-    int x = (user->player->pos_x + i - j + server->parsed_info->width)
-        % server->parsed_info->width;
-
-    return tile_to_str(&server->map[y][x]);
-}
-
-static char *check_left(client_t *user, int i, int j, server_t *server)
-{
-    int y = (user->player->pos_y + j) % server->parsed_info->height;
-    int x = (user->player->pos_x - i + server->parsed_info->width)
-        % server->parsed_info->width;
-
-    return tile_to_str(&server->map[y][x]);
-}
-
-static char *check_right(client_t *user, int i, int j, server_t *server)
-{
-    int y = (user->player->pos_y - j + server->parsed_info->height)
-        % server->parsed_info->height;
-    int x = (user->player->pos_x + i) % server->parsed_info->width;
-
-    return tile_to_str(&server->map[y][x]);
-}
-
-static char *check_rota_tiles(client_t *user, server_t *server, int i, int j)
-{
-    switch (user->player->rotation) {
-    case UP:
-        return check_up(user, i, j, server);
-    case DOWN:
-        return check_down(user, i, j, server);
-    case LEFT:
-        return check_left(user, i, j, server);
-    case RIGHT:
-        return check_right(user, i, j, server);
-    default:
-        return strdup("");
+    *tiles = malloc(num_tiles * sizeof(char *));
+    if (!*tiles)
+        return 1;
+    for (int j = 0; j < num_tiles; j++) {
+        (*tiles)[j] = check_rota_tiles(user, server, i, j);
+        if (!(*tiles)[j])
+            (*tiles)[j] = strdup("");
+        total_len += strlen((*tiles)[j]);
+        if (strlen((*tiles)[j]) > 0 && strchr((*tiles)[j], ' ') != NULL)
+            total_len += 1;
+        if (j > 0)
+            total_len += 1;
     }
+    return total_len;
 }
 
-static void check_formatting(char **tile, char **res)
+static char *format_tile(size_t total_len, char **tiles, int num_tiles)
 {
-    if (strlen(*tile) > 0 && strchr(*tile, ' ') != NULL) {
-        *res = realloc(*res, strlen(*res) + 3);
-        strcat(*res, ", ");
-    } else {
-        *res = realloc(*res, strlen(*res) + 2);
-        strcat(*res, ",");
+    char *res = malloc(sizeof(char) * total_len);
+
+    if (!res)
+        malloc_failed(11);
+    res[0] = '\0';
+    for (int j = 0; j < num_tiles; j++) {
+        if (j > 0)
+            strcat(res, ",");
+        if (strlen(tiles[j]) > 0 && strchr(tiles[j], ' ') != NULL)
+            strcat(res, " ");
+        strcat(res, tiles[j]);
+        free(tiles[j]);
     }
+    return res;
 }
 
 static char *look_tiles(client_t *user, server_t *server, int i)
 {
-    char *res = strdup("");
-    char *tile;
+    int num_tiles = 2 * i + 1;
+    char **tiles = NULL;
+    size_t total_len;
+    char *res;
 
-    for (int j = 0; j < 2 * i + 1; ++j) {
-        tile = check_rota_tiles(user, server, i, j);
-        if (j > 0)
-            check_formatting(&tile, &res);
-        res = realloc(res, strlen(res) + strlen(tile) + 1);
-        strcat(res, tile);
-        free(tile);
+    total_len = get_total_size_tile(i, &tiles, user, server);
+    if (!tiles)
+        return strdup("");
+    res = format_tile(total_len, tiles, num_tiles);
+    free(tiles);
+    return res;
+}
+
+static int get_total_size(char ***level_tiles,
+    client_t *user, server_t *server)
+{
+    int total = 4;
+    int num_levels = user->player->level + 1;
+
+    *level_tiles = malloc(num_levels * sizeof(char *));
+    if (!*level_tiles)
+        return 3;
+    for (int i = 0; i <= user->player->level; i++) {
+        (*level_tiles)[i] = look_tiles(user, server, i);
+        if (!(*level_tiles)[i])
+            (*level_tiles)[i] = strdup("");
+        total += strlen((*level_tiles)[i]);
+        if (i > 0)
+            total += 1;
     }
+    return total;
+}
+
+static char *format_look(size_t total_len, char **level_tiles, client_t *user)
+{
+    char *res = malloc(sizeof(char) * total_len);
+
+    if (!res)
+        malloc_failed(10);
+    strcpy(res, "[");
+    for (int i = 0; i <= user->player->level; i++) {
+        if (i > 0)
+            strcat(res, ",");
+        strcat(res, level_tiles[i]);
+        free(level_tiles[i]);
+    }
+    strcat(res, "]\n");
     return res;
 }
 
 void look(server_t *server, client_t *user, char *buffer)
 {
-    char *res = strdup("[");
-    char *tiles;
+    char **level_tiles = NULL;
+    size_t total_len = 0;
+    char *res;
 
     (void)buffer;
-    for (int i = 0; i <= user->player->level; ++i) {
-        tiles = look_tiles(user, server, i);
-        if (i > 0) {
-            res = realloc(res, strlen(res) + 2);
-            strcat(res, ",");
-        }
-        res = realloc(res, strlen(res) + strlen(tiles) + 1);
-        strcat(res, tiles);
-        free(tiles);
+    total_len = get_total_size(&level_tiles, user, server);
+    if (!level_tiles) {
+        write_command_output(user->client_fd, "ko\n");
+        return;
     }
-    res = realloc(res, strlen(res) + 3);
-    strcat(res, "]\n");
+    res = format_look(total_len, level_tiles, user);
+    free(level_tiles);
     write_command_output(user->client_fd, res);
     free(res);
 }

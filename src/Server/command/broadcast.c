@@ -103,6 +103,7 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     direction = calculate_direction(receiver, dx, dy);
     snprintf(response, res_size, "message %d, %s\n", direction, message);
     write_command_output(receiver->client_fd, response);
+    free(response);
 }
 
 void broadcast(server_t *server, client_t *user, char *buffer)

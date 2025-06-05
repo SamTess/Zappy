@@ -48,7 +48,6 @@ static void set_busy_all(server_t *server, client_t *client, int duration)
 {
     tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
     client_t *tmp_client;
-    int participants = 0;
 
     for (int i = 0; i < tile->player_count; i++) {
         tmp_client = get_client_by_id_player(server, tile->player_ids[i]);
@@ -56,7 +55,6 @@ static void set_busy_all(server_t *server, client_t *client, int duration)
             tmp_client->player->level == client->player->level) {
             tmp_client->player->incantation_leader_id = client->client_id;
             set_busy_until(server, tmp_client, duration);
-            participants++;
         }
     }
 }

@@ -30,6 +30,7 @@ SRC = 	help.c								\
 		command/left.c						\
 		command/inventory.c					\
 		command/look.c						\
+		command/look_utils.c				\
 		command/tile_to_str.c				\
 		command/eject.c						\
 		command/connect_nbr.c				\
