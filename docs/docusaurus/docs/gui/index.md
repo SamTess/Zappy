@@ -39,6 +39,44 @@ L'interface utilisateur comprend plusieurs sections :
 4. **Liste des équipes** : Affiche les équipes et leurs statistiques
 5. **Timeline** : Permet de suivre l'historique des événements
 
-## Développement
+## Architecture
 
-Le client GUI est implémenté en C++ et utilise une bibliothèque graphique pour le rendu.
+Le GUI est développé en C++ et utilise une architecture modulaire basée sur le chargement dynamique de bibliothèques (DLLoader) :
+
+- **Core** : Boucle principale, gestion d'événements, coordinateur
+- **NetworkManager** : Communication avec le serveur
+- **Renderer** : Affichage graphique 3D et 2D
+- **CameraController** : Gestion de la caméra et vues
+- **GUI Components** : Éléments d'interface utilisateur
+
+## Système de chargement dynamique (DLLoader)
+
+Le GUI utilise un système de chargement dynamique de bibliothèques pour permettre l'utilisation de différentes implémentations graphiques :
+- Interface `IGraphicsLib` : Définit les fonctions attendues pour les bibliothèques graphiques
+- Interface `IGuiLib` : Définit les fonctions attendues pour les bibliothèques d'interface utilisateur
+- Gestionnaire `LibraryManager` : Permet de charger dynamiquement les bibliothèques
+
+## Visualisation 3D
+
+L'interface utilise RaylibCPP pour le rendu 3D avec les caractéristiques suivantes :
+- Rendu de la carte comme une grille 3D
+- Modèles 3D pour les joueurs et ressources
+- Caméra libre ou modes de suivi
+- Effets visuels pour les événements spéciaux
+
+## Compilation et Exécution
+
+```bash
+# Compilation
+make -C src/GUI
+
+# Exécution
+./zappy_gui -p <port> -h <host>
+```
+
+## Fichiers importants
+- `main.cpp` : Point d'entrée du programme
+- `GameLoop.cpp` : Boucle principale du jeu
+- `network/networkManager/NetworkManager.cpp` : Gestion de la communication réseau
+- `renderer/Renderer.cpp` : Rendu graphique
+- `cameraController/CameraController.cpp` : Contrôle de la caméra
