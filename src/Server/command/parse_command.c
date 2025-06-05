@@ -99,9 +99,14 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     return false;
 }
 
+// if you want to test with telnet
+// (void)team_name;
+// (void)server;
+// return true;
 static bool is_valid_team_name(char *team_name, server_t *server)
 {
-    if (!team_name || !server || !server->parsed_info || !server->parsed_info->names)
+    if (!team_name || !server ||
+        !server->parsed_info || !server->parsed_info->names)
         return false;
     if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
         return false;
@@ -113,7 +118,7 @@ static bool is_valid_team_name(char *team_name, server_t *server)
     return false;
 }
 
-void send_info_new_client(server_t *server, client_t *user)
+static void send_info_new_client(server_t *server, client_t *user)
 {
     char *tmp_string = NULL;
     int len1 = snprintf(NULL, 0, "%d\n", user->client_id);
@@ -131,17 +136,18 @@ void send_info_new_client(server_t *server, client_t *user)
         server->parsed_info->height);
     write_command_output(user->client_fd, tmp_string);
     free(tmp_string);
+    user->is_fully_connected = true;
 }
 
 void execute_com(server_t *server, client_t *user, char *buffer)
 {
-    char *tmp_string = NULL;
-
     if (!user)
         return;
     if (!user->is_fully_connected) {
         if (!is_valid_team_name(buffer, server))
             return write_command_output(user->client_fd, "ko\n");
+        else
+            return send_info_new_client(server, user);
     }
     if (!find_and_execute(server, user, buffer))
         write_command_output(user->client_fd, "ko\n");
