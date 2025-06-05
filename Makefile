@@ -41,6 +41,7 @@ all: display_banner
 	@echo "$(CYAN)[$(BOLD)BUILDING$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de tous les composants...$(RESET)"
 	@sleep 0.3
+	@mkdir -p $(PLUGINS_DIR)
 	@$(MAKE) -C $(SERVER_DIR)
 	@$(MAKE) -C $(LIBS_DIR) static shared
 	@$(MAKE) -C $(GUI_DIR)
