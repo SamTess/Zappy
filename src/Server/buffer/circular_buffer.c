@@ -32,6 +32,9 @@ int find_command_end(circular_buffer_t *cb)
     if (cb->count < 1)
         return -1;
     for (int i = 0; i < cb->count; i++) {
+        if ((cb->buffer[pos] == '\r' && cb->buffer[pos + 1] == '\n')
+            || (cb->buffer[pos] == '\r' && cb->buffer[pos + 1] == '\0'))
+            return -1;
         if (cb->buffer[pos] == '\n')
             return i + 1;
         pos = (pos + 1) % BUFFER_SIZE;

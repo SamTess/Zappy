@@ -61,7 +61,7 @@ static int count_team_eggs(server_t *server, char *team_name)
 
 static void format_response(int available_slots, client_t *client)
 {
-    size_t res_size = sprintf(NULL, "%d\n", available_slots);
+    size_t res_size = snprintf(NULL, 0, "%d\n", available_slots) + 1;
     char *response = malloc(sizeof(char) * res_size);
 
     snprintf(response, res_size, "%d\n", available_slots);

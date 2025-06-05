@@ -77,7 +77,8 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
 // (void)team_name;
 // (void)server;
 // return true;
-static bool is_valid_team_name(char *team_name, server_t *server)
+static bool is_valid_team_name(char *team_name, server_t *server,
+    client_t *user)
 {
     if (!team_name || !server ||
         !server->parsed_info || !server->parsed_info->names)
@@ -86,8 +87,10 @@ static bool is_valid_team_name(char *team_name, server_t *server)
         return false;
     team_name[strlen(team_name) - 1] = '\0';
     for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
-        if (strcmp(team_name, server->parsed_info->names[i]) == 0)
+        if (strcmp(team_name, server->parsed_info->names[i]) == 0){
+            user->player->team_name = strdup(team_name);
             return true;
+        }
     }
     return false;
 }
@@ -118,7 +121,7 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     if (!user)
         return;
     if (!user->is_fully_connected) {
-        if (!is_valid_team_name(buffer, server))
+        if (!is_valid_team_name(buffer, server, user))
             return write_command_output(user->client_fd, "ko\n");
         else
             return send_info_new_client(server, user);

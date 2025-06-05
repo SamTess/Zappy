@@ -27,7 +27,7 @@ static char *repeat_word(char *word, int nb)
     return res;
 }
 
-static int calculate_total_size(int *resources, char *names)
+static int calculate_total_size(int *resources, char **names)
 {
     int non_empty_count = 0;
     int total_size = 2;
