@@ -12,25 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 
-static bool is_client_valid(server_t *server, client_t *target)
+static bool tick_check(server_t *server, client_t *current)
 {
-    client_t *current = server->client;
+    bool dead = false;
 
-    while (current != NULL) {
-        if (current == target)
-            return true;
-        current = current->next;
-    }
-    return false;
-}
-
-static void tick_check(server_t *server, client_t *current)
-{
     if (current != NULL && current->player != NULL)
-        check_player_starvation(server, current);
-    if (is_client_valid(server, current) && current != NULL &&
+        dead = check_player_starvation(server, current);
+    if (dead == false && current != NULL &&
         current->player != NULL)
         finish_incantation(server, current);
+    return dead;
 }
 
 void update_game_tick(server_t *server)
@@ -43,8 +34,7 @@ void update_game_tick(server_t *server)
         current = current->next;
     while (current != NULL) {
         next = current->next;
-        tick_check(server, current);
-        if (is_client_valid(server, current) && current->player &&
+        if (tick_check(server, current) == false && current->player &&
             current->player->busy_until <= server->current_tick &&
             current->player->queue_size > 0)
             process_next_queued_command(server, current);

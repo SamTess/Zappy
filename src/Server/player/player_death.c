@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 void handle_player_death(server_t *server, client_t *client)
 {
@@ -34,9 +35,10 @@ void handle_player_death(server_t *server, client_t *client)
     remove_fd(server, client->client_fd);
 }
 
-void check_player_starvation(server_t *server, client_t *client)
+bool check_player_starvation(server_t *server, client_t *client)
 {
     int food_amount = 0;
+    bool dead = false;
 
     if (!client || !client->player)
         return;
@@ -46,7 +48,10 @@ void check_player_starvation(server_t *server, client_t *client)
         if (food_amount > 0) {
             remove_item_from_inventory(client->player, FOOD, 1);
             client->player->life = MAX_LIFE_AFTER_FOOD;
-        } else
+        } else {
             handle_player_death(server, client);
+            dead = true;
+        }
     }
+    return dead;
 }

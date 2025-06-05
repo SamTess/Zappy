@@ -9,6 +9,7 @@
     #define COMMAND_H_
     #define MAX_LIFE_AFTER_FOOD 126
     #include "server.h"
+    #include <stdbool.h>
 
 typedef struct command_data_s {
     const char **commands;
@@ -40,7 +41,7 @@ void broadcast(server_t *server, client_t *user, char *buffer);
 
 // Death and starvation management functions
 void handle_player_death(server_t *server, client_t *client);
-void check_player_starvation(server_t *server, client_t *client);
+bool check_player_starvation(server_t *server, client_t *client);
 void start_incantation(server_t *server, client_t *client, char *buffer);
 void finish_incantation(server_t *server, client_t *client);
 bool can_start_incantation(server_t *server, client_t *client);
