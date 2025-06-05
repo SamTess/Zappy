@@ -54,6 +54,17 @@ ModelWrap::ModelWrap(const std::string& objPath) {
     model = LoadModel(objPath.c_str());
     if (model.meshCount == 0)
         throw std::runtime_error("Erreur chargement model: " + objPath);
+    bool hasTextures = false;
+    for (int i = 0; i < model.materialCount; i++) {
+        if (model.materials[i].maps[MATERIAL_MAP_DIFFUSE].texture.id > 0) {
+            hasTextures = true;
+            break;
+        }
+    }
+
+    if (!hasTextures && model.materialCount > 0) {
+        std::cout << "Aucune texture chargée automatiquement pour: " << objPath << std::endl;
+    }
 }
 
 ModelWrap::~ModelWrap() {

@@ -12,6 +12,7 @@ on:
       - 'HEAD'
 
 env:
+  TERM: xterm
   MIRROR_URL: https://github.com/EpitechPromo2028/B-YEP-400-NAN-4-1-zappy-samuel.tesson.git
   GITHUB_URL: git@github.com:EpitechPromo2028/B-YEP-400-NAN-4-1-zappy-samuel.tesson.git
   BINARIES: "zappy_gui, zappy_server"
@@ -20,17 +21,45 @@ env:
 
 
 jobs:
+  cancel-if-mirror:
+    name: Cancel if repository is the mirror
+    runs-on: ubuntu-latest
+    outputs:
+      should_cancel: ${{ steps.check-repo-url.outputs.should_cancel }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: check-repo-url
+        name: Check repository URL
+        run: |
+          REPO_URL=$(git config --get remote.origin.url)
+
+          # Normalize URLs by removing any trailing `.git`
+          REPO_URL=${REPO_URL%.git}
+          MIRROR_URL=${MIRROR_URL%.git}
+
+          if [ "$REPO_URL" == "$MIRROR_URL" ]; then
+            echo "Repository URL matches the mirror URL. Skipping further jobs."
+            echo "should_cancel=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Repository URL does not match the mirror URL. Proceeding with other jobs."
+            echo "should_cancel=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build project
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    needs: [cancel-if-mirror]
+    if: needs.cancel-if-mirror.outputs.should_cancel == 'false'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         timeout-minutes: 2
 
       - name: Install dependencies
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           sudo apt-get update
           sudo apt-get install -y make g++ libsfml-dev libcriterion-dev build-essential cmake gcovr \

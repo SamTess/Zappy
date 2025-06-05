@@ -60,7 +60,31 @@ public:
     }
 
     /**
-     * @brief Obtient la bibliothèque graphique chargée
+     * @brief Obtient la bibliothèque graphique chargée comme shared_ptr
+     * @return shared_ptr vers la bibliothèque graphique
+     */
+    std::shared_ptr<IGraphicsLib> getGraphicsLibPtr() {
+        if (!_graphicsLib) {
+            throw std::runtime_error("Bibliothèque graphique non chargée");
+        }
+        // Crée un shared_ptr qui ne détruit pas l'objet (il est déjà géré par _graphicsLib)
+        return std::shared_ptr<IGraphicsLib>(_graphicsLib.get(), [](IGraphicsLib*){});
+    }
+
+    /**
+     * @brief Obtient la bibliothèque GUI chargée comme shared_ptr
+     * @return shared_ptr vers la bibliothèque GUI
+     */
+    std::shared_ptr<IGuiLib> getGuiLibPtr() {
+        if (!_guiLib) {
+            throw std::runtime_error("Bibliothèque GUI non chargée");
+        }
+        // Crée un shared_ptr qui ne détruit pas l'objet (il est déjà géré par _guiLib)
+        return std::shared_ptr<IGuiLib>(_guiLib.get(), [](IGuiLib*){});
+    }
+
+    /**
+     * @brief Obtient la bibliothèque graphique chargée (pour rétrocompatibilité)
      * @return Référence vers la bibliothèque graphique
      */
     IGraphicsLib& getGraphicsLib() {
@@ -71,7 +95,7 @@ public:
     }
 
     /**
-     * @brief Obtient la bibliothèque GUI chargée
+     * @brief Obtient la bibliothèque GUI chargée (pour rétrocompatibilité)
      * @return Référence vers la bibliothèque GUI
      */
     IGuiLib& getGuiLib() {

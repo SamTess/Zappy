@@ -1,103 +1,192 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy Server
+## Zappy Server Makefile
 ## File description:
-## Server Makefile
+## Builds the Zappy server binary
 ##
 
-CC				=	gcc
-CFLAGS			=	-Wextra -Wall -Werror -std=gnu17 -g
-DEBUGFLAGS		=	-ggdb -fsanitize=address
+# Binary name
+NAME = ../../zappy_server
+BUILD_DIR = ../../build/Server
+
+MAIN = main.c
+# Source files
+SRC = 	help.c								\
+		parsing_err.c						\
+		parsing.c							\
+		network/connection_err.c			\
+		network/connection.c				\
+		network/server_run.c				\
+		network/queue_connection.c			\
+		map/map_creation.c					\
+		map/tile.c							\
+		map/tick_update.c					\
+		command/parse_command.c				\
+		command/parse_command_utils.c		\
+		command/forward.c					\
+		command/right.c						\
+		command/left.c						\
+		command/inventory.c					\
+		command/look.c						\
+		command/tile_to_str.c				\
+		command/eject.c						\
+		command/connect_nbr.c				\
+		command/take_object.c				\
+		command/set_object.c				\
+		command/fork.c						\
+		command/start_incantation.c			\
+		command/finish_incantation.c		\
+		command/broadcast.c					\
+		command/pending_cmd_utils.c			\
+		map/egg.c							\
+		player/player_init.c				\
+		player/player_inventory.c			\
+		player/player_inventory_utils.c		\
+		player/player_inventory_display.c	\
+		player/player_death.c				\
+		buffer/circular_buffer.c			\
+
+MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
+MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))
+OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SRC))
+DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(SRC))
 
 # Directories
-SRC_DIR			=	.
-INCLUDE_DIR		=	include
-SHARED_INCLUDE	=	../Shared/include
-BUILD_DIR		= ../../build
+INCLUDE_DIR = include
 
-# Library and binary
-LIB_NAME		= $(BUILD_DIR)/libserver.a
-BINARY_NAME		= ../../zappy_server
+# Compiler and flags
+CC = gcc
+CFLAGS = -Wall -Wextra -I$(INCLUDE_DIR) -fPIC
+LDFLAGS =
+DEBUG_FLAGS = -g3 -ggdb
+COVERAGE_FLAGS = --coverage
 
-# Source files
-MAIN_FILE 		= 	main.c
+# Colors and animations
+RED = \033[31m
+GREEN = \033[32m
+YELLOW = \033[33m
+BLUE = \033[34m
+MAGENTA = \033[35m
+CYAN = \033[36m
+WHITE = \033[37m
+BOLD = \033[1m
+RESET = \033[0m
 
-SRCS			=	help.c								\
-					parsing_err.c						\
-					parsing.c							\
-					network/connection_err.c			\
-					network/connection.c				\
-					network/server_run.c				\
-					network/queue_connection.c			\
-					map/map_creation.c					\
-					map/tile.c							\
-					map/tick_update.c					\
-					command/parse_command.c				\
-					command/parse_command_utils.c		\
-					command/forward.c					\
-					command/right.c						\
-					command/left.c						\
-					command/inventory.c					\
-					command/look.c						\
-					command/tile_to_str.c				\
-					command/eject.c						\
-					command/connect_nbr.c				\
-					command/take_object.c				\
-					command/set_object.c				\
-					command/fork.c						\
-					command/start_incantation.c			\
-					command/finish_incantation.c		\
-					command/broadcast.c					\
-					command/pending_cmd_utils.c			\
-					map/egg.c							\
-					player/player_init.c				\
-					player/player_inventory.c			\
-					player/player_inventory_utils.c		\
-					player/player_inventory_display.c	\
-					player/player_death.c				\
-					buffer/circular_buffer.c			\
+# Animation frames
+COMPILE_MSG = "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)"
+LINKING_MSG = "$(GREEN)[$(BOLD)LINKING$(RESET)$(GREEN)]$(RESET)"
+SUCCESS_MSG = "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET)"
+BG_BLACK = \033[40m
 
-OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
+# Main target
+all: setup_dirs display_banner $(NAME)
 
-# Includes
-INCLUDES		=	-Iinclude -I../Shared/include
+# Create the necessary build directories
+setup_dirs:
+	@mkdir -p $(BUILD_DIR)/player
+	@mkdir -p $(BUILD_DIR)/network
+	@mkdir -p $(BUILD_DIR)/map
+	@mkdir -p ../../build
 
-# Colors
-RED				=	\033[0;91m
-GREEN			=	\033[0;92m
-YELLOW			=	\033[0;93m
-BLUE			=	\033[0;94m
-CYAN			=	\033[0;96m
-RESET			=	\033[0m
+# Display a fancy banner for the build process
+display_banner:
+	@clear
+	@echo "$(CYAN)╔═══════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(GREEN)$(BOLD)Z A P P Y   S E R V E R   \
+	B U I L D E R$(RESET)  $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═══════════════════════════════════════════╝$(RESET)"
+	@echo ""
+	@echo "$(BLUE)[$(BOLD)INFO$(RESET)$(BLUE)]$(RESET) $(BOLD)Préparation \
+	du serveur Zappy...$(RESET)"
+	@sleep 0.3
 
-all: $(LIB_NAME) $(BINARY_NAME)
+# Build the server
+$(NAME): $(OBJ) $(MAIN_OBJ)
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Liaison \
+	du serveur Zappy...$(RESET)"
+	@for i in `seq 1 21`; do \
+		progress=$$(( i > 20 ? 20 : i )); \
+		echo -n "$(GREEN)[$(BOLD)PROGRESS$(RESET)$(GREEN)]$(RESET) $(BOLD)["; \
+		for j in `seq 1 $$progress`; do echo -n "▰"; done; \
+		for j in `seq $$progress 19`; do echo -n "▱"; done; \
+		echo -n "] $$(( i > 20 ? 100 : 5 * i ))%$(RESET)\r"; \
+		sleep 0.05; \
+	done
+	@echo ""
+	@$(CC) $(CFLAGS) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(LDFLAGS)
+	@echo "$(CYAN)[$(BOLD)LIB$(RESET)$(CYAN)]$(RESET) $(BOLD)Création de \
+	la bibliothèque statique...$(RESET)"
+	@ar rc ../../build/libserver.a $(OBJ)
+	@ranlib ../../build/libserver.a
+	@sleep 0.2
+	@echo ""
+	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Serveur \
+	compilé avec succès : $(NAME)$(RESET)"
+	@echo "$(CYAN)╔════════════════════════════════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Le serveur est prêt à être \
+	utilisé !$(RESET)      $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚════════════════════════════════════════════╝$(RESET)"
 
-$(LIB_NAME): $(OBJ_FILES)
-	@mkdir -p $(BUILD_DIR)
-	@ar rcs $(LIB_NAME) $(OBJ_FILES)
-
-$(BINARY_NAME): $(OBJ_FILES) $(LIB_NAME)
-	@echo -e "$(GREEN)Compiling server binary...$(RESET)"
-	@$(CC) -o $(BINARY_NAME) $(MAIN_FILE) $(OBJ_FILES) $(LIB_NAME) \
-		$(CFLAGS) $(INCLUDES)
-
-$(BUILD_DIR)/Server/%.o: %.c
+# Rule for object files
+$(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
-	@echo -e "$(BLUE)Compiling $< into $@...$(RESET)"
-	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	@echo -n "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)\
+	 $(notdir $<)... "
+	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+	@echo "$(GREEN)✓$(RESET)"
 
-debug: CFLAGS += $(DEBUGFLAGS)
-debug: all
+# Debug build
+debug: CFLAGS += $(DEBUG_FLAGS)
+debug: clean all
+	@echo "$(MAGENTA)[$(BOLD)DEBUG$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
+	debug activé !$(RESET)"
 
+# Coverage build for tests
+coverage: CFLAGS += $(COVERAGE_FLAGS)
+coverage: LDFLAGS += $(COVERAGE_FLAGS)
+coverage: clean all
+	@echo "$(MAGENTA)[$(BOLD)COVERAGE$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
+	couverture activé pour le serveur !$(RESET)"
+	@echo "$(CYAN)╔═════════════════════════════════════════\
+	═════╗$(RESET)"
+	@echo "$(CYAN)║  $(YELLOW)$(BOLD)Serveur compilé avec \
+	instrumentation$(RESET)        $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚═════════════════════════════════════════\
+	═════╝$(RESET)"
+
+# Clean object files
 clean:
-	@echo -e "$(YELLOW)Cleaning server objects...$(RESET)"
-	@rm -f $(BUILD_DIR)/Server/*.o
+	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Suppression des fichiers objets...$(RESET)"
+	@rm -rf $(BUILD_DIR)
+	@sleep 0.3
+	@for i in `seq 1 10`; do \
+		echo -n "$(YELLOW)[$(BOLD)CLEAN$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Progression: ["; \
+		for j in `seq 1 $$i`; do echo -n "▓"; done; \
+		for j in `seq $$i 10`; do echo -n "░"; done; \
+		echo -n "]$(RESET)\r"; \
+		sleep 0.1; \
+	done
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Nettoyage effectué !$(RESET)       "
 
+# Clean everything (including binary)
 fclean: clean
-	@echo -e "$(RED)Cleaning server binary and library...$(RESET)"
-	@rm -f $(BINARY_NAME)
-	@rm -f $(LIB_NAME)
+	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) \
+	$(BOLD)Suppression du binaire...$(RESET)"
+	@rm -f $(NAME)
+	@rm -f ../../build/libserver.a
+	@sleep 0.3
+	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Nettoyage complet effectué !$(RESET)"
 
+# Clean and rebuild
 re: fclean all
 
-.PHONY: all debug clean fclean re
+# Include dependency files
+-include $(DEP)
+-include $(MAIN_DEP)
+
+.PHONY: all clean fclean re debug coverage setup_dirs
