@@ -110,7 +110,7 @@ void broadcast(server_t *server, client_t *user, char *buffer)
     char *message;
     client_t *current;
 
-    if (strlen(buffer) <= 10) {
+    if (strlen(buffer) <= 11 || buffer[strlen(buffer) - 1] != '\n') {
         write_command_output(user->client_fd, "ko\n");
         return;
     }
