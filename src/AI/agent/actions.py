@@ -27,24 +27,23 @@ def take_all_of_item_here(agent, item):
     surroundings = agent.send_command("Look")
 
 def go_take_item(agent, item):
-  surroundings = agent.send_command("Look")
-  closetest_item_distance = zappy.get_closest_of_item(surroundings, item)
-
   nb_turns = 0
   i = 0
-  while zappy.get_closest_of_item(surroundings, item) == -1:
-    if nb_turns >= 3:
-      for _ in range(agent.level * i):
-        agent.send_command("Forward")
-      i += 1
-      nb_turns = 0
-    nb_turns += 1
-    agent.send_command("Left")
-    surroundings = agent.send_command("Look")
-    if i > 3:
-      break
 
-  if closetest_item_distance == 0:
+  while True:
+    surroundings = agent.send_command("Look")
+    closest_item_distance = zappy.get_closest_of_item(surroundings, item)
+    if closest_item_distance != -1 or i > 4:
+      break
+    agent.send_command("Right")
+    nb_turns += 1
+    if nb_turns > 3:
+      i += 1
+      for _ in range(i * agent.level):
+        agent.send_command("Forward")
+      nb_turns = 0
+
+  if closest_item_distance == 0:
     take_all_of_item_here(agent, item)
     return
 
