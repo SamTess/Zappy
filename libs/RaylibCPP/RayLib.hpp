@@ -24,7 +24,7 @@ class RayLib : public IGraphicsLib {
 public:
     RayLib();
     ~RayLib() override;
-    // Fenêtre
+
     void InitWindow(int width, int height, const std::string& title) override;
     void CloseWindow() override;
     bool WindowShouldClose() override;
@@ -32,10 +32,9 @@ public:
     void EndDrawing() override;
     void ClearBackground(ZappyTypes::Color color) override;
 
-    // Formes 2D
     void DrawRectangle(int x, int y, int width, int height, ZappyTypes::Color color) override;
     void DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Color color) override;
-    // Formes 3D
+
     void DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
     void DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) override;
     void DrawPlane(ZappyTypes::Vector3 centerPos, ZappyTypes::Vector2 size, ZappyTypes::Color color) override;
@@ -57,6 +56,12 @@ public:
     bool IsKeyPressed(int key) override;
     bool IsKeyDown(int key) override;
     bool IsMouseButtonPressed(int button) override;
+    bool IsMouseButtonDown(int button) override;
+    bool IsMouseButtonReleased(int button) override;
+    int GetMouseX() override;
+    int GetMouseY() override;
+    ZappyTypes::Vector2 GetMousePosition() override;
+    float GetMouseWheelMove() override;
 
     // Audio
     void PlaySound(const std::string& path) override;
@@ -81,6 +86,7 @@ public:
     // Modèles 3D
     void LoadModel3D(const std::string& path) override;
     void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override;
+    void DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override;
     void UnloadModel3D() override;
 
 private:

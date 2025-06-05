@@ -10,7 +10,10 @@
 namespace raylibcpp {
 
 Camera2DWrap::Camera2DWrap() {
-    camera = {0};
+    camera.offset = (Vector2){0.0f, 0.0f};
+    camera.target = (Vector2){0.0f, 0.0f};
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
 }
 
 Camera2DWrap::~Camera2DWrap() {}
@@ -20,7 +23,6 @@ Camera2D& Camera2DWrap::get() {
 }
 
 Camera3DWrap::Camera3DWrap() {
-    camera = {0};
     camera.position = (Vector3){4.0f, 4.0f, 10.0f};
     camera.target = (Vector3){0.0f, 1.0f, 0.0f};
     camera.up = (Vector3){0.0f, 1.0f, 0.0f};

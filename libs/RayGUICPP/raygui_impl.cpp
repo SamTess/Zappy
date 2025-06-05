@@ -13,7 +13,7 @@
 
 // Définir RAYGUI_IMPLEMENTATION pour générer le code d'implémentation
 #define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+#include "raygui-4.0/src/raygui.h"
 
 // Inclure l'adaptateur après pour avoir les fonctions de conversion
 #include "../TypeAdapter.hpp"
