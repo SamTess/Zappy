@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include "../raygui-4.0/src/raygui.h"
+#include "../raygui/src/raygui.h"
 
 namespace RayGUICPP {
 
