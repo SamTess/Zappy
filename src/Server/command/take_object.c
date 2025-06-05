@@ -43,6 +43,7 @@ void take_object(server_t *server, client_t *client, char *buffer)
         [client->player->pos_x].resources[resource_type] > 0) {
         server->map[client->player->pos_y]
         [client->player->pos_x].resources[resource_type]--;
+        server->current_resources[resource_type]--;
         add_item_to_inventory(client->player, resource_type, 1);
         write_command_output(client->client_fd, "ok\n");
     } else {
