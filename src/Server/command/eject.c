@@ -62,6 +62,8 @@ static char *get_string_to_send(float x, float y)
 {
     char *string_to_send = malloc(sizeof(char) * 10);
 
+    if (!string_to_send)
+        malloc_failed(18);
     sprintf(string_to_send, "eject: %d\n", direction_push(x, y));
     return string_to_send;
 }

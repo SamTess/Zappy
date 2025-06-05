@@ -20,6 +20,10 @@ static void malloc_failed_cinq(int i)
         perror("Realloc failed for res in add_resources");
         exit(84);
     }
+    if (i == 18){
+        perror("Malloc failed in get_string_to_send");
+        exit(84);
+    }
 }
 
 static void malloc_failed_quat(int i)
