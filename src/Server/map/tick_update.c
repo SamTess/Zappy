@@ -8,6 +8,7 @@
 #include "../include/server.h"
 #include "../include/command.h"
 #include "../include/player.h"
+#include "../include/pending_cmd_utils.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -34,6 +35,9 @@ void update_game_tick(server_t *server)
         current = current->next;
     while (current != NULL) {
         next = current->next;
+        if (current->player && current->player->pending_cmd &&
+            current->player->busy_until <= server->current_tick)
+            execute_pending_cmd(server, current);
         if (tick_check(server, current) == false && current->player &&
             current->player->busy_until <= server->current_tick &&
             current->player->queue_size > 0)

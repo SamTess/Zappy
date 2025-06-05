@@ -79,17 +79,20 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
 // return true;
 static bool is_valid_team_name(char *team_name, server_t *server)
 {
-    if (!team_name || !server ||
-        !server->parsed_info || !server->parsed_info->names)
-        return false;
-    if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
-        return false;
-    team_name[strlen(team_name) - 1] = '\0';
-    for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
-        if (strcmp(team_name, server->parsed_info->names[i]) == 0)
-            return true;
-    }
-    return false;
+    (void)team_name;
+    (void)server;
+    return true;
+    // if (!team_name || !server ||
+    //     !server->parsed_info || !server->parsed_info->names)
+    //     return false;
+    // if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
+    //     return false;
+    // team_name[strlen(team_name) - 1] = '\0';
+    // for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
+    //     if (strcmp(team_name, server->parsed_info->names[i]) == 0)
+    //         return true;
+    // }
+    // return false;
 }
 
 static void send_info_new_client(server_t *server, client_t *user)
