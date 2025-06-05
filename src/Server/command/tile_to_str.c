@@ -43,6 +43,8 @@ static char *add_resources(int *resources)
             strcat(res, " ");
         } else
             res = realloc(res, strlen(res) + strlen(temp) + 1);
+        if (!res)
+            malloc_failed(17);
         strcat(res, temp);
         free(temp);
     }

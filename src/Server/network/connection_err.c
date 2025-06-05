@@ -14,9 +14,18 @@
 #include <errno.h>
 #include <arpa/inet.h>
 
+static void malloc_failed_cinq(int i)
+{
+    if (i == 17){
+        perror("Realloc failed for res in add_resources");
+        exit(84);
+    }
+}
 
 static void malloc_failed_quat(int i)
 {
+    if (i > 16)
+        malloc_failed_cinq(i);
     if (i == 13){
         perror("Malloc failed for res final look");
         exit(84);
