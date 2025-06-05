@@ -36,6 +36,7 @@ void connect_nbr(server_t *server, client_t *client, char *buffer);
 void take_object(server_t *server, client_t *client, char *buffer);
 void set_object(server_t *server, client_t *client, char *buffer);
 void fork_c(server_t *server, client_t *client, char *buffer);
+void broadcast(server_t *server, client_t *user, char *buffer);
 
 // Death and starvation management functions
 void handle_player_death(server_t *server, client_t *client);
@@ -43,5 +44,6 @@ void check_player_starvation(server_t *server, client_t *client);
 void start_incantation(server_t *server, client_t *client, char *buffer);
 void finish_incantation(server_t *server, client_t *client);
 bool can_start_incantation(server_t *server, client_t *client);
+command_data_t get_command_data(void);
 
 #endif /* !COMMAND_H_ */

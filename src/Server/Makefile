@@ -47,12 +47,15 @@ SRCS			=	help.c								\
 					command/fork.c						\
 					command/start_incantation.c			\
 					command/finish_incantation.c		\
+					command/broadcast.c					\
+					command/pending_cmd_utils.c			\
 					map/egg.c							\
 					player/player_init.c				\
 					player/player_inventory.c			\
 					player/player_inventory_utils.c		\
 					player/player_inventory_display.c	\
 					player/player_death.c				\
+					buffer/circular_buffer.c			\
 
 OBJ_FILES		= $(SRCS:%.c=$(BUILD_DIR)/Server/%.o)
 

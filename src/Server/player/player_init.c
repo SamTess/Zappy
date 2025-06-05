@@ -22,6 +22,13 @@ void init_new_player_pos(server_t *server, client_t *new_client)
     tile_add_player(&server->map[random_y][random_x], new_client->client_id);
 }
 
+static void init_pending(player_t *player)
+{
+    player->pending_cmd = calloc(1, sizeof(pending_cmd_t));
+    player->pending_cmd->args = NULL;
+    player->pending_cmd->func = NULL;
+}
+
 void init_player(player_t *player, char *playerTeam)
 {
     player->pos_x = 0;
@@ -43,4 +50,5 @@ void init_player(player_t *player, char *playerTeam)
     init_inventory(player);
     player->is_in_incantation = false;
     player->incantation_leader_id = -1;
+    init_pending(player);
 }

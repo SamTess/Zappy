@@ -7,6 +7,7 @@
 #include "../include/server.h"
 #include "../include/command.h"
 #include "../include/player.h"
+#include "../include/pending_cmd_utils.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>

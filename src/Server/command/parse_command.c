@@ -6,19 +6,19 @@
 */
 #include "../include/command.h"
 #include "../include/server.h"
+#include "../include/pending_cmd.h"
+#include "../include/circular_buffer.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-static int check_disconnect(int bytes_read, client_t *user,
-    server_t *server, char *buffer)
+static int check_disconnect(int bytes_read, client_t *user, server_t *server)
 {
     if (bytes_read <= 0) {
-        if (bytes_read == 0){
+        if (bytes_read == 0) {
             cleanup_client(user);
             remove_fd(server, user->client_poll->fd);
-            free(buffer);
             return 1;
         }
         return 1;
@@ -26,43 +26,16 @@ static int check_disconnect(int bytes_read, client_t *user,
     return 0;
 }
 
-static int manage_buffer(char **buffer, int *b_size, char byte)
-{
-    char *new_buffer = realloc(*buffer, (*b_size + 2) * sizeof(char));
-
-    if (!new_buffer){
-        perror("Realloc failed");
-        exit(84);
-    }
-    *buffer = new_buffer;
-    (*buffer)[*b_size] = byte;
-    *b_size += 1;
-    if (*b_size >= 2 && (*buffer)[*b_size - 2] == '\r' &&
-        (*buffer)[*b_size - 1] == '\n')
-        return 1;
-    return 0;
-}
-
-static int check_buffer_size(int b_size, char *buffer, client_t *user)
-{
-    if (b_size > 8192) {
-        write(user->client_fd, "trop long", strlen("trop long"));
-        free(buffer);
-        return 1;
-    }
-    return 0;
-}
-
-static command_data_t get_command_data(void)
+command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
-        "Incantation", "Fork", NULL};
+        "Incantation", "Fork", "Broadcast", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
-        fork_c, NULL};
-    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42};
+        fork_c, broadcast, NULL};
+    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7};
     command_data_t data = {comm_char, comm_func, comm_times};
 
     return data;
@@ -74,7 +47,8 @@ static bool execute_if_free(server_t *server, client_t *user,
     command_data_t data = get_command_data();
 
     if (user->player->busy_until <= server->current_tick) {
-        data.functions[cmd_index](server, user, buffer);
+        user->player->pending_cmd->args = strdup(buffer);
+        user->player->pending_cmd->func = data.functions[cmd_index];
         if (data.times[cmd_index] > 0)
             user->player->busy_until =
                 server->current_tick + data.times[cmd_index];
@@ -153,23 +127,38 @@ void execute_com(server_t *server, client_t *user, char *buffer)
         write_command_output(user->client_fd, "ko\n");
 }
 
+static void check_command(circular_buffer_t *temp_buffer, int cmd_length,
+    server_t *server, client_t *user)
+{
+    char *command;
+
+    command = extract_command(temp_buffer, cmd_length);
+    if (command) {
+        execute_com(server, user, command);
+        free(command);
+    }
+}
+
 void get_message(server_t *server, client_t *user)
 {
-    char *buffer = calloc(2, sizeof(char));
-    int b_size = 0;
+    circular_buffer_t temp_buffer;
     char byte;
     int bytes_read;
+    int cmd_length;
 
-    while (1){
+    init_circular_buffer(&temp_buffer);
+    while (1) {
         bytes_read = read(user->client_poll->fd, &byte, 1);
-        if (check_disconnect(bytes_read, user, server, buffer) == 1)
+        if (check_disconnect(bytes_read, user, server) == 1)
             return;
-        if (manage_buffer(&buffer, &b_size, byte) == 1)
+        if (add_to_circular_buffer(&temp_buffer, byte) == -1) {
+            write(user->client_fd, "trop long", strlen("trop long"));
+            return;
+        }
+        cmd_length = find_command_end(&temp_buffer);
+        if (cmd_length > 0) {
+            check_command(&temp_buffer, cmd_length, server, user);
             break;
-        if (check_buffer_size(b_size, buffer, user) == 1)
-            return;
+        }
     }
-    buffer[b_size] = '\0';
-    execute_com(server, user, buffer);
-    free(buffer);
 }
