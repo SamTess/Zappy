@@ -3,32 +3,6 @@ import termios
 import tty
 import select
 
-def read_line(sock):
-    line = b""
-    while True:
-        ready, _, _ = select.select([sock], [], [], 0)
-        if not ready:
-            break
-
-        char = sock.recv(1)
-        if not char:
-            break
-        line += char
-        if char == b'\n':
-            break
-    return line.decode('utf-8').strip()
-
-def read_line_blocking(sock):
-    line = b""
-    while True:
-        char = sock.recv(1)
-        if not char:
-            break
-        line += char
-        if char == b'\n':
-            break
-    return line.decode('utf-8').strip()
-
 def get_key():
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
