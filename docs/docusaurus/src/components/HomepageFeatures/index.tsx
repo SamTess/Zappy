@@ -11,32 +11,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Serveur multi-joueurs',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Le serveur gère la logique du jeu, les règles et l'état du monde où les 
+        agents évoluent et collectent des ressources pour s'élever.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Interface graphique',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        L'interface graphique permet de visualiser en temps réel l'état du jeu, les joueurs,
+        leurs actions et les ressources sur une carte en 3D.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Intelligence artificielle',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Des clients IA autonomes qui prennent des décisions pour explorer, collecter des 
+        ressources et collaborer afin de gagner le jeu.
       </>
     ),
   },

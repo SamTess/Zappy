@@ -10,10 +10,10 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://epitech.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/Zappy/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -27,8 +27,8 @@ const config: Config = {
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: 'fr',
+    locales: ['fr', 'en'],
   },
 
   presets: [
@@ -40,23 +40,9 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/Epitech/Zappy/tree/main/docs/docusaurus/',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-          // Useful options to enforce blogging best practices
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        // blog section removed as it's not needed for Zappy documentation
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -66,11 +52,11 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/zappy-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: 'Zappy',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'Zappy Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -78,11 +64,36 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Documentation',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
+          type: 'docSidebar',
+          sidebarId: 'tutorialSidebar',
+          position: 'left',
+          label: 'Serveur',
+          to: '/docs/server',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'tutorialSidebar', 
+          position: 'left',
+          label: 'GUI',
+          to: '/docs/gui',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'tutorialSidebar',
+          position: 'left',
+          label: 'AI',
+          to: '/docs/ai',
+        },
+
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/Epitech/Zappy',
           label: 'GitHub',
           position: 'right',
         },
@@ -92,46 +103,51 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Documentation',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Introduction',
               to: '/docs/intro',
             },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'Guide de démarrage',
+              to: '/docs/getting-started',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'X',
-              href: 'https://x.com/docusaurus',
+              label: 'Architecture',
+              to: '/docs/architecture',
             },
           ],
         },
         {
-          title: 'More',
+          title: 'Composants',
           items: [
             {
-              label: 'Blog',
-              to: '/blog',
+              label: 'Serveur',
+              to: '/docs/server',
             },
+            {
+              label: 'Interface Graphique',
+              to: '/docs/gui',
+            },
+            {
+              label: 'Intelligence Artificielle',
+              to: '/docs/ai',
+            },
+          ],
+        },
+        {
+          title: 'Liens',
+          items: [
+
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/Epitech/Zappy',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Epitech, Projet Zappy. Construit avec Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

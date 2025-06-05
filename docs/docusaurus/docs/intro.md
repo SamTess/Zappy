@@ -2,46 +2,58 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Zappy - Introduction
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Bienvenue dans la documentation de **Zappy**, un écosystème virtuel multi-agents avec serveur de jeu, interface graphique et intelligence artificielle.
 
-## Getting Started
+## Qu'est-ce que Zappy ?
 
-Get started by **creating a new site**.
+Zappy est un projet multi-composants développé en C/C++ et Python, reproduisant un écosystème virtuel où des agents contrôlés par IA évoluent en collectant des ressources, en communiquant, et en réalisant des rituels d'élévation.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Composants principaux
 
-### What you'll need
+Le projet se compose de trois éléments principaux :
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+- **Serveur** : Écrit en C, il gère la logique du jeu, les règles, et l'état du monde
+- **Interface Graphique** : Développée en C++, elle visualise l'état du jeu en temps réel
+- **Clients IA** : Implémentés en Python, ils contrôlent automatiquement les joueurs pour accomplir des objectifs stratégiques
 
-## Generate a new site
+## Prérequis
 
-Generate a new Docusaurus site using the **classic template**.
+Pour compiler et exécuter Zappy, vous aurez besoin de :
 
-The classic template will automatically be added to your project after you run the command:
+- Compilateur C/C++ (GCC ou Clang)
+- Python 3.x
+- Make
+- Bibliothèques de développement graphique (pour le client GUI)
 
-```bash
-npm init docusaurus@latest my-website classic
+## Architecture simplifiée
+
+Les composants communiquent via des protocoles réseau TCP/IP :
+
+```
+┌────────┐    Commandes/Réponses    ┌──────────┐
+│        │◄────────────────────────►│          │
+│ Client │                          │          │
+│  (IA)  │                          │          │
+│        │                          │          │
+└────────┘                          │          │
+                                    │ Serveur  │
+┌────────┐    Données de jeu        │          │
+│        │◄────────────────────────►│          │
+│  GUI   │                          │          │
+│        │                          │          │
+└────────┘                          └──────────┘
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+## Comment utiliser cette documentation
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+Cette documentation est organisée par sections :
 
-## Start your site
+- **Premiers pas** : Installation et configuration du projet
+- **Architecture** : Vue d'ensemble de la conception
+- **Serveur** : Documentation du composant serveur
+- **Interface graphique** : Documentation de la visualisation
+- **IA** : Documentation des clients intelligents
 
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Explorez la barre latérale pour accéder aux différentes sections.
