@@ -24,6 +24,7 @@ typedef struct server_s {
     parsing_info_t *parsed_info;
 } server_t;
 
+void update_game_tick(server_t *server);
 void finish_incantation(server_t *server, client_t *client);
 void display_help(void);
 void remove_fd(server_t *server, int fd);
