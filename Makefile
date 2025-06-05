@@ -37,7 +37,7 @@ BOLD=\033[1m
 RESET=\033[0m
 BG_BLACK=\033[40m
 
-all: display_banner
+all: display_banner check_submodules
 	@echo "$(CYAN)[$(BOLD)BUILDING$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de tous les composants...$(RESET)"
 	@sleep 0.3
@@ -134,6 +134,38 @@ install_ai:
 	@$(MAKE) -C $(AI_DIR) install
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
 	 IA installées avec succès !$(RESET)"
+
+check_submodules:
+	@echo "$(CYAN)[$(BOLD)SUBMODULES$(RESET)$(CYAN)]$(RESET) \
+	$(BOLD)Vérification des sous-modules git...$(RESET)"
+	@if [ -z "$$(git submodule status 2>/dev/null)" ]; then \
+		echo "$(YELLOW)[$(BOLD)WARNING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Aucun sous-module trouvé, initialisation...$(RESET)"; \
+		git submodule init && git submodule update --recursive; \
+		if [ $$? -eq 0 ]; then \
+			echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Sous-modules initialisés avec succès !$(RESET)"; \
+		else \
+			echo "$(RED)[$(BOLD)ERROR$(RESET)$(RED)]$(RESET) \
+	$(BOLD)Échec d'initialisation des sous-modules.$(RESET)"; \
+			exit 1; \
+		fi; \
+	elif [ -n "$$(git submodule status | grep ^-)" ]; then \
+		echo "$(YELLOW)[$(BOLD)WARNING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Sous-modules non initialisés, mise à jour...$(RESET)"; \
+		git submodule init && git submodule update --recursive; \
+		if [ $$? -eq 0 ]; then \
+			echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Sous-modules initialisés avec succès !$(RESET)"; \
+		else \
+			echo "$(RED)[$(BOLD)ERROR$(RESET)$(RED)]$(RESET) \
+	$(BOLD)Échec d'initialisation des sous-modules.$(RESET)"; \
+			exit 1; \
+		fi; \
+	else \
+		echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Tous les sous-modules sont déjà initialisés !$(RESET)"; \
+	fi
 
 init:
 	@echo "$(CYAN)[$(BOLD)INIT$(RESET)$(CYAN)]$(RESET) $(BOLD)Initialisation\
@@ -255,6 +287,6 @@ style_cpp: fclean
 	 cpplint terminée$(RESET)"
 
 .PHONY: all zappy_server zappy_gui zappy_ai tests tests_run \
-debug install_ai init clean fclean re coverage \
+debug install_ai init check_submodules clean fclean re coverage \
 docs docusaurus-build docusaurus-serve docusaurus-start docusaurus-deploy \
 style style_cpp test_network_gui
