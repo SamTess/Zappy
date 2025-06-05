@@ -84,7 +84,7 @@ void push_client(server_t *server, client_t *client, float x, float y)
                 tmp->player->pos_x = new_x;
                 tmp->player->pos_y = new_y;
                 tile_add_player(&server->map[new_y][new_x], tmp->client_id);
-                write_command_output(client->client_fd, string_to_send);
+                write_command_output(tmp->client_fd, string_to_send);
         }
         tmp = tmp->next;
     }
