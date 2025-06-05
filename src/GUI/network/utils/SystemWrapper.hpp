@@ -125,7 +125,7 @@ std::unique_ptr<T[]> makeUniqueArray(size_t size) {
 
 template<typename T>
 std::shared_ptr<T[]> makeSharedArray(size_t size) {
-    return std::make_shared<T[]>(size);
+    return std::shared_ptr<T[]>(new T[size], std::default_delete<T[]>());
 }
 
 // Exécution avec timeout

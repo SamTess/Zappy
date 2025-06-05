@@ -180,7 +180,7 @@ public:
 class ScrollPanel {
 public:
     static Rectangle Draw(const Rectangle& bounds, const std::string& text, Rectangle content, std::shared_ptr<Vector2> scroll) {
-        Rectangle view = {0};
+        Rectangle view = {0.0f, 0.0f, 0.0f, 0.0f};
         if (!scroll) return view;
         Vector2 temp = *scroll;
         GuiScrollPanel(bounds, text.c_str(), content, &temp, &view);
