@@ -1,43 +1,65 @@
 #!/usr/bin/env python3
 import sys
-import threading
+import os
+import signal
 from time import sleep
-from agent.agent import ClientAI
+from agent.agent import Agent
 from parser.paringArgsClass import parseArgs
 
+
 def run_agent(ip, port, team, agent_id):
+  try:
+    ai = Agent(ip, port, team, agent_id)
+    ai.start()
+  except Exception as e:
+    print(f"Agent {agent_id} failed: {e}")
+    sys.exit(1)
+
+def signal_handler(sig, frame):
+  for pid in child_pids:
     try:
-        ai = ClientAI(ip, port, team, agent_id)
-        ai.run()
-    except Exception as e:
-        print(f"Agent {agent_id}: Failed to start: {e}")
+      os.kill(pid, signal.SIGTERM)
+    except ProcessLookupError:
+      pass
+  sys.exit(0)
 
 if __name__ == "__main__":
-    args = parseArgs()
-    num_agents = 10
-    port = args.getPort()
-    ip = args.getMachine()
-    team = args.getName()
 
-    print(f"Starting {num_agents} agents for team {team} on {ip}:{port}")
+  for i in range(17):
+    get_nb_rows_to_item(i)
+  # print("Number of rows to reach item:", nb_rows)
+  if 1:
+    sys.exit(0)
 
-    threads = []
+  args = parseArgs()
+  num_agents = 1
+  port = args.getPort()
+  ip = args.getMachine()
+  team = args.getName()
 
-    for i in range(num_agents):
-        thread = threading.Thread(target=run_agent, args=(ip, port, team, i))
-        thread.daemon = True
-        threads.append(thread)
-        thread.start()
-        print(f"Started agent {i}")
-        sleep(0.1)
+  print(f"Starting {num_agents} agents for team {team} on {ip}:{port}")
 
-    try:
-        for thread in threads:
-            thread.join()
-    except KeyboardInterrupt:
-        print("\nShutting down all agents...")
-        sys.exit(0)
+  child_pids = []
 
+  signal.signal(signal.SIGINT, signal_handler)
+  signal.signal(signal.SIGTERM, signal_handler)
 
-    print("IA started successfully!")
-    exit(0)
+  for i in range(num_agents):
+    pid = os.fork()
+
+    if pid == 0:
+      run_agent(ip, port, team, i)
+      sys.exit(0)
+    else:
+      child_pids.append(pid)
+      print(f"Started agent {i} with PID {pid}")
+      sleep(0.1)
+
+  print("IA started successfully!")
+
+  try:
+    for pid in child_pids:
+      os.waitpid(pid, 0)
+  except KeyboardInterrupt:
+    pass
+  print("All agents completed")
