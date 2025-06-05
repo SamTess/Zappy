@@ -25,6 +25,8 @@ resource_type_t determine_type(char *resource_string)
         return MENDIANE;
     if (strncmp(resource_string, "phiras", 6) == 0)
         return PHIRAS;
+    if (strncmp(resource_string, "thystame", 8) == 0)
+        return THYSTAME;
     return COUNT;
 }
 
