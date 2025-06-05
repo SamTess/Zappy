@@ -68,7 +68,7 @@ class SocketManager:
 
 
 # envoie une commande et attend une réponse
-  def send_command(self, command, timeout=2.0):
+  def send_command(self, command, timeout=4.0):
     if command is None:
       print("Command is None, not sending.")
       return None

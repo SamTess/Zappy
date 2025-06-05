@@ -25,12 +25,6 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
 
-  for i in range(17):
-    get_nb_rows_to_item(i)
-  # print("Number of rows to reach item:", nb_rows)
-  if 1:
-    sys.exit(0)
-
   args = parseArgs()
   num_agents = 1
   port = args.getPort()
