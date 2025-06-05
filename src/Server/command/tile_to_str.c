@@ -27,26 +27,53 @@ static char *repeat_word(char *word, int nb)
     return res;
 }
 
+static int calculate_total_size(int *resources, char *names)
+{
+    int non_empty_count = 0;
+    int total_size = 2;
+
+    for (int i = 0; i < COUNT; ++i) {
+        if (resources[i] > 0) {
+            total_size += (strlen(names[i]) *
+                resources[i]) + (resources[i] - 1);
+            non_empty_count++;
+        }
+    }
+    if (non_empty_count > 1)
+        total_size += non_empty_count - 1;
+    return total_size;
+}
+
+static char *format_str_resources(char *names,
+    int resources, int first_resource, char *res)
+{
+    char *temp = repeat_word(names, resources);
+
+    if (!first_resource)
+        strcat(res, " ");
+    return temp;
+}
+
 static char *add_resources(int *resources)
 {
     char *names[COUNT] = {"food", "linemate", "deraumere", "sibur", "mendiane",
         "phiras", "thystame"};
-    char *res = strdup("");
+    size_t total_size = calculate_total_size(resources, names);
+    char *res = malloc(total_size);
+    int first_resource = 1;
     char *temp;
 
     if (!res)
         malloc_failed(15);
+    res[0] = '\0';
     for (int i = 0; i < COUNT; ++i) {
-        temp = repeat_word(names[i], resources[i]);
-        if (strlen(res) && strlen(temp)) {
-            res = realloc(res, strlen(res) + strlen(temp) + 2);
-            strcat(res, " ");
-        } else
-            res = realloc(res, strlen(res) + strlen(temp) + 1);
-        if (!res)
-            malloc_failed(17);
-        strcat(res, temp);
-        free(temp);
+        if (resources[i] > 0) {
+            temp = format_str_resources(names[i], resources[i],
+                first_resource, res);
+            strcat(res, temp);
+            free(temp);
+            first_resource = 0;
+        }
     }
     return res;
 }
