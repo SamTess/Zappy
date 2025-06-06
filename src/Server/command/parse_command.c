@@ -104,7 +104,7 @@ static void send_info_new_client(server_t *server, client_t *user)
         server->parsed_info->height);
 
     tmp_string = malloc(len1 + 1);
-    sprintf(tmp_string, "%d\n", user->client_id);
+    sprintf(tmp_string, "%d\n", server->parsed_info->client_nb);
     write_command_output(user->client_fd, tmp_string);
     free(tmp_string);
     tmp_string = malloc(len2 + 1);
