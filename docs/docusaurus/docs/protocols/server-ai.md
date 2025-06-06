@@ -53,6 +53,11 @@ Ce document détaille le protocole de communication entre le serveur Zappy et le
 
 Objets possibles : `player`, `food`, `linemate`, `deraumere`, `sibur`, `mendiane`, `phiras`, `thystame`, `egg`
 
+Le résultat de la commande `Look` est une liste de tuiles visibles, organisées comme suit:
+- La première tuile est celle où se trouve le joueur
+- Les tuiles suivantes s'organisent en cercles concentriques autour du joueur
+- Le nombre de tuiles visibles dépend du niveau du joueur
+
 #### Inventory
 ```
 {food <n>, linemate <n>, deraumere <n>, sibur <n>, mendiane <n>, phiras <n>, thystame <n>}
@@ -61,10 +66,16 @@ Objets possibles : `player`, `food`, `linemate`, `deraumere`, `sibur`, `mendiane
 #### Broadcast
 - Les joueurs reçoivent : `message <direction>, <message>\n`
 - Direction : nombre de 1 à 8 représentant la direction du message
+  - 1 = Nord, 2 = Nord-Est, 3 = Est, 4 = Sud-Est, 5 = Sud, 6 = Sud-Ouest, 7 = Ouest, 8 = Nord-Ouest
 
 #### Incantation
 1. Serveur répond immédiatement : `Elevation underway\n`
-2. À la fin de l'incantation : `Current level: <level>\n` ou échec
+2. À la fin de l'incantation : `Current level: <level>\n` ou échec avec `ko\n`
+
+Pour démarrer une incantation:
+- Tous les joueurs participants doivent être sur la même case
+- Les ressources nécessaires doivent être présentes sur la case
+- Tous les joueurs doivent être du même niveau
 
 ## Conditions d'élévation
 
@@ -78,9 +89,39 @@ Objets possibles : `player`, `food`, `linemate`, `deraumere`, `sibur`, `mendiane
 | 6→7 | 6 | 1 | 2 | 3 | 0 | 1 | 0 |
 | 7→8 | 6 | 2 | 2 | 2 | 2 | 2 | 1 |
 
-## Mort du joueur
+## Champ de vision
 
-Si un joueur meurt (manque de nourriture), le serveur ferme la connexion.
+Le champ de vision dépend du niveau du joueur et s'étend en cercles concentriques autour de lui:
+
+| Niveau | Zones visibles |
+|--------|---------------|
+| 1 | 1 (case actuelle) + 8 (cercle 1) = 9 cases |
+| 2 | 9 + 16 (cercle 2) = 25 cases |
+| 3 | 25 + 24 (cercle 3) = 49 cases |
+| Et ainsi de suite... |  |
+
+## Messages serveur non sollicités
+
+L'IA peut recevoir certains messages du serveur sans les avoir demandés:
+
+| Message | Description |
+|---------|-------------|
+| `message <direction>, <message>\n` | Message de broadcast reçu d'un autre joueur |
+| `dead\n` | Le joueur est mort (manque de nourriture) |
+| `eject: <direction>\n` | Le joueur a été éjecté par un autre joueur |
+
+## Logique de nourriture
+
+- Chaque joueur commence avec une certaine quantité de nourriture (food)
+- La nourriture est consommée à un taux constant (par défaut: 126 unités de temps)
+- Si la nourriture atteint zéro, le joueur meurt et la connexion est fermée
+
+## Système d'œufs
+
+Quand un joueur utilise la commande `Fork`:
+1. Un nouvel œuf est créé sur la même case que le joueur
+2. Cet œuf permet à un nouveau joueur de rejoindre l'équipe
+3. L'éclosion de l'œuf se produit lorsqu'un nouveau client se connecte
 
 ## Exemple d'échange
 
@@ -96,4 +137,8 @@ CLIENT: Forward\n
 SERVER: ok\n
 CLIENT: Inventory\n
 SERVER: {food 9, linemate 0, deraumere 0, sibur 0, mendiane 0, phiras 0, thystame 0}\n
+CLIENT: Broadcast Hello team!\n
+SERVER: ok\n
+CLIENT: Take food\n
+SERVER: ok\n
 ```
