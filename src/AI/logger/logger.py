@@ -34,4 +34,3 @@ class Logger:
 
     def critical(self, message: str):
         self.log(message, LogLevel.CRITICAL)
-

@@ -3,6 +3,7 @@ import sys
 from time import sleep
 from agent.socketManager import SocketManager
 from agent.decisionManager import DecisionManager
+import agent.actions as actions
 from logger.logger import Logger
 
 class Agent:
@@ -10,8 +11,12 @@ class Agent:
     try:
       self.ip = ip
       self.port = port
+
+      self.level = 1
       self.team = team
       self.agent_id = agent_id
+      self.map_size_x = None
+      self.map_size_y = None
 
       self.decisionManager = DecisionManager(self)
       self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.agent_id}): ")
@@ -33,9 +38,12 @@ class Agent:
 
 
   def start(self):
-    welcome_msg = self.get_message(timeout=2)
+    welcome_msg = self.get_message(timeout=4)
     team_slots = self.send_command(self.team)
-    map_size = self.get_message(timeout=2)
+    map_size = self.get_message(timeout=4)
+
+    self.map_size_x = int(map_size.split()[0])
+    self.map_size_y = int(map_size.split()[1])
 
     if welcome_msg == "WELCOME":
       print(f"Welcome message {welcome_msg}")
@@ -62,11 +70,12 @@ class Agent:
 
 
   def run(self):
+
     while self.socketManager.running:
       try:
 
         self.decisionManager.process_server_message()
-        self.decisionManager.take_next_decision()
+        self.decisionManager.take_action()
 
         sleep(0.1)
 
@@ -83,6 +92,24 @@ class Agent:
 
   def has_messages(self):
     return self.socketManager.has_messages()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # def process_server_messages(self):
     #     while True:
     #         server_message = inputs.read_line(self.sock)
