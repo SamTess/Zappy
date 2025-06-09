@@ -4,7 +4,8 @@
 ** File description:
 ** parsing
 */
-#include "parsing.h"
+#include "../include/parsing.h"
+#include "../include/server.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -109,15 +110,15 @@ static bool is_dup_flag(char **av, int current_pos, char *flag,
 
 static int check_other_flags(char **av, int i, parsing_info_t *parsed_info)
 {
-    if (strcmp(av[i], "-n") == 0 && !is_dup_flag(av, i, "-n ", parsed_info)){
+    if (strcmp(av[i], "-n") == 0 && !is_dup_flag(av, i, "-n", parsed_info)){
         parsed_info->names = parse_names(av, i);
         return 1;
     }
-    if (strcmp(av[i], "-c") == 0 && !is_dup_flag(av, i, "-c ", parsed_info)){
+    if (strcmp(av[i], "-c") == 0 && !is_dup_flag(av, i, "-c", parsed_info)){
         parsed_info->client_nb = parse_client_nb(av, i, parsed_info);
         return 1;
     }
-    if (strcmp(av[i], "-f") == 0 && !is_dup_flag(av, i, "-f ", parsed_info)){
+    if (strcmp(av[i], "-f") == 0 && !is_dup_flag(av, i, "-f", parsed_info)){
         parsed_info->frequence = parse_frequence(av, i, parsed_info);
         return 1;
     }
@@ -126,22 +127,22 @@ static int check_other_flags(char **av, int i, parsing_info_t *parsed_info)
 
 static void check_args(char **av, int i, parsing_info_t *parsed_info)
 {
-    if (strcmp(av[i], "-p") == 0 && !is_dup_flag(av, i, "-p ", parsed_info)){
+    if (strcmp(av[i], "-p") == 0 && !is_dup_flag(av, i, "-p", parsed_info)){
         parsed_info->port = parse_port(av, i, parsed_info);
         return;
     }
-    if (strcmp(av[i], "-x") == 0 && !is_dup_flag(av, i, "-x ", parsed_info)){
+    if (strcmp(av[i], "-x") == 0 && !is_dup_flag(av, i, "-x", parsed_info)){
         parsed_info->width = parse_coordinates(av, i, parsed_info);
         return;
     }
-    if (strcmp(av[i], "-y") == 0 && !is_dup_flag(av, i, "-y ", parsed_info)){
+    if (strcmp(av[i], "-y") == 0 && !is_dup_flag(av, i, "-y", parsed_info)){
         parsed_info->height = parse_coordinates(av, i, parsed_info);
         return;
     }
     if (check_other_flags(av, i, parsed_info) == 1)
         return;
     if (av[i][0] == '-'){
-        printf("%s\n", av[i]);
+        display_help();
         exit(84);
     }
 }
