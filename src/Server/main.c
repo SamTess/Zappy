@@ -30,7 +30,7 @@ static void sigint_handler(int signum)
 
 static int setup_signal_handler(void)
 {
-    struct sigaction sa;
+    struct sigaction sa = {0};
 
     sa.sa_handler = sigint_handler;
     sigemptyset(&sa.sa_mask);
