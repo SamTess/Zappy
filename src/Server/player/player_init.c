@@ -27,6 +27,8 @@ static egg_t *find_egg_for_team(server_t *server, char *team_name)
     return NULL;
 }
 
+//! The second update of client position is a fallback maybe
+//! need more error handling
 void init_new_player_pos(server_t *server, client_t *new_client)
 {
     int random_x = rand() % server->parsed_info->width;
