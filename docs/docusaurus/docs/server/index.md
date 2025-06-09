@@ -56,3 +56,36 @@ Le serveur envoie des mises à jour au client GUI pour lui permettre de visualis
 ## Implémentation
 
 Le serveur est implémenté en C et utilise les sockets POSIX pour la communication réseau et un modèle de programmation événementiel pour gérer plusieurs clients simultanément.
+
+## Structure des fichiers
+
+Le code du serveur est organisé comme suit :
+- `main.c` : Point d'entrée du programme
+- `parsing.c` : Analyse des arguments de la ligne de commande
+- `network/*.c` : Gestion des connexions réseau
+- `map/*.c` : Gestion de la carte et des ressources
+- `player/*.c` : Gestion des joueurs et des commandes
+
+## Compilation et Exécution
+
+```bash
+# Compilation
+make -C src/Server
+
+# Exécution
+./zappy_server -p <port> -x <width> -y <height> -n <team_names> -c <clients_per_team> -f <freq>
+```
+
+## Mécanismes importants
+
+### Gestion des ressources
+Le serveur génère aléatoirement les ressources sur la carte et les renouvelle à intervalles réguliers en fonction de la fréquence configurée.
+
+### Gestion du temps
+Toutes les actions dans le jeu sont mesurées en unités temporelles. Le serveur utilise un système de file d'attente pour gérer les actions qui doivent être exécutées après un certain délai.
+
+### Montée de niveau
+Le jeu comprend un système de montée de niveau basé sur des rituels d'incantation qui nécessitent :
+- Un nombre spécifique de joueurs
+- Des combinaisons précises de ressources
+- Tous les joueurs doivent être au même niveau
