@@ -10,7 +10,44 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
-#include "include/server.h"
+#include <signal.h>
+#include "../include/server.h"
+
+static int *get_running_flag(void)
+{
+    static int keep_running = 1;
+
+    return &keep_running;
+}
+
+static void sigint_handler(int signum)
+{
+    int *flag = get_running_flag();
+
+    (void)signum;
+    *flag = 0;
+}
+
+static int setup_signal_handler(void)
+{
+    struct sigaction sa = {0};
+
+    sa.sa_handler = sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        perror("Failed to setup SIGINT handler");
+        return -1;
+    }
+    return 0;
+}
+
+static int should_continue_running(void)
+{
+    int *keep_running = get_running_flag();
+
+    return *keep_running;
+}
 
 static int check_mini_args(int ac, char **av)
 {
@@ -43,10 +80,10 @@ static void disp_args(parsing_info_t *parsed_info)
 
 static void server_loop(server_t *server)
 {
-    while (1) {
+    while (should_continue_running()) {
         check_client(server);
     }
-    close(server->s_fd);
+    printf("Server is shutting down\n");
 }
 
 static void set_rdm_seed(void)
@@ -74,6 +111,8 @@ int main(int ac, char **av)
         display_help();
         return 0;
     }
+    if (setup_signal_handler() == -1)
+        server_err("Couldn't setup signal handler");
     parse_args(ac, av, &parsed_info);
     disp_args(&parsed_info);
     create_server(&server, &parsed_info);
@@ -81,5 +120,7 @@ int main(int ac, char **av)
     create_map(&server, &parsed_info);
     init_server_eggs(&server);
     server_loop(&server);
+    free_all(&server, &parsed_info);
+    close(server.s_fd);
     return 0;
 }
