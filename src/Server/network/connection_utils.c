@@ -32,7 +32,6 @@ static void create_server_egg(server_t *n_server, int egg_id, int i)
     egg_t *n_egg = create_egg(egg_id, pos_x, pos_y,
         n_server->parsed_info->names[i]);
 
-    egg_id++;
     if (n_egg == NULL)
         server_err("Error in egg creation");
     add_egg(n_server, n_egg);
@@ -47,6 +46,7 @@ void init_server_eggs(server_t *n_server)
     for (int i = 0; i < team_count; i++) {
         for (int j = 0; j < eggs_per_team; j++) {
             create_server_egg(n_server, egg_id, i);
+            egg_id++;
         }
     }
 }
