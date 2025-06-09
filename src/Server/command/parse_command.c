@@ -86,9 +86,15 @@ static bool is_valid_team_name(char *team_name, server_t *server,
     if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
         return false;
     team_name[strlen(team_name) - 1] = '\0';
+    if (strcmp(team_name, "GRAPHIC") == 0) {
+        user->type = GRAPHICAL;
+        user->player = NULL;
+        return true;
+    }
     for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
         if (strcmp(team_name, server->parsed_info->names[i]) == 0){
             user->player->team_name = strdup(team_name);
+            user->type = AI;
             return true;
         }
     }
@@ -123,7 +129,11 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     if (!user->is_fully_connected) {
         if (!is_valid_team_name(buffer, server, user))
             return write_command_output(user->client_fd, "ko\n");
-        else
+        if (user->type == GRAPHICAL) {
+            add_graphical_reference(server, user);
+            send_map_info_to_one_client(server, user);
+            return;
+        } else
             return send_info_new_client(server, user);
     }
     if (!find_and_execute(server, user, buffer))

@@ -19,6 +19,7 @@ SRC = 	help.c								\
 		network/server_run.c				\
 		network/queue_connection.c			\
 		network/client_node.c 				\
+		network/graphical_client.c			\
 		map/map_creation.c					\
 		map/tile.c							\
 		map/tick_update.c					\
@@ -48,6 +49,13 @@ SRC = 	help.c								\
 		player/player_inventory_display.c	\
 		player/player_death.c				\
 		buffer/circular_buffer.c			\
+		graphical_command/command_bct.c		\
+		graphical_command/command_msz.c		\
+		graphical_command/command_pin.c		\
+		graphical_command/command_plv.c		\
+		graphical_command/command_pnw.c		\
+		graphical_command/command_sgt.c		\
+		graphical_command/command_tna.c		\
 
 MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))
@@ -59,7 +67,7 @@ INCLUDE_DIR = include
 
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra -I$(INCLUDE_DIR) -fPIC
+CFLAGS = -Wall -Wextra -I$(INCLUDE_DIR) -fPIC -Wextra -Werror
 LDFLAGS =
 DEBUG_FLAGS = -g3 -ggdb
 COVERAGE_FLAGS = --coverage
