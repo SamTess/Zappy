@@ -28,6 +28,8 @@ static bool remove_head_client(server_t *server, int fd)
         printf("Error: Attempting to remove server listening socket\n");
         return true;
     }
+    if (current->type == GRAPHICAL)
+        remove_graphical_reference(server, current);
     server->client = current->next;
     free_node(current);
     server->nfds -= 1;
@@ -49,6 +51,8 @@ static bool remove_other_client(server_t *server, int fd)
         printf("Error: Client with fd %d not found during removal\n", fd);
         return false;
     }
+    if (current->type == GRAPHICAL)
+        remove_graphical_reference(server, current);
     client_id = current->client_id;
     prev->next = current->next;
     free_node(current);
@@ -168,6 +172,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
 {
     server->nfds = 0;
     server->client = NULL;
+    server->graphical_clients = NULL;
     server->s_fd = 0;
     server->serv_add = NULL;
     server->current_tick = 0;

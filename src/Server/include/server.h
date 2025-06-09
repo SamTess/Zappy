@@ -18,6 +18,7 @@ typedef struct server_s {
     int s_fd;
     struct sockaddr_in *serv_add;
     client_t *client;
+    graphical_client_t *graphical_clients;
     egg_t *eggs;
     tile_t **map;
     int current_tick;
