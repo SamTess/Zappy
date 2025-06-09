@@ -12,6 +12,7 @@ BUILD_DIR = ../../build/Server
 MAIN = main.c
 # Source files
 SRC = 	help.c								\
+		free.c								\
 		parsing_err.c						\
 		parsing.c							\
 		network/connection_err.c			\

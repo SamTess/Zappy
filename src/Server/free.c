@@ -10,11 +10,15 @@
 
 static void free_command_queue(player_t *player)
 {
+    if (!player || !player->command_queue)
+        return;
     for (int i = 0; i < player->queue_size; i++) {
         free(player->command_queue[i]);
+        player->command_queue[i] = NULL;
     }
     free(player->command_queue);
     player->command_queue = NULL;
+    player->queue_size = 0;
 }
 
 static void free_client_player(client_t *current_client)
@@ -23,14 +27,13 @@ static void free_client_player(client_t *current_client)
 
     free(player->team_name);
     player->team_name = NULL;
-    if (player->inventory) {
+    if (player->inventory){
         free_inventory(player);
         player->inventory = NULL;
     }
     if (player->command_queue)
-        free_command_queue(current_client->player);
-    player->queue_size = 0;
-    if (player->pending_cmd) {
+        free_command_queue(player);
+    if (player->pending_cmd){
         free(player->pending_cmd->args);
         player->pending_cmd->args = NULL;
         free(player->pending_cmd);
@@ -53,7 +56,6 @@ static void free_client(server_t *server)
         current_client->client_poll = NULL;
         free(current_client->client_add);
         current_client->client_add = NULL;
-        close(current_client->client_fd);
         free(current_client);
         current_client = next_client;
     }
@@ -77,18 +79,19 @@ static void free_eggs(server_t *server)
 
 static void free_tiles(server_t *server, int i, parsing_info_t *parsed_info)
 {
-    if (server->map[i]) {
-        for (int j = 0; j < parsed_info->width; j++) {
-            tile_free(&server->map[i][j]);
-        }
-        free(server->map[i]);
-        server->map[i] = NULL;
+    if (!server || !server->map || !server->map[i] || !parsed_info)
+        return;
+    for (int j = 0; j < parsed_info->width; j++) {
+        tile_free(&server->map[i][j]);
     }
+    free(server->map[i]);
+    server->map[i] = NULL;
 }
 
 static void free_map(server_t *server, parsing_info_t *parsed_info)
 {
-    if (server->map && parsed_info && parsed_info->height > 0 && parsed_info->width > 0) {
+    if (server->map && parsed_info && parsed_info->height > 0
+        && parsed_info->width > 0) {
         for (int i = 0; i < parsed_info->height; i++) {
             free_tiles(server, i, parsed_info);
         }
@@ -103,16 +106,16 @@ static void free_map(server_t *server, parsing_info_t *parsed_info)
     server->current_resources = NULL;
 }
 
-static void free_parsed_info(parsing_info_t *parsed_info)
+static void free_parsed_info_contents(parsing_info_t *p_info)
 {
-    if (parsed_info->names) {
-        for (int i = 0; parsed_info->names[i] != NULL; i++) {
-            free(parsed_info->names[i]);
-            parsed_info->names[i] = NULL;
-        }
-        free(parsed_info->names);
-        parsed_info->names = NULL;
+    if (!p_info || !p_info->names)
+        return;
+    for (int i = 0; p_info->names[i] != NULL; i++) {
+        free(p_info->names[i]);
+        p_info->names[i] = NULL;
     }
+    free(p_info->names);
+    p_info->names = NULL;
 }
 
 void free_all(server_t *server, parsing_info_t *parsed_info)
@@ -123,7 +126,5 @@ void free_all(server_t *server, parsing_info_t *parsed_info)
     free_eggs(server);
     free_map(server, parsed_info);
     if (parsed_info)
-        free_parsed_info(parsed_info);
-    if (server->parsed_info)
-        free_parsed_info(server->parsed_info);
+        free_parsed_info_contents(parsed_info);
 }
