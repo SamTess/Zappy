@@ -20,7 +20,6 @@
 #include "../protocol/HeaderMessage.hpp"
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
-#include "../buffer/CircularBuffer.hpp"
 #include "../../graphicalContext/GraphicalContext.hpp"
 
 class NetworkManager {
@@ -40,6 +39,7 @@ class NetworkManager {
         // Callback pour les changements de statut de connexion
         using ConnectionCallback = std::function<void(bool)>;
         void setConnectionCallback(ConnectionCallback callback);
+        void networkThreadLoop();
 
     private:
         std::unique_ptr<TcpConnection> _connection;
@@ -47,7 +47,7 @@ class NetworkManager {
         std::unique_ptr<NetworkThread> _networkThread;
         std::unique_ptr<MessageQueue> _incomingQueue;
         std::unique_ptr<MessageQueue> _outgoingQueue;
-        std::shared_ptr<CircularBuffer> _receiveBuffer;
+        std::string _receiveBuffer;
         std::unique_ptr<GraphicalContext> _graphicalContext;
 
         bool _isConnected;
@@ -59,22 +59,20 @@ class NetworkManager {
         ConnectionCallback _connectionCallback;
 
         // Méthodes de gestion du thread réseau
-        void networkThreadLoop();
-        void tryReceiveInitialWelcome(std::shared_ptr<bool> welcomeReceived);
-        int receiveAndProcessData(int errorCount, int maxErrors, std::shared_ptr<bool> welcomeReceived);
-        void processReceivedData(std::shared_ptr<bool> welcomeReceived);
+        bool tryReceiveInitialWelcome();
+        bool processInitialWelcomeData();
+        int receiveAndProcessData(int errorCount, int maxErrors);
+        void processReceivedData();
+        void extractCompleteMessages();
         int handleReceiveError(int errorCount, int maxErrors, const std::exception& e);
         int processPendingOutgoingMessages(int errorCount, int maxErrors);
         int handleNetworkThreadError(int errorCount, int maxErrors, const std::exception& e);
 
-        // Méthodes de traitement des messages entrants
         void processIncomingMessage(const std::string& message);
         void handleWelcomeMessage(const std::string& message);
         void handleRegularMessage(const std::string& message);
-        void executeMessageCallback(const std::string& message);
         void handleInvalidMessage(const std::string& message, const std::exception& e);
 
-        // Méthodes pour l'envoi des commandes
         bool validateConnectionForSending();
         std::string formatCommand(const std::string& command);
         void logOutgoingCommand(const std::string& formattedCommand);

@@ -22,7 +22,7 @@ NetworkManager::NetworkManager()
       _networkThread(std::make_unique<NetworkThread>()),
       _incomingQueue(std::make_unique<MessageQueue>()),
       _outgoingQueue(std::make_unique<MessageQueue>()),
-      _receiveBuffer(std::make_shared<CircularBuffer>()),
+      _receiveBuffer(""),
       _graphicalContext(std::make_unique<GraphicalContext>()),
       _isConnected(false) {
 }
@@ -85,7 +85,6 @@ void NetworkManager::sendCommand(const std::string& command) {
     if (!validateConnectionForSending()) {
         return;
     }
-
     std::string finalCommand = formatCommand(command);
     logOutgoingCommand(finalCommand);
     queueCommandForSending(finalCommand);
@@ -123,16 +122,19 @@ void NetworkManager::queueCommandForSending(const std::string& formattedCommand)
 void NetworkManager::networkThreadLoop() {
     int errorCount = 0;
     const int maxErrors = 3;
-    std::shared_ptr<bool> welcomeReceived = std::make_shared<bool>(false);
     NetworkLogger::get().log("Network thread started");
-    tryReceiveInitialWelcome(welcomeReceived);
+    if (!tryReceiveInitialWelcome()) {
+        NetworkLogger::get().log("Failed to receive WELCOME message, exiting network thread");
+        return;
+    }
     while (_networkThread->isRunning()) {
         if (!_isConnected) {
             NetworkLogger::get().log("Network thread: connection lost, exiting...");
             break;
         }
         try {
-            errorCount = receiveAndProcessData(errorCount, maxErrors, welcomeReceived);
+            errorCount = receiveAndProcessData(errorCount, maxErrors);
+            processIncomingMessages();
             errorCount = processPendingOutgoingMessages(errorCount, maxErrors);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         } catch (const std::exception& e) {
@@ -145,37 +147,52 @@ void NetworkManager::networkThreadLoop() {
     NetworkLogger::get().log("Network thread exited");
 }
 
-void NetworkManager::tryReceiveInitialWelcome(std::shared_ptr<bool> welcomeReceived) {
-    try {
-        if (!*welcomeReceived) {
-            return;
+bool NetworkManager::processInitialWelcomeData() {
+    size_t pos = 0;
+    while ((pos = _receiveBuffer.find('\n')) != std::string::npos) {
+        std::string message = _receiveBuffer.substr(0, pos + 1);
+        _receiveBuffer.erase(0, pos + 1);
+        NetworkLogger::get().log(std::string("Initial message extracted: ") + message);
+        if (message.find("WELCOME") != std::string::npos) {
+            NetworkLogger::get().log("WELCOME message received during initialization");
+            handleWelcomeMessage(message);
+            return true;
+        } else {
+            _incomingQueue->enqueue(message);
         }
-        for (int i = 0; i < 30 && _networkThread->isRunning() && !*welcomeReceived; ++i) {
+    }
+    return false;
+}
+
+bool NetworkManager::tryReceiveInitialWelcome() {
+    try {
+        for (int i = 0; i < 30 && _networkThread->isRunning(); ++i) {
             std::string data = _connection->receive();
             if (!data.empty()) {
-                NetworkLogger::get().log(std::string("Initial data received: ") + data);
-                if (data.find("WELCOME") != std::string::npos) {
-                    *welcomeReceived = true;
-                    _incomingQueue->enqueue(data);
-                } else {
-                    _receiveBuffer->write(data);
+                _receiveBuffer += data;
+                if (processInitialWelcomeData()) {
+                    processPendingOutgoingMessages(0, 3);
+                    return true;
                 }
-                break;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        NetworkLogger::get().log("[ERROR] Timeout waiting for WELCOME message");
+        return false;
     } catch (const std::exception& e) {
         NetworkLogger::get().log(std::string("[ERROR] Error receiving initial welcome: ") + e.what());
+        return false;
     }
 }
 
-int NetworkManager::receiveAndProcessData(int errorCount, int maxErrors, std::shared_ptr<bool> welcomeReceived) {
+int NetworkManager::receiveAndProcessData(int errorCount, int maxErrors) {
     try {
         std::string data = _connection->receive();
         if (!data.empty()) {
-            NetworkLogger::get().log(std::string("Data received (") + std::to_string(data.size()) + " bytes): " + (data.size() > 20 ? data.substr(0, 20) + "..." : data));
-            _receiveBuffer->write(data);
-            processReceivedData(welcomeReceived);
+            NetworkLogger::get().log(std::string("Data received (") +
+            std::to_string(data.size()) + " bytes): " + (data.size() > 20 ? data.substr(0, 20) + "..." : data));
+            _receiveBuffer += data;
+            processReceivedData();
             return 0;
         }
         return errorCount;
@@ -184,20 +201,19 @@ int NetworkManager::receiveAndProcessData(int errorCount, int maxErrors, std::sh
     }
 }
 
-void NetworkManager::processReceivedData(std::shared_ptr<bool> welcomeReceived) {
-    if (!welcomeReceived) {
-        return;
-    }
-    while (true) {
-        std::string message = _protocolParser->extractMessage(_receiveBuffer);
-        if (message.empty())
-            break;
-        NetworkLogger::get().log(std::string("Message extracted: ") + message);
-        if (!(*welcomeReceived) && message.find("WELCOME") != std::string::npos) {
-            *welcomeReceived = true;
-            NetworkLogger::get().log("WELCOME message received in main loop");
+void NetworkManager::processReceivedData() {
+    extractCompleteMessages();
+}
+
+void NetworkManager::extractCompleteMessages() {
+    size_t pos = 0;
+    while ((pos = _receiveBuffer.find('\n')) != std::string::npos) {
+        std::string message = _receiveBuffer.substr(0, pos + 1);
+        _receiveBuffer.erase(0, pos + 1);
+        if (!message.empty()) {
+            NetworkLogger::get().log(std::string("Message extracted: ") + message);
+            _incomingQueue->enqueue(message);
         }
-        _incomingQueue->enqueue(message);
     }
 }
 
@@ -255,16 +271,14 @@ int NetworkManager::handleNetworkThreadError(int errorCount, int maxErrors, cons
 
 void NetworkManager::processIncomingMessages() {
     std::string message;
-    while (!(message = _incomingQueue->dequeue()).empty())
+    while (!(message = _incomingQueue->dequeue()).empty()) {
+        NetworkLogger::get().log(std::string("Processing incoming message: ") + message);
         processIncomingMessage(message);
+    }
 }
 
 void NetworkManager::processIncomingMessage(const std::string& message) {
     NetworkLogger::get().log(std::string("[RECV] ") + message);
-    if (message.find("WELCOME") != std::string::npos) {
-        handleWelcomeMessage(message);
-        return;
-    }
     try {
         handleRegularMessage(message);
     } catch (const std::exception& e) {
@@ -292,12 +306,9 @@ void NetworkManager::handleWelcomeMessage(const std::string& message) {
 
 void NetworkManager::handleRegularMessage(const std::string& message) {
     Message parsedMessage = _protocolParser->parseMessage(message);
+
     if (_graphicalContext)
         _graphicalContext->updateContext(parsedMessage);
-    executeMessageCallback(message);
-}
-
-void NetworkManager::executeMessageCallback(const std::string& message) {
     MessageCallback localCallback;
     {
         std::lock_guard<std::mutex> lock(_mutex);
@@ -310,6 +321,11 @@ void NetworkManager::executeMessageCallback(const std::string& message) {
             localCallback(cmdParams.first, cmdParams.second);
         } catch (const std::exception& e) {
             NetworkLogger::get().log(std::string("[ERROR] Error in message callback: ") + e.what());
+            try {
+                localCallback("RAW", message);
+            } catch (const std::exception& e2) {
+                NetworkLogger::get().log(std::string("[ERROR] Error in raw message callback: ") + e2.what());
+            }
         }
     }
 }
