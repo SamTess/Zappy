@@ -17,7 +17,7 @@ static int get_total_size_tile(int i, char ***tiles,
 
     *tiles = malloc(num_tiles * sizeof(char *));
     if (!*tiles)
-        malloc_failed(10);
+        server_err("Malloc failed for tiles array");
     for (int j = 0; j < num_tiles; j++) {
         (*tiles)[j] = check_rota_tiles(user, server, i, j);
         if (!(*tiles)[j])
@@ -36,7 +36,7 @@ static char *format_tile(size_t total_len, char **tiles, int num_tiles)
     char *res = malloc(sizeof(char) * total_len);
 
     if (!res)
-        malloc_failed(11);
+        server_err("Malloc failed for res formatting");
     res[0] = '\0';
     for (int j = 0; j < num_tiles; j++) {
         if (j > 0)
@@ -72,7 +72,7 @@ static int get_total_size(char ***level_tiles,
 
     *level_tiles = malloc(num_levels * sizeof(char *));
     if (!*level_tiles)
-        malloc_failed(12);
+        server_err("Malloc failed for tiles allocation");
     for (int i = 0; i <= user->player->level; i++) {
         (*level_tiles)[i] = look_tiles(user, server, i);
         if (!(*level_tiles)[i])
@@ -89,7 +89,7 @@ static char *format_look(size_t total_len, char **level_tiles, client_t *user)
     char *res = malloc(sizeof(char) * total_len);
 
     if (!res)
-        malloc_failed(13);
+        server_err("Malloc failed for res final look");
     strcpy(res, "[");
     for (int i = 0; i <= user->player->level; i++) {
         if (i > 0)

@@ -66,13 +66,13 @@ void init_player(player_t *player, char *playerTeam)
     player->queue_size = 0;
     player->command_queue = calloc(10, sizeof(char *));
     if (player->command_queue == NULL)
-        malloc_failed(5);
+        server_err("Malloc failed for command queue");
     player->level = 1;
     player->life = 126;
     if (playerTeam != NULL) {
         player->team_name = strdup(playerTeam);
         if (player->team_name == NULL)
-            malloc_failed(4);
+            server_err("Strdup failed for player team name");
     } else
         player->team_name = NULL;
     init_inventory(player);
