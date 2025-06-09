@@ -164,6 +164,10 @@ std::string& SafeBuffer::data() {
     return _buffer;
 }
 
+void SafeBuffer::setData(const std::string& data) {
+    _buffer = data;
+}
+
 const std::string& SafeBuffer::data() const {
     return _buffer;
 }

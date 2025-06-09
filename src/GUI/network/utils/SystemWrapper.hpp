@@ -80,7 +80,7 @@ public:
     size_t size() const;
     void resize(size_t newSize);
     std::string toString() const;
-
+    void setData(const std::string& data);
 private:
     std::string _buffer;
 };
