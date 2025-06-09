@@ -34,8 +34,8 @@ void fork_c(server_t *server, client_t *client, char *buffer)
         return;
     }
     egg_id = get_next_egg_id(server);
-    new_egg = create_egg(egg_id, client->client_id,
-        client->player->pos_x, client->player->pos_y);
+    new_egg = create_egg(egg_id, client->player->pos_x, client->player->pos_y,
+        client->player->team_name);
     if (!new_egg) {
         write_command_output(client->client_fd, "ko\n");
         return;

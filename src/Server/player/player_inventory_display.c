@@ -31,7 +31,7 @@ static void process_one_item(player_inventory_t item, char **content,
     if (!item_str)
         return;
     item_length = strlen(item_str);
-    *content_length += item_length + 2;
+    *content_length += item_length + 3;
     *content = realloc(*content, *content_length);
     if (!*content) {
         free(item_str);

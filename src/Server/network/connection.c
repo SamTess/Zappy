@@ -71,10 +71,10 @@ static client_t *init_new_client(int fd)
     client_t *new_c = calloc(1, sizeof(client_t));
 
     if (!new_c)
-        malloc_failed(1);
+        server_err("New client allocation failed");
     new_c->client_poll = calloc(1, sizeof(struct pollfd));
     if (!new_c->client_poll)
-        malloc_failed(2);
+        server_err("Poll fd struct allocation in new client struct failed");
     new_c->client_poll->fd = fd;
     new_c->client_poll->events = POLLIN;
     new_c->client_poll->revents = 0;
@@ -85,7 +85,7 @@ static client_t *init_new_client(int fd)
     new_c->player = calloc(1, sizeof(player_t));
     new_c->is_fully_connected = false;
     if (new_c->player == NULL)
-        malloc_failed(3);
+        server_err("Failed to allocate player");
     init_player(new_c->player, NULL);
     return new_c;
 }
@@ -145,7 +145,7 @@ static void copy_names(server_t *server, parsing_info_t *parsed_info)
     }
     server->parsed_info->names = calloc(i + 1, sizeof(char *));
     if (server->parsed_info->names == NULL)
-        malloc_failed(6);
+        server_err("Malloc failed for parsing info names copy into server");
     for (int j = 0; parsed_info->names[j] != NULL; j++){
         server->parsed_info->names[j] = strdup(parsed_info->names[j]);
     }
@@ -157,7 +157,7 @@ void init_server_resources(server_t *server)
     server->total_resources = malloc(sizeof(int) * COUNT);
     server->current_resources = malloc(sizeof(int) * COUNT);
     if (server->total_resources == NULL || server->current_resources == NULL)
-        malloc_failed(9);
+        server_err("Malloc failed for allocating resource counters");
     for (int i = 0; i < COUNT; i++) {
         server->total_resources[i] = 0;
         server->current_resources[i] = 0;
@@ -174,12 +174,13 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->map = NULL;
     server->parsed_info = malloc(sizeof(parsing_info_t));
     if (server->parsed_info == NULL)
-        malloc_failed(7);
+        server_err("Malloc failed for allocating parsed_info in server");
     server->parsed_info->port = parsed_info->port;
     server->parsed_info->width = parsed_info->width;
     server->parsed_info->height = parsed_info->height;
     server->parsed_info->client_nb = parsed_info->client_nb;
     server->parsed_info->frequence = parsed_info->frequence;
+    server->eggs = NULL;
     init_server_resources(server);
     copy_names(server, parsed_info);
 }

@@ -46,10 +46,8 @@ static void new_connection(server_t *server)
     add_fd(server, client_fd);
     server->nfds += 1;
     new_client = find_client_by_socket(server, client_fd);
-    if (new_client != NULL){
-        init_new_player_pos(server, new_client);
+    if (new_client != NULL)
         write_command_output(new_client->client_fd, "WELCOME\n");
-    }
 }
 
 static void check_new_connection(server_t *server)

@@ -16,6 +16,7 @@ SRC = 	help.c								\
 		parsing.c							\
 		network/connection_err.c			\
 		network/connection.c				\
+		network/connection_utils.c			\
 		network/server_run.c				\
 		network/queue_connection.c			\
 		network/client_node.c 				\
