@@ -1,7 +1,6 @@
 import random
 from constants.resources import resources
-
-
+from constants.upgrades import upgrades
 
 def get_item_relative_pos(item_position):
   i = item_position
@@ -15,8 +14,7 @@ def get_item_relative_pos(item_position):
     row_length += 2
     nb_rows += 1
 
-  return nb_rows, i + nb_rows + 1
-
+  return i + nb_rows + 1, nb_rows
 
 # transforms inventory string into a list of pair ressource - amount
 def parse_inventory(inventory_str):
@@ -52,15 +50,15 @@ def get_closest_of_item(surroundings_str, item):
 def go_get_item(surroundings, item):
   distance_to_item = get_closest_of_item(surroundings, item)
   if distance_to_item == 0:
-  return "Take " + item
+    return "Take " + item
   elif distance_to_item == -1:
-  return random.choice(["Forward", "Right", "Left"])
+    return random.choice(["Forward", "Right", "Left"])
   else:
-  return "Forward"
+    return "Forward"
 
 def get_best_available_resource(surroundings):
   best_available_resource = None
-  best_priority = float('inf')
+  best_priority = 0
 
   for resource in resources:
     if get_closest_of_item(surroundings, resource) != -1:
@@ -70,3 +68,24 @@ def get_best_available_resource(surroundings):
         best_available_resource = resource
 
   return best_available_resource
+
+def can_upgrade(inventory, current_level):
+  inventory_dict = parse_inventory(inventory)
+  upgrade_info = upgrades.get(current_level, {})
+
+  if not upgrade_info:
+    print(f"No upgrade defined for level {current_level}.")
+    return False
+  if not inventory_dict:
+    print("Inventory is empty or not properly parsed.")
+    return False
+
+  upgrade_cost = upgrade_info.get("cost", {})
+
+  for resource, amount in upgrade_cost.items():
+    if resource == "players":
+      continue #TODO: handle players requirement
+    if inventory_dict.get(resource, 0) < amount:
+      return False
+
+  return True
