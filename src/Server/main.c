@@ -79,6 +79,7 @@ int main(int ac, char **av)
     create_server(&server, &parsed_info);
     set_rdm_seed();
     create_map(&server, &parsed_info);
+    init_server_eggs(&server);
     server_loop(&server);
     return 0;
 }

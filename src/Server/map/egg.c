@@ -9,18 +9,19 @@
 #include "../include/server.h"
 #include "../include/egg.h"
 #include <stdlib.h>
+#include <string.h>
 
-egg_t *create_egg(int egg_id, int creator_id, int pos_x, int pos_y)
+egg_t *create_egg(int egg_id, int pos_x, int pos_y, char *team)
 {
     egg_t *new_egg = malloc(sizeof(egg_t));
 
     if (new_egg == NULL)
         return NULL;
     new_egg->egg_id = egg_id;
-    new_egg->creator_id = creator_id;
     new_egg->pos_x = pos_x;
     new_egg->pos_y = pos_y;
     new_egg->next = NULL;
+    new_egg->team_name = strdup(team);
     return new_egg;
 }
 
@@ -41,18 +42,19 @@ static int remove_id_from_array(int **array, int *count, int id)
     return -1;
 }
 
-static void execute_remove_egg(egg_t *current, egg_t *prev,
-    int id, server_t *server)
+static void remove_node(egg_t *current, egg_t *prev, server_t *server)
 {
-    if (current->egg_id == id) {
-        if (prev == NULL) {
-            server->eggs = current->next;
-        } else {
-            prev->next = current->next;
-        }
-        free(current);
-        return;
-    }
+    egg_t *node_to_delete = NULL;
+
+    node_to_delete = current;
+    if (prev == NULL)
+        server->eggs = current->next;
+    else
+        prev->next = current->next;
+    if (node_to_delete->team_name)
+        free(node_to_delete->team_name);
+    free(node_to_delete);
+    return;
 }
 
 static void remove_egg_by_id(server_t *server, int id)
@@ -61,7 +63,10 @@ static void remove_egg_by_id(server_t *server, int id)
     egg_t *prev = NULL;
 
     while (current != NULL) {
-        execute_remove_egg(current, prev, id, server);
+        if (current->egg_id == id) {
+            remove_node(current, prev, server);
+            return;
+        }
         prev = current;
         current = current->next;
     }
