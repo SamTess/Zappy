@@ -58,6 +58,7 @@ SRC = 	help.c								\
 		graphical_command/command_pnw.c		\
 		graphical_command/command_sgt.c		\
 		graphical_command/command_tna.c		\
+		graphical_command/command_ppo.c		\
 
 MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))
