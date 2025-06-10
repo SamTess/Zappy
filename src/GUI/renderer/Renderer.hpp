@@ -14,7 +14,6 @@
 #include "../../Shared/IGuiLib.hpp"
 #include "../cameraController/CameraController.hpp"
 #include "UIRenderer.hpp"
-#include "../obj/ObjManager.hpp"
 #include "../textureManager/TextureManager.hpp"
 #include "../textureManager/ModelManager.hpp"
 
@@ -25,12 +24,12 @@ public:
 
     void init(std::shared_ptr<IGraphicsLib> graphics);
     void render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
-                std::shared_ptr<ObjManager> modelManager, std::shared_ptr<CameraController> camera,
+                std::shared_ptr<CameraController> camera,
                 std::shared_ptr<UIRenderer> uiRenderer);
 
     void renderBackground(std::shared_ptr<IGraphicsLib> graphics);
     void renderGrid(std::shared_ptr<IGraphicsLib> graphics);
-    void renderScene(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<ObjManager> modelManager);
+    void renderScene(std::shared_ptr<IGraphicsLib> graphics);
     void renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
                  std::shared_ptr<CameraController> camera, std::shared_ptr<UIRenderer> uiRenderer);
     void renderSprite2D(int textureId, int x, int y);

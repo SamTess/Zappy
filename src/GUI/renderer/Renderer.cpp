@@ -23,14 +23,14 @@ void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
 }
 
 void Renderer::render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
-    std::shared_ptr<ObjManager> modelManager, std::shared_ptr<CameraController> camera,
+    std::shared_ptr<CameraController> camera,
     std::shared_ptr<UIRenderer> uiRenderer) {
 
     graphics->BeginDrawing();
     renderBackground(graphics);
     graphics->BeginCamera3D();
     renderGrid(graphics);
-    renderScene(graphics, modelManager);
+    renderScene(graphics);
     graphics->EndCamera3D();
     renderUI(graphics, gui, camera, uiRenderer);
     graphics->EndDrawing();
@@ -44,8 +44,11 @@ void Renderer::renderGrid(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->DrawPlane({0.0f, 0.0f, 0.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
 }
 
-void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<ObjManager> modelManager) {
-    modelManager->renderAll(graphics);
+void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
+    auto& modelManager = ModelManager::getInstance();
+    (void)modelManager;
+    (void)graphics;
+    //TODO(Sam): Implement scene rendering logic
 }
 
 void Renderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
