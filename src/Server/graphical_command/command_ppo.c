@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** command_poo
+** command_ppo
 */
 
 #include "../include/server.h"
