@@ -31,8 +31,10 @@ static void free_client_player(client_t *current_client)
     if (player->command_queue)
         free_command_queue(player);
     if (player->pending_cmd){
-        free(player->pending_cmd->args);
-        player->pending_cmd->args = NULL;
+        if (player->pending_cmd->args){
+            free(player->pending_cmd->args);
+            player->pending_cmd->args = NULL;
+        }
         free(player->pending_cmd);
         player->pending_cmd = NULL;
     }
@@ -124,6 +126,9 @@ void free_all(server_t *server, parsing_info_t *parsed_info)
     free_map(server, parsed_info);
     if (parsed_info)
         free_parsed_info(parsed_info);
-    if (server->parsed_info)
+    if (server->parsed_info) {
         free_parsed_info(server->parsed_info);
+        free(server->parsed_info);
+        server->parsed_info = NULL;
+    }
 }

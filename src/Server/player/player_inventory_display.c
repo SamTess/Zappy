@@ -29,11 +29,13 @@ static bool append_item_string(char **content, size_t *content_length,
     const char *item_str)
 {
     size_t item_length = strlen(item_str);
+    char *temp;
 
     *content_length += item_length + 3;
-    *content = realloc(*content, *content_length);
-    if (!*content)
+    temp = realloc(*content, *content_length);
+    if (!temp)
         return false;
+    *content = temp;
     strcat(*content, item_str);
     return true;
 }
@@ -55,6 +57,8 @@ static void process_one_item(resource_type_t type, int quantity,
         return;
     if (!append_item_string(content, content_length, item_str)) {
         free(item_str);
+        free(*content);
+        *content = NULL;
         return;
     }
     free(item_str);

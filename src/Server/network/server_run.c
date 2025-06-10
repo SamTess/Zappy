@@ -76,10 +76,14 @@ static void setup_poll_manager(poll_manager_t *poll_mana, int size)
 {
     if (!poll_mana->fds) {
         poll_mana->fds = malloc(size * sizeof(struct pollfd));
+        if (!poll_mana->fds)
+            server_err("Poll_mana alloc failed\n");
         poll_mana->capacity = size;
     }
     if (size > poll_mana->capacity) {
         poll_mana->fds = realloc(poll_mana->fds, size * sizeof(struct pollfd));
+        if (!poll_mana->fds)
+            server_err("Poll_mana realloc failed\n");
         poll_mana->capacity = size;
     }
     poll_mana->needs_rebuild = true;
