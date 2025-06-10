@@ -14,6 +14,14 @@ class DecisionManager:
       "Dyson": behaviors.DysonBehavior(agent)
     }
 
+  def manage_broadcast(self, full_message):
+    if not full_message or len(full_message) < 2:
+      print("Empty broadcast message received.")
+      return
+    broadcast_emitter_direction = int(full_message.split(", ")[0])
+    print(f"Broadcast received from direction: {broadcast_emitter_direction}")
+    broadcast_message = encryption.decrypt_message(full_message.split(", ")[1])
+    print(f"Broadcast message: {broadcast_message}")
 
   def process_server_message(self):
     if not self.agent.has_messages():
@@ -21,7 +29,7 @@ class DecisionManager:
 
     message = self.agent.get_message()
     if message.startswith("message "):
-      print(f"Received message: {encryption.decrypt_message(message[8:])}")
+      self.manage_broadcast(message[8:])
     elif message.startswith("dead"):
       print("Agent has died.")
       self.agent.stop()
@@ -45,7 +53,12 @@ class DecisionManager:
 
     print(inventory)
 
-    self.behaviors["Dyson"].execute()
+    if (self.agent.level < 2):
+      self.behaviors["Dyson"].execute()
+    else:
+      if zappy.parse_inventory(inventory).get("food", 0) < 10:
+        self.behaviors["GetFood"].execute(surroundings, inventory)
+      else:
+        self.behaviors["GetMinerals"].execute(surroundings, inventory)
 
-    if zappy.can_upgrade(inventory, surroundings, self.agent.level):
-      self.behaviors["Upgrade"].execute()
+    self.behaviors["Upgrade"].execute(surroundings, inventory)

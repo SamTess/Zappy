@@ -86,8 +86,8 @@ class Agent:
         self.stop()
         break
 
-  def send_command(self, command):
-    return self.socketManager.send_command(command)
+  def send_command(self, command, timeout=2.0):
+    return self.socketManager.send_command(command, timeout=timeout)
 
   def get_message(self, timeout=None):
     return self.socketManager.get_message(timeout=timeout)
