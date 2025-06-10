@@ -82,7 +82,7 @@ void command_bct(server_t *server, client_t *client, char *buffer)
         return write_command_output(client->client_fd, "ko\n");
     if (strlen(buffer) < 7)
         return write_command_output(client->client_fd, "ko\n");
-    if (sscanf(buffer, "bct %d %d", &x, &y) != 2)
+    if (sscanf(buffer, "bct %d %d\n", &x, &y) != 2)
         return write_command_output(client->client_fd, "ko\n");
     if (x < 0 || y < 0 || y >= server->parsed_info->height ||
         x >= server->parsed_info->width)
