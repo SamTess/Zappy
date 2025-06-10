@@ -85,7 +85,7 @@ void send_map_info_to_one_client(server_t *server, client_t *client)
     send_msz_command(server, client);
     send_sgt_command(server, client);
     send_tile_content_to_one_client(server, client);
-    send_team_names_to_one_client(server, client);
+    send_tna_command(server, client);
     send_all_player_info_to_one_client(server, client);
     write_command_output(client->client_fd, "egg send missing\n");
 }

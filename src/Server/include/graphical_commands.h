@@ -12,7 +12,7 @@
 
 void send_msz_command(server_t *server, client_t *client);
 void send_sgt_command(server_t *server, client_t *client);
-void send_tna_command(server_t *server, client_t *client, const char *team);
+void send_tna_command(server_t *server, client_t *client);
 void send_pnw_command(server_t *server, client_t *client, client_t *recipient);
 void send_pin_command(server_t *server, client_t *client, client_t *recipient);
 void send_plv_command(server_t *server, client_t *client, client_t *recipient);
