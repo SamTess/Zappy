@@ -47,8 +47,9 @@ void take_object(server_t *server, client_t *client, char *buffer)
         [client->player->pos_x].resources[resource_type]--;
         server->current_resources[resource_type]--;
         add_item_to_inventory(client->player, resource_type, 1);
+        send_bct_to_all_graphical_clients(server, client->player->pos_x,
+            client->player->pos_y);
         write_command_output(client->client_fd, "ok\n");
-    } else {
+    } else
         write_command_output(client->client_fd, "ko\n");
-    }
 }
