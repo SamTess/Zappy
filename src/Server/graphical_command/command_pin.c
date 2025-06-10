@@ -80,7 +80,7 @@ void command_pin(server_t *server, client_t *client, char *buffer)
     client_t *recipient = NULL;
     int id = -1;
 
-    if (!server || !client || !client)
+    if (!server || !client)
         return;
     if (sscanf(buffer, "pin #%d\n", &id) != 1)
         return;
