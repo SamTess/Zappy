@@ -30,7 +30,6 @@ public:
     void renderCube();
 
 private:
-    // Fonctions d'initialisation
     bool loadLibraries();
     void initializeManagers();
     bool loadModels();
@@ -45,8 +44,8 @@ private:
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
 
-    int m_girlModelId = -1;    // ID du modèle girl.obj
-    int m_castleModelId = -1;  // ID du modèle castle.obj
-    int m_cubeModelId = -1;    // ID du modèle cube.obj
-    int m_cubeModelIdBis = -1; // ID du second cube.obj pour démonstration
+    int m_girlModelId = -1;
+    int m_castleModelId = -1;
+    int m_cubeModelId = -1;
+    int m_cubeModelIdBis = -1;
 };
