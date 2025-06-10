@@ -192,17 +192,13 @@ int NetworkManager::receiveAndProcessData(int errorCount, int maxErrors) {
             NetworkLogger::get().log(std::string("Data received (") +
             std::to_string(data.size()) + " bytes): " + (data.size() > 20 ? data.substr(0, 20) + "..." : data));
             _receiveBuffer += data;
-            processReceivedData();
+            extractCompleteMessages();
             return 0;
         }
         return errorCount;
     } catch (const std::exception& e) {
         return handleReceiveError(errorCount, maxErrors, e);
     }
-}
-
-void NetworkManager::processReceivedData() {
-    extractCompleteMessages();
 }
 
 void NetworkManager::extractCompleteMessages() {

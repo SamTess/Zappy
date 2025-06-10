@@ -30,15 +30,26 @@ command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
-        "Incantation", "Fork", "Broadcast", NULL};
+        "Incantation", "Fork", "Broadcast", "msz", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
-        fork_c, broadcast, NULL};
-    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7};
-    command_data_t data = {comm_char, comm_func, comm_times};
+        fork_c, broadcast, command_msz, NULL};
+    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0};
+    static enum client_type_e accepted_types[] = {AI, AI, AI, AI, AI,
+        AI, AI, AI, AI, AI, AI, AI, GRAPHICAL};
+    command_data_t data = {comm_char, comm_func, comm_times, accepted_types};
 
     return data;
+}
+
+static bool execute_graphical_command(server_t *server, client_t *user,
+    char *buffer, int cmd_index)
+{
+    command_data_t data = get_command_data();
+
+    data.functions[cmd_index](server, user, buffer);
+    return true;
 }
 
 static bool execute_if_free(server_t *server, client_t *user,
@@ -46,7 +57,11 @@ static bool execute_if_free(server_t *server, client_t *user,
 {
     command_data_t data = get_command_data();
 
-    if (user->player->busy_until <= server->current_tick) {
+    if (user->type != data.accepted_types[cmd_index])
+        return false;
+    if (user->type == GRAPHICAL)
+        return execute_graphical_command(server, user, buffer, cmd_index);
+    if (user->type == AI && user->player->busy_until <= server->current_tick) {
         user->player->pending_cmd->args = strdup(buffer);
         user->player->pending_cmd->func = data.functions[cmd_index];
         if (data.times[cmd_index] > 0)
@@ -67,8 +82,9 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     command_data_t data = get_command_data();
 
     for (int i = 0; data.commands[i] != NULL; i++) {
-        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0)
+        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0) {
             return execute_if_free(server, user, buffer, i);
+        }
     }
     return false;
 }
@@ -119,7 +135,6 @@ static void send_info_new_client(server_t *server, client_t *user)
         server->parsed_info->height);
     write_command_output(user->client_fd, tmp_string);
     free(tmp_string);
-    user->is_fully_connected = true;
 }
 
 void execute_com(server_t *server, client_t *user, char *buffer)
@@ -129,8 +144,9 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     if (!user->is_fully_connected) {
         if (!is_valid_team_name(buffer, server, user))
             return write_command_output(user->client_fd, "ko\n");
+        user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {
-            add_graphical_reference(server, user);
+            add_graphic_client(server, user);
             send_map_info_to_one_client(server, user);
             return;
         } else
@@ -165,7 +181,7 @@ void get_message(server_t *server, client_t *user)
         if (check_disconnect(bytes_read, user, server) == 1)
             return;
         if (add_to_circular_buffer(&temp_buffer, byte) == -1) {
-            write(user->client_fd, "trop long", strlen("trop long"));
+            write_command_output(user->client_fd, "trop long\n");
             return;
         }
         cmd_length = find_command_end(&temp_buffer);

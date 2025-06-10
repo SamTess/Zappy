@@ -62,7 +62,6 @@ class NetworkManager {
         bool tryReceiveInitialWelcome();
         bool processInitialWelcomeData();
         int receiveAndProcessData(int errorCount, int maxErrors);
-        void processReceivedData();
         void extractCompleteMessages();
         int handleReceiveError(int errorCount, int maxErrors, const std::exception& e);
         int processPendingOutgoingMessages(int errorCount, int maxErrors);

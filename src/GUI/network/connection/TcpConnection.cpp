@@ -95,7 +95,6 @@ void TcpConnection::send(const std::string &message) {
     }
     size_t totalSent = 0;
     const size_t size = finalMessage.size();
-    const char* data = finalMessage.c_str();
     while (totalSent < size) {
         _pollfd->setEvents(POLLOUT);
         int pollResult = SystemWrapper::pollSocket(*_pollfd, 5000);
@@ -104,7 +103,7 @@ void TcpConnection::send(const std::string &message) {
         if (!(_pollfd->getRevents() & POLLOUT))
             throw TcpConnectionException("Socket not ready for writing");
         SystemWrapper::SafeBuffer sendBuffer(size - totalSent);
-        sendBuffer.setData(std::string(data + totalSent, size - totalSent));
+        sendBuffer.setData(std::string(finalMessage.c_str() + totalSent, size - totalSent));
         ssize_t sent = SystemWrapper::writeSocket(_socket, sendBuffer, size - totalSent);
         if (sent < 0) {
             if (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)
