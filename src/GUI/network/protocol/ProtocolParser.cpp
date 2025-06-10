@@ -17,7 +17,6 @@
 #include <sstream>
 
 ProtocolParser::ProtocolParser() {
-    using std::placeholders::_1;
     _headerHandlers = std::map<std::string, ParseFunction>{
         {MSZ_HEADER, [this](const std::string& msg) { return this->parseMapSize(msg); }},
         {BCT_HEADER, [this](const std::string& msg) { return this->parseTileContent(msg); }},
@@ -45,22 +44,6 @@ ProtocolParser::ProtocolParser() {
         {SUC_HEADER, [this](const std::string& msg) { return this->parseUnknownCommand(msg); }},
         {SBP_HEADER, [this](const std::string& msg) { return this->parseUnknownCommand(msg); }}
     };
-}
-
-std::string ProtocolParser::extractMessage(std::shared_ptr<CircularBuffer> buffer) {
-    if (!buffer || buffer->isEmpty())
-        return "";
-    std::string tempBuffer = buffer->readAsString(buffer->available());
-    size_t newlinePos = tempBuffer.find('\n');
-    if (newlinePos == std::string::npos) {
-        buffer->write(tempBuffer);
-        return "";
-    }
-    std::string message = tempBuffer.substr(0, newlinePos + 1);
-    if (newlinePos + 1 < tempBuffer.size()) {
-        buffer->write(tempBuffer.substr(newlinePos + 1));
-    }
-    return message;
 }
 
 Message ProtocolParser::parseMessage(const std::string &message) {

@@ -14,7 +14,6 @@ MAIN = main.cpp
 SRC = graphicalContext/GraphicalContext.cpp \
 	  parsing/ParsingCLI.cpp \
 	  shared/exception/AException.cpp \
-	  network/buffer/CircularBuffer.cpp \
 	  network/buffer/MessageQueue.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \

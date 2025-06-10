@@ -29,7 +29,7 @@ static bool remove_head_client(server_t *server, int fd)
         return true;
     }
     server->client = current->next;
-    free_node(current);
+    free_node(current, server);
     server->nfds -= 1;
     printf("Client %d disconnected\n", client_id);
     return true;
@@ -51,7 +51,7 @@ static bool remove_other_client(server_t *server, int fd)
     }
     client_id = current->client_id;
     prev->next = current->next;
-    free_node(current);
+    free_node(current, server);
     server->nfds -= 1;
     printf("Client %d disconnected\n", client_id);
     return true;
@@ -168,6 +168,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
 {
     server->nfds = 0;
     server->client = NULL;
+    server->graphical_clients = NULL;
     server->s_fd = 0;
     server->serv_add = NULL;
     server->current_tick = 0;
@@ -181,6 +182,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->client_nb = parsed_info->client_nb;
     server->parsed_info->frequence = parsed_info->frequence;
     server->eggs = NULL;
+    server->should_run = true;
     init_server_resources(server);
     copy_names(server, parsed_info);
 }

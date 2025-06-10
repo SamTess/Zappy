@@ -9,6 +9,7 @@
 #include <string>
 #include "parsing/ParsingCLI.hpp"
 #include "GameLoop.hpp"
+#include "network/networkManager/NetworkManager.hpp"
 
 void displayHelp() {
     std::cout << "USAGE: ./zappy_gui -p port -h machine" << std::endl;
@@ -25,14 +26,14 @@ int main(int argc, char** argv) {
         ParsingCLI parser(argc, argv);
         std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
 
-        /*
         NetworkManager networkManager;
 
         if (!networkManager.connect(parser.getMachine(), parser.getPort())) {
             std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
         }
-        */
+        // pas sur que ca sois la bonne facon de faire mais le networkManager doit etre dans un thread
+        std::thread networkThread(&NetworkManager::networkThreadLoop, &networkManager);
 
         GameLoop gameLoop;
         gameLoop.setServerInfo(parser.getMachine(), parser.getPort());

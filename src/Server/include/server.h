@@ -8,6 +8,7 @@
 #ifndef SERVER_H_
     #define SERVER_H_
     #include <sys/socket.h>
+    #include <stdbool.h>
     #include "client.h"
     #include "parsing.h"
     #include "tile.h"
@@ -18,12 +19,14 @@ typedef struct server_s {
     int s_fd;
     struct sockaddr_in *serv_add;
     client_t *client;
+    graphical_client_t *graphical_clients;
     egg_t *eggs;
     tile_t **map;
     int current_tick;
     parsing_info_t *parsed_info;
     int *total_resources;
     int *current_resources;
+    int should_run;
 } server_t;
 
 void update_game_tick(server_t *server);
@@ -40,8 +43,9 @@ void create_map(server_t *server, parsing_info_t *parsed_info);
 void init_new_player_pos(server_t *server, client_t *new_client);
 void process_next_queued_command(server_t *server, client_t *client);
 void add_to_command_queue(client_t *client, char *command);
-void free_node(client_t *node);
+void free_node(client_t *node, server_t *server);
 void init_server_eggs(server_t *n_server);
 void free_all(server_t *server, parsing_info_t *parsed_info);
+int count_team(server_t *n_server);
 
 #endif /* !SERVER_H_ */
