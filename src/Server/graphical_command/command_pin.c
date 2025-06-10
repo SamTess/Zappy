@@ -60,3 +60,22 @@ void send_pin_command(server_t *server, client_t *client, client_t *recipient)
     write_command_output(recipient->client_fd, buffer);
     free(buffer);
 }
+
+void command_pin(server_t *server, client_t *client, char *buffer)
+{
+    client_t *recipient = NULL;
+    int id = -1;
+
+    if (!server || !client || !client)
+        return;
+    if (sscanf(buffer, "pin #%d\n", &id) != 1)
+        return;
+    if (id < 0)
+        return write_command_output(client->client_fd, "ko\n");
+    recipient = find_client_by_id(server, id);
+    if (!recipient || recipient->type != AI) {
+        write_command_output(client->client_fd, "ko\n");
+        return;
+    }
+    send_pin_command(server, recipient, client);
+}
