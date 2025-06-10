@@ -57,11 +57,11 @@ static bool execute_if_free(server_t *server, client_t *user,
 {
     command_data_t data = get_command_data();
 
-    if (user->type != data.accepted_types[cmd_index])
-        return false;
     if (user->type == GRAPHICAL)
         return execute_graphical_command(server, user, buffer, cmd_index);
     if (user->type == AI && user->player->busy_until <= server->current_tick) {
+        if (cmd_index == 9)
+            write_command_output(user->client_fd, "Elevation underway\n");
         user->player->pending_cmd->args = strdup(buffer);
         user->player->pending_cmd->func = data.functions[cmd_index];
         if (data.times[cmd_index] > 0)
@@ -82,7 +82,8 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     command_data_t data = get_command_data();
 
     for (int i = 0; data.commands[i] != NULL; i++) {
-        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0)
+        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0 &&
+            user->type == data.accepted_types[i])
             return execute_if_free(server, user, buffer, i);
     }
     return false;

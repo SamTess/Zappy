@@ -80,7 +80,7 @@ static void disp_args(parsing_info_t *parsed_info)
 
 static void server_loop(server_t *server)
 {
-    while (should_continue_running()) {
+    while (should_continue_running() && server->should_run) {
         check_client(server);
     }
     printf("Server is shutting down\n");
