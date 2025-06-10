@@ -31,17 +31,17 @@ command_data_t get_command_data(void)
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
         "Incantation", "Fork", "Broadcast", "msz", "bct", "mtc",
-        "tna", NULL};
+        "tna", "ppo", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
         fork_c, broadcast, command_msz, command_bct, command_mtc,
-        command_tna, NULL};
+        command_tna, command_ppo, NULL};
     static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0,
-        0, 0, 0};
+        0, 0, 0, 0, 0};
     static enum client_type_e accepted_types[] = {AI, AI, AI, AI, AI,
         AI, AI, AI, AI, AI, AI, AI, GRAPHICAL, GRAPHICAL, GRAPHICAL,
-        GRAPHICAL};
+        GRAPHICAL, GRAPHICAL};
     command_data_t data = {comm_char, comm_func, comm_times, accepted_types};
 
     return data;
