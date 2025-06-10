@@ -28,11 +28,15 @@ def take_all_of_item_here(agent, item):
 
 def take_everything_here(agent):
   surroundings = agent.send_command("Look")
-  items_on_ground = surroundings.strip("[ ]").split(", ")[0].strip().split()
+  if surroundings is None or "ko" in surroundings:
+    print(f"Failed to look around. Response: {surroundings}")
+    return
+
+  items_on_ground = surroundings.strip("[ ]").split(",")[0].split(" ")
 
   for item in items_on_ground:
-    if item.endswith(","):
-      item = item[:-1]
+    if item:
+      item.strip(", .")
     if item != "player":
       take_all_of_item_here(agent, item)
 

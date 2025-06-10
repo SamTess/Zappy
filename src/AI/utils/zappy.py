@@ -69,23 +69,50 @@ def get_best_available_resource(surroundings):
 
   return best_available_resource
 
-def can_upgrade(inventory, current_level):
+def can_upgrade(inventory, surroundings, current_level):
   inventory_dict = parse_inventory(inventory)
   upgrade_info = upgrades.get(current_level, {})
 
+  print(f"can_upgrade: Checking upgrade for level {current_level}.")
+
   if not upgrade_info:
-    print(f"No upgrade defined for level {current_level}.")
+    print(f"can_upgrade: No upgrade defined for level {current_level}.")
     return False
   if not inventory_dict:
-    print("Inventory is empty or not properly parsed.")
+    print("can_upgrade: Inventory is empty or not properly parsed.")
     return False
 
   upgrade_cost = upgrade_info.get("cost", {})
 
+
   for resource, amount in upgrade_cost.items():
     if resource == "players":
-      continue #TODO: handle players requirement
-    if inventory_dict.get(resource, 0) < amount:
+      if how_much_of_item_here(surroundings, "player") < amount:
+        return False
+      continue
+    elif inventory_dict.get(resource, 0) < amount:
       return False
 
+  print(f"can_upgrade: Upgrade possible for level {current_level}.")
+
   return True
+
+def how_much_of_item_here(surroundings, item):
+  if not surroundings:
+    print("is_item_here: Surroundings data is empty or None.")
+    return 0
+
+  print(surroundings)
+
+  cleaned = surroundings.strip("[ ]")
+  tiles = cleaned.split(", ")
+  here = tiles[0].strip().split()
+
+  count = 0
+  for item_here in here:
+    if item_here.strip() == item:
+      count += 1
+
+  if (item == "player"):
+    count += 1
+  return count

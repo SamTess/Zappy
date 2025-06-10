@@ -40,17 +40,26 @@ class SocketManager:
     return line.strip()
 
 
-# détermine si le message est une réponse à une requête ou un message du serveur
+# détermine si la ligne est une réponse à une requête ou un message du serveur
   def _handle_message(self, message):
-    with self.lock:
-      # si il y a des requêtes en attente on considère que c'est une réponse
-      if self.pending_requests or (message.startswith("ko") or message.startswith("ok") or message.startswith("[")):
-        request_id = next(iter(self.pending_requests))
-        response_queue = self.pending_requests.pop(request_id)
-        response_queue.put(message)
-      else:
-        self.message_queue.put(message)
+    try:
+      with self.lock:
+        if message.startswith("dead") or message.startswith("message") or message.startswith("Elevation") or message.startswith("Current"):
+          self.message_queue.put(message)
+          return
 
+        is_response = message in ["ok", "ko"] or message.startswith("[") or message.isdigit()
+
+        if is_response and self.pending_requests:
+          request_id = next(iter(self.pending_requests))
+          response_queue = self.pending_requests.pop(request_id)
+          response_queue.put(message)
+        else:
+          print(f"Unknown message: {message}")
+          self.message_queue.put(message)
+
+    except Exception as e:
+      print(f"Error in _handle_message: {e}")
 
   def _listen_loop(self):
     while self.running:

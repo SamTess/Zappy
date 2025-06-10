@@ -16,26 +16,32 @@ class DecisionManager:
 
 
   def process_server_message(self):
+    print("Processing server messages...")
     if not self.agent.has_messages():
       return
 
+    print("Agent has messages to process.")
     message = self.agent.get_message()
-    if message.startswith("message: "):
-      print(f"Received message: {encryption.decrypt_message(message[9:])}")
-
+    if message.startswith("message "):
+      print(f"Received message: {encryption.decrypt_message(message[8:])}")
     elif message.startswith("dead"):
       print("Agent has died.")
       self.agent.stop()
-
     else:
       print(f"Unknown server message: {message}")
 
 
   def take_action(self):
     inventory = self.agent.send_command("Inventory")
+    surroundings = self.agent.send_command("Look")
+
+    if inventory is None or surroundings is None:
+      print("Failed to retrieve inventory or surroundings.")
+      return
+
     print(inventory)
 
     self.behaviors["Dyson"].execute()
 
-    if zappy.can_upgrade(inventory, self.agent.level):
+    if zappy.can_upgrade(inventory, surroundings, self.agent.level):
       self.behaviors["Upgrade"].execute()
