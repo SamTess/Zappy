@@ -16,6 +16,7 @@
 #include <vector>
 #include "../../../src/Shared/IGraphicsLib.hpp"
 #include "../../../src/Shared/Common.hpp"
+#include "TextureManager.hpp"
 
 /**
  * @brief Structure représentant un modèle 3D avec ses textures associées
@@ -135,12 +136,82 @@ public:
         getBoundingBox(int modelId) const;
 
 private:
-    ModelManager() = default;
+    ModelManager() : m_textureManager(TextureManager::getInstance()) {}
     ~ModelManager();
 
     // Empêcher la copie ou l'assignation
     ModelManager(const ModelManager&) = delete;
     ModelManager& operator=(const ModelManager&) = delete;
+
+    /**
+     * @brief Vérifie si un modèle existe déjà dans le cache
+     * @param modelPath Chemin d'accès au fichier du modèle
+     * @return ID du modèle s'il existe, -1 sinon
+     */
+    int checkModelCache(const std::string& modelPath);
+
+    /**
+     * @brief Vérifie si la bibliothèque graphique est initialisée
+     * @return true si initialisée, false sinon
+     */
+    bool checkGraphicsLibInitialized();
+
+    /**
+     * @brief Crée et initialise un objet modèle 3D
+     * @param modelId ID du modèle chargé
+     * @return Objet Model3D initialisé
+     */
+    Model3D createModelObject(int modelId);
+
+    /**
+     * @brief Charge les textures pour un modèle
+     * @param model Référence vers l'objet modèle
+     * @param texturePaths Liste des chemins d'accès aux textures
+     */
+    void loadTexturesForModel(Model3D& model, const std::vector<std::string>& texturePaths);
+
+    /**
+     * @brief Charge une texture unique pour un modèle
+     * @param model Référence vers l'objet modèle
+     * @param texturePath Chemin d'accès à la texture
+     * @return true si le chargement a réussi, false sinon
+     */
+    bool loadTextureForModel(Model3D& model, const std::string& texturePath);
+
+    /**
+     * @brief Enregistre le modèle dans les structures de données internes
+     * @param modelPath Chemin d'accès au fichier du modèle
+     * @param modelId ID du modèle
+     * @param model Objet modèle à enregistrer
+     */
+    void registerModel(const std::string& modelPath, int modelId, const Model3D& model);
+
+    /**
+     * @brief Décharge les textures associées à un modèle
+     * @param model Modèle dont les textures doivent être déchargées
+     */
+    void unloadModelTextures(const Model3D& model);
+
+    /**
+     * @brief Décharge un modèle spécifique de la bibliothèque graphique
+     * @param modelId ID du modèle à décharger
+     */
+    void unloadModelFromGraphicsLib(int modelId);
+
+    /**
+     * @brief Supprime les références d'un modèle dans le dictionnaire de chemins
+     * @param modelId ID du modèle à supprimer
+     */
+    void removeModelPathReferences(int modelId);
+
+    /**
+     * @brief Vérifie si un modèle peut être dessiné (existe et lib graphique initialisée)
+     * @param modelId ID du modèle à vérifier
+     * @return true si le modèle peut être dessiné, false sinon
+     */
+    bool validateModelForDrawing(int modelId);
+
+    TextureManager& m_textureManager;                // Instance de TextureManager pour gérer les textures associées
 
     std::shared_ptr<IGraphicsLib> m_graphicsLib = nullptr;
     std::map<std::string, int> m_pathToId;           // Associe les chemins aux IDs
