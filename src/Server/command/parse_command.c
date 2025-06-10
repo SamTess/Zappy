@@ -183,7 +183,7 @@ void get_message(server_t *server, client_t *user)
         if (check_disconnect(bytes_read, user, server) == 1)
             return;
         if (add_to_circular_buffer(&temp_buffer, byte) == -1) {
-            write_command_output(user->client_fd, "trop long\n");
+            write_command_output(user->client_fd, "ko\n");
             return;
         }
         cmd_length = find_command_end(&temp_buffer);
