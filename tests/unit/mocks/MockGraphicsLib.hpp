@@ -135,4 +135,16 @@ public:
     }
     
     void UnloadModel3D() override {}
+    
+    // Modèle avec texture
+    void LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override {
+        wasLoadModelWithTextureCalled = true;
+        lastModelPath = modelPath;
+        lastTexturePath = texturePath;
+    }
+
+    // Variables pour les tests
+    bool wasLoadModelWithTextureCalled = false;
+    std::string lastModelPath;
+    std::string lastTexturePath;
 };

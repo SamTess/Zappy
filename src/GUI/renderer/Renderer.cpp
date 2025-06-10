@@ -19,6 +19,7 @@ Renderer::Renderer()
 
 void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->InitWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE);
+    m_graphicsLib = graphics;
 }
 
 void Renderer::render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
@@ -53,8 +54,14 @@ void Renderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<
 }
 
 void Renderer::renderSprite2D(int textureId, int x, int y) {
-    auto& textureManager = TextureManager::getInstance();
-    textureManager.drawTexture(textureId, x, y);
+    if (auto graphics = m_graphicsLib.lock()) {
+        graphics->DrawTexture2D(textureId, x, y);
+    }
+}
+
+void Renderer::renderModelFromManager(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color) {
+    if (auto graphics = m_graphicsLib.lock())
+        graphics->DrawModel3D(modelId, position, 1.0f, color);
 }
 
 int Renderer::loadResourceTexture(const std::string& resourceName, const std::string& texturePath) {
@@ -62,13 +69,15 @@ int Renderer::loadResourceTexture(const std::string& resourceName, const std::st
     if (it != m_resourceTextures.end()) {
         return it->second;
     }
-    auto& textureManager = TextureManager::getInstance();
-    int textureId = textureManager.loadTexture(texturePath);
-    if (textureId != -1)
-        m_resourceTextures[resourceName] = textureId;
-    else
-        std::cerr << "Échec du chargement de la texture de ressource: " << texturePath << std::endl;
-    return textureId;
+    if (auto graphics = m_graphicsLib.lock()) {
+        int textureId = graphics->LoadTexture2D(texturePath);
+        if (textureId != -1)
+            m_resourceTextures[resourceName] = textureId;
+        else
+            std::cerr << "Échec du chargement de la texture de ressource: " << texturePath << std::endl;
+        return textureId;
+    }
+    return -1;
 }
 
 int Renderer::getResourceTextureId(const std::string& resourceName) const {
@@ -76,5 +85,5 @@ int Renderer::getResourceTextureId(const std::string& resourceName) const {
     if (it != m_resourceTextures.end()) {
         return it->second;
     }
-    return -1; // Texture non trouvée
+    return -1;
 }

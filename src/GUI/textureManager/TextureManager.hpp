@@ -12,7 +12,7 @@
 #include <map>
 #include <mutex>
 #include <iostream>
-#include "../../Shared/IGraphicsLib.hpp"
+#include "../../../src/Shared/IGraphicsLib.hpp"
 
 /**
  * @brief Gestionnaire de textures singleton qui implémente un pattern de pool de ressources
@@ -34,6 +34,12 @@ public:
      * @param graphicsLib Pointeur partagé vers une implémentation de IGraphicsLib
      */
     void setGraphicsLib(std::shared_ptr<IGraphicsLib> graphicsLib);
+
+    /**
+     * @brief Vérifie si la bibliothèque graphique a été initialisée
+     * @return true si initialisée, false sinon
+     */
+    bool hasTextureLibSet() const { return m_graphicsLib != nullptr; }
 
     /**
      * @brief Charge une texture à partir d'un chemin
@@ -87,7 +93,6 @@ private:
     TextureManager() = default;
     ~TextureManager();
 
-    // Empêcher la copie ou l'assignation
     TextureManager(const TextureManager&) = delete;
     TextureManager& operator=(const TextureManager&) = delete;
 

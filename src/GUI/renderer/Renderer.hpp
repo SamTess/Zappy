@@ -16,6 +16,7 @@
 #include "UIRenderer.hpp"
 #include "../obj/ObjManager.hpp"
 #include "../textureManager/TextureManager.hpp"
+#include "../textureManager/ModelManager.hpp"
 
 class Renderer {
 public:
@@ -33,6 +34,8 @@ public:
     void renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
                  std::shared_ptr<CameraController> camera, std::shared_ptr<UIRenderer> uiRenderer);
     void renderSprite2D(int textureId, int x, int y);
+    void renderModelFromManager(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color = {255, 255, 255, 255});
+
 
     int loadResourceTexture(const std::string& resourceName, const std::string& texturePath);
     int getResourceTextureId(const std::string& resourceName) const;
@@ -44,4 +47,5 @@ private:
     int m_mapWidth;
     int m_mapHeight;
     std::map<std::string, int> m_resourceTextures;
+    std::weak_ptr<IGraphicsLib> m_graphicsLib;
 };

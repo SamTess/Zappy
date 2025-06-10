@@ -15,7 +15,7 @@
 class ObjFile {
 public:
     explicit ObjFile(std::shared_ptr<IGraphicsLib> graphics, const std::string& objPath);
-    ~ObjFile() = default;
+    ~ObjFile();
 
     void load(std::shared_ptr<IGraphicsLib> graphics, const std::string& objPath);
     const std::string& path() const;
@@ -24,4 +24,5 @@ public:
 private:
     std::string m_filePath;
     bool m_isLoaded;
+    int m_modelId;
 };

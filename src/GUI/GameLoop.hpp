@@ -25,15 +25,28 @@ public:
     bool init();
     int run();
     void setServerInfo(const std::string& host, int port);
+    void renderGirl();
+    void renderCastle();
+    void renderCube();
 
 private:
+    // Fonctions d'initialisation
+    bool loadLibraries();
+    void initializeManagers();
+    bool loadModels();
+    void setupComponents();
+
     std::string m_host;
     int m_port;
 
     std::shared_ptr<IGraphicsLib> m_graphics;
     std::shared_ptr<IGuiLib> m_gui;
     std::shared_ptr<Renderer> m_renderer;
-    std::shared_ptr<ObjManager> m_modelManager;
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
+
+    int m_girlModelId = -1;    // ID du modèle girl.obj
+    int m_castleModelId = -1;  // ID du modèle castle.obj
+    int m_cubeModelId = -1;    // ID du modèle cube.obj
+    int m_cubeModelIdBis = -1; // ID du second cube.obj pour démonstration
 };

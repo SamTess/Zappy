@@ -14,8 +14,8 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "../../Shared/IGraphicsLib.hpp"
-#include "../../Shared/Common.hpp"
+#include "../../../src/Shared/IGraphicsLib.hpp"
+#include "../../../src/Shared/Common.hpp"
 
 /**
  * @brief Structure représentant un modèle 3D avec ses textures associées
@@ -48,6 +48,12 @@ public:
      * @param graphicsLib Pointeur partagé vers une implémentation de IGraphicsLib
      */
     void setGraphicsLib(std::shared_ptr<IGraphicsLib> graphicsLib);
+
+    /**
+     * @brief Vérifie si la bibliothèque graphique a été initialisée
+     * @return true si initialisée, false sinon
+     */
+    bool hasModelLibSet() const { return m_graphicsLib != nullptr; }
 
     /**
      * @brief Charge un modèle 3D à partir d'un chemin

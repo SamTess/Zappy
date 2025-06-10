@@ -28,8 +28,15 @@ int ModelManager::loadModel(const std::string& modelPath, const std::string& tex
     }
 
     try {
-        m_graphicsLib->LoadModel3D(modelPath);
-        int modelId = m_nextModelId++;
+        int modelId;
+        if (!texturePath.empty())
+            modelId = m_graphicsLib->LoadModelWithTexture(modelPath, texturePath);
+        else
+            modelId = m_graphicsLib->LoadModel3D(modelPath);
+        if (modelId < 0) {
+            std::cerr << "Erreur: Échec du chargement du modèle " << modelPath << std::endl;
+            return -1;
+        }
         Model3D model;
         model.modelId = modelId;
         model.scale = {1.0f, 1.0f, 1.0f};
@@ -62,8 +69,16 @@ int ModelManager::loadModelWithTextures(const std::string& modelPath, const std:
         return -1;
     }
     try {
-        m_graphicsLib->LoadModel3D(modelPath);
-        int modelId = m_nextModelId++;
+        int modelId;
+        if (!texturePaths.empty()) {
+            modelId = m_graphicsLib->LoadModelWithTexture(modelPath, texturePaths[0]);
+        } else {
+            modelId = m_graphicsLib->LoadModel3D(modelPath);
+        }
+        if (modelId < 0) {
+            std::cerr << "Erreur: Échec du chargement du modèle " << modelPath << std::endl;
+            return -1;
+        }
         Model3D model;
         model.modelId = modelId;
         model.scale = {1.0f, 1.0f, 1.0f};
@@ -97,7 +112,7 @@ void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, ZappyTyp
         std::cerr << "Erreur: Modèle ID " << modelId << " non trouvé" << std::endl;
         return;
     }
-    m_graphicsLib->DrawModel3D(position, 1.0f, color);
+    m_graphicsLib->DrawModel3D(modelId, position, 1.0f, color);
 }
 
 void ModelManager::drawModelEx(int modelId, ZappyTypes::Vector3 position,
@@ -114,7 +129,7 @@ void ModelManager::drawModelEx(int modelId, ZappyTypes::Vector3 position,
         std::cerr << "Erreur: Modèle ID " << modelId << " non trouvé" << std::endl;
         return;
     }
-    m_graphicsLib->DrawModelEx(position, rotationAxis, rotationAngle, scale);
+    m_graphicsLib->DrawModelEx(modelId, position, rotationAxis, rotationAngle, scale);
 }
 
 void ModelManager::unloadModel(int modelId) {
@@ -128,7 +143,7 @@ void ModelManager::unloadModel(int modelId) {
     if (m_graphicsLib) {
         for (int textureId : modelIt->second.textureIds)
             m_graphicsLib->UnloadTexture2D(textureId);
-        m_graphicsLib->UnloadModel3D();
+        m_graphicsLib->UnloadModel3D(modelId);
     }
     for (auto it = m_pathToId.begin(); it != m_pathToId.end(); ) {
         if (it->second == modelId) {
@@ -148,7 +163,7 @@ void ModelManager::unloadAllModels() {
             for (int textureId : model.textureIds) {
                 m_graphicsLib->UnloadTexture2D(textureId);
             }
-            m_graphicsLib->UnloadModel3D();
+            m_graphicsLib->UnloadModel3D(modelId);
         }
     }
 
