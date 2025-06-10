@@ -110,9 +110,6 @@ void eject(server_t *server, client_t *client, char *buffer)
         }
         tmp_egg = tmp_egg->next;
     }
-    printf("Eject command executed for client %d\n", client->client_id);
     command_pex(server, client);
-    printf("Eject command sent to graphical clients for client %d\n",
-        client->client_id);
     write_command_output(client->client_fd, "ok\n");
 }
