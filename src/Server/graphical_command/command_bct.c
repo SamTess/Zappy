@@ -89,3 +89,13 @@ void command_bct(server_t *server, client_t *client, char *buffer)
         return write_command_output(client->client_fd, "ko\n");
     send_bct_command(server, client, x, y);
 }
+
+void command_mtc(server_t *server, client_t *client, char *buffer)
+{
+    (void)buffer;
+    if (!server || !client)
+        return;
+    if (client->type != GRAPHICAL)
+        return write_command_output(client->client_fd, "ko\n");
+    send_tile_content_to_one_client(server, client);
+}
