@@ -45,7 +45,7 @@ static char *get_buffer_bct_command(int x, int y, tile_t *tile)
     return buffer;
 }
 
-void send_bct_command(server_t *server, client_t *client, int x, int y)
+static void send_bct_command(server_t *server, client_t *client, int x, int y)
 {
     tile_t *tile = NULL;
     char *buffer = NULL;
@@ -58,6 +58,30 @@ void send_bct_command(server_t *server, client_t *client, int x, int y)
     buffer = get_buffer_bct_command(x, y, tile);
     write_command_output(client->client_fd, buffer);
     free(buffer);
+}
+
+void send_bct_to_all_graphical_clients(server_t *server, int x, int y)
+{
+    graphical_client_t *current = server->graphical_clients;
+
+    if (!server || !server->graphical_clients)
+        return;
+    while (current) {
+        send_bct_command(server, current->client, x, y);
+        current = current->next;
+    }
+}
+
+void send_mtc_to_all_graphical_clients(server_t *server)
+{
+    graphical_client_t *current = server->graphical_clients;
+
+    if (!server || !server->graphical_clients)
+        return;
+    while (current) {
+        send_tile_content_to_one_client(server, current->client);
+        current = current->next;
+    }
 }
 
 void send_tile_content_to_one_client(server_t *server, client_t *client)
