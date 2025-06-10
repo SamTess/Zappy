@@ -5,6 +5,7 @@
 ** right
 */
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdio.h>
 
 static void change_rot(client_t *client)
@@ -39,5 +40,6 @@ void right(server_t *server, client_t *client, char *buffer)
         return;
     }
     change_rot(client);
+    send_ppo_command(server, client->client_id);
     write_command_output(client->client_fd, "ok\n");
 }
