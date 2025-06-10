@@ -136,6 +136,7 @@ static void send_info_new_client(server_t *server, client_t *user)
         server->parsed_info->height);
     write_command_output(user->client_fd, tmp_string);
     free(tmp_string);
+    send_pnw_command_to_all(server, user);
 }
 
 void execute_com(server_t *server, client_t *user, char *buffer)

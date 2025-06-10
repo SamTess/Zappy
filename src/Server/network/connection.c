@@ -15,6 +15,7 @@
 #include <linux/limits.h>
 #include "../include/server.h"
 #include "../include/parsing.h"
+#include "../include/command.h"
 
 static bool remove_head_client(server_t *server, int fd)
 {
