@@ -61,6 +61,20 @@ void send_pin_command(server_t *server, client_t *client, client_t *recipient)
     free(buffer);
 }
 
+void send_pin_to_all(server_t *server, client_t *client)
+{
+    client_t *current = server->client;
+
+    if (!server || !client || !client->player)
+        return;
+    while (current) {
+        if (current->type == GRAPHICAL && current != client) {
+            send_pin_command(server, client, current);
+        }
+        current = current->next;
+    }
+}
+
 void command_pin(server_t *server, client_t *client, char *buffer)
 {
     client_t *recipient = NULL;
