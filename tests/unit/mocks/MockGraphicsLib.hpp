@@ -117,30 +117,37 @@ public:
     void UnloadTexture3D() override {}
 
     // Modèles 3D
-    void LoadModel3D(const std::string& path) override {}
+    int LoadModel3D(const std::string& path) override {
+        static int nextModelId = 1;
+        return nextModelId++;
+    }
     
-    void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override {
+    void DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override {
         wasDrawModelCalled = true;
+        lastDrawTextureId = modelId;
         lastDrawModelPosition = position;
         lastDrawModelScale = scale;
         lastDrawModelColor = color;
     }
     
-    void DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override {
+    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override {
         wasDrawModelExCalled = true;
+        lastDrawTextureId = modelId;
         lastDrawModelExPosition = position;
         lastDrawModelExRotationAxis = rotationAxis;
         lastDrawModelExAngle = rotationAngle;
         lastDrawModelExScale = scale;
     }
     
-    void UnloadModel3D() override {}
+    void UnloadModel3D(int modelId) override {}
     
     // Modèle avec texture
-    void LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override {
+    int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override {
+        static int nextModelId = 100;
         wasLoadModelWithTextureCalled = true;
         lastModelPath = modelPath;
         lastTexturePath = texturePath;
+        return nextModelId++;
     }
 
     // Variables pour les tests
