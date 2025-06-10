@@ -26,7 +26,6 @@ typedef struct client_s {
     int client_fd;
     struct pollfd *client_poll;
     struct sockaddr_in *client_add;
-    char *team;
     player_t *player;
     struct client_s *next;
     bool is_fully_connected;

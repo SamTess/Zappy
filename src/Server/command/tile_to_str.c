@@ -17,7 +17,7 @@ static char *repeat_word(char *word, int nb)
         return strdup("");
     res = malloc(sizeof(char) * ((strlen(word) * nb) + (nb + 1)));
     if (!res)
-        malloc_failed(14);
+        server_err("Malloc failed for res repeat_word");
     res[0] = '\0';
     for (int i = 0; i < nb; ++i) {
         if (i > 0)
@@ -64,7 +64,7 @@ static char *add_resources(int *resources)
     char *temp;
 
     if (!res)
-        malloc_failed(15);
+        server_err("Malloc failed res add_resources");
     res[0] = '\0';
     for (int i = 0; i < COUNT; ++i) {
         if (resources[i] > 0) {
@@ -87,7 +87,7 @@ char *tile_to_str(tile_t *tile)
     char *res = malloc(p_len + r_len + 2);
 
     if (!res)
-        malloc_failed(16);
+        server_err("Malloc failed res tile_to_str");
     res[0] = '\0';
     if (p_len)
         strcat(res, player);

@@ -110,6 +110,7 @@ static bool is_valid_team_name(char *team_name, server_t *server,
         if (strcmp(team_name, server->parsed_info->names[i]) == 0){
             user->player->team_name = strdup(team_name);
             user->type = AI;
+            init_new_player_pos(server, user);
             return true;
         }
     }
@@ -125,7 +126,8 @@ static void send_info_new_client(server_t *server, client_t *user)
         server->parsed_info->height);
 
     tmp_string = malloc(len1 + 1);
-    sprintf(tmp_string, "%d\n", user->client_id);
+    sprintf(tmp_string, "%d\n", connect_nbr_srv(server,
+        user->player->team_name));
     write_command_output(user->client_fd, tmp_string);
     free(tmp_string);
     tmp_string = malloc(len2 + 1);
@@ -141,7 +143,8 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     if (!user)
         return;
     if (!user->is_fully_connected) {
-        if (!is_valid_team_name(buffer, server, user))
+        if (!is_valid_team_name(buffer, server, user)
+            && connect_nbr_srv(server, user->player->team_name) > 0)
             return write_command_output(user->client_fd, "ko\n");
         user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {
