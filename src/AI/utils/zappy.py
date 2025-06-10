@@ -73,8 +73,6 @@ def can_upgrade(inventory, surroundings, current_level):
   inventory_dict = parse_inventory(inventory)
   upgrade_info = upgrades.get(current_level, {})
 
-  print(f"can_upgrade: Checking upgrade for level {current_level}.")
-
   if not upgrade_info:
     print(f"can_upgrade: No upgrade defined for level {current_level}.")
     return False
@@ -84,7 +82,6 @@ def can_upgrade(inventory, surroundings, current_level):
 
   upgrade_cost = upgrade_info.get("cost", {})
 
-
   for resource, amount in upgrade_cost.items():
     if resource == "players":
       if how_much_of_item_here(surroundings, "player") < amount:
@@ -92,8 +89,6 @@ def can_upgrade(inventory, surroundings, current_level):
       continue
     elif inventory_dict.get(resource, 0) < amount:
       return False
-
-  print(f"can_upgrade: Upgrade possible for level {current_level}.")
 
   return True
 
@@ -112,7 +107,4 @@ def how_much_of_item_here(surroundings, item):
   for item_here in here:
     if item_here.strip() == item:
       count += 1
-
-  if (item == "player"):
-    count += 1
   return count

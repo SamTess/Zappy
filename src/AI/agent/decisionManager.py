@@ -16,17 +16,21 @@ class DecisionManager:
 
 
   def process_server_message(self):
-    print("Processing server messages...")
     if not self.agent.has_messages():
       return
 
-    print("Agent has messages to process.")
     message = self.agent.get_message()
     if message.startswith("message "):
       print(f"Received message: {encryption.decrypt_message(message[8:])}")
     elif message.startswith("dead"):
       print("Agent has died.")
       self.agent.stop()
+    elif message.startswith("Current level: "):
+      try:
+        self.agent.level = int(message.split(": ")[1])
+        print(f"Current level set to: {self.agent.level}")
+      except ValueError:
+        print(f"Failed to parse level from message: {message}")
     else:
       print(f"Unknown server message: {message}")
 

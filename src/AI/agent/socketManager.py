@@ -44,7 +44,7 @@ class SocketManager:
   def _handle_message(self, message):
     try:
       with self.lock:
-        if message.startswith("dead") or message.startswith("message") or message.startswith("Elevation") or message.startswith("Current"):
+        if message.startswith("dead") or message.startswith("message") or message.startswith("Current"):
           self.message_queue.put(message)
           return
 
@@ -55,7 +55,6 @@ class SocketManager:
           response_queue = self.pending_requests.pop(request_id)
           response_queue.put(message)
         else:
-          print(f"Unknown message: {message}")
           self.message_queue.put(message)
 
     except Exception as e:

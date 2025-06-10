@@ -20,12 +20,7 @@ class GetFoodBehavior(Behavior):
 
 class UpgradeBehavior(Behavior):
   def execute(self):
-    result = self.agent.send_command("Incantation")
-    if result is None or "ko" in result:
-      print("Upgrade failed: " + str(result))
-    else:
-      self.agent.level += 1
-      print("Upgrade done: " + str(result))
+    self.agent.send_command("Incantation")
       # res = self.agent.send_command("Broadcast a.")
       # print(f"Broadcasting upgrade message: {res}")
 

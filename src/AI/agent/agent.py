@@ -70,15 +70,11 @@ class Agent:
 
 
   def run(self):
-    i = 0
     while self.socketManager.running:
       try:
 
         self.decisionManager.process_server_message()
         self.decisionManager.take_action()
-        i += 1
-        if i % 5 == 0:
-          self.send_command("Broadcast SALUT")
         sleep(0.1)
 
       except BrokenPipeError:
