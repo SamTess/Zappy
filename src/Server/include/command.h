@@ -10,11 +10,13 @@
     #define MAX_LIFE_AFTER_FOOD 126
     #include "server.h"
     #include <stdbool.h>
+    #include "client.h"
 
 typedef struct command_data_s {
     const char **commands;
     void (**functions)(server_t *, client_t *, char *);
     int *times;
+    enum client_type_e *accepted_types;
 } command_data_t;
 
 resource_type_t determine_type(char *resource_string);
@@ -47,5 +49,8 @@ void finish_incantation(server_t *server, client_t *client);
 bool can_start_incantation(server_t *server, client_t *client);
 command_data_t get_command_data(void);
 char *check_rota_tiles(client_t *user, server_t *server, int i, int j);
+
+// client graphical commands
+void command_msz(server_t *server, client_t *client, char *buffer);
 
 #endif /* !COMMAND_H_ */

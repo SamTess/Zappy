@@ -22,7 +22,7 @@ static int calcul_size_pnw_command(client_t *client)
                 client->player->pos_y,
                 client->player->rotation,
                 client->player->level,
-                client->team);
+                client->player->team_name);
 }
 
 void send_pnw_command(server_t *server, client_t *client, client_t *recipient)

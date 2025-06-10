@@ -27,7 +27,7 @@ static void add_to_graphical_list(server_t *server, graphical_client_t *new)
     new->next = NULL;
 }
 
-void add_graphical_reference(server_t *server, client_t *client)
+void add_graphic_client(server_t *server, client_t *client)
 {
     graphical_client_t *new_ref = malloc(sizeof(graphical_client_t));
 
@@ -42,11 +42,10 @@ static void remove_graphical_node(server_t *server, client_t *client,
     graphical_client_t *current, graphical_client_t *prev)
 {
     if (current->client == client) {
-        if (prev == NULL) {
+        if (prev == NULL)
             server->graphical_clients = current->next;
-        } else {
+        else
             prev->next = current->next;
-        }
         free(current);
         return;
     }
@@ -54,7 +53,7 @@ static void remove_graphical_node(server_t *server, client_t *client,
     current = current->next;
 }
 
-void remove_graphical_reference(server_t *server, client_t *client)
+void remove_graphic_client(server_t *server, client_t *client)
 {
     graphical_client_t *current = server->graphical_clients;
     graphical_client_t *prev = NULL;

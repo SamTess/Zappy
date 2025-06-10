@@ -30,3 +30,15 @@ void send_msz_command(server_t *server, client_t *client)
     write_command_output(client->client_fd, buffer);
     free(buffer);
 }
+
+void command_msz(server_t *server, client_t *client, char *buffer)
+{
+    printf("command_msz called\n");
+    if (!server || !client || !buffer)
+        return;
+    if (client->type != GRAPHICAL) {
+        write_command_output(client->client_fd, "ko\n");
+        return;
+    }
+    send_msz_command(server, client);
+}

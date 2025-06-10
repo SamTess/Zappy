@@ -34,8 +34,8 @@ typedef struct client_s {
 } client_t;
 
 void send_message_to_all_graphic(server_t *server, char *message);
-void remove_graphical_reference(server_t *server, client_t *client);
-void add_graphical_reference(server_t *server, client_t *client);
+void remove_graphic_client(server_t *server, client_t *client);
+void add_graphic_client(server_t *server, client_t *client);
 void send_map_info_to_one_client(server_t *server, client_t *client);
 
 #endif /* !CLIENT_H_ */

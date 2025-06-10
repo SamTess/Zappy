@@ -8,8 +8,10 @@
 #include "../include/server.h"
 #include <stdlib.h>
 
-void free_node(client_t *node)
+void free_node(client_t *node, server_t *server)
 {
+    if (node->type == GRAPHICAL)
+        remove_graphic_client(server, node);
     if (node->client_poll)
         free(node->client_poll);
     if (node->client_add)

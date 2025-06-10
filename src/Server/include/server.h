@@ -42,6 +42,6 @@ void create_map(server_t *server, parsing_info_t *parsed_info);
 void init_new_player_pos(server_t *server, client_t *new_client);
 void process_next_queued_command(server_t *server, client_t *client);
 void add_to_command_queue(client_t *client, char *command);
-void free_node(client_t *node);
+void free_node(client_t *node, server_t *server);
 
 #endif /* !SERVER_H_ */
