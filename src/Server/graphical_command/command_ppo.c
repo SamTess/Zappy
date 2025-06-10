@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static client_t *find_client_by_id(server_t *server, int id)
+client_t *find_client_by_id(server_t *server, int id)
 {
     client_t *current = server->client;
 

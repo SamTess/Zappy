@@ -41,6 +41,7 @@ void set_object(server_t *server, client_t *client, char *buffer);
 void fork_c(server_t *server, client_t *client, char *buffer);
 void broadcast(server_t *server, client_t *user, char *buffer);
 int connect_nbr_srv(server_t *server, char *team);
+client_t *find_client_by_id(server_t *server, int id);
 
 // Death and starvation management functions
 void handle_player_death(server_t *server, client_t *client);
@@ -57,6 +58,7 @@ void command_bct(server_t *server, client_t *client, char *buffer);
 void command_mtc(server_t *server, client_t *client, char *buffer);
 void command_tna(server_t *server, client_t *client, char *buffer);
 void command_ppo(server_t *server, client_t *client, char *buffer);
+void command_plv(server_t *server, client_t *client, char *buffer);
 
 // send to all graphical clients
 void send_mtc_to_all_graphical_clients(server_t *server);

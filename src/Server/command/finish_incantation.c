@@ -6,6 +6,7 @@
 */
 
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -64,4 +65,5 @@ void finish_incantation(server_t *server, client_t *client)
     if (!can_start_incantation(server, client))
         return handle_incantation_failure(client);
     handle_incantation_success(client, tile, old_level);
+    send_plv_to_all(server, client);
 }
