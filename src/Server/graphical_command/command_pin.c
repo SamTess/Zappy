@@ -17,16 +17,16 @@ static int calculate_size_pin_command(client_t *client)
     if (!client || !client->player)
         return 0;
     return snprintf(NULL, 0, "pin #%d %d %d %d %d %d %d %d %d %d\n",
-                client->client_id,
-                client->player->pos_x,
-                client->player->pos_y,
-                client->player->inventory[FOOD].quantity,
-                client->player->inventory[LINEMATE].quantity,
-                client->player->inventory[DERAUMERE].quantity,
-                client->player->inventory[SIBUR].quantity,
-                client->player->inventory[MENDIANE].quantity,
-                client->player->inventory[PHIRAS].quantity,
-                client->player->inventory[THYSTAME].quantity);
+        client->client_id,
+        client->player->pos_x,
+        client->player->pos_y,
+        client->player->inventory[FOOD],
+        client->player->inventory[LINEMATE],
+        client->player->inventory[DERAUMERE],
+        client->player->inventory[SIBUR],
+        client->player->inventory[MENDIANE],
+        client->player->inventory[PHIRAS],
+        client->player->inventory[THYSTAME]);
 }
 
 static char *get_buffer_pin_command(client_t *client)
@@ -40,13 +40,13 @@ static char *get_buffer_pin_command(client_t *client)
             client->client_id,
             client->player->pos_x,
             client->player->pos_y,
-            client->player->inventory[FOOD].quantity,
-            client->player->inventory[LINEMATE].quantity,
-            client->player->inventory[DERAUMERE].quantity,
-            client->player->inventory[SIBUR].quantity,
-            client->player->inventory[MENDIANE].quantity,
-            client->player->inventory[PHIRAS].quantity,
-            client->player->inventory[THYSTAME].quantity);
+            client->player->inventory[FOOD],
+            client->player->inventory[LINEMATE],
+            client->player->inventory[DERAUMERE],
+            client->player->inventory[SIBUR],
+            client->player->inventory[MENDIANE],
+            client->player->inventory[PHIRAS],
+            client->player->inventory[THYSTAME]);
     return buffer;
 }
 

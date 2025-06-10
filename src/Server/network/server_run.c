@@ -72,46 +72,55 @@ static void check_client_message(server_t *server)
     }
 }
 
-static void poll_fds(server_t *server, client_t *current, int nfds,
-    struct pollfd *fds)
+static void setup_poll_manager(poll_manager_t *poll_mana, int size)
 {
-    server->client->client_poll->revents = fds[0].revents;
+    if (!poll_mana->fds) {
+        poll_mana->fds = malloc(size * sizeof(struct pollfd));
+        poll_mana->capacity = size;
+    }
+    if (size > poll_mana->capacity) {
+        poll_mana->fds = realloc(poll_mana->fds, size * sizeof(struct pollfd));
+        poll_mana->capacity = size;
+    }
+    poll_mana->needs_rebuild = true;
+}
+
+static void fill_poll_array(server_t *server, poll_manager_t *poll_mana)
+{
+    client_t *current = server->client;
+    int size = server->nfds + 1;
+
+    poll_mana->fds[0] = *(current->client_poll);
+    current = current->next;
+    for (int i = 1; i < size && current != NULL; i++) {
+        poll_mana->fds[i] = *(current->client_poll);
+        current = current->next;
+    }
+    poll_mana->needs_rebuild = false;
+}
+
+static void poll_client(server_t *server, poll_manager_t *poll_mana)
+{
+    client_t *current = server->client;
+    int size = server->nfds + 1;
+
+    current->client_poll->revents = poll_mana->fds[0].revents;
     check_new_connection(server);
-    current = server->client->next;
-    for (int i = 1; i < nfds && current != NULL; i++) {
-        current->client_poll->revents = fds[i].revents;
+    current = current->next;
+    for (int i = 1; i < size && current != NULL; i++) {
+        current->client_poll->revents = poll_mana->fds[i].revents;
         current = current->next;
     }
     if (server->nfds > 0)
         check_client_message(server);
 }
 
-static void helper_function(server_t *server, int nfds, struct pollfd *fds)
+static void handle_game_tick(server_t *server)
 {
-    client_t *current = server->client;
-    int i = 0;
-
-    fds[0] = *(current->client_poll);
-    current = current->next;
-    for (i = 1; i < nfds && current != NULL; i++) {
-        fds[i] = *(current->client_poll);
-        current = current->next;
-    }
-    if (poll(fds, nfds, 10) > 0)
-        poll_fds(server, current, nfds, fds);
-}
-
-void check_client(server_t *server)
-{
-    struct pollfd *fds = calloc((server->nfds + 1), sizeof(struct pollfd));
     static struct timeval last_tick = {0, 0};
     struct timeval current_time;
     long time_diff;
 
-    if (!fds) {
-        perror("Poll array allocation failed");
-        exit(84);
-    }
     gettimeofday(&current_time, NULL);
     time_diff = (current_time.tv_sec - last_tick.tv_sec) * 1000 +
         (current_time.tv_usec - last_tick.tv_usec) / 1000;
@@ -119,7 +128,17 @@ void check_client(server_t *server)
         update_game_tick(server);
         last_tick = current_time;
     }
-    fds[0] = *(server->client->client_poll);
-    helper_function(server, server->nfds + 1, fds);
-    free(fds);
+}
+
+void check_client(server_t *server)
+{
+    static poll_manager_t poll_mana = {0};
+    int size = server->nfds + 1;
+
+    setup_poll_manager(&poll_mana, size);
+    handle_game_tick(server);
+    if (poll_mana.needs_rebuild)
+        fill_poll_array(server, &poll_mana);
+    if (poll(poll_mana.fds, size, 10) > 0)
+        poll_client(server, &poll_mana);
 }

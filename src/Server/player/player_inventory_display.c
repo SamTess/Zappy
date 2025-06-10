@@ -10,38 +10,53 @@
 #include <stdio.h>
 #include <string.h>
 
-static char *get_one_item_content(player_inventory_t item)
+static char *get_one_item_content(resource_type_t type, int quantity)
 {
-    int total_length = strlen(item.name) +
-        snprintf(NULL, 0, "%d", item.quantity) + 3;
+    char *name = get_resource_name(type);
+    int total_length = strlen(name) + snprintf(NULL, 0, "%d", quantity) + 3;
     char *content = malloc(total_length);
 
-    if (!content)
+    if (!content) {
+        free(name);
         return NULL;
-    snprintf(content, total_length, "%s %d", item.name, item.quantity);
+    }
+    snprintf(content, total_length, "%s %d", name, quantity);
+    free(name);
     return content;
 }
 
-static void process_one_item(player_inventory_t item, char **content,
-    size_t *content_length, bool is_last)
+static bool append_item_string(char **content, size_t *content_length,
+    const char *item_str)
 {
-    char *item_str = get_one_item_content(item);
-    size_t item_length = 0;
+    size_t item_length = strlen(item_str);
 
-    if (!item_str)
-        return;
-    item_length = strlen(item_str);
     *content_length += item_length + 3;
     *content = realloc(*content, *content_length);
-    if (!*content) {
-        free(item_str);
-        return;
-    }
+    if (!*content)
+        return false;
     strcat(*content, item_str);
+    return true;
+}
+
+static void add_separator(char **content, bool is_last)
+{
     if (!is_last)
         strcat(*content, ", ");
     else
         strcat(*content, "]\n");
+}
+
+static void process_one_item(resource_type_t type, int quantity,
+    char **content, size_t *content_length)
+{
+    char *item_str = get_one_item_content(type, quantity);
+
+    if (!item_str)
+        return;
+    if (!append_item_string(content, content_length, item_str)) {
+        free(item_str);
+        return;
+    }
     free(item_str);
 }
 
@@ -49,18 +64,18 @@ char *get_inventory_content(player_t *player)
 {
     char *content = strdup("[");
     size_t content_length = 1;
+    int quantity;
 
-    if (!player || player->inventory_size == 0)
+    if (!player)
         return strdup("[]");
-    for (int i = 0; i < player->inventory_size; i++) {
-        if (i == player->inventory_size - 1)
-            process_one_item(player->inventory[i], &content,
-                &content_length, true);
-        else
-            process_one_item(player->inventory[i], &content,
-                &content_length, false);
+    for (int i = 0; i < COUNT; i++) {
+        quantity = 0;
+        if (player->inventory[i])
+            quantity = player->inventory[i];
+        process_one_item(i, quantity, &content, &content_length);
         if (!content)
             return NULL;
+        add_separator(&content, i == COUNT - 1);
     }
     return content;
 }

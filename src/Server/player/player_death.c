@@ -31,7 +31,6 @@ void handle_player_death(server_t *server, client_t *client)
         free(client->player);
         client->player = NULL;
     }
-    close(client->client_fd);
     remove_fd(server, client->client_fd);
 }
 

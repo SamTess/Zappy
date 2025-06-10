@@ -27,10 +27,7 @@ static void free_client_player(client_t *current_client)
 
     free(player->team_name);
     player->team_name = NULL;
-    if (player->inventory){
-        free_inventory(player);
-        player->inventory = NULL;
-    }
+    free_inventory(player);
     if (player->command_queue)
         free_command_queue(player);
     if (player->pending_cmd){

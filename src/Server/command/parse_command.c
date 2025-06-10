@@ -145,7 +145,8 @@ void execute_com(server_t *server, client_t *user, char *buffer)
         return;
     if (!user->is_fully_connected) {
         if (!is_valid_team_name(buffer, server, user)
-            && connect_nbr_srv(server, user->player->team_name) > 0)
+            || (user->type != GRAPHICAL &&
+                connect_nbr_srv(server, user->player->team_name) < 0))
             return write_command_output(user->client_fd, "ko\n");
         user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {

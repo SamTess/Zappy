@@ -40,7 +40,7 @@ int connect_nbr_srv(server_t *server, char *team)
 
     team_eggs = count_team_eggs(server, team);
     if (team_eggs < 0)
-        team_eggs = 0;
+        team_eggs = -1;
     return team_eggs;
 }
 
