@@ -15,13 +15,34 @@ class DecisionManager:
     }
 
   def manage_broadcast(self, full_message):
+
     if not full_message or len(full_message) < 2:
       print("Empty broadcast message received.")
       return
-    broadcast_emitter_direction = int(full_message.split(", ")[0])
+    splitted_message = full_message.split(", ")
+    broadcast_emitter_direction = int(splitted_message[0])
+    broadcast_message = splitted_message[1]
+
     print(f"Broadcast received from direction: {broadcast_emitter_direction}")
-    broadcast_message = encryption.decrypt_message(full_message.split(", ")[1])
-    print(f"Broadcast message: {broadcast_message}")
+
+    decrypted_broadcast_message = encryption.decrypt_message(full_message.split(", ")[1])
+    if decrypted_broadcast_message is not None:
+      print(f"Decrypted broadcast message: {decrypted_broadcast_message}")
+    else:
+      print(f"Enemy broadcast message: {broadcast_message}")
+      return
+
+    if decrypted_broadcast_message.startswith("HELP! Upgrade: "):
+      try:
+        level = int(decrypted_broadcast_message.split(": ")[1])
+        if level == self.agent.level + 1:
+          print(f"Received help request for current level {self.agent.level}.")
+          self.agent.send_command("Incantation")
+        else:
+          print(f"Received help request for level {level}, but current level is {self.agent.level}. Ignoring.")
+      except ValueError:
+        print(f"Failed to parse level from message: {decrypted_broadcast_message}")
+
 
   def process_server_message(self):
     if not self.agent.has_messages():

@@ -35,4 +35,4 @@ def decrypt_message(encrypted_message):
 
   except Exception as e:
     print(f"Decryption error: {e}, with message: {encrypted_message}")
-    return encrypted_message
+    return None
