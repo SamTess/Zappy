@@ -106,7 +106,7 @@ static void free_map(server_t *server, parsing_info_t *parsed_info)
     server->current_resources = NULL;
 }
 
-static void free_parsed_info_contents(parsing_info_t *p_info)
+static void free_parsed_info(parsing_info_t *p_info)
 {
     if (!p_info || !p_info->names)
         return;
@@ -126,5 +126,7 @@ void free_all(server_t *server, parsing_info_t *parsed_info)
     free_eggs(server);
     free_map(server, parsed_info);
     if (parsed_info)
-        free_parsed_info_contents(parsed_info);
+        free_parsed_info(parsed_info);
+    if (server->parsed_info)
+        free_parsed_info(server->parsed_info);
 }
