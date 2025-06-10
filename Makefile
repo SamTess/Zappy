@@ -43,7 +43,7 @@ all: display_banner check_submodules
 	@sleep 0.3
 	@mkdir -p $(PLUGINS_DIR)
 	@$(MAKE) -C $(SERVER_DIR)
-	@$(MAKE) -C $(LIBS_DIR) static shared
+	@$(MAKE) -C $(LIBS_DIR)
 	@$(MAKE) -C $(GUI_DIR)
 	@$(MAKE) -C $(AI_DIR)
 	@echo ""

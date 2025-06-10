@@ -164,19 +164,20 @@ private:
     Model3D createModelObject(int modelId);
 
     /**
-     * @brief Charge les textures pour un modèle
-     * @param model Référence vers l'objet modèle
+     * @brief Charge les textures pour un modèle et retourne le modèle modifié
+     * @param model Objet modèle à modifier
      * @param texturePaths Liste des chemins d'accès aux textures
+     * @return Modèle avec les textures chargées
      */
-    void loadTexturesForModel(Model3D& model, const std::vector<std::string>& texturePaths);
+    Model3D loadTexturesForModel(Model3D model, const std::vector<std::string>& texturePaths);
 
     /**
-     * @brief Charge une texture unique pour un modèle
-     * @param model Référence vers l'objet modèle
+     * @brief Charge une texture unique pour un modèle et retourne le modèle modifié
+     * @param model Objet modèle à modifier
      * @param texturePath Chemin d'accès à la texture
-     * @return true si le chargement a réussi, false sinon
+     * @return std::pair<bool, Model3D> Résultat du chargement et modèle modifié
      */
-    bool loadTextureForModel(Model3D& model, const std::string& texturePath);
+    std::pair<bool, Model3D> loadTextureForModel(Model3D model, const std::string& texturePath);
 
     /**
      * @brief Enregistre le modèle dans les structures de données internes

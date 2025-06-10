@@ -58,29 +58,20 @@ void GameLoop::initializeManagers() {
 bool GameLoop::loadModels() {
     auto& modelManager = ModelManager::getInstance();
     auto& textureManager = TextureManager::getInstance();
-    
     std::cout << "\n=== Test du système de cache des textures et modèles ===\n" << std::endl;
-    
-    // Chargement initial des textures individuelles pour tester le cache
     std::cout << "Chargement direct de textures via TextureManager:" << std::endl;
     int girlTextureId = textureManager.loadTexture("assets/models/14-girl-obj/tEXTURE/girl.png");
     int castleTextureId = textureManager.loadTexture("assets/models/castle_diffuse.png");
     int cubeTextureId = textureManager.loadTexture("assets/models/Cube/cube_diffuse.png");
-    
-    // Rechargement des mêmes textures (devrait retourner les mêmes IDs)
     std::cout << "\nRechargement des mêmes textures (devrait réutiliser les instances existantes):" << std::endl;
     int girlTextureId2 = textureManager.loadTexture("assets/models/14-girl-obj/tEXTURE/girl.png");
     int castleTextureId2 = textureManager.loadTexture("assets/models/castle_diffuse.png");
     int cubeTextureId2 = textureManager.loadTexture("assets/models/Cube/cube_diffuse.png");
-    
     std::cout << "\nVérification des IDs de textures:" << std::endl;
     std::cout << "Girl texture: Premier chargement ID = " << girlTextureId << ", Second chargement ID = " << girlTextureId2 << std::endl;
     std::cout << "Castle texture: Premier chargement ID = " << castleTextureId << ", Second chargement ID = " << castleTextureId2 << std::endl;
     std::cout << "Cube texture: Premier chargement ID = " << cubeTextureId << ", Second chargement ID = " << cubeTextureId2 << std::endl;
-    
     std::cout << "\nChargement des modèles (avec textures via ModelManager):" << std::endl;
-    
-    // Chargement du modèle girl
     int girlModelId = modelManager.loadModel("assets/models/14-girl-obj/girl.obj");
     if (girlModelId != -1) {
         std::cout << "Modèle girl.obj chargé avec succès (ID: " << girlModelId << ")" << std::endl;
@@ -88,8 +79,6 @@ bool GameLoop::loadModels() {
     } else {
         std::cerr << "Impossible de charger le modèle girl.obj" << std::endl;
     }
-    
-    // Chargement du modèle castle avec texture
     int castleModelId = modelManager.loadModel("assets/models/castle.obj", "assets/models/castle_diffuse.png");
     if (castleModelId != -1) {
         std::cout << "Modèle castle.obj avec texture chargé avec succès (ID: " << castleModelId << ")" << std::endl;
@@ -97,8 +86,6 @@ bool GameLoop::loadModels() {
     } else {
         std::cerr << "Impossible de charger le modèle castle.obj avec sa texture" << std::endl;
     }
-    
-    // Premier chargement du cube
     int cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
     if (cubeModelId != -1) {
         std::cout << "Modèle cube.obj avec texture chargé avec succès (ID: " << cubeModelId << ")" << std::endl;
@@ -106,14 +93,11 @@ bool GameLoop::loadModels() {
     } else {
         std::cerr << "Impossible de charger le modèle cube.obj avec sa texture" << std::endl;
     }
-    
-    // Deuxième chargement du cube - devrait réutiliser le même modèle
     std::cout << "\nRechargement du même modèle (devrait réutiliser l'instance existante):" << std::endl;
     int cubeModelIdBis = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
     if (cubeModelIdBis != -1) {
         std::cout << "Modèle cube.obj rechargé (ID: " << cubeModelIdBis << ")" << std::endl;
         m_cubeModelIdBis = cubeModelIdBis;
-        
         if (cubeModelId == cubeModelIdBis) {
             std::cout << "SUCCÈS: Les deux chargements du même modèle ont retourné le même ID." << std::endl;
         } else {
@@ -122,12 +106,10 @@ bool GameLoop::loadModels() {
     } else {
         std::cerr << "Impossible de recharger le modèle cube.obj avec sa texture" << std::endl;
     }
-    
     std::cout << "\nStatistiques du cache:" << std::endl;
     std::cout << "Nombre total de textures en cache: " << textureManager.getTextureCount() << std::endl;
     std::cout << "Nombre total de modèles en cache: " << modelManager.getModelCount() << std::endl;
     std::cout << "\n=== Fin des tests du système de cache ===\n" << std::endl;
-    
     return true;
 }
 

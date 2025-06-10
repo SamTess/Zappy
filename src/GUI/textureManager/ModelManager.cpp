@@ -40,7 +40,9 @@ int ModelManager::loadModel(const std::string& modelPath, const std::string& tex
         }
         Model3D model = createModelObject(modelId);
         if (!texturePath.empty()) {
-            loadTextureForModel(model, texturePath);
+            auto [success, updatedModel] = loadTextureForModel(model, texturePath);
+            if (success)
+                model = updatedModel;
         }
         registerModel(modelPath, modelId, model);
         return modelId;
@@ -68,7 +70,7 @@ int ModelManager::loadModelWithTextures(const std::string& modelPath, const std:
             return -1;
         }
         Model3D model = createModelObject(modelId);
-        loadTexturesForModel(model, texturePaths);
+        model = loadTexturesForModel(model, texturePaths);
         registerModel(modelPath, modelId, model);
         return modelId;
     } catch (const std::exception& e) {
@@ -173,24 +175,27 @@ Model3D ModelManager::createModelObject(int modelId) {
     return model;
 }
 
-void ModelManager::loadTexturesForModel(Model3D& model, const std::vector<std::string>& texturePaths) {
+Model3D ModelManager::loadTexturesForModel(Model3D model, const std::vector<std::string>& texturePaths) {
     for (const auto& texturePath : texturePaths) {
-        loadTextureForModel(model, texturePath);
+        auto [success, updatedModel] = loadTextureForModel(model, texturePath);
+        if (success)
+            model = updatedModel;
     }
+    return model;
 }
 
-bool ModelManager::loadTextureForModel(Model3D& model, const std::string& texturePath) {
+std::pair<bool, Model3D> ModelManager::loadTextureForModel(Model3D model, const std::string& texturePath) {
     if (texturePath.empty())
-        return false;
+        return {false, model};
     auto& textureManager = TextureManager::getInstance();
     int textureId = textureManager.loadTexture(texturePath);
     if (textureId >= 0) {
         model.textureIds.push_back(textureId);
         std::cout << "Texture " << texturePath << " chargée via TextureManager (ID: " << textureId << ")" << std::endl;
-        return true;
+        return {true, model};
     } else {
         std::cerr << "Avertissement: Échec du chargement de la texture " << texturePath << std::endl;
-        return false;
+        return {false, model};
     }
 }
 
