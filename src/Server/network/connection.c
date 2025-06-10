@@ -182,6 +182,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->client_nb = parsed_info->client_nb;
     server->parsed_info->frequence = parsed_info->frequence;
     server->eggs = NULL;
+    server->should_run = true;
     init_server_resources(server);
     copy_names(server, parsed_info);
 }
