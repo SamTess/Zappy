@@ -82,9 +82,8 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     command_data_t data = get_command_data();
 
     for (int i = 0; data.commands[i] != NULL; i++) {
-        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0) {
+        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0)
             return execute_if_free(server, user, buffer, i);
-        }
     }
     return false;
 }
