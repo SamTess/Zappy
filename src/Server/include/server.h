@@ -32,7 +32,6 @@ void display_help(void);
 void remove_fd(server_t *server, int fd);
 void add_fd(server_t *server, int fd);
 void create_server(server_t *server, parsing_info_t *parsed_info);
-void malloc_failed(int i);
 void server_err(char *msg);
 void print_co(char *client_ip, struct sockaddr_in *client_addr,
     client_t *new_client);
@@ -42,5 +41,7 @@ void init_new_player_pos(server_t *server, client_t *new_client);
 void process_next_queued_command(server_t *server, client_t *client);
 void add_to_command_queue(client_t *client, char *command);
 void free_node(client_t *node);
+void init_server_eggs(server_t *n_server);
+void free_all(server_t *server, parsing_info_t *parsed_info);
 
 #endif /* !SERVER_H_ */

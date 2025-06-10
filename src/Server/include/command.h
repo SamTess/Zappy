@@ -38,6 +38,7 @@ void take_object(server_t *server, client_t *client, char *buffer);
 void set_object(server_t *server, client_t *client, char *buffer);
 void fork_c(server_t *server, client_t *client, char *buffer);
 void broadcast(server_t *server, client_t *user, char *buffer);
+int connect_nbr_srv(server_t *server, char *team);
 
 // Death and starvation management functions
 void handle_player_death(server_t *server, client_t *client);

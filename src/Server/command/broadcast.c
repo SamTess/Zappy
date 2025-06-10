@@ -95,7 +95,7 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     if (!receiver || !receiver->player || receiver == sender)
         return;
     if (response == NULL)
-        malloc_failed(8);
+        server_err("Malloc failed for allocating response for broadcast");
     dx = calculate_shortest_distance_x(sender->player->pos_x,
         receiver->player->pos_x, server->parsed_info->width);
     dy = calculate_shortest_distance_y(sender->player->pos_y,
