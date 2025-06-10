@@ -14,7 +14,6 @@
 #include <memory>
 #include <utility>
 #include <functional>
-#include "../buffer/CircularBuffer.hpp"
 #include "Message.hpp"
 #include "HeaderMessage.hpp"
 #include "messageData/MessageDataAll.hpp"
@@ -27,7 +26,6 @@ class ProtocolParser {
         ProtocolParser();
         ~ProtocolParser() = default;
 
-        std::string extractMessage(std::shared_ptr<CircularBuffer> buffer);
         Message parseMessage(const std::string &message);
         std::pair<std::string, std::string> parseMessage(const std::string &message) const;
         std::string getCommandName(const std::string &message);
