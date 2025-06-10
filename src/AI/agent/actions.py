@@ -65,3 +65,17 @@ def go_take_item(agent, item):
 
   go_to_pos_with_distance(agent, distance_to_item)
   take_all_of_item_here(agent, item)
+
+def got_to_dir(agent, direction):
+  if direction == 1 or direction == 2:
+    agent.send_command("Forward")
+  elif direction == 3 or direction == 4:
+    agent.send_command("Left")
+    agent.send_command("Forward")
+  elif direction == 5 or direction == 6:
+    agent.send_command("Left")
+    agent.send_command("Left")
+    agent.send_command("Forward")
+  elif direction == 7 or direction == 8:
+    agent.send_command("Right")
+    agent.send_command("Forward")

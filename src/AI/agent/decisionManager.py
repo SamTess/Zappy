@@ -1,5 +1,6 @@
 import utils.encryption as encryption
 import agent.behaviors as behaviors
+import agent.actions as actions
 import utils.zappy as zappy
 from random import choices
 from abc import ABC, abstractmethod
@@ -15,7 +16,6 @@ class DecisionManager:
     }
 
   def manage_broadcast(self, full_message):
-
     if not full_message or len(full_message) < 2:
       print("Empty broadcast message received.")
       return
@@ -36,8 +36,8 @@ class DecisionManager:
       try:
         level = int(decrypted_broadcast_message.split(": ")[1])
         if level == self.agent.level + 1:
-          print(f"Received help request for current level {self.agent.level}.")
-          self.agent.send_command("Incantation")
+          actions.got_to_dir(self.agent, broadcast_emitter_direction)
+          print(f"Received help request for level {level}. Moving towards the emitter.")
         else:
           print(f"Received help request for level {level}, but current level is {self.agent.level}. Ignoring.")
       except ValueError:
