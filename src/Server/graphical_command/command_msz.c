@@ -33,7 +33,6 @@ void send_msz_command(server_t *server, client_t *client)
 
 void command_msz(server_t *server, client_t *client, char *buffer)
 {
-    printf("command_msz called\n");
     if (!server || !client || !buffer)
         return;
     if (client->type != GRAPHICAL) {

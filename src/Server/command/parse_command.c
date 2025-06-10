@@ -30,14 +30,14 @@ command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
-        "Incantation", "Fork", "Broadcast", "msz", NULL};
+        "Incantation", "Fork", "Broadcast", "msz", "bct", NULL};
     static void (*comm_func[])(server_t *, client_t *, char *) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
-        fork_c, broadcast, command_msz, NULL};
-    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0};
+        fork_c, broadcast, command_msz, command_bct, NULL};
+    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0, 0};
     static enum client_type_e accepted_types[] = {AI, AI, AI, AI, AI,
-        AI, AI, AI, AI, AI, AI, AI, GRAPHICAL};
+        AI, AI, AI, AI, AI, AI, AI, GRAPHICAL, GRAPHICAL};
     command_data_t data = {comm_char, comm_func, comm_times, accepted_types};
 
     return data;
@@ -88,10 +88,6 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     return false;
 }
 
-// if you want to test with telnet
-// (void)team_name;
-// (void)server;
-// return true;
 static bool is_valid_team_name(char *team_name, server_t *server,
     client_t *user)
 {
