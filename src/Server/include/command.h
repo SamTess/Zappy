@@ -60,5 +60,6 @@ void command_tna(server_t *server, client_t *client, char *buffer);
 // send to all graphical clients
 void send_mtc_to_all_graphical_clients(server_t *server);
 void send_bct_to_all_graphical_clients(server_t *server, int x, int y);
+void send_pnw_command_to_all(server_t *server, client_t *client);
 
 #endif /* !COMMAND_H_ */

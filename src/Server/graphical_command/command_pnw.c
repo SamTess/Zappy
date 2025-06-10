@@ -47,6 +47,20 @@ void send_pnw_command(server_t *server, client_t *client, client_t *recipient)
     free(buffer);
 }
 
+void send_pnw_command_to_all(server_t *server, client_t *client)
+{
+    client_t *current = NULL;
+
+    if (!server || !client || !client->player)
+        return;
+    current = server->client;
+    while (current) {
+        if (current->type == GRAPHICAL && current->is_fully_connected)
+            send_pnw_command(server, client, current);
+        current = current->next;
+    }
+}
+
 void send_all_player_info_to_one_client(server_t *server, client_t *client)
 {
     client_t *current = NULL;
