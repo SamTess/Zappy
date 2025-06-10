@@ -53,5 +53,6 @@ char *check_rota_tiles(client_t *user, server_t *server, int i, int j);
 
 // client graphical commands
 void command_msz(server_t *server, client_t *client, char *buffer);
+void command_bct(server_t *server, client_t *client, char *buffer);
 
 #endif /* !COMMAND_H_ */

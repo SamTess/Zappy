@@ -11,6 +11,7 @@
 #include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int calculate_size_bct_command(int x, int y, tile_t *tile)
 {
@@ -68,4 +69,23 @@ void send_tile_content_to_one_client(server_t *server, client_t *client)
             send_bct_command(server, client, x, y);
         }
     }
+}
+
+void command_bct(server_t *server, client_t *client, char *buffer)
+{
+    int x = 0;
+    int y = 0;
+
+    if (!server || !client || !buffer)
+        return;
+    if (client->type != GRAPHICAL)
+        return write_command_output(client->client_fd, "ko\n");
+    if (strlen(buffer) < 7)
+        return write_command_output(client->client_fd, "ko\n");
+    if (sscanf(buffer, "bct %d %d", &x, &y) != 2)
+        return write_command_output(client->client_fd, "ko\n");
+    if (x < 0 || y < 0 || y >= server->parsed_info->height ||
+        x >= server->parsed_info->width)
+        return write_command_output(client->client_fd, "ko\n");
+    send_bct_command(server, client, x, y);
 }
