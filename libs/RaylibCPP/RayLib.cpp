@@ -27,7 +27,7 @@ void RayLib::InitWindow(int width, int height, const std::string& title) {
 void RayLib::CloseWindow() {
     _window.reset();
     _initialized = false;
-    _texture.reset();
+    _textures.clear();
     _font.reset();
     _sound.reset();
     _music.reset();
@@ -85,17 +85,30 @@ void RayLib::DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos
 }
 
 // Textures
-void RayLib::LoadTexture2D(const std::string& path) {
-    _texture.emplace(path);
+int RayLib::LoadTexture2D(const std::string& path) {
+    try {
+        int id = raylibcpp::Texture::getNextId();
+        _textures[id] = std::make_unique<raylibcpp::Texture>(path);
+        return id;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur de chargement de texture: " << e.what() << std::endl;
+        return -1;
+    }
 }
 
-void RayLib::DrawTexture2D(int x, int y) {
-    if (_texture)
-        _texture->draw(x, y);
+void RayLib::DrawTexture2D(int textureId, int x, int y) {
+    auto it = _textures.find(textureId);
+    if (it != _textures.end())
+        it->second->draw(x, y);
 }
 
-void RayLib::UnloadTexture2D() {
-    _texture.reset();
+void RayLib::UnloadTexture2D(int textureId) {
+    _textures.erase(textureId);
+}
+
+bool RayLib::IsTextureReady(int textureId) const {
+    auto it = _textures.find(textureId);
+    return it != _textures.end() && it->second->isReady();
 }
 
 // Texte

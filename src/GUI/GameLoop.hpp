@@ -16,6 +16,7 @@
 #include "renderer/UIRenderer.hpp"
 #include "renderer/Renderer.hpp"
 #include "obj/ObjManager.hpp"
+#include "textureManager/TextureManager.hpp"
 
 class GameLoop {
 public:

@@ -6,6 +6,9 @@
 */
 
 #include <memory>
+#include <map>
+#include <string>
+#include <iostream>
 #include "Renderer.hpp"
 #include "../Constants.hpp"
 
@@ -47,4 +50,31 @@ void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics, std::shared_p
 void Renderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
                        std::shared_ptr<CameraController> camera, std::shared_ptr<UIRenderer> uiRenderer) {
     uiRenderer->renderUI(graphics, gui, camera);
+}
+
+void Renderer::renderSprite2D(int textureId, int x, int y) {
+    auto& textureManager = TextureManager::getInstance();
+    textureManager.drawTexture(textureId, x, y);
+}
+
+int Renderer::loadResourceTexture(const std::string& resourceName, const std::string& texturePath) {
+    auto it = m_resourceTextures.find(resourceName);
+    if (it != m_resourceTextures.end()) {
+        return it->second;
+    }
+    auto& textureManager = TextureManager::getInstance();
+    int textureId = textureManager.loadTexture(texturePath);
+    if (textureId != -1)
+        m_resourceTextures[resourceName] = textureId;
+    else
+        std::cerr << "Échec du chargement de la texture de ressource: " << texturePath << std::endl;
+    return textureId;
+}
+
+int Renderer::getResourceTextureId(const std::string& resourceName) const {
+    auto it = m_resourceTextures.find(resourceName);
+    if (it != m_resourceTextures.end()) {
+        return it->second;
+    }
+    return -1; // Texture non trouvée
 }

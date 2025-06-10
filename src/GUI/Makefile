@@ -22,6 +22,8 @@ SRC = graphicalContext/GraphicalContext.cpp \
 	  network/protocol/ProtocolParser.cpp \
 	  network/utils/SystemWrapper.cpp \
 	  network/networkManager/NetworkManager.cpp \
+	  textureManager/TextureManager.cpp \
+	  textureManager/ModelManager.cpp \
 	  obj/ObjFile.cpp \
 	  obj/ObjManager.cpp \
 	  renderer/Renderer.cpp \

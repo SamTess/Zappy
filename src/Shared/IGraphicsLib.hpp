@@ -33,9 +33,10 @@ public:
     virtual void DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos, ZappyTypes::Color color) = 0;
 
     // Textures
-    virtual void LoadTexture2D(const std::string& path) = 0;
-    virtual void DrawTexture2D(int x, int y) = 0;
-    virtual void UnloadTexture2D() = 0;
+    virtual int LoadTexture2D(const std::string& path) = 0;
+    virtual void DrawTexture2D(int textureId, int x, int y) = 0;
+    virtual void UnloadTexture2D(int textureId) = 0;
+    virtual bool IsTextureReady(int textureId) const = 0;
 
     // Texte
     virtual void LoadFont(const std::string& path) = 0;

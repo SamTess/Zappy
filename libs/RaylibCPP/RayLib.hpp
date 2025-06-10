@@ -10,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <map>
 
 #include "../../src/Shared/IGraphicsLib.hpp"
 #include "window/Window.hpp"
@@ -43,9 +44,10 @@ public:
     void DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos, ZappyTypes::Color color) override;
 
     // Textures
-    void LoadTexture2D(const std::string& path) override;
-    void DrawTexture2D(int x, int y) override;
-    void UnloadTexture2D() override;
+    int LoadTexture2D(const std::string& path) override;
+    void DrawTexture2D(int textureId, int x, int y) override;
+    void UnloadTexture2D(int textureId) override;
+    bool IsTextureReady(int textureId) const override;
 
     // Texte
     void LoadFont(const std::string& path) override;
@@ -91,7 +93,7 @@ public:
 
 private:
     std::unique_ptr<raylibcpp::Window> _window;
-    std::optional<raylibcpp::Texture> _texture;
+    std::map<int, std::unique_ptr<raylibcpp::Texture>> _textures;
     std::optional<raylibcpp::Font> _font;
     std::optional<raylibcpp::SoundWrap> _sound;
     std::optional<raylibcpp::MusicWrap> _music;

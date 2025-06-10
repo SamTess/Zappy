@@ -33,6 +33,9 @@ bool GameLoop::init() {
     m_graphics = libraryManager.getGraphicsLibPtr();
     m_gui = libraryManager.getGuiLibPtr();
 
+    auto& textureManager = TextureManager::getInstance();
+    textureManager.setGraphicsLib(m_graphics);
+
     m_renderer = std::make_shared<Renderer>();
     m_renderer->init(m_graphics);
 
