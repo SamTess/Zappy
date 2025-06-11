@@ -65,7 +65,7 @@ void send_all_player_info_to_one_client(server_t *server, client_t *client)
 {
     client_t *current = NULL;
 
-    if (!server)
+    if (!server || !client || !server->graphical_clients)
         return;
     current = server->client;
     while (current) {

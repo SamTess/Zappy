@@ -40,7 +40,7 @@ void send_tna_command(server_t *server, client_t *client)
 
 void command_tna(server_t *server, client_t *client, char *buffer)
 {
-    if (!server || !client || !buffer)
+    if (!server || !client || !buffer || !server->graphical_clients)
         return;
     (void)buffer;
     if (client->type != GRAPHICAL) {

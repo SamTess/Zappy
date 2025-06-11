@@ -15,8 +15,8 @@ void command_pfk(server_t *server, client_t *client)
     char *buffer = NULL;
     int size = 0;
 
-    if (client == NULL || client->player == NULL)
-        return write_command_output(client->client_fd, "ko\n");
+    if (!client || !client->player || !server->graphical_clients)
+        return;
     size = snprintf(NULL, 0, "pfk #%d\n", client->client_id);
     buffer = malloc(size + 1);
     if (buffer == NULL)

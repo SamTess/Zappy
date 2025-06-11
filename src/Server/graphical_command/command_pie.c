@@ -30,7 +30,7 @@ void command_pie(server_t *server, int x, int y, int result)
     client_t *current = NULL;
     char *buffer = NULL;
 
-    if (!server)
+    if (!server || !server->graphical_clients)
         return;
     buffer = get_pie_buffer(x, y, result);
     if (!buffer)
