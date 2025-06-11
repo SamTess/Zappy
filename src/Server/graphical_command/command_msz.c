@@ -33,7 +33,7 @@ void send_msz_command(server_t *server, client_t *client)
 
 void command_msz(server_t *server, client_t *client, char *buffer)
 {
-    if (!server || !client || !buffer)
+    if (!server || !client || !buffer || !server->graphical_clients)
         return;
     if (client->type != GRAPHICAL) {
         write_command_output(client->client_fd, "ko\n");

@@ -51,7 +51,7 @@ void command_plv(server_t *server, client_t *client, char *buffer)
     client_t *recipient = NULL;
     int id = -1;
 
-    if (!server || !client || !buffer)
+    if (!server || !client || !buffer || !server->graphical_clients)
         return;
     if (client->type != GRAPHICAL)
         return;

@@ -55,7 +55,7 @@ void send_pin_command(server_t *server, client_t *client, client_t *recipient)
     char *buffer = get_buffer_pin_command(client);
 
     (void)server;
-    if (!buffer)
+    if (!buffer || !server->graphical_clients)
         return;
     write_command_output(recipient->client_fd, buffer);
     free(buffer);
@@ -63,14 +63,12 @@ void send_pin_command(server_t *server, client_t *client, client_t *recipient)
 
 void send_pin_to_all(server_t *server, client_t *client)
 {
-    client_t *current = server->client;
+    graphical_client_t *current = server->graphical_clients;
 
-    if (!server || !client || !client->player)
+    if (!server || !client || !server->graphical_clients)
         return;
     while (current) {
-        if (current->type == GRAPHICAL && current != client) {
-            send_pin_command(server, client, current);
-        }
+        send_pin_command(server, client, current->client);
         current = current->next;
     }
 }
@@ -80,7 +78,7 @@ void command_pin(server_t *server, client_t *client, char *buffer)
     client_t *recipient = NULL;
     int id = -1;
 
-    if (!server || !client)
+    if (!server || !client || !server->graphical_clients)
         return;
     if (sscanf(buffer, "pin #%d\n", &id) != 1)
         return;

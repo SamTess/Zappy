@@ -86,7 +86,7 @@ void send_mtc_to_all_graphical_clients(server_t *server)
 
 void send_tile_content_to_one_client(server_t *server, client_t *client)
 {
-    if (!server || !client)
+    if (!server || !client || !server->graphical_clients)
         return;
     for (int y = 0; y < server->parsed_info->height; y++) {
         for (int x = 0; x < server->parsed_info->width; x++) {
@@ -100,7 +100,7 @@ void command_bct(server_t *server, client_t *client, char *buffer)
     int x = 0;
     int y = 0;
 
-    if (!server || !client || !buffer)
+    if (!server || !client || !buffer || !server->graphical_clients)
         return;
     if (client->type != GRAPHICAL)
         return write_command_output(client->client_fd, "ko\n");
@@ -117,7 +117,7 @@ void command_bct(server_t *server, client_t *client, char *buffer)
 void command_mtc(server_t *server, client_t *client, char *buffer)
 {
     (void)buffer;
-    if (!server || !client)
+    if (!server || !client || !server->graphical_clients)
         return;
     if (client->type != GRAPHICAL)
         return write_command_output(client->client_fd, "ko\n");

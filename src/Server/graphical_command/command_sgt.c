@@ -17,7 +17,7 @@ void send_sgt_command(server_t *server, client_t *client)
     char *buffer = NULL;
     int size = 0;
 
-    if (!server || !client)
+    if (!server || !client || !server->graphical_clients)
         return;
     buffer = NULL;
     size = snprintf(NULL, 0, "sgt %d\n", server->parsed_info->frequence);

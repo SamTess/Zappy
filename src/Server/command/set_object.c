@@ -27,6 +27,7 @@ void set_object(server_t *server, client_t *client, char *buffer)
     server->map[client->player->pos_y]
         [client->player->pos_x].resources[resource_type]++;
     server->current_resources[resource_type]++;
+    command_pdr(server, client, resource_type);
     send_pin_to_all(server, client);
     send_bct_to_all_graphical_clients(server, client->player->pos_x,
         client->player->pos_y);

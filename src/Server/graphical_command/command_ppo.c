@@ -67,7 +67,7 @@ void command_ppo(server_t *server, client_t *client, char *buffer)
 {
     int id = 0;
 
-    if (!server || !client || !buffer)
+    if (!server || !client || !buffer || !server->graphical_clients)
         return write_command_output(client->client_fd, "ko\n");
     if (client->type != GRAPHICAL)
         return write_command_output(client->client_fd, "ko\n");
