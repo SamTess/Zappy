@@ -151,8 +151,11 @@ void execute_com(server_t *server, client_t *user, char *buffer)
         } else
             return send_info_new_client(server, user);
     }
-    if (!find_and_execute(server, user, buffer))
+    if (!find_and_execute(server, user, buffer)){
+        if (user->type == GRAPHICAL)
+            return write_command_output(user->client_fd, "suc\n");
         write_command_output(user->client_fd, "ko\n");
+    }
 }
 
 static void check_command(circular_buffer_t *temp_buffer, int cmd_length,
