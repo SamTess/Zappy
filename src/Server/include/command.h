@@ -69,6 +69,7 @@ void command_pfk(server_t *server, client_t *client);
 void command_pdr(server_t *server, client_t *client,
     resource_type_t resource_type);
 void send_enw_command(server_t *server, client_t *client, int egg_id);
+void command_sst(server_t *server, client_t *client, char *buffer);
 
 // send to all graphical clients
 void send_mtc_to_all_graphical_clients(server_t *server);
