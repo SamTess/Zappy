@@ -5,6 +5,7 @@
 ** broadcast
 */
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include "../include/server.h"
 #include <string.h>
 #include <stdio.h>
@@ -116,13 +117,12 @@ void broadcast(server_t *server, client_t *user, char *buffer)
         return;
     }
     message = buffer + 10;
-    if (message[strlen(message) - 1] == '\n')
-        message[strlen(message) - 1] = '\0';
     current = server->client;
     if (current)
         current = current->next;
+    command_pbc(server, user, message);
     while (current) {
-        if (current->player && current != user)
+        if (current->player && current != user && current->type != GRAPHICAL)
             send_broadcast_to_client(server, user, current, message);
         current = current->next;
     }
