@@ -59,7 +59,6 @@ void send_pin_command(server_t *server, client_t *client, client_t *recipient)
         return;
     write_command_output(recipient->client_fd, buffer);
     free(buffer);
-    printf("Sent pin command to client ID: %d\n", recipient->client_id);
 }
 
 void send_pin_to_all(server_t *server, client_t *client)
