@@ -41,6 +41,7 @@ static bool remove_resources(tile_t *tile, int level)
 static void handle_win(char *winner, server_t *server)
 {
     server->should_run = false;
+    command_seg(server, winner);
     printf("%s team are the winner of this Zappy tournament\n", winner);
 }
 
