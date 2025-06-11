@@ -9,6 +9,7 @@
 #include "../include/client.h"
 #include "../include/graphical_commands.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void send_ebo_command(server_t *server, int egg_id)
 {
