@@ -18,6 +18,10 @@ def get_item_relative_pos(item_position):
 
 # transforms inventory string into a list of pair ressource - amount
 def parse_inventory(inventory_str):
+  if not inventory_str:
+    print("parse_inventory: Inventory string is empty or None.")
+    return {}
+
   cleaned = inventory_str.strip("[ ]")
   items = cleaned.split(", ")
 
@@ -37,6 +41,10 @@ def parse_inventory(inventory_str):
 # tries to find the closest item in surroundings string
 # returns distance to the item if found, otherwise -1
 def get_closest_of_item(surroundings_str, item):
+  if not surroundings_str:
+    print("get_closest_of_item: Surroundings data is empty or None.")
+    return -1
+
   cleaned = surroundings_str.strip("[ ]")
   tiles = cleaned.split(", ")
 
@@ -69,23 +77,20 @@ def get_best_available_resource(surroundings):
 
   return best_available_resource
 
-def can_upgrade(inventory, current_level):
-  inventory_dict = parse_inventory(inventory)
-  upgrade_info = upgrades.get(current_level, {})
 
-  if not upgrade_info:
-    print(f"No upgrade defined for level {current_level}.")
-    return False
-  if not inventory_dict:
-    print("Inventory is empty or not properly parsed.")
-    return False
+def how_much_of_item_here(surroundings, item):
+  if not surroundings:
+    print("is_item_here: Surroundings data is empty or None.")
+    return 0
 
-  upgrade_cost = upgrade_info.get("cost", {})
+  print(surroundings)
 
-  for resource, amount in upgrade_cost.items():
-    if resource == "players":
-      continue #TODO: handle players requirement
-    if inventory_dict.get(resource, 0) < amount:
-      return False
+  cleaned = surroundings.strip("[ ]")
+  tiles = cleaned.split(", ")
+  here = tiles[0].strip().split()
 
-  return True
+  count = 0
+  for item_here in here:
+    if item_here.strip() == item:
+      count += 1
+  return count
