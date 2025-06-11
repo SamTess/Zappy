@@ -1,10 +1,12 @@
-import socket
-import sys
 from time import sleep
 from agent.socketManager import SocketManager
 from agent.decisionManager import DecisionManager
-import agent.actions as actions
+from agent.broadcastManager import BroadcastManager
 from logger.logger import Logger
+import utils.encryption as encryption
+import agent.actions as actions
+import socket
+import sys
 
 class Agent:
   def __init__(self, ip, port, team, agent_id=0):
@@ -14,27 +16,31 @@ class Agent:
 
       self.level = 1
       self.team = team
-      self.agent_id = agent_id
+      self.id = agent_id
       self.map_size_x = None
       self.map_size_y = None
-
-      self.decisionManager = DecisionManager(self)
-      self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.agent_id}): ")
+      self.current_behaviour = "Dyson"
+      encryption.secret_key = encryption.secret_key + self.team  # to test encryption between our teams
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.ip, self.port))
-      print(f"Connected to {self.ip}:{self.port}")
 
+      self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.id}): ")
+
+      self.decisionManager = DecisionManager(self)
+      self.broadcastManager = BroadcastManager(self)
       self.socketManager = SocketManager(self.sock)
       self.socketManager.start()
 
     except socket.error as e:
       print(f"Error connecting to server: {e}")
       sys.exit(1)
-
     except Exception as e:
       print(f"Unexpected error: {e}")
       sys.exit(1)
+
+    finally:
+      print(f"Connected to {self.ip}:{self.port} as team '{self.team}' with agent ID {self.id}.")
 
 
   def start(self):
@@ -63,29 +69,31 @@ class Agent:
 
 
   def stop(self):
-    self.logger.info(f"Stopping agent {self.agent_id}...")
+    self.logger.info(f"Stopping agent {self.id}...")
     self.socketManager.stop()
     self.sock.close()
-    print(f"Agent {self.agent_id} stopped.")
+    print(f"Agent {self.id} stopped.")
 
 
   def run(self):
-
     while self.socketManager.running:
       try:
 
-        self.decisionManager.process_server_message()
+        self.process_server_message()
         self.decisionManager.take_action()
-
         sleep(0.1)
 
+      except BrokenPipeError:
+        print(f"Agent {self.id}: Connection closed by server.")
+        self.stop()
+        break
       except Exception as e:
-        print(f"Agent {self.agent_id}: Error: {e}")
+        print(f"Agent {self.id}: Error: {e}")
         self.stop()
         break
 
-  def send_command(self, command):
-    return self.socketManager.send_command(command)
+  def send_command(self, command, timeout=2.0):
+    return self.socketManager.send_command(command, timeout=timeout)
 
   def get_message(self, timeout=None):
     return self.socketManager.get_message(timeout=timeout)
@@ -93,71 +101,22 @@ class Agent:
   def has_messages(self):
     return self.socketManager.has_messages()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # def process_server_messages(self):
-    #     while True:
-    #         server_message = inputs.read_line(self.sock)
-    #         if server_message is None or server_message == "":
-    #             break
-    #         else:
-    #             print("uknown server message received:" + server_message)
-
-    # def take_items_on_ground(self, surroundings):
-    #   cleaned = surroundings.strip("[ ]")
-    #   tiles = cleaned.split(", ")
-    #   items_on_ground = tiles[0].strip().split()
-    #   has_item = False
-
-    #   for item in items_on_ground:
-    #     if item != "player":
-    #       has_item = True
-    #       self.send_command(f"Take {item}")
-    #   return has_item
-
-    # def take_next_decision(self, inventory, surroundings):
-    #   # print(f"Agent {self.agent_id}: Surroundings: {surroundings}")
-    #   # print(f"Agent {self.agent_id}: Inventory: {inventory}")
-
-    #   result = None
-    #   nb_food = utils.parse_inventory(inventory).get("food", 0)
-    #   if nb_food < 10:
-    #     result = self.send_command(utils.go_get_item(surroundings, "food"))
-    #   elif nb_food >= 15:
-    #     result = self.send_command("Broadcast " + encryptionManager._encrypt_message(f"Agent {self.agent_id} is alive and running."))
-    #     print(f"Agent {self.agent_id}: Broadcasting alive message.")
-    #   else:
-    #     self.take_items_on_ground(surroundings)
-    #     result = self.send_command(utils.go_get_item(surroundings, utils.get_best_available_resource(surroundings)))
-
-    #   if result and result.startswith("ko"):
-    #       print(f"Agent {self.agent_id}: Command failed: {result}")
-
-    # def run(self):
-    #     while True:
-    #       try:
-    #         self.process_server_messages()
-    #         surroundings = self.send_command("Look")
-    #         inventory = self.send_command("Inventory")
-    #         self.take_next_decision(inventory, surroundings)
-
-    #       except BrokenPipeError:
-    #           print(f"Agent {self.agent_id}: Connection closed by server.")
-    #           break
-    #       except Exception as e:
-    #           print(f"Agent {self.agent_id}: Error: {e}")
+  def process_server_message(self):
+    if not self.has_messages():
+      return
+    message = self.get_message()
+    if message.startswith("message "):
+      self.broadcastManager.manage_broadcast(message)
+    elif message.startswith("dead"):
+      print("Agent has died.")
+      self.stop()
+    elif message.startswith("Current level: "):
+      try:
+        self.level = int(message.split(": ")[1])
+        if self.level >= 2:
+          self.current_behaviour = "GetFoodAndMinerals"
+        print(f"Current level set to: {self.level}")
+      except ValueError:
+        print(f"Failed to parse level from message: {message}")
+    else:
+      print(f"Unknown server message: {message}")
