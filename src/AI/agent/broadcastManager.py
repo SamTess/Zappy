@@ -40,7 +40,7 @@ class BroadcastManager:
       try:
         level = int(decrypted_message.split(": ")[1])
         if level == self.agent.level + 1:
-          actions.got_to_dir(self.agent, broadcast_emitter_direction)
+          actions.got_to_dir(self.agent, emitter_direction)
           print(f"Received help request for level {level}. Moving towards the emitter.")
         else:
           print(f"Received help request for level {level}, but current level is {self.agent.level}. Ignoring.")

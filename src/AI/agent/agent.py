@@ -20,26 +20,27 @@ class Agent:
       self.map_size_x = None
       self.map_size_y = None
       self.current_behaviour = "Dyson"
-      encryption.secret_key = encryption.secret_key + self.team
-
-      self.decisionManager = DecisionManager(self)
-      self.broadcastManager = BroadcastManager(self)
-      self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.id}): ")
+      encryption.secret_key = encryption.secret_key + self.team  # to test encryption between our teams
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.ip, self.port))
-      print(f"Connected to {self.ip}:{self.port}")
 
+      self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.id}): ")
+
+      self.decisionManager = DecisionManager(self)
+      self.broadcastManager = BroadcastManager(self)
       self.socketManager = SocketManager(self.sock)
       self.socketManager.start()
 
     except socket.error as e:
       print(f"Error connecting to server: {e}")
       sys.exit(1)
-
     except Exception as e:
       print(f"Unexpected error: {e}")
       sys.exit(1)
+
+    finally:
+      print(f"Connected to {self.ip}:{self.port} as team '{self.team}' with agent ID {self.id}.")
 
 
   def start(self):
@@ -80,6 +81,7 @@ class Agent:
 
         self.process_server_message()
         self.decisionManager.take_action()
+        print("running")
         sleep(0.1)
 
       except BrokenPipeError:

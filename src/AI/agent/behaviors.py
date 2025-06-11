@@ -20,7 +20,6 @@ class GetFoodBehavior(Behavior):
 
 class UpgradeBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-
     if not surroundings or not inventory:
       print("UpgradeBehavior: Surroundings or inventory is None.")
       return
@@ -47,13 +46,13 @@ class UpgradeBehavior(Behavior):
         return
 
     self.agent.send_command("Incantation")
-      # res = self.agent.send_command("Broadcast a.")
-      # print(f"Broadcasting upgrade message: {res}")
 
 
 class GetMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    surroundings = self.agent.send_command("Look")
+    if not surroundings:
+      print("GetMineralsBehavior: Surroundings is None.")
+      return
     actions.go_take_item(self.agent, zappy.get_best_available_resource(surroundings))
 
 
@@ -66,7 +65,8 @@ class DysonBehavior(Behavior):
     self.agent.send_command("Forward")
     self.agent.send_command("Left")
 
-class GetFoodAndMineralsBehaviour(Behavior):
+
+class GetFoodAndMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if not surroundings or not inventory:
       print("GetFoodAndMineralsBehaviour: Surroundings or inventory is None.")
