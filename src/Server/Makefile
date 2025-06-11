@@ -58,6 +58,7 @@ SRC = 	help.c								\
 		graphical_command/command_pnw.c		\
 		graphical_command/command_sgt.c		\
 		graphical_command/command_tna.c		\
+		graphical_command/command_ebo.c		\
 		graphical_command/command_ppo.c		\
 		graphical_command/command_pie.c		\
 		graphical_command/command_pex.c		\

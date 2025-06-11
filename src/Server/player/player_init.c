@@ -7,6 +7,7 @@
 
 #include "../include/player.h"
 #include "../include/server.h"
+#include "../include/graphical_commands.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +43,7 @@ void init_new_player_pos(server_t *server, client_t *new_client)
             new_client->player->pos_y = team_egg->pos_y;
             tile_add_player(&server->map[team_egg->pos_y][team_egg->pos_x],
                 new_client->client_id);
+            send_ebo_command(server, team_egg->egg_id);
             remove_egg(server, team_egg->egg_id,
                 &server->map[team_egg->pos_y][team_egg->pos_x]);
             return;
