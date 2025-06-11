@@ -17,6 +17,7 @@ void send_pnw_command(server_t *server, client_t *client, client_t *recipient);
 void send_pin_command(server_t *server, client_t *client, client_t *recipient);
 void send_plv_command(server_t *server, client_t *client, client_t *recipient);
 void send_ebo_command(server_t *server, int egg_id);
+void command_pic(server_t *server, int x, int y, int level);
 
 void send_tile_content_to_one_client(server_t *server, client_t *client);
 void send_team_names_to_one_client(server_t *server, client_t *client);
