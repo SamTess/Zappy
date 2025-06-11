@@ -54,6 +54,7 @@ void take_object(server_t *server, client_t *client, char *buffer)
         [client->player->pos_x].resources[type] > 0) {
         update_resources(server, client, type);
         add_item_to_inventory(client->player, type, 1);
+        command_pgt(server, client, type);
         send_bct_to_all_graphical_clients(server, client->player->pos_x,
             client->player->pos_y);
         send_pin_to_all(server, client);
