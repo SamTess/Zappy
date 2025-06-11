@@ -39,7 +39,7 @@ def take_everything_here(agent):
 
   for item in items_on_ground:
     if item:
-      item.strip(", .")
+      item = item.strip(", .")
     if item != "player":
       take_all_of_item_here(agent, item)
 
