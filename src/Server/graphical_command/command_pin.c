@@ -89,17 +89,16 @@ void command_pin(server_t *server, client_t *client, char *buffer)
     client_t *recipient = NULL;
     int id = -1;
 
-    if (!server || !client || !server->graphical_clients)
-        return;
-    if (sscanf(buffer, "pin #%d\n", &id) != 1)
-        return;
-    if (!check_if_length_is_valid_pin(buffer, id))
-        return write_command_output(client->client_fd, "sbp\n");
-    if (id < 0)
-        return write_command_output(client->client_fd, "sbp\n");
-    recipient = find_client_by_id(server, id);
-    if (!recipient || recipient->type != AI) {
-        write_command_output(client->client_fd, "sbp\n");
+    if (!server || !client || !server->graphical_clients ||
+        sscanf(buffer, "pin #%d\n", &id) != 1 ||
+        !check_if_length_is_valid_pin(buffer, id) ||
+        id < 0 ||
+        !(recipient = find_client_by_id(server, id)) ||
+        recipient->type != AI) {
+        if (client && client->client_fd >= 0 &&
+            (id >= 0 || !check_if_length_is_valid_pin(buffer, id) ||
+            !recipient || recipient->type != AI))
+            write_command_output(client->client_fd, "sbp\n");
         return;
     }
     send_pin_command(server, recipient, client);

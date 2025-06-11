@@ -109,15 +109,12 @@ void command_bct(server_t *server, client_t *client, char *buffer)
     int x = 0;
     int y = 0;
 
-    if (!server || !client || !buffer || !server->graphical_clients)
-        return;
-    if (strlen(buffer) < 7)
-        return write_command_output(client->client_fd, "sbp\n");
-    if (sscanf(buffer, "bct %d %d\n", &x, &y) != 2)
-        return write_command_output(client->client_fd, "sbp\n");
-    if (!check_if_length_is_valid_bct(buffer, x, y))
-        return write_command_output(client->client_fd, "sbp\n");
-    if (x < 0 || y < 0 || y >= server->parsed_info->height ||
+    if (!server || !client || !buffer || !server->graphical_clients ||
+        strlen(buffer) < 7 ||
+        sscanf(buffer, "bct %d %d\n", &x, &y) != 2 ||
+        !check_if_length_is_valid_bct(buffer, x, y) ||
+        x < 0 || y < 0 ||
+        y >= server->parsed_info->height ||
         x >= server->parsed_info->width)
         return write_command_output(client->client_fd, "sbp\n");
     send_bct_command(server, client, x, y);

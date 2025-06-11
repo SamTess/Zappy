@@ -78,16 +78,12 @@ void command_ppo(server_t *server, client_t *client, char *buffer)
 {
     int id = 0;
 
-    if (!server || !client || !buffer || !server->graphical_clients)
+    if (!server || !client || !buffer || !server->graphical_clients ||
+        client->type != GRAPHICAL ||
+        sscanf(buffer, "ppo #%d\n", &id) != 1 ||
+        !check_if_length_is_valid_ppo(buffer, id) ||
+        id < 0 || !find_client_by_id(server, id) ||
+        !send_ppo_command(server, id)) {
         return write_command_output(client->client_fd, "sbp\n");
-    if (client->type != GRAPHICAL)
-        return write_command_output(client->client_fd, "sbp\n");
-    if (sscanf(buffer, "ppo #%d\n", &id) != 1)
-        return write_command_output(client->client_fd, "sbp\n");
-    if (!check_if_length_is_valid_ppo(buffer, id))
-        return write_command_output(client->client_fd, "sbp\n");
-    if (id < 0 || !find_client_by_id(server, id))
-        return write_command_output(client->client_fd, "sbp\n");
-    if (!send_ppo_command(server, id))
-        return write_command_output(client->client_fd, "sbp\n");
+    }
 }
