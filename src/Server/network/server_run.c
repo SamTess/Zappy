@@ -136,13 +136,12 @@ static void handle_game_tick(server_t *server)
 
 void check_client(server_t *server)
 {
-    static poll_manager_t poll_mana = {0};
     int size = server->nfds + 1;
 
-    setup_poll_manager(&poll_mana, size);
+    setup_poll_manager(server->poll_manager, size);
     handle_game_tick(server);
-    if (poll_mana.needs_rebuild)
-        fill_poll_array(server, &poll_mana);
-    if (poll(poll_mana.fds, size, 10) > 0)
-        poll_client(server, &poll_mana);
+    if (server->poll_manager->needs_rebuild)
+        fill_poll_array(server, server->poll_manager);
+    if (poll(server->poll_manager->fds, size, 10) > 0)
+        poll_client(server, server->poll_manager);
 }

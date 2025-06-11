@@ -31,3 +31,38 @@ void send_plv_command(server_t *server, client_t *client, client_t *recipient)
     write_command_output(recipient->client_fd, buffer);
     free(buffer);
 }
+
+void send_plv_to_all(server_t *server, client_t *client)
+{
+    client_t *current = server->client;
+
+    if (!server || !client || !client->player)
+        return;
+    while (current) {
+        if (current->type == GRAPHICAL && current != client) {
+            send_plv_command(server, client, current);
+        }
+        current = current->next;
+    }
+}
+
+void command_plv(server_t *server, client_t *client, char *buffer)
+{
+    client_t *recipient = NULL;
+    int id = -1;
+
+    if (!server || !client || !buffer || !server->graphical_clients)
+        return;
+    if (client->type != GRAPHICAL)
+        return;
+    if (sscanf(buffer, "plv #%d\n", &id) != 1)
+        return;
+    if (id < 0)
+        return write_command_output(client->client_fd, "ko\n");
+    recipient = find_client_by_id(server, id);
+    if (!recipient || recipient->type != AI) {
+        write_command_output(client->client_fd, "ko\n");
+        return;
+    }
+    send_plv_command(server, recipient, client);
+}
