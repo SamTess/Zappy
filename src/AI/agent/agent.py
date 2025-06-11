@@ -81,7 +81,6 @@ class Agent:
 
         self.process_server_message()
         self.decisionManager.take_action()
-        print("running")
         sleep(0.1)
 
       except BrokenPipeError:

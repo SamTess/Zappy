@@ -18,6 +18,10 @@ def get_item_relative_pos(item_position):
 
 # transforms inventory string into a list of pair ressource - amount
 def parse_inventory(inventory_str):
+  if not inventory_str:
+    print("parse_inventory: Inventory string is empty or None.")
+    return {}
+
   cleaned = inventory_str.strip("[ ]")
   items = cleaned.split(", ")
 
@@ -37,6 +41,10 @@ def parse_inventory(inventory_str):
 # tries to find the closest item in surroundings string
 # returns distance to the item if found, otherwise -1
 def get_closest_of_item(surroundings_str, item):
+  if not surroundings_str:
+    print("get_closest_of_item: Surroundings data is empty or None.")
+    return -1
+
   cleaned = surroundings_str.strip("[ ]")
   tiles = cleaned.split(", ")
 

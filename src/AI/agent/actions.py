@@ -20,6 +20,9 @@ def go_to_pos_with_distance(agent, distance):
 def take_all_of_item_here(agent, item):
   surroundings = agent.send_command("Look")
   while zappy.get_closest_of_item(surroundings, item) == 0:
+    if surroundings is None or "ko" in surroundings:
+      print(f"take_all_of_item_here: Failed to look around. Response: {surroundings}")
+      return
     response = agent.send_command("Take " + item)
     if (response is None or "ko" in response):
       print(f"Failed to take {item}. Response: {response}")
@@ -29,7 +32,7 @@ def take_all_of_item_here(agent, item):
 def take_everything_here(agent):
   surroundings = agent.send_command("Look")
   if surroundings is None or "ko" in surroundings:
-    print(f"Failed to look around. Response: {surroundings}")
+    print(f"take_everything_here: Failed to look around. Response: {surroundings}")
     return
 
   items_on_ground = surroundings.strip("[ ]").split(",")[0].split(" ")
@@ -46,6 +49,9 @@ def go_take_item(agent, item):
 
   while True:
     surroundings = agent.send_command("Look")
+    if surroundings is None or "ko" in surroundings:
+      print(f"go_take_item: Failed to look around. Response: {surroundings}")
+      return
     closest_item_distance = zappy.get_closest_of_item(surroundings, item)
     if closest_item_distance != -1 or i > 4:
       break
