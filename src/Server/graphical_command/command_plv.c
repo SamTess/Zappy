@@ -46,6 +46,16 @@ void send_plv_to_all(server_t *server, client_t *client)
     }
 }
 
+static bool check_if_length_is_valid_plv(const char *buffer, int id)
+{
+    int expected_length = 0;
+
+    expected_length = snprintf(NULL, 0, "plv #%d\n", id);
+    if (expected_length != strlen(buffer))
+        return false;
+    return true;
+}
+
 void command_plv(server_t *server, client_t *client, char *buffer)
 {
     client_t *recipient = NULL;
@@ -57,11 +67,11 @@ void command_plv(server_t *server, client_t *client, char *buffer)
         return;
     if (sscanf(buffer, "plv #%d\n", &id) != 1)
         return;
-    if (id < 0)
-        return write_command_output(client->client_fd, "ko\n");
+    if (!check_if_length_is_valid_plv(buffer, id))
+        return write_command_output(client->client_fd, "sbp\n");
     recipient = find_client_by_id(server, id);
     if (!recipient || recipient->type != AI) {
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output(client->client_fd, "sbp\n");
         return;
     }
     send_plv_command(server, recipient, client);

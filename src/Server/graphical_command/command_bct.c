@@ -95,6 +95,16 @@ void send_tile_content_to_one_client(server_t *server, client_t *client)
     }
 }
 
+static bool check_if_length_is_valid_bct(const char *buffer, int x, int y)
+{
+    int expected_length = 0;
+
+    expected_length = snprintf(NULL, 0, "bct %d %d\n", x, y);
+    if (expected_length != strlen(buffer))
+        return false;
+    return true;
+}
+
 void command_bct(server_t *server, client_t *client, char *buffer)
 {
     int x = 0;
@@ -102,15 +112,15 @@ void command_bct(server_t *server, client_t *client, char *buffer)
 
     if (!server || !client || !buffer || !server->graphical_clients)
         return;
-    if (client->type != GRAPHICAL)
-        return write_command_output(client->client_fd, "ko\n");
     if (strlen(buffer) < 7)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
     if (sscanf(buffer, "bct %d %d\n", &x, &y) != 2)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
+    if (!check_if_length_is_valid_bct(buffer, x, y))
+        return write_command_output(client->client_fd, "sbp\n");
     if (x < 0 || y < 0 || y >= server->parsed_info->height ||
         x >= server->parsed_info->width)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
     send_bct_command(server, client, x, y);
 }
 

@@ -63,18 +63,30 @@ bool send_ppo_command(server_t *server, int id)
     return true;
 }
 
+static bool check_if_length_is_valid_ppo(const char *buffer, int id)
+{
+    int expected_length = 0;
+
+    expected_length = snprintf(NULL, 0, "ppo #%d\n", id);
+    if (expected_length != strlen(buffer))
+        return false;
+    return true;
+}
+
 void command_ppo(server_t *server, client_t *client, char *buffer)
 {
     int id = 0;
 
     if (!server || !client || !buffer || !server->graphical_clients)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
     if (client->type != GRAPHICAL)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
     if (sscanf(buffer, "ppo #%d\n", &id) != 1)
-        return write_command_output(client->client_fd, "ko\n");
-    if (id < 0)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
+    if (!check_if_length_is_valid_ppo(buffer, id))
+        return write_command_output(client->client_fd, "sbp\n");
+    if (id < 0 || !find_client_by_id(server, id))
+        return write_command_output(client->client_fd, "sbp\n");
     if (!send_ppo_command(server, id))
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "sbp\n");
 }
