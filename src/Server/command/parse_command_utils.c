@@ -9,6 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
 
 void cleanup_pending(player_t *player)
 {
@@ -67,5 +69,9 @@ void cleanup_client(client_t *client)
 
 void write_command_output(int client_fd, char *msg)
 {
-    write(client_fd, msg, strlen(msg));
+    if (fcntl(client_fd, F_GETFD) == -1) {
+        perror("Need to find better way to handle this\n");
+    } else {
+        write(client_fd, msg, strlen(msg));
+    }
 }

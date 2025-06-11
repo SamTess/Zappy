@@ -87,31 +87,6 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     return false;
 }
 
-static bool is_valid_team_name(char *team_name, server_t *server,
-    client_t *user)
-{
-    if (!team_name || !server ||
-        !server->parsed_info || !server->parsed_info->names)
-        return false;
-    if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
-        return false;
-    team_name[strlen(team_name) - 1] = '\0';
-    if (strcmp(team_name, "GRAPHIC") == 0) {
-        user->type = GRAPHICAL;
-        user->player = NULL;
-        return true;
-    }
-    for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
-        if (strcmp(team_name, server->parsed_info->names[i]) == 0){
-            user->player->team_name = strdup(team_name);
-            user->type = AI;
-            init_new_player_pos(server, user);
-            return true;
-        }
-    }
-    return false;
-}
-
 static void send_info_new_client(server_t *server, client_t *user)
 {
     char *tmp_string = NULL;
@@ -138,11 +113,7 @@ void execute_com(server_t *server, client_t *user, char *buffer)
 {
     if (!user)
         return;
-    if (!user->is_fully_connected) {
-        if (!is_valid_team_name(buffer, server, user)
-            || (user->type != GRAPHICAL &&
-                connect_nbr_srv(server, user->player->team_name) < 0))
-            return write_command_output(user->client_fd, "ko\n");
+    if (!user->is_fully_connected && can_connect(server, user, buffer)){
         user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {
             add_graphic_client(server, user);

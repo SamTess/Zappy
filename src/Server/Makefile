@@ -28,6 +28,7 @@ SRC = 	help.c								\
 		map/resources_map.c					\
 		command/parse_command.c				\
 		command/parse_command_utils.c		\
+		command/parse_command_utils_bis.c	\
 		command/forward.c					\
 		command/right.c						\
 		command/left.c						\

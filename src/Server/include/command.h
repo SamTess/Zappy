@@ -41,6 +41,7 @@ void set_object(server_t *server, client_t *client, char *buffer);
 void fork_c(server_t *server, client_t *client, char *buffer);
 void broadcast(server_t *server, client_t *user, char *buffer);
 int connect_nbr_srv(server_t *server, char *team);
+bool can_connect(server_t *server, client_t *user, char *buffer);
 client_t *find_client_by_id(server_t *server, int id);
 
 // Death and starvation management functions
