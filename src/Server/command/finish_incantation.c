@@ -91,7 +91,7 @@ void finish_incantation(server_t *server, client_t *client)
             client->player->pos_y, 0);
         return handle_incantation_failure(client);
     }
-    handle_incantation_success(client, tile, old_level);
+    handle_incantation_success(client, tile, old_level, server);
     command_pie(server, client->player->pos_x,
         client->player->pos_y, 1);
     send_plv_to_all(server, client);
