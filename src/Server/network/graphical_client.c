@@ -84,7 +84,7 @@ void send_map_info_to_one_client(server_t *server, client_t *client)
     if (!server || !client)
         return;
     send_msz_command(server, client);
-    send_sgt_command(server, client);
+    command_sgt(server, client, "");
     send_tile_content_to_one_client(server, client);
     send_tna_command(server, client);
     send_all_player_info_to_one_client(server, client);
