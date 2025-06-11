@@ -14,6 +14,11 @@
     #include "tile.h"
     #include "egg.h"
 
+typedef struct poll_manager_s {
+    struct pollfd *fds;
+    int capacity;
+    bool needs_rebuild;
+} poll_manager_t;
 typedef struct server_s {
     int nfds;
     int s_fd;

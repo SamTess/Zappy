@@ -10,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <map>
 
 #include "../../src/Shared/IGraphicsLib.hpp"
 #include "window/Window.hpp"
@@ -43,9 +44,10 @@ public:
     void DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos, ZappyTypes::Color color) override;
 
     // Textures
-    void LoadTexture2D(const std::string& path) override;
-    void DrawTexture2D(int x, int y) override;
-    void UnloadTexture2D() override;
+    int LoadTexture2D(const std::string& path) override;
+    void DrawTexture2D(int textureId, int x, int y) override;
+    void UnloadTexture2D(int textureId) override;
+    bool IsTextureReady(int textureId) const override;
 
     // Texte
     void LoadFont(const std::string& path) override;
@@ -84,20 +86,22 @@ public:
     void UnloadTexture3D() override;
 
     // Modèles 3D
-    void LoadModel3D(const std::string& path) override;
-    void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override;
-    void DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override;
-    void UnloadModel3D() override;
+    int LoadModel3D(const std::string& path) override;
+    void DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override;
+    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override;
+    void UnloadModel3D(int modelId) override;
+    int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override;
 
 private:
     std::unique_ptr<raylibcpp::Window> _window;
-    std::optional<raylibcpp::Texture> _texture;
+    std::map<int, std::unique_ptr<raylibcpp::Texture>> _textures;
+    std::map<int, std::unique_ptr<raylibcpp::ModelWrap>> _models;
+    int _nextModelId = 1;
     std::optional<raylibcpp::Font> _font;
     std::optional<raylibcpp::SoundWrap> _sound;
     std::optional<raylibcpp::MusicWrap> _music;
     std::optional<raylibcpp::Camera2DWrap> _camera2D;
     std::optional<raylibcpp::Camera3DWrap> _camera3D;
     std::optional<raylibcpp::Texture3DWrap> _texture3D;
-    std::optional<raylibcpp::ModelWrap> _model3D;
     bool _initialized = false;
 };

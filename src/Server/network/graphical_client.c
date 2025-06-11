@@ -38,19 +38,20 @@ void add_graphic_client(server_t *server, client_t *client)
     add_to_graphical_list(server, new_ref);
 }
 
-static void remove_graphical_node(server_t *server, client_t *client,
-    graphical_client_t *current, graphical_client_t *prev)
+static bool remove_graphical_node(server_t *server, client_t *client,
+    graphical_client_t **current, graphical_client_t **prev)
 {
-    if (current->client == client) {
-        if (prev == NULL)
-            server->graphical_clients = current->next;
+    if ((*current)->client == client) {
+        if (*prev == NULL)
+            server->graphical_clients = (*current)->next;
         else
-            prev->next = current->next;
-        free(current);
-        return;
+            (*prev)->next = (*current)->next;
+        free(*current);
+        return true;
     }
-    prev = current;
-    current = current->next;
+    *prev = *current;
+    *current = (*current)->next;
+    return false;
 }
 
 void remove_graphic_client(server_t *server, client_t *client)
@@ -61,8 +62,10 @@ void remove_graphic_client(server_t *server, client_t *client)
     if (!server || !client || !server->graphical_clients)
         return;
     while (current != NULL) {
-        remove_graphical_node(server, client, current, prev);
+        if (remove_graphical_node(server, client, &current, &prev))
+            return;
     }
+    remove_fd(server, client->client_fd);
 }
 
 void send_message_to_all_graphic(server_t *server, char *message)
@@ -83,7 +86,7 @@ void send_map_info_to_one_client(server_t *server, client_t *client)
     send_msz_command(server, client);
     send_sgt_command(server, client);
     send_tile_content_to_one_client(server, client);
-    send_team_names_to_one_client(server, client);
+    send_tna_command(server, client);
     send_all_player_info_to_one_client(server, client);
     write_command_output(client->client_fd, "egg send missing\n");
 }

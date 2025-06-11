@@ -55,18 +55,10 @@ static bool execute_graphical_command(server_t *server, client_t *user,
 static bool execute_if_free(server_t *server, client_t *user,
     char *buffer, int cmd_index)
 {
-    command_data_t data = get_command_data();
-
     if (user->type == GRAPHICAL)
         return execute_graphical_command(server, user, buffer, cmd_index);
     if (user->type == AI && user->player->busy_until <= server->current_tick) {
-        if (cmd_index == 9)
-            write_command_output(user->client_fd, "Elevation underway\n");
-        user->player->pending_cmd->args = strdup(buffer);
-        user->player->pending_cmd->func = data.functions[cmd_index];
-        if (data.times[cmd_index] > 0)
-            user->player->busy_until =
-                server->current_tick + data.times[cmd_index];
+        add_pending_cmd(user, server, buffer, cmd_index);
         return true;
     } else {
         if (user->player->queue_size < 10) {
@@ -145,7 +137,8 @@ void execute_com(server_t *server, client_t *user, char *buffer)
         return;
     if (!user->is_fully_connected) {
         if (!is_valid_team_name(buffer, server, user)
-            && connect_nbr_srv(server, user->player->team_name) > 0)
+            || (user->type != GRAPHICAL &&
+                connect_nbr_srv(server, user->player->team_name) < 0))
             return write_command_output(user->client_fd, "ko\n");
         user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {

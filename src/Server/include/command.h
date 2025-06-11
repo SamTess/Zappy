@@ -50,6 +50,9 @@ void finish_incantation(server_t *server, client_t *client);
 bool can_start_incantation(server_t *server, client_t *client);
 command_data_t get_command_data(void);
 char *check_rota_tiles(client_t *user, server_t *server, int i, int j);
+void add_pending_cmd(client_t *user, server_t *server,
+    char *buffer, int cmd_index);
+void cleanup_pending(player_t *player);
 
 // client graphical commands
 void command_msz(server_t *server, client_t *client, char *buffer);

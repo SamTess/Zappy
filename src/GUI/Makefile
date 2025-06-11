@@ -21,8 +21,8 @@ SRC = graphicalContext/GraphicalContext.cpp \
 	  network/protocol/ProtocolParser.cpp \
 	  network/utils/SystemWrapper.cpp \
 	  network/networkManager/NetworkManager.cpp \
-	  obj/ObjFile.cpp \
-	  obj/ObjManager.cpp \
+	  textureManager/TextureManager.cpp \
+	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
 	  renderer/UIRenderer.cpp \
 	  cameraController/CameraController.cpp \

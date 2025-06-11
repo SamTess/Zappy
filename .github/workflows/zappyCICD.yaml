@@ -171,7 +171,7 @@ jobs:
         timeout-minutes: 2
 
       - name: Install cppcheck
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           sudo apt-get update
           sudo apt-get install -y cppcheck gcc g++ libtinyxml2-dev python3-pip
