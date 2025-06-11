@@ -10,6 +10,8 @@ zappy_server
 zappy_gui
 zappy_ai
 unit_tests
+c_unit_tests
+cpp_unit_tests
 tests/Functionnal/Test1
 tests/Functionnal/Test2
 tests/Functionnal/Test3

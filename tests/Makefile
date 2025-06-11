@@ -24,7 +24,9 @@ CLIENT_SRC = unit/network/buffer/test_circular_buffer.cpp \
 			 unit/network/protocol/test_protocol_parser.cpp \
 			 unit/network/utils/test_system_wrapper.cpp \
 			 unit/network/networkManager/test_network_manager.cpp \
-			 unit/network/networkThread/test_network_thread.cpp
+			 unit/network/networkThread/test_network_thread.cpp \
+			 unit/texture/test_model_manager.cpp \
+			 unit/texture/test_texture_manager.cpp
 
 
 UNIT_OBJ = $(patsubst %.c, $(BUILD_DIR_C)/%.o, $(UNIT_SRC))
