@@ -65,6 +65,7 @@ void remove_graphic_client(server_t *server, client_t *client)
         if (remove_graphical_node(server, client, &current, &prev))
             return;
     }
+    remove_fd(server, client->client_fd);
 }
 
 void send_message_to_all_graphic(server_t *server, char *message)

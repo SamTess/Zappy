@@ -16,7 +16,7 @@
 #include "../include/server.h"
 #include "../include/parsing.h"
 
-static int count_team(server_t *n_server)
+int count_team(server_t *n_server)
 {
     int i = 0;
 

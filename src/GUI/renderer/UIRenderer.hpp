@@ -12,7 +12,6 @@
 #include "../../Shared/IGuiLib.hpp"
 #include "../cameraController/CameraController.hpp"
 #include "../Constants.hpp"
-#include "../obj/ObjManager.hpp"
 
 class UIRenderer {
 public:
@@ -22,7 +21,6 @@ public:
     void renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui, std::shared_ptr<CameraController> camera);
     void renderStatusBar(std::shared_ptr<IGuiLib> gui);
     void renderCameraInfo(std::shared_ptr<IGuiLib> gui, std::shared_ptr<CameraController> camera);
-    void renderModelControls(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui, std::shared_ptr<ObjManager> modelManager);
     void renderFPS(std::shared_ptr<IGraphicsLib> graphics);
 
     bool& showUI() { return m_showUI; }

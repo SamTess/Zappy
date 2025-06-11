@@ -27,10 +27,12 @@ void RayLib::InitWindow(int width, int height, const std::string& title) {
 void RayLib::CloseWindow() {
     _window.reset();
     _initialized = false;
-    _texture.reset();
+    _textures.clear();
+    _models.clear();
     _font.reset();
     _sound.reset();
     _music.reset();
+    _texture3D.reset();
 }
 
 bool RayLib::WindowShouldClose() {
@@ -85,17 +87,30 @@ void RayLib::DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos
 }
 
 // Textures
-void RayLib::LoadTexture2D(const std::string& path) {
-    _texture.emplace(path);
+int RayLib::LoadTexture2D(const std::string& path) {
+    try {
+        int id = raylibcpp::Texture::getNextId();
+        _textures[id] = std::make_unique<raylibcpp::Texture>(path);
+        return id;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur de chargement de texture: " << e.what() << std::endl;
+        return -1;
+    }
 }
 
-void RayLib::DrawTexture2D(int x, int y) {
-    if (_texture)
-        _texture->draw(x, y);
+void RayLib::DrawTexture2D(int textureId, int x, int y) {
+    auto it = _textures.find(textureId);
+    if (it != _textures.end())
+        it->second->draw(x, y);
 }
 
-void RayLib::UnloadTexture2D() {
-    _texture.reset();
+void RayLib::UnloadTexture2D(int textureId) {
+    _textures.erase(textureId);
+}
+
+bool RayLib::IsTextureReady(int textureId) const {
+    auto it = _textures.find(textureId);
+    return it != _textures.end() && it->second->isReady();
 }
 
 // Texte
@@ -238,30 +253,70 @@ void RayLib::UnloadTexture3D() {
 }
 
 // Modèles 3D
-void RayLib::LoadModel3D(const std::string& path) {
-    _model3D.emplace(path);
+int RayLib::LoadModel3D(const std::string& path) {
+    try {
+        int modelId = _nextModelId++;
+        _models[modelId] = std::make_unique<raylibcpp::ModelWrap>(path);
+        return modelId;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur lors du chargement du modèle: " << path << " - " << e.what() << std::endl;
+        return -1;
+    }
 }
 
-void RayLib::DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
-    if (_model3D)
-        _model3D->draw(TypeAdapter::ToRaylib(position), scale, TypeAdapter::ToRaylib(color));
+void RayLib::DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
+    auto it = _models.find(modelId);
+    if (it != _models.end() && it->second) {
+        it->second->draw(TypeAdapter::ToRaylib(position), scale, TypeAdapter::ToRaylib(color));
+    } else {
+        std::cerr << "Tentative de dessiner un modèle inexistant (ID: " << modelId << ")" << std::endl;
+    }
 }
 
-void RayLib::DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) {
-    if (_model3D) {
+void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) {
+    auto it = _models.find(modelId);
+    if (it != _models.end() && it->second) {
         ::DrawModelEx(
-            _model3D->get(),
+            it->second->get(),
             TypeAdapter::ToRaylib(position),
             TypeAdapter::ToRaylib(rotationAxis),
             rotationAngle,
             Vector3{scale, scale, scale},
             WHITE
         );
+    } else {
+        std::cerr << "Tentative de dessiner un modèle inexistant avec rotation (ID: " << modelId << ")" << std::endl;
     }
 }
 
-void RayLib::UnloadModel3D() {
-    _model3D.reset();
+void RayLib::UnloadModel3D(int modelId) {
+    auto it = _models.find(modelId);
+    if (it != _models.end()) {
+        _models.erase(it);
+    } else {
+        std::cerr << "Tentative de décharger un modèle inexistant (ID: " << modelId << ")" << std::endl;
+    }
+}
+
+int RayLib::LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) {
+    try {
+        int modelId = _nextModelId++;
+        _models[modelId] = std::make_unique<raylibcpp::ModelWrap>(modelPath);
+        if (!texturePath.empty()) {
+            Texture2D texture = ::LoadTexture(texturePath.c_str());
+            if (texture.id > 0) {
+                if (_models[modelId]->get().materialCount > 0) {
+                    _models[modelId]->get().materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+                } else {
+                    ::UnloadTexture(texture);
+                }
+            }
+        }
+        return modelId;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur lors du chargement du modèle avec texture: " << modelPath << " - " << e.what() << std::endl;
+        return -1;
+    }
 }
 
 extern "C" {

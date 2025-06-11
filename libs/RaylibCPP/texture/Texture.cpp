@@ -15,6 +15,8 @@
 
 namespace raylibcpp {
 
+int Texture::nextId = 1;
+
 Texture::Texture(const std::string& path) {
     texture = LoadTexture(path.c_str());
 }
@@ -29,6 +31,14 @@ void Texture::draw(int x, int y) const {
 
 Texture2D Texture::get() const {
     return texture;
+}
+
+bool Texture::isReady() const {
+    return texture.id != 0;
+}
+
+int Texture::getNextId() {
+    return nextId++;
 }
 
 Texture3DWrap::Texture3DWrap(const std::string& path) {

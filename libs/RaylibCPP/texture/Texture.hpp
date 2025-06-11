@@ -19,8 +19,11 @@ class Texture {
         ~Texture();
         void draw(int x, int y) const;
         Texture2D get() const;
+        bool isReady() const;
+        static int getNextId();
     private:
         Texture2D texture;
+        static int nextId;
 };
 
 class Texture3DWrap {

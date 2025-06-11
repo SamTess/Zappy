@@ -59,18 +59,10 @@ static bool execute_graphical_command(server_t *server, client_t *user,
 static bool execute_if_free(server_t *server, client_t *user,
     char *buffer, int cmd_index)
 {
-    command_data_t data = get_command_data();
-
-    if (user->type != data.accepted_types[cmd_index])
-        return false;
     if (user->type == GRAPHICAL)
         return execute_graphical_command(server, user, buffer, cmd_index);
     if (user->type == AI && user->player->busy_until <= server->current_tick) {
-        user->player->pending_cmd->args = strdup(buffer);
-        user->player->pending_cmd->func = data.functions[cmd_index];
-        if (data.times[cmd_index] > 0)
-            user->player->busy_until =
-                server->current_tick + data.times[cmd_index];
+        add_pending_cmd(user, server, buffer, cmd_index);
         return true;
     } else {
         if (user->player->queue_size < 10) {
@@ -86,7 +78,8 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
     command_data_t data = get_command_data();
 
     for (int i = 0; data.commands[i] != NULL; i++) {
-        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0)
+        if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0 &&
+            user->type == data.accepted_types[i])
             return execute_if_free(server, user, buffer, i);
     }
     return false;
@@ -145,7 +138,8 @@ void execute_com(server_t *server, client_t *user, char *buffer)
         return;
     if (!user->is_fully_connected) {
         if (!is_valid_team_name(buffer, server, user)
-            && connect_nbr_srv(server, user->player->team_name) > 0)
+            || (user->type != GRAPHICAL &&
+                connect_nbr_srv(server, user->player->team_name) < 0))
             return write_command_output(user->client_fd, "ko\n");
         user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {

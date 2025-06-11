@@ -21,7 +21,7 @@ static bool tick_check(server_t *server, client_t *current)
     if (current != NULL && current->player != NULL)
         dead = check_player_starvation(server, current);
     if (dead == false && current != NULL &&
-        current->player != NULL)
+        current->player != NULL && current->player->is_in_incantation)
         finish_incantation(server, current);
     return dead;
 }

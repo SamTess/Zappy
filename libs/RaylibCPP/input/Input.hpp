@@ -15,7 +15,6 @@ class Input {
         static bool isKeyPressed(int key);
         static bool isMouseButtonPressed(int button);
         static bool isKeyDown(int key);
-        
         static bool isMouseButtonDown(int button);
         static bool isMouseButtonReleased(int button);
         static int getMouseX();

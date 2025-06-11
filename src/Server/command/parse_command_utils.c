@@ -8,14 +8,32 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-static void cleanup_pending(player_t *player)
+void cleanup_pending(player_t *player)
 {
     if (!player || !player->pending_cmd)
         return;
-    free(player->pending_cmd->args);
+    if (player->pending_cmd->args){
+        free(player->pending_cmd->args);
+        player->pending_cmd->args = NULL;
+    }
     free(player->pending_cmd);
     player->pending_cmd = NULL;
+}
+
+void add_pending_cmd(client_t *user, server_t *server,
+    char *buffer, int cmd_index)
+{
+    command_data_t data = get_command_data();
+
+    if (cmd_index == 9)
+            write_command_output(user->client_fd, "Elevation underway\n");
+    user->player->pending_cmd->args = strdup(buffer);
+    user->player->pending_cmd->func = data.functions[cmd_index];
+    if (data.times[cmd_index] > 0)
+        user->player->busy_until =
+            server->current_tick + data.times[cmd_index];
 }
 
 void cleanup_player_queue(player_t *player)

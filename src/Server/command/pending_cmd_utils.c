@@ -17,6 +17,8 @@ void execute_pending_cmd(server_t *server, client_t *client)
     cmd = client->player->pending_cmd;
     if (cmd->func)
         cmd->func(server, client, cmd->args);
+    if (cmd->args)
+        free(cmd->args);
     cmd->args = NULL;
     cmd->func = NULL;
 }

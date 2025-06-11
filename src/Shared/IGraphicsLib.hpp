@@ -33,9 +33,10 @@ public:
     virtual void DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos, ZappyTypes::Color color) = 0;
 
     // Textures
-    virtual void LoadTexture2D(const std::string& path) = 0;
-    virtual void DrawTexture2D(int x, int y) = 0;
-    virtual void UnloadTexture2D() = 0;
+    virtual int LoadTexture2D(const std::string& path) = 0;
+    virtual void DrawTexture2D(int textureId, int x, int y) = 0;
+    virtual void UnloadTexture2D(int textureId) = 0;
+    virtual bool IsTextureReady(int textureId) const = 0;
 
     // Texte
     virtual void LoadFont(const std::string& path) = 0;
@@ -74,8 +75,11 @@ public:
     virtual void UnloadTexture3D() = 0;
 
     // Modèles 3D
-    virtual void LoadModel3D(const std::string& path) = 0;
-    virtual void DrawModel3D(ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) = 0;
-    virtual void DrawModelEx(ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) = 0;
-    virtual void UnloadModel3D() = 0;
+    virtual int LoadModel3D(const std::string& path) = 0;
+    virtual void DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) = 0;
+    virtual void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) = 0;
+    virtual void UnloadModel3D(int modelId) = 0;
+
+    // Modèle avec texture
+    virtual int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) = 0;
 };

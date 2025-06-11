@@ -37,8 +37,30 @@ static bool remove_resources(tile_t *tile, int level)
     return true;
 }
 
+//? This is the function that needs to send the winner team's name
+static void handle_win(char *winner, server_t *server)
+{
+    server->should_run = false;
+    printf("%s team are the winner of this Zappy tournament\n", winner);
+}
+
+static void check_win(client_t *client, server_t *server)
+{
+    int count = 0;
+    char *team_name = client->player->team_name;
+    client_t *temp = server->client;
+
+    while (temp){
+        if (temp->player && temp->player->level == 8 &&
+            strcmp(temp->player->team_name, team_name) == 0)
+            count++;
+    }
+    if (count >= 6)
+        handle_win(team_name, server);
+}
+
 static void handle_incantation_success(client_t *client,
-    tile_t *tile, int old_level)
+    tile_t *tile, int old_level, server_t *server)
 {
     char *level_str;
 
@@ -50,6 +72,8 @@ static void handle_incantation_success(client_t *client,
     sprintf(level_str, "Current level: %d\n", client->player->level);
     write_command_output(client->client_fd, level_str);
     free(level_str);
+    if (client->player->level == 8)
+        check_win(client, server);
 }
 
 void finish_incantation(server_t *server, client_t *client)
