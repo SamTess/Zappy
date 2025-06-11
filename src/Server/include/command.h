@@ -62,6 +62,7 @@ void command_plv(server_t *server, client_t *client, char *buffer);
 void command_pie(server_t *server, int x, int y, int result);
 void command_pex(server_t *server, client_t *client);
 void command_pin(server_t *server, client_t *client, char *buffer);
+void command_pfk(server_t *server, client_t *client);
 
 // send to all graphical clients
 void send_mtc_to_all_graphical_clients(server_t *server);

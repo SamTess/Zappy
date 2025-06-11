@@ -41,5 +41,6 @@ void fork_c(server_t *server, client_t *client, char *buffer)
         return;
     }
     add_egg(server, new_egg);
+    command_pfk(server, client);
     write_command_output(client->client_fd, "ok\n");
 }
