@@ -7,6 +7,7 @@
 
 #include "../include/server.h"
 #include "../include/client.h"
+#include "../include/command.h"
 #include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +24,7 @@ void send_ebo_command(server_t *server, int egg_id)
     buffer = malloc(size + 1);
     if (!buffer)
         server_err("Buffer alloc in ebo command failed\n");
-    snprintf(buffer, sizeof(buffer), "ebo #%d\n", egg_id);
+    sprintf(buffer, "ebo #%d\n", egg_id);
     current = server->graphical_clients;
     while (current) {
         write_command_output(current->client->client_fd, buffer);
