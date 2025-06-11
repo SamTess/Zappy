@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 static int calculate_size_bct_command(int x, int y, tile_t *tile)
 {
     return snprintf(NULL, 0, "bct %d %d %d %d %d %d %d %d %d\n",
@@ -97,7 +96,7 @@ void send_tile_content_to_one_client(server_t *server, client_t *client)
 
 static bool check_if_length_is_valid_bct(const char *buffer, int x, int y)
 {
-    int expected_length = 0;
+    size_t expected_length = 0;
 
     expected_length = snprintf(NULL, 0, "bct %d %d\n", x, y);
     if (expected_length != strlen(buffer))

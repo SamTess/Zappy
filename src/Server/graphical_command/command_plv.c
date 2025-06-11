@@ -11,6 +11,7 @@
 #include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void send_plv_command(server_t *server, client_t *client, client_t *recipient)
 {
@@ -48,7 +49,7 @@ void send_plv_to_all(server_t *server, client_t *client)
 
 static bool check_if_length_is_valid_plv(const char *buffer, int id)
 {
-    int expected_length = 0;
+    size_t expected_length = 0;
 
     expected_length = snprintf(NULL, 0, "plv #%d\n", id);
     if (expected_length != strlen(buffer))

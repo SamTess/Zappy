@@ -8,6 +8,7 @@
 #include "../include/command.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 static char *get_buffer_sst(int time)
 {
@@ -34,7 +35,7 @@ static int get_time_from_buffer(char *buffer)
 
 static bool check_if_length_is_valid_sst(const char *buffer, int time)
 {
-    int expected_length = 0;
+    size_t expected_length = 0;
 
     expected_length = snprintf(NULL, 0, "sst %d\n", time);
     if (expected_length != strlen(buffer))

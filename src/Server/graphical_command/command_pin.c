@@ -11,6 +11,7 @@
 #include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int calculate_size_pin_command(client_t *client)
 {
@@ -75,7 +76,7 @@ void send_pin_to_all(server_t *server, client_t *client)
 
 static bool check_if_length_is_valid_pin(const char *buffer, int id)
 {
-    int expected_length = 0;
+    size_t expected_length = 0;
 
     expected_length = snprintf(NULL, 0, "pin #%d\n", id);
     if (expected_length != strlen(buffer))

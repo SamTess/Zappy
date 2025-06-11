@@ -11,6 +11,7 @@
 #include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 client_t *find_client_by_id(server_t *server, int id)
 {
@@ -65,7 +66,7 @@ bool send_ppo_command(server_t *server, int id)
 
 static bool check_if_length_is_valid_ppo(const char *buffer, int id)
 {
-    int expected_length = 0;
+    size_t expected_length = 0;
 
     expected_length = snprintf(NULL, 0, "ppo #%d\n", id);
     if (expected_length != strlen(buffer))
