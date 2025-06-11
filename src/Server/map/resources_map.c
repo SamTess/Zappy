@@ -8,6 +8,7 @@
 #include "../include/tile.h"
 #include "../include/server.h"
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -94,5 +95,6 @@ void respawn_resources(tile_t **map, server_t *server,
             current_resources[res] += missing;
         }
     }
+    send_smg_command(server, "Resources respawned");
     free(dist.tile_indices);
 }
