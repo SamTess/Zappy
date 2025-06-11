@@ -31,7 +31,7 @@ typedef struct player_s {
     int level;
     int life;
     char *team_name;
-    player_inventory_t *inventory;
+    int inventory[COUNT];
     int inventory_size;
     int busy_until;
     char **command_queue;

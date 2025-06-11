@@ -69,7 +69,7 @@ INCLUDE_DIR = include
 
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra -I$(INCLUDE_DIR) -Werror
+CFLAGS = -Wall -Wextra -Werror -I$(INCLUDE_DIR)
 LDFLAGS =
 DEBUG_FLAGS = -g3 -ggdb
 COVERAGE_FLAGS = --coverage

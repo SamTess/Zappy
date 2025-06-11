@@ -64,6 +64,7 @@ void remove_fd(server_t *server, int fd)
     if (remove_head_client(server, fd))
         return;
     remove_other_client(server, fd);
+    close(fd);
 }
 
 static client_t *init_new_client(int fd)

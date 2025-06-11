@@ -27,11 +27,11 @@ void handle_player_death(server_t *server, client_t *client)
     if (client->player) {
         free_inventory(client->player);
         cleanup_player_queue(client->player);
+        cleanup_pending(client->player);
         free(client->player->team_name);
         free(client->player);
         client->player = NULL;
     }
-    close(client->client_fd);
     remove_fd(server, client->client_fd);
 }
 
