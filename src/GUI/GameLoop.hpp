@@ -24,8 +24,6 @@ public:
     bool init();
     int run();
     void setServerInfo(const std::string& host, int port);
-    void renderGirl();
-    void renderCastle();
     void renderCube();
 
 private:
@@ -43,8 +41,5 @@ private:
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
 
-    int m_girlModelId = -1;
-    int m_castleModelId = -1;
     int m_cubeModelId = -1;
-    int m_cubeModelIdBis = -1;
 };
