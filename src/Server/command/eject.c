@@ -77,7 +77,7 @@ void push_client(server_t *server, client_t *client, float x, float y)
 
     wrap_position(server, &new_x, &new_y);
     while (tmp) {
-        if (tmp->client_id == client->client_id) {
+        if (tmp->client_id == client->client_id || tmp->type == GRAPHICAL) {
             tmp = tmp->next;
             continue;
         }
@@ -110,5 +110,6 @@ void eject(server_t *server, client_t *client, char *buffer)
         }
         tmp_egg = tmp_egg->next;
     }
+    command_pex(server, client);
     write_command_output(client->client_fd, "ok\n");
 }

@@ -59,6 +59,7 @@ void command_mtc(server_t *server, client_t *client, char *buffer);
 void command_tna(server_t *server, client_t *client, char *buffer);
 void command_ppo(server_t *server, client_t *client, char *buffer);
 void command_plv(server_t *server, client_t *client, char *buffer);
+void command_pex(server_t *server, client_t *client);
 void command_pin(server_t *server, client_t *client, char *buffer);
 
 // send to all graphical clients
