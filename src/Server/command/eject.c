@@ -105,6 +105,7 @@ void eject(server_t *server, client_t *client, char *buffer)
     while (tmp_egg) {
         if (tmp_egg->pos_x == client->player->pos_x &&
             tmp_egg->pos_y == client->player->pos_y) {
+                send_edi_command(server, tmp_egg->egg_id);
                 remove_egg(server, tmp_egg->egg_id,
                     &server->map[tmp_egg->pos_y][tmp_egg->pos_x]);
         }
