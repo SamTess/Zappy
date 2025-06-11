@@ -15,9 +15,13 @@ class DecisionManager:
       "Dyson": behaviors.DysonBehavior(agent)
     }
 
+
+  def update_behaviour(self):
+    print("Updating behavior...")
+
   def take_action(self):
-    inventory = self.agent.send_command("Inventory")
-    surroundings = self.agent.send_command("Look")
+    inventory = self.agent.send_command(" Inventory")
+    surroundings = self.agent.send_command(" Look")
 
     if inventory is None or surroundings is None:
       print("Failed to retrieve inventory or surroundings.")
