@@ -185,6 +185,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->frequence = parsed_info->frequence;
     server->eggs = NULL;
     server->should_run = true;
+    server->poll_manager = calloc(1, sizeof(poll_manager_t));
     init_server_resources(server);
     copy_names(server, parsed_info);
 }

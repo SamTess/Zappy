@@ -32,6 +32,7 @@ typedef struct server_s {
     int *total_resources;
     int *current_resources;
     int should_run;
+    poll_manager_t *poll_manager;
 } server_t;
 
 void update_game_tick(server_t *server);
