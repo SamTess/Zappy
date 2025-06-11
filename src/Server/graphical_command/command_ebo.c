@@ -12,15 +12,14 @@
 
 void send_ebo_command(server_t *server, int egg_id)
 {
-    client_t *current = NULL;
+    graphical_client_t *current = NULL;
     char buffer[32];
-    if (!server)
+    if (!server && !server->graphical_clients)
         return;
     snprintf(buffer, sizeof(buffer), "ebo #%d\n", egg_id);
-    current = server->client;
+    current = server->graphical_clients;
     while (current) {
-        if (current->type == GRAPHICAL)
-            write_command_output(current->client_fd, buffer);
+        write_command_output(current->client->client_fd, buffer);
         current = current->next;
     }
 }
