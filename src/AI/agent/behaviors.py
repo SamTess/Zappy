@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from time import sleep
 import utils.zappy as zappy
 import utils.encryption as encryption
-import agent.actions as actions
+import utils.agentActions as agentActions
 import constants.upgrades as upgrades
 
 class Behavior(ABC):
@@ -15,7 +15,7 @@ class Behavior(ABC):
 
 class GetFoodBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    actions.go_take_item(self.agent, "food")
+    agentActions.go_take_item(self.agent, "food")
 
 
 class UpgradeBehavior(Behavior):
@@ -53,18 +53,28 @@ class GetMineralsBehavior(Behavior):
     if not surroundings:
       print("GetMineralsBehavior: Surroundings is None.")
       return
-    actions.go_take_item(self.agent, zappy.get_best_available_resource(surroundings))
+    agentActions.go_take_item(self.agent, zappy.get_best_available_resource(surroundings))
 
 
 class DysonBehavior(Behavior):
-  def execute(self, surroundings=None, inventory=None):
-    for _ in range(self.agent.map_size_y):
-      actions.take_everything_here(self.agent)
-      self.agent.send_command("Forward")
-    self.agent.send_command("Right")
-    self.agent.send_command("Forward")
-    self.agent.send_command("Left")
+  def __init__(self, agent):
+    super().__init__(agent)
+    self.current_index = 0
 
+  def execute(self, surroundings=None, inventory=None):
+    self.current_index += 1
+    self.agent.send_command("Forward")
+    agentActions.take_everything_here(self.agent)
+
+    max_index = 10
+    if self.agent.map_size_x is not None:
+      max_index = self.agent.map_size_x
+
+    if self.current_index >= max_index:
+      self.agent.send_command("Right")
+      self.agent.send_command("Forward")
+      self.agent.send_command("Left")
+      self.current_index = 0
 
 class GetFoodAndMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
@@ -76,3 +86,21 @@ class GetFoodAndMineralsBehavior(Behavior):
       GetFoodBehavior(self.agent).execute(surroundings, inventory)
     else:
       GetMineralsBehavior(self.agent).execute(surroundings, inventory)
+
+class JoinTeamMatesBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not surroundings:
+      print("JoinTeamMatesBehavior: Surroundings is None.")
+      return
+
+    closest_player_distance = zappy.get_closest_of_item(surroundings, "player")
+    if closest_player_distance == -1:
+      print("No teammates found nearby.")
+      return
+
+    if closest_player_distance == 0:
+      print("Already at the same position as a teammate.")
+      return
+
+    agentActions.go_to_pos_with_distance(self.agent, closest_player_distance)
+    print(f"Moving towards teammate at distance {closest_player_distance}.")

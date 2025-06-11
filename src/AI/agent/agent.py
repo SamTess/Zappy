@@ -4,7 +4,7 @@ from agent.decisionManager import DecisionManager
 from agent.broadcastManager import BroadcastManager
 from logger.logger import Logger
 import utils.encryption as encryption
-import agent.actions as actions
+import utils.agentActions as agentActions
 import socket
 import sys
 
@@ -20,7 +20,7 @@ class Agent:
       self.map_size_x = None
       self.map_size_y = None
       self.current_behaviour = "Dyson"
-      encryption.secret_key = encryption.secret_key + self.team  # to test encryption between our teams
+      encryption.secret_key = encryption.secret_key + self.team  # to test encryption locally // need tests
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.ip, self.port))
@@ -64,7 +64,6 @@ class Agent:
       print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
 
     print(f"Map size: {map_size}")
-
     self.run()
 
 
@@ -113,8 +112,6 @@ class Agent:
     elif message.startswith("Current level: "):
       try:
         self.level = int(message.split(": ")[1])
-        if self.level >= 2:
-          self.current_behaviour = "GetFoodAndMinerals"
         print(f"Current level set to: {self.level}")
       except ValueError:
         print(f"Failed to parse level from message: {message}")
