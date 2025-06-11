@@ -47,6 +47,8 @@ static void free_client(server_t *server)
     client_t *current_client = server->client;
     client_t *next_client;
 
+    if (server->client->next != NULL)
+        current_client = server->client->next;
     while (current_client != NULL) {
         next_client = current_client->next;
         if (current_client->player)
