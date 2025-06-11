@@ -19,6 +19,7 @@ void handle_player_death(server_t *server, client_t *client)
     if (!client || !client->player)
         return;
     write_command_output(client->client_fd, "dead\n");
+    command_pdi(server, client);
     if (server->map && client->player->pos_y < server->parsed_info->height &&
         client->player->pos_x < server->parsed_info->width) {
         tile = &server->map[client->player->pos_y][client->player->pos_x];

@@ -68,6 +68,7 @@ SRC = 	help.c								\
 		graphical_command/command_edi.c		\
 		graphical_command/command_pic.c		\
 		graphical_command/command_sst.c		\
+		graphical_command/command_pdi.c		\
 		graphical_command/command_pbc.c		\
 		graphical_command/command_pgt.c		\
 		graphical_command/command_seg.c		\
