@@ -20,6 +20,8 @@ void send_ebo_command(server_t *server, int egg_id)
         return;
     size = snprintf(NULL, 0, "ebo #%d\n", egg_id);
     buffer = malloc(size + 1);
+    if (!buffer)
+        server_err("Buffer alloc in ebo command failed\n");
     snprintf(buffer, sizeof(buffer), "ebo #%d\n", egg_id);
     current = server->graphical_clients;
     while (current) {
