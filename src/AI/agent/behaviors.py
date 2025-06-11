@@ -29,10 +29,10 @@ class UpgradeBehavior(Behavior):
     upgrade_info = upgrades.upgrades.get(self.agent.level, {})
 
     if not upgrade_info:
-      print(f"can_upgrade: No upgrade defined for level {self.agent.level}.")
+      print(f"UpgradeBehavior: No upgrade defined for level {self.agent.level}.")
       return
     if not inventory_dict:
-      print("can_upgrade: Inventory is empty or not properly parsed.")
+      print("UpgradeBehavior: Inventory is empty or not properly parsed.")
       return
 
     upgrade_cost = upgrade_info.get("cost", {})
@@ -65,3 +65,14 @@ class DysonBehavior(Behavior):
     self.agent.send_command("Right")
     self.agent.send_command("Forward")
     self.agent.send_command("Left")
+
+class GetFoodAndMineralsBehaviour(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not surroundings or not inventory:
+      print("GetFoodAndMineralsBehaviour: Surroundings or inventory is None.")
+      return
+
+    if zappy.parse_inventory(inventory).get("food", 0) < 10:
+      GetFoodBehavior(self.agent).execute(surroundings, inventory)
+    else:
+      GetMineralsBehavior(self.agent).execute(surroundings, inventory)
