@@ -5,6 +5,7 @@
 ** forward
 */
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -51,5 +52,6 @@ void forward(server_t *server, client_t *client, char *buffer)
         return;
     }
     change_map_pos(server, client);
+    send_ppo_command(server, client->client_id);
     write_command_output(client->client_fd, "ok\n");
 }

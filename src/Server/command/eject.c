@@ -6,6 +6,7 @@
 */
 
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -73,11 +74,10 @@ void push_client(server_t *server, client_t *client, float x, float y)
     client_t *tmp = server->client->next;
     int new_x = client->player->pos_x + x;
     int new_y = client->player->pos_y + y;
-    char *string_to_send = get_string_to_send(x, y);
 
     wrap_position(server, &new_x, &new_y);
     while (tmp) {
-        if (tmp->client_id == client->client_id) {
+        if (tmp->client_id == client->client_id || tmp->type == GRAPHICAL) {
             tmp = tmp->next;
             continue;
         }
@@ -86,7 +86,8 @@ void push_client(server_t *server, client_t *client, float x, float y)
                 tmp->player->pos_x = new_x;
                 tmp->player->pos_y = new_y;
                 tile_add_player(&server->map[new_y][new_x], tmp->client_id);
-                write_command_output(tmp->client_fd, string_to_send);
+                send_ppo_command(server, tmp->client_id);
+                write_command_output(tmp->client_fd, get_string_to_send(x, y));
         }
         tmp = tmp->next;
     }
@@ -109,5 +110,6 @@ void eject(server_t *server, client_t *client, char *buffer)
         }
         tmp_egg = tmp_egg->next;
     }
+    command_pex(server, client);
     write_command_output(client->client_fd, "ok\n");
 }
