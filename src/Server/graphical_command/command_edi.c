@@ -6,6 +6,7 @@
 */
 
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 
