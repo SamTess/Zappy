@@ -218,11 +218,10 @@ void ModelManager::unloadModelFromGraphicsLib(int modelId) {
 }
 
 void ModelManager::removeModelPathReferences(int modelId) {
-    for (auto it = m_pathToId.begin(); it != m_pathToId.end(); ) {
+    for (auto it = m_pathToId.begin(); it != m_pathToId.end(); ++it) {
         if (it->second == modelId) {
             it = m_pathToId.erase(it);
-        } else {
-            ++it;
+            return;
         }
     }
 }
