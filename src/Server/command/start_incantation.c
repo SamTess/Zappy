@@ -6,6 +6,7 @@
 */
 
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -15,9 +16,8 @@ static client_t *get_client_by_id_player(server_t *server, int player_id)
     client_t *tmp = server->client->next;
 
     while (tmp != NULL) {
-        if (tmp->player != NULL && tmp->client_id == player_id) {
+        if (tmp->player != NULL && tmp->client_id == player_id)
             return tmp;
-        }
         tmp = tmp->next;
     }
     return NULL;
@@ -110,6 +110,8 @@ void start_incantation(server_t *server, client_t *client, char *buffer)
     (void)buffer;
     if (!can_start_incantation(server, client))
         return write_command_output(client->client_fd, "ko\n");
+    command_pic(server, client->player->pos_x, client->player->pos_y,
+        client->player->level);
     set_busy_all(server, client, 300);
     client->player->is_in_incantation = true;
     client->player->incantation_leader_id = client->client_id;

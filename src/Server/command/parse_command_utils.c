@@ -22,14 +22,13 @@ void cleanup_pending(player_t *player)
     player->pending_cmd = NULL;
 }
 
-// a verifier les condition si index 9 etc
 void add_pending_cmd(client_t *user, server_t *server,
     char *buffer, int cmd_index)
 {
     command_data_t data = get_command_data();
 
     if (cmd_index == 9)
-        write_command_output(user->client_fd, "Elevation underway\n");
+        return start_incantation(server, user, NULL);
     if (cmd_index == 10)
         command_pfk(server, user);
     user->player->pending_cmd->args = strdup(buffer);
