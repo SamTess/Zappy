@@ -18,7 +18,6 @@ void send_edi_command(server_t *server, int egg_id)
 
     if (!server || !server->graphical_clients)
         return;
-    buffer = NULL;
     size = snprintf(NULL, 0, "edi #%d\n", egg_id);
     buffer = malloc(size + 1);
     if (!buffer)
