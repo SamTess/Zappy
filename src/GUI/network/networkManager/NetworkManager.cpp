@@ -23,7 +23,7 @@ NetworkManager::NetworkManager()
       _incomingQueue(std::make_unique<MessageQueue>()),
       _outgoingQueue(std::make_unique<MessageQueue>()),
       _receiveBuffer(""),
-      _graphicalContext(std::make_unique<GraphicalContext>()),
+      _graphicalContext(std::make_shared<GraphicalContext>()),
       _isConnected(false) {
 }
 
@@ -348,4 +348,12 @@ void NetworkManager::setMessageCallback(MessageCallback callback) {
 
 void NetworkManager::setConnectionCallback(ConnectionCallback callback) {
     _connectionCallback = callback;
+}
+
+std::shared_ptr<GraphicalContext> NetworkManager::getGraphicalContext() const {
+    return _graphicalContext;
+}
+
+void NetworkManager::setGraphicalContext(std::shared_ptr<GraphicalContext> context) {
+    _graphicalContext = context;
 }

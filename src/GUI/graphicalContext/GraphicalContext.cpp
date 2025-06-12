@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <iomanip>
 #include "GraphicalContext.hpp"
 
 GraphicalContext::GraphicalContext() {
@@ -47,12 +48,32 @@ void GraphicalContext::updateContext(const Message& message) {
 }
 
 void GraphicalContext::updateMapSize(std::shared_ptr<IMessageData> data) {
+    if (isMapInit)
+        return;
     auto mapSizeData = std::static_pointer_cast<MapSizeData>(data);
     _mapWidth = mapSizeData->getWidth();
     _mapHeight = mapSizeData->getHeight();
     _mapTiles.resize(_mapHeight, std::vector<TileData>(_mapWidth));
-    std::cout << "Map size updated to: " << _mapWidth << "x" << _mapHeight << std::endl;
-    notifyMapSizeChanged();
+    for (int y = 0; y < _mapHeight; ++y) {
+        for (int x = 0; x < _mapWidth; ++x) {
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::FOOD)] = 0;
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::LINEMATE)] = 0;
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::DERAUMERE)] = 0;
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::SIBUR)] = 0;
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::MENDIANE)] = 0;
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::PHIRAS)] = 0;
+            _mapTiles[y][x].resources[static_cast<int>(ResourceType::THYSTAME)] = 0;
+            _mapTiles[y][x].playerIds.clear();
+            _mapTiles[y][x].eggIds.clear();
+        }
+    }
+    // notifyMapSizeChanged();
+    // for (int y = 0; y < _mapHeight; ++y) {
+    //     for (int x = 0; x < _mapWidth; ++x) {
+    //         notifyTileChanged(x, y);
+    //     }
+    // }
+    isMapInit = true;
 }
 
 void GraphicalContext::updateTileContent(std::shared_ptr<IMessageData> data) {
@@ -78,7 +99,7 @@ void GraphicalContext::updateTileContent(std::shared_ptr<IMessageData> data) {
               << "Mendiane: " << tileContentData->getMendiane() << ", "
               << "Phiras: " << tileContentData->getPhiras() << ", "
               << "Thystame: " << tileContentData->getThystame() << std::endl;
-    notifyTileChanged(x, y);
+    // notifyTileChanged(x, y);
 }
 
 void GraphicalContext::updateTeamName(std::shared_ptr<IMessageData> data) {
@@ -101,7 +122,7 @@ void GraphicalContext::updatePlayerInfo(std::shared_ptr<IMessageData> data) {
             if (isValidCoordinates(oldX, oldY)) {
                 auto& oldPlayerIds = _mapTiles[oldY][oldX].playerIds;
                 oldPlayerIds.erase(std::remove(oldPlayerIds.begin(), oldPlayerIds.end(), playerInfoData->getId()), oldPlayerIds.end());
-                notifyTileChanged(oldX, oldY);
+                // notifyTileChanged(oldX, oldY);
             }
         }
     }
@@ -112,7 +133,7 @@ void GraphicalContext::updatePlayerInfo(std::shared_ptr<IMessageData> data) {
         auto& playerIds = _mapTiles[y][x].playerIds;
         if (std::find(playerIds.begin(), playerIds.end(), playerInfoData->getId()) == playerIds.end()) {
             playerIds.push_back(playerInfoData->getId());
-            notifyTileChanged(x, y);
+            // notifyTileChanged(x, y);
         }
     }
     std::cout << "Player " << playerInfoData->getId() << " (" << playerInfoData->getTeamName() << ") at position ("

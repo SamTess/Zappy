@@ -33,13 +33,14 @@ class NetworkManager {
         void sendCommand(const std::string& command);
         void processIncomingMessages();
 
-        // Callback pour récupérer les messages
         using MessageCallback = std::function<void(const std::string&, const std::string&)>;
         void setMessageCallback(MessageCallback callback);
-        // Callback pour les changements de statut de connexion
         using ConnectionCallback = std::function<void(bool)>;
         void setConnectionCallback(ConnectionCallback callback);
         void networkThreadLoop();
+
+        std::shared_ptr<GraphicalContext> getGraphicalContext() const;
+        void setGraphicalContext(std::shared_ptr<GraphicalContext> context);
 
     private:
         std::unique_ptr<TcpConnection> _connection;
@@ -48,7 +49,7 @@ class NetworkManager {
         std::unique_ptr<MessageQueue> _incomingQueue;
         std::unique_ptr<MessageQueue> _outgoingQueue;
         std::string _receiveBuffer;
-        std::unique_ptr<GraphicalContext> _graphicalContext;
+        std::shared_ptr<GraphicalContext> _graphicalContext;
 
         bool _isConnected;
         std::mutex _logMutex;

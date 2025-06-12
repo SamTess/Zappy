@@ -124,7 +124,11 @@ std::string ProtocolParser::extractCommandParameter(const std::string &message) 
 
 int ProtocolParser::parseIntParameter(const std::string &param) {
     try {
-        return std::stoi(param);
+        std::string cleanParam = param;
+        if (!cleanParam.empty() && cleanParam[0] == '#') {
+            cleanParam = cleanParam.substr(1);
+        }
+        return std::stoi(cleanParam);
     } catch (const std::exception &e) {
         throw ProtocolParserException("Failed to parse integer parameter: " + param);
     }
@@ -172,6 +176,7 @@ Message ProtocolParser::parseTeamNames(const std::string &message) {
 }
 
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
+    printf("Parsing player connection message: %s\n", message.c_str());
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 6)
         throw ProtocolParserException("Invalid player connection parameters: " + message);

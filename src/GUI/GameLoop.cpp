@@ -13,6 +13,7 @@
 #include <chrono>
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
+#include "textureManager/ModelManagerAdapter.hpp"
 
 GameLoop::GameLoop()
     : m_host("localhost"), m_port(4242) {
@@ -22,8 +23,8 @@ bool GameLoop::init() {
     if (!loadLibraries())
         return false;
     initializeManagers();
-    if (!loadModels())
-        return false;
+    // if (!loadModels())
+    //     return false;
     setupComponents();
     return true;
 }
@@ -65,10 +66,19 @@ void GameLoop::setupComponents() {
     m_camera->init(m_graphics);
     m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
+    if (!m_context) {
+        m_context = std::make_shared<GraphicalContext>();
+    }
+    m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
+    m_modelManagerAdapter->setGraphicsLib(m_graphics);
+    m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_context, m_modelManagerAdapter);
+    m_mapRenderer->initialize();
+    m_mapRendererObserver = std::make_shared<Zappy::MapRendererObserver>(m_mapRenderer);
+    m_context->addObserver(m_mapRendererObserver);
 }
 
 int GameLoop::run() {
-    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer) {
+    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer || !m_mapRenderer) {
         std::cerr << "Game components not initialized properly." << std::endl;
         return 84;
     }
@@ -78,8 +88,8 @@ int GameLoop::run() {
         m_graphics->BeginDrawing();
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();
-        m_graphics->DrawPlane({0.0f, 0.0f, 0.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
-        renderCube();
+        if (m_mapRenderer)
+            m_mapRenderer->render();
         m_graphics->EndCamera3D();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();
@@ -94,25 +104,15 @@ void GameLoop::setServerInfo(const std::string& host, int port) {
     m_port = port;
 }
 
-void GameLoop::renderCube() {
-    auto& modelManager = ModelManager::getInstance();
-    if (m_cubeModelId != -1) {
-        ZappyTypes::Vector3 cubePosition = {2.0f, 0.0f, 2.0f};
-        ZappyTypes::Color cubeColor = {255, 255, 255, 255};
-        modelManager.drawModel(m_cubeModelId, cubePosition, cubeColor);
-    } else {
-        std::cerr << "Modèle cube.obj non trouvé." << std::endl;
+void GameLoop::setGraphicalContext(std::shared_ptr<GraphicalContext> context) {
+    if (m_context && m_mapRendererObserver) {
+        m_context->removeObserver(m_mapRendererObserver);
+    }
+    m_context = context;
+    std::cout << "GraphicalContext set in GameLoop" << std::endl;
+    if (m_mapRenderer && m_mapRendererObserver) {
+        m_context->addObserver(m_mapRendererObserver);
+        std::cout << "MapRenderer observer reconnected to new GraphicalContext" << std::endl;
     }
 }
 
-void GameLoop::onMapSizeChanged(int width, int height) {
-    m_mapWidth = width;
-    m_mapHeight = height;
-    if (m_camera) {
-        m_camera->setMapDimensions(width, height);
-    }
-}
-
-void GameLoop::onTileChanged(int /*x*/, int /*y*/, const TileData& /*tileData*/) {
-    //TODO(Sam): Implement tile change handling
-}

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 #include "parsing/ParsingCLI.hpp"
 #include "GameLoop.hpp"
 #include "network/networkManager/NetworkManager.hpp"
@@ -32,16 +33,16 @@ int main(int argc, char** argv) {
             std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
         }
-        // pas sur que ca sois la bonne facon de faire mais le networkManager doit etre dans un thread
         std::thread networkThread(&NetworkManager::networkThreadLoop, &networkManager);
 
-        GameLoop gameLoop;
-        gameLoop.setServerInfo(parser.getMachine(), parser.getPort());
-        if (!gameLoop.init()) {
+        auto gameLoop = std::make_shared<GameLoop>();
+        gameLoop->setServerInfo(parser.getMachine(), parser.getPort());
+        gameLoop->setGraphicalContext(networkManager.getGraphicalContext());
+        if (!gameLoop->init()) {
             std::cerr << "Failed to initialize game components" << std::endl;
             return 84;
         }
-        return gameLoop.run();
+        return gameLoop->run();
     } catch (const AException &e) {
         std::cerr << e.getFormattedMessage() << std::endl;
         return 84;

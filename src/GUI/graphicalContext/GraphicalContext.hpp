@@ -176,12 +176,19 @@ private:
     void notifyTileChanged(int x, int y);
 
     /**
+     * @brief Affiche la carte dans la console
+     */
+    void displayMap() const;
+
+    /**
      * @brief Vérifie si les coordonnées sont valides
      * @param x Coordonnée X à vérifier
      * @param y Coordonnée Y à vérifier
      * @return true si les coordonnées sont valides, false sinon
      */
     bool isValidCoordinates(int x, int y) const;
+
+    bool isMapInit = false;
 };
 
 #endif /* !GRAPHICAL_CONTEXT_HPP_ */
