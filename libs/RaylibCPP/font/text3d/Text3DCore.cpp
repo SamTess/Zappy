@@ -8,8 +8,4 @@
 #include "Text3DCore.hpp"
 
 namespace raylibcpp {
-
-// Les variables globales ont été déplacées vers Text3DConfig
-// pour une meilleure encapsulation
-
 }  // namespace raylibcpp

@@ -93,7 +93,6 @@ void Text3DConfig::adjustWaveSpeed(const WaveTextConfigPtr& config, float multip
     config->waveSpeed.z = std::clamp(config->waveSpeed.z * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
 }
 
-// Static members for debug options
 bool Text3DConfig::_showLetterBoundary = false;
 bool Text3DConfig::_showTextBoundary = false;
 
