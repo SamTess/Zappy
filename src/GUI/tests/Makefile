@@ -17,11 +17,17 @@ SHARED_SRC = $(SRC_DIR)/Shared
 # Fichiers sources
 SRC = test_map_renderer.cpp \
       $(GUI_SRC)/renderer/MapRenderer.cpp \
+	$(GUI_SRC)/renderer/MapRendererObserver.cpp \
+	$(GUI_SRC)/renderer/UIRenderer.cpp \
+	$(GUI_SRC)/renderer/strategies/DetailedTileRenderStrategy.cpp \
+	$(GUI_SRC)/renderer/strategies/ModelTileRenderStrategy.cpp \
+	$(GUI_SRC)/renderer/strategies/SimpleTileRenderStrategy.cpp \
+	$(GUI_SRC)/renderer/strategies/TileRenderStrategyFactory.cpp \
       $(GUI_SRC)/graphicalContext/GraphicalContext.cpp \
       $(GUI_SRC)/textureManager/ModelManager.cpp \
       $(GUI_SRC)/textureManager/TextureManager.cpp \
       $(GUI_SRC)/cameraController/CameraController.cpp \
-      $(GUI_SRC)/network/protocol/Message.cpp
+      $(GUI_SRC)/network/protocol/Message.cpp \
 
 # Fichiers objets
 OBJ = $(SRC:.cpp=.o)
