@@ -368,19 +368,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [calculate-version, build-release]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: 📥 Télécharger les artefacts
         uses: actions/download-artifact@v4
         with:
           name: zappy-${{ needs.calculate-version.outputs.new_version }}
 
       - name: 🚀 Créer la release GitHub
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.calculate-version.outputs.new_version }}
           name: "🎮 Zappy ${{ needs.calculate-version.outputs.new_version }}"
