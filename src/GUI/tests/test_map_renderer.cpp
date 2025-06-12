@@ -8,6 +8,7 @@
 #include "../renderer/MapRenderer.hpp"
 #include "../graphicalContext/GraphicalContext.hpp"
 #include "../textureManager/ModelManager.hpp"
+#include "../textureManager/ModelManagerAdapter.hpp"
 #include "../cameraController/CameraController.hpp"
 #include "../network/protocol/Message.hpp"
 #include "../network/protocol/messageData/MapSizeData.hpp"
@@ -42,16 +43,20 @@ int main() {
 
     // Initialiser la fenêtre
     graphics->InitWindow(800, 600, "Test de Rendu de Carte");
-
+    graphics->setFps(60); // Définir la fréquence d'images cible
     // Initialiser les managers
-    auto& modelManager = ModelManager::getInstance();
-    modelManager.setGraphicsLib(graphics);
+    auto& modelManagerRef = ModelManager::getInstance();
+    modelManagerRef.setGraphicsLib(graphics);
+    
+    // Créer un shared_ptr vers l'adaptateur de ModelManager
+    auto modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
+    modelManagerAdapter->setGraphicsLib(graphics);
 
     // Créer le contexte graphique
     auto context = std::make_shared<GraphicalContext>();
 
     // Créer et initialiser le renderer de carte
-    auto mapRenderer = std::make_shared<MapRenderer>(graphics, context, modelManager);
+    auto mapRenderer = std::make_shared<MapRenderer>(graphics, context, modelManagerAdapter);
     mapRenderer->initialize();
 
     // Créer un contrôleur de caméra pour la navigation
@@ -139,7 +144,6 @@ int main() {
     while (!graphics->WindowShouldClose()) {
         // Mettre à jour la caméra
         camera->update(graphics);
-
         // Gérer le zoom avec la molette de la souris
         
         float mouseWheel = graphics->GetMouseWheelMove();

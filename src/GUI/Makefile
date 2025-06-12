@@ -132,15 +132,6 @@ test_dlloader: setup_dirs $(TEST_OBJ) $(filter-out $(BUILD_DIR)/main.o, $(OBJ))
 	$(filter-out $(BUILD_DIR)/main.o, $(OBJ)) $(LDFLAGS)
 	@echo "$(SUCCESS_MSG) $(BOLD)Test DLLoader compilé avec succès$(RESET)"
 
-# Clean and rebuild
-re: fclean all
-
-# Test Text 3D with RaylibCPP
-test_text3d: setup_dirs
-	@echo "$(BLUE)[$(BOLD)BUILDING$(RESET)$(BLUE)]$(RESET) $(BOLD)Building Text3D test...$(RESET)"
-	$(CXX) $(CXXFLAGS) tests/test_Text3D_CPP.cpp -o ../../test_text3d -lraylib $(LDFLAGS)
-	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Text3D test compiled!$(RESET)"
-
 # Rule for object files
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -196,9 +187,12 @@ fclean: clean
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage complet effectué !$(RESET)"
 
+# Clean and rebuild
+re: fclean all
+
 # Include dependency files
 -include $(DEP)
 -include $(MAIN_DEP)
 
-.PHONY: all clean fclean re debug coverage test_dlloader test_text3d \
+.PHONY: all clean fclean re debug coverage test_dlloader \
 compile_animation setup_dirs

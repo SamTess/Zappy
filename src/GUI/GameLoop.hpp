@@ -26,8 +26,6 @@ public:
     int run();
     void setServerInfo(const std::string& host, int port);
     void renderCube();
-    
-    // Implementation of IGraphicalContextObserver
     void onMapSizeChanged(int width, int height) override;
     void onTileChanged(int x, int y, const TileData& tileData) override;
 
@@ -39,8 +37,7 @@ private:
 
     std::string m_host;
     int m_port;
-    
-    // Map dimensions from GraphicalContext
+
     int m_mapWidth = 20;
     int m_mapHeight = 20;
 

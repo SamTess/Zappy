@@ -6,6 +6,8 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <memory>
 #include <algorithm>
 #include "GraphicalContext.hpp"
 
@@ -179,7 +181,7 @@ void GraphicalContext::updateEggLaying(std::shared_ptr<IMessageData> data) {
 
 void GraphicalContext::updateEggDrop(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
-    
+
     switch (eggData->getAction()) {
         case EggData::EggAction::Drop: {
             _eggs[eggData->getEggId()] = *eggData;

@@ -8,6 +8,7 @@
 #include "Text3D.hpp"
 #include <math.h>
 #include <cstring>
+#include <iostream>
 #include <string>
 #include "rlgl.h"
 
@@ -94,6 +95,7 @@ void Text3D::DrawTextCodepoint3D(::Font font, int codepoint, Vector3 position, f
 // Draw a 2D text in 3D space
 void Text3D::DrawText3D(::Font font, const std::string& text, Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, Color tint)
 {
+    std::cout << "DrawTextWave3D: " << text << std::endl;
     int length = text.length();          // Total length in bytes of the text, scanned by codepoints in loop
 
     float textOffsetY = 0.0f;            // Offset between lines (on line break '\n')
@@ -137,6 +139,11 @@ void Text3D::DrawText3D(::Font font, const std::string& text, Vector3 position, 
 // Draw a 2D text in 3D space and wave the parts that start with `~~` and end with `~~`
 void Text3D::DrawTextWave3D(::Font font, const std::string& text, Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, WaveTextConfig* config, float time, Color tint)
 {
+    std::cout << "DrawTextWave3D: " << text << std::endl;
+    if (config == nullptr) {
+        std::cerr << "Error: WaveTextConfig is null!" << std::endl;
+        return;
+    }
     int length = text.length();            // Total length in bytes of the text, scanned by codepoints in loop
 
     float textOffsetY = 0.0f;              // Offset between lines (on line break '\n')
@@ -201,6 +208,7 @@ void Text3D::DrawTextWave3D(::Font font, const std::string& text, Vector3 positi
 // Measure a text in 3D ignoring the `~~` chars
 Vector3 Text3D::MeasureTextWave3D(::Font font, const std::string& text, float fontSize, float fontSpacing, float lineSpacing)
 {
+    std::cout << "DrawTextWave3D: " << text << std::endl;
     int len = text.length();
     int tempLen = 0;                // Used to count longer text line num chars
     int lenCounter = 0;

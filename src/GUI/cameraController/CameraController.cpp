@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <memory>
+#include <iostream>
 #include <algorithm>
 #include "CameraController.hpp"
 #include "../Constants.hpp"
@@ -23,7 +24,7 @@ CameraController::CameraController(float initialDistance)
       m_cameraAngleY(0.8f),
       m_cameraAngleX(0.6f),
       m_mouseSensitivity(0.003f),
-      m_keyboardSpeed(0.01f) {
+      m_keyboardSpeed(0.1f) {
 }
 
 void CameraController::init(std::shared_ptr<IGraphicsLib> graphics) {
@@ -43,7 +44,15 @@ void CameraController::reset() {
     m_cameraTarget = m_initialCameraTarget;
 }
 
+void CameraController::setMousePosition(int x, int y) {
+    m_lastMouseX = x;
+    m_lastMouseY = y;
+}
+
 void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics) {
+    if (!graphics) {
+        return;
+    }
     if (graphics->IsMouseButtonPressed(0)) {
         m_isDragging = true;
         m_lastMouseX = graphics->GetMouseX();
@@ -86,15 +95,11 @@ void CameraController::handleKeyboardInput(std::shared_ptr<IGraphicsLib> graphic
     if (graphics->IsKeyPressed(KEY_R)) {
         reset();
     }
-
-    // Calculer les vecteurs de direction de la caméra en ignorant la composante Y pour le déplacement horizontal
     ZappyTypes::Vector3 forward = {
         std::cos(m_cameraAngleY),
         0.0f,
         std::sin(m_cameraAngleY)
     };
-
-    // Normaliser le vecteur forward
     float forwardLength = std::sqrt(forward.x * forward.x + forward.z * forward.z);
     if (forwardLength > 0.0001f) {
         forward.x /= forwardLength;

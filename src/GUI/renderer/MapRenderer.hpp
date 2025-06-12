@@ -7,10 +7,12 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include "../graphicalContext/GraphicalContext.hpp"
 #include "../../Shared/IGraphicsLib.hpp"
 #include "../textureManager/ModelManager.hpp"
+#include "../textureManager/ModelManagerAdapter.hpp"
 
 namespace Zappy {
 
@@ -23,10 +25,10 @@ class MapRenderer;
  */
 class MapRendererObserver : public IGraphicalContextObserver {
 private:
-    MapRenderer& renderer;
+    std::shared_ptr<MapRenderer> renderer;
 
 public:
-    explicit MapRendererObserver(MapRenderer& renderer);
+    explicit MapRendererObserver(std::shared_ptr<MapRenderer> renderer);
     void onMapSizeChanged(int width, int height) override;
     void onTileChanged(int x, int y, const TileData& tileData) override;
 };
@@ -39,10 +41,10 @@ class ITileRenderStrategy {
 public:
     virtual ~ITileRenderStrategy() = default;
     virtual void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                           int x, int y,
-                           const ZappyTypes::Color& color,
-                           float tileSize,
-                           float spacing) = 0;
+        int x, int y,
+        const ZappyTypes::Color& color,
+        float tileSize,
+        float spacing) = 0;
 };
 
 /**
@@ -55,10 +57,10 @@ private:
 public:
     explicit SimpleTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx);
     void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                   int x, int y,
-                   const ZappyTypes::Color& color,
-                   float tileSize,
-                   float spacing) override;
+        int x, int y,
+        const ZappyTypes::Color& color,
+        float tileSize,
+        float spacing) override;
 };
 
 /**
@@ -66,17 +68,17 @@ public:
  */
 class ModelTileRenderStrategy : public ITileRenderStrategy {
 private:
-    ModelManager& modelManager;
+    std::shared_ptr<ModelManager> modelManager;
     int modelId;
     const std::shared_ptr<GraphicalContext> context;
 
 public:
-    ModelTileRenderStrategy(ModelManager& manager, int modelId, const std::shared_ptr<GraphicalContext>& ctx);
+    ModelTileRenderStrategy(const std::shared_ptr<ModelManager>& manager, int modelId, const std::shared_ptr<GraphicalContext>& ctx);
     void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                   int x, int y,
-                   const ZappyTypes::Color& color,
-                   float tileSize,
-                   float spacing) override;
+        int x, int y,
+        const ZappyTypes::Color& color,
+        float tileSize,
+        float spacing) override;
 };
 
 /**
@@ -85,10 +87,11 @@ public:
  */
 class TileRenderStrategyFactory {
 private:
-    ModelManager& modelManager;
+    std::shared_ptr<ModelManager> modelManager;
 
 public:
-    explicit TileRenderStrategyFactory(ModelManager& modelManager);
+    explicit TileRenderStrategyFactory(const std::shared_ptr<ModelManager>& modelManager);
+    explicit TileRenderStrategyFactory(ModelManager* modelManager);
 
     std::shared_ptr<ITileRenderStrategy> createSimpleTileStrategy(const std::shared_ptr<GraphicalContext>& ctx);
     std::shared_ptr<ITileRenderStrategy> createModelTileStrategy(int modelId, const std::shared_ptr<GraphicalContext>& ctx);
@@ -118,9 +121,9 @@ private:
     std::unordered_map<int, std::shared_ptr<ITileRenderStrategy>> resourceRenderStrategies;
 
 public:
-    MapRenderer(std::shared_ptr<IGraphicsLib> graphicsLib,
-               std::shared_ptr<GraphicalContext> context,
-               ModelManager& modelManager);
+    MapRenderer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
+               const std::shared_ptr<GraphicalContext>& context,
+               const std::shared_ptr<ModelManagerAdapter>& modelManagerAdapter);
     /**
      * @brief Initialise le renderer de carte
      */
@@ -196,33 +199,33 @@ private:
 
     // Méthode pour dessiner du texte en 3D
     void renderText3D(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                      const std::string& text,
-                      ZappyTypes::Vector3 position,
-                      float fontSize,
-                      ZappyTypes::Color color);
+        const std::string& text,
+        ZappyTypes::Vector3 position,
+        float fontSize,
+        ZappyTypes::Color color);
 
 public:
     explicit DetailedTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx);
     void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                   int x, int y,
-                   const ZappyTypes::Color& color,
-                   float tileSize,
-                   float spacing) override;
+        int x, int y,
+        const ZappyTypes::Color& color,
+        float tileSize,
+        float spacing) override;
 
 private:
     void renderResourceIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                                ZappyTypes::Vector3 position,
-                                ResourceType resourceType,
-                                int quantity,
-                                float tileSize);
+        ZappyTypes::Vector3 position,
+        ResourceType resourceType,
+        int quantity,
+        float tileSize);
     void renderPlayerIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                              ZappyTypes::Vector3 position,
-                              int playerId,
-                              float tileSize);
+        ZappyTypes::Vector3 position,
+        int playerId,
+        float tileSize);
     void renderEggIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                           ZappyTypes::Vector3 position,
-                           int eggId,
-                           float tileSize);
+        ZappyTypes::Vector3 position,
+        int eggId,
+        float tileSize);
 };
 
 } // namespace Zappy

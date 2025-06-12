@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <string>
 #include "MapRenderer.hpp"
 #include "../graphicalContext/GraphicalContext.hpp"
@@ -21,7 +22,6 @@ void SimpleTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& g
     const ZappyTypes::Color& color,
     float tileSize,
     float spacing) {
-    // Ajustement pour aligner avec la grille en fonction de la taille de la map
     float mapOffset = context->getMapWidth() / 2.0f;
     ZappyTypes::Vector3 position = {
         (x - mapOffset + 0.5f) * (tileSize + spacing),
@@ -44,7 +44,7 @@ void SimpleTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& g
                            borderColor);
 }
 
-ModelTileRenderStrategy::ModelTileRenderStrategy(ModelManager& manager, int id, const std::shared_ptr<GraphicalContext>& ctx)
+ModelTileRenderStrategy::ModelTileRenderStrategy(const std::shared_ptr<ModelManager>& manager, int id, const std::shared_ptr<GraphicalContext>& ctx)
     : modelManager(manager), modelId(id), context(ctx) {}
 
 void ModelTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
@@ -52,14 +52,13 @@ void ModelTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& gr
     const ZappyTypes::Color& color,
     float tileSize,
     float spacing) {
-    // Ajustement pour aligner avec la grille en fonction de la taille de la map
     float mapOffset = context->getMapWidth() / 2.0f;
     ZappyTypes::Vector3 position = {
         (x - mapOffset + 0.5f) * (tileSize + spacing),
         0.0f,
         (y - mapOffset + 0.5f) * (tileSize + spacing)
     };
-    modelManager.drawModel(modelId, position, color);
+    modelManager->drawModel(modelId, position, color);
     ZappyTypes::Color baseColor = {50, 50, 50, 200};
     graphicsLib->DrawCube({position.x, position.y - 0.05f, position.z},
                          tileSize, 0.01f, tileSize, baseColor);
@@ -79,7 +78,6 @@ void ModelTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& gr
                            borderColor);
 }
 
-// Implémentation du constructeur pour DetailedTileRenderStrategy
 DetailedTileRenderStrategy::DetailedTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx)
     : context(ctx) {}
 
@@ -184,12 +182,11 @@ void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGr
                                                        ZappyTypes::Vector3 position,
                                                        int playerId,
                                                        float tileSize) {
-    // Récupérer les données du joueur depuis le contexte
     const std::shared_ptr<PlayerInfoData> playerInfo = context->getPlayerInfo(playerId);
     if (!playerInfo) return;
     ZappyTypes::Color playerColor = {255, 0, 0, 255};
     ZappyTypes::Color borderColor = {80, 80, 80, 255};
-    ZappyTypes::Color directionColor = {255, 255, 0, 255}; // Couleur jaune pour l'indicateur de direction
+    ZappyTypes::Color directionColor = {255, 255, 0, 255};
     float playerSize = tileSize * 0.25f;
     float playerHeight = tileSize * 0.5f;
     ZappyTypes::Vector3 playerPos = position;
@@ -234,8 +231,6 @@ void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGr
     graphicsLib->DrawLine3D({playerPos.x - halfSize, bottomY, playerPos.z + halfSize},
                            {playerPos.x - halfSize, topY, playerPos.z + halfSize},
                            borderColor);
-    
-    // Ajout d'un indicateur de direction
     if (playerInfo) {
         float arrowSize = playerSize * 1.5f;
         float arrowHeight = topY + 0.5f;
@@ -244,47 +239,46 @@ void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGr
         ZappyTypes::Vector3 arrowEnd = arrowStart;
         int orientation = playerInfo->getOrientation();
         switch (orientation) {
-            case 1: // Nord
+            case 1: // North
                 arrowEnd.z -= arrowSize;
                 break;
-            case 2: // Est
+            case 2: // East
                 arrowEnd.x += arrowSize;
                 break;
-            case 3: // Sud
+            case 3: // South
                 arrowEnd.z += arrowSize;
                 break;
-            case 4: // Ouest
+            case 4: // West
                 arrowEnd.x -= arrowSize;
                 break;
             default:
                 break;
         }
         graphicsLib->DrawLine3D(arrowStart, arrowEnd, directionColor);
-        // Dessiner les pointes de la flèche
         float arrowHeadSize = arrowSize * 0.3f;
         ZappyTypes::Vector3 arrowHeadLeft = arrowEnd;
         ZappyTypes::Vector3 arrowHeadRight = arrowEnd;
-        
+
         switch (orientation) {
-            case 1: // Nord
+            case 1: // North
                 arrowHeadLeft.x -= arrowHeadSize * 0.5f;
                 arrowHeadLeft.z += arrowHeadSize;
                 arrowHeadRight.x += arrowHeadSize * 0.5f;
                 arrowHeadRight.z += arrowHeadSize;
                 break;
-            case 2: // Est
+            case 2: // East
                 arrowHeadLeft.x -= arrowHeadSize;
                 arrowHeadLeft.z -= arrowHeadSize * 0.5f;
                 arrowHeadRight.x -= arrowHeadSize;
                 arrowHeadRight.z += arrowHeadSize * 0.5f;
                 break;
-            case 3: // Sud
+            case 3: // South
                 arrowHeadLeft.x -= arrowHeadSize * 0.5f;
                 arrowHeadLeft.z -= arrowHeadSize;
                 arrowHeadRight.x += arrowHeadSize * 0.5f;
                 arrowHeadRight.z -= arrowHeadSize;
                 break;
-            case 4: // Ouest
+            case 4: // West
                 arrowHeadLeft.x += arrowHeadSize;
                 arrowHeadLeft.z -= arrowHeadSize * 0.5f;
                 arrowHeadRight.x += arrowHeadSize;
@@ -295,33 +289,21 @@ void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGr
         }
         graphicsLib->DrawLine3D(arrowEnd, arrowHeadLeft, directionColor);
         graphicsLib->DrawLine3D(arrowEnd, arrowHeadRight, directionColor);
-        
-        // Afficher le nom de l'équipe au-dessus du joueur
         if (!playerInfo->getTeamName().empty()) {
             ZappyTypes::Vector3 textPosition = playerPos;
-            textPosition.y = position.y + playerHeight + 0.3f; // Position au-dessus du joueur
-            
-            // Créer une version abrégée du nom d'équipe si trop long
+            textPosition.y = position.y + playerHeight + 1.0f;
             std::string teamName = playerInfo->getTeamName();
             if (teamName.length() > 10) {
                 teamName = teamName.substr(0, 8) + "...";
             }
-            
-            // Déterminer une couleur en fonction du nom de l'équipe pour différencier les équipes
-            ZappyTypes::Color textColor = {255, 255, 255, 255}; // Blanc par défaut
-            
-            // Utilisation d'un hachage simple du nom d'équipe pour générer des couleurs différentes
+            ZappyTypes::Color textColor = {255, 255, 255, 255};
             unsigned int hash = 0;
             for (char c : playerInfo->getTeamName()) {
                 hash = hash * 31 + c;
             }
-            
-            // Générer des couleurs vives en évitant le blanc et les couleurs trop sombres
-            textColor.r = 128 + (hash % 128);          // 128-255
-            textColor.g = 128 + ((hash / 256) % 128);  // 128-255
-            textColor.b = 128 + ((hash / 65536) % 128);// 128-255
-            
-            // Afficher le texte 3D avec la couleur générée
+            textColor.r = 128 + (hash % 128);
+            textColor.g = 128 + ((hash / 256) % 128);
+            textColor.b = 128 + ((hash / 65536) % 128);
             float textSize = 0.1f * playerSize;
             renderText3D(graphicsLib, teamName, textPosition, textSize, textColor);
         }
@@ -333,16 +315,12 @@ void DetailedTileRenderStrategy::renderText3D(const std::shared_ptr<IGraphicsLib
                                              ZappyTypes::Vector3 position,
                                              float fontSize,
                                              ZappyTypes::Color color) {
-    // Vérifier si la chaîne de texte est vide pour éviter les plantages
     if (text.empty()) {
         return;
     }
-    
-    // Utiliser la nouvelle fonction DrawText3D ajoutée à l'encapsulation RaylibCPP
     float fontSpacing = 0.05f;
     float lineSpacing = -0.1f;
-    bool backface = true;  // Afficher le texte des deux côtés pour qu'il soit visible de n'importe quel angle
-    std::cout << "Test : " << text << std::endl;
+    bool backface = true;
     graphicsLib->DrawText3D(text, position, fontSize, fontSpacing, lineSpacing, backface, color);
 }
 
@@ -380,8 +358,11 @@ void DetailedTileRenderStrategy::renderEggIndicator(const std::shared_ptr<IGraph
     }
 }
 
-TileRenderStrategyFactory::TileRenderStrategyFactory(ModelManager& manager)
+TileRenderStrategyFactory::TileRenderStrategyFactory(const std::shared_ptr<ModelManager>& manager)
     : modelManager(manager) {}
+
+TileRenderStrategyFactory::TileRenderStrategyFactory(ModelManager* manager)
+    : modelManager(std::shared_ptr<ModelManager>(manager, [](ModelManager*) {})) {}
 
 std::shared_ptr<ITileRenderStrategy> TileRenderStrategyFactory::createSimpleTileStrategy(const std::shared_ptr<GraphicalContext>& ctx) {
     return std::make_shared<SimpleTileRenderStrategy>(ctx);
@@ -396,20 +377,20 @@ std::shared_ptr<ITileRenderStrategy> TileRenderStrategyFactory::createDetailedTi
     return std::make_shared<DetailedTileRenderStrategy>(ctx);
 }
 
-// Implémentation de MapRenderer
-MapRenderer::MapRenderer(std::shared_ptr<IGraphicsLib> graphics,
-    std::shared_ptr<GraphicalContext> ctx,
-    ModelManager& modelManager)
+MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
+    const std::shared_ptr<GraphicalContext>& ctx,
+    const std::shared_ptr<ModelManagerAdapter>& modelManagerAdapter)
     : graphicsLib(graphics),
       context(ctx),
-      strategyFactory(modelManager),
+      strategyFactory(&modelManagerAdapter->getManager()),
       tileSize(1.0f),
       tileSpacing(0.1f),
       zoomLevel(1.0f),
-      detailThreshold(2.0f) { // detailThreshold n'est plus utilisé, vue détaillée toujours active
+      detailThreshold(2.0f) {
     tileRenderStrategy = strategyFactory.createSimpleTileStrategy(ctx);
     detailedTileStrategy = strategyFactory.createDetailedTileStrategy(ctx);
-    context->addObserver(std::make_shared<MapRendererObserver>(*this));
+    std::shared_ptr<MapRenderer> selfPtr(this, [](MapRenderer*) {});
+    context->addObserver(std::make_shared<MapRendererObserver>(selfPtr));
 }
 
 void MapRenderer::initialize() {
@@ -464,17 +445,14 @@ void MapRenderer::setResourceColor(int resourceType, const ZappyTypes::Color& co
 
 void MapRenderer::setZoomLevel(float zoom) {
     zoomLevel = std::max(0.1f, zoom);
-    // Le niveau de zoom n'affecte plus le style de rendu
 }
 
 void MapRenderer::setDetailThreshold(float threshold) {
     detailThreshold = threshold;
-    // Ce seuil n'est plus utilisé pour choisir entre vue simple et vue détaillée
 }
 
 void MapRenderer::renderTile(int x, int y, int resourceType) {
     ZappyTypes::Color tileColor = calculateTileColor(x, y);
-    // Toujours utiliser la vue détaillée, peu importe le niveau de zoom
     detailedTileStrategy->renderTile(graphicsLib, x, y, tileColor, tileSize, tileSpacing);
 }
 
@@ -493,21 +471,19 @@ ZappyTypes::Color MapRenderer::calculateTileColor(int x, int y) {
     return resourceColors[resourceIndex];
 }
 
-MapRendererObserver::MapRendererObserver(MapRenderer& renderer)
+MapRendererObserver::MapRendererObserver(std::shared_ptr<MapRenderer> renderer)
     : renderer(renderer) {}
 
 void MapRendererObserver::onMapSizeChanged(int width, int height) {
     if (width > 20 || height > 20) {
         float newSize = 10.0f / std::max(width, height);
-        renderer.setTileSize(newSize);
-        renderer.setTileSpacing(newSize * 0.1f);
+        renderer->setTileSize(newSize);
+        renderer->setTileSpacing(newSize * 0.1f);
     }
 }
 
 void MapRendererObserver::onTileChanged(int /*x*/, int /*y*/, const TileData& /*tileData*/) {
-    // Rien à faire ici car le rendu récupère les dernières données
-    // directement depuis le contexte au moment du rendu
-    // Les paramètres sont marqués comme non utilisés pour éviter les avertissements
+    //TODO(Sam) : maj avec les données du network
 }
 
 } // namespace Zappy

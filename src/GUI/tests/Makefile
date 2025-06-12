@@ -1,4 +1,9 @@
-# Test du MapRenderer
+##
+## EPITECH PROJECT, 2025
+## B-YEP-400 Zappy GUI
+## File description:
+## Makefile
+##
 
 CC = g++
 CPPFLAGS = -std=c++17 -Wall -Wextra -g3

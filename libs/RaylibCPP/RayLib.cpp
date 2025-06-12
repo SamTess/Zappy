@@ -144,12 +144,10 @@ void RayLib::DrawText3D(const std::string& text, ZappyTypes::Vector3 position, f
 
 void RayLib::DrawTextWave3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, float time, ZappyTypes::Color tint) {
     ::Font font = _font.has_value() ? _font.value().get() : GetFontDefault();
-    
     raylibcpp::WaveTextConfig config;
     config.waveSpeed = (Vector3){ 3.0f, 3.0f, 0.5f };
     config.waveOffset = (Vector3){ 0.35f, 0.35f, 0.35f };
     config.waveRange = (Vector3){ 0.45f, 0.45f, 0.45f };
-    
     raylibcpp::Text3D::DrawTextWave3D(
         font, text, TypeAdapter::ToRaylib(position),
         fontSize, fontSpacing, lineSpacing, backface,
