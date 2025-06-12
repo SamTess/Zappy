@@ -71,7 +71,7 @@ static bool execute_if_free(server_t *server, client_t *user,
         return true;
     } else {
         if (user->player->queue_size < 10) {
-            add_to_command_queue(user, buffer);
+            add_to_command_queue(server, user, buffer);
             return true;
         } else
             return true;

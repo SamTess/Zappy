@@ -25,7 +25,6 @@ void process_next_queued_command(server_t *server, client_t *client);
 void cleanup_player_queue(player_t *player);
 void cleanup_client(client_t *client);
 char *tile_to_str(tile_t *tile);
-void add_to_command_queue(client_t *client, char *command);
 void get_message(server_t *server, client_t *user);
 void execute_com(server_t *server, client_t *user, char *buffer);
 void write_command_output(int client_fd, char *msg);
