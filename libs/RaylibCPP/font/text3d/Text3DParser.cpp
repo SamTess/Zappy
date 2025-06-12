@@ -5,33 +5,30 @@
 ** Text3D Parser implementation
 */
 
+#include <iostream>
+#include <cmath>
 #include "Text3DParser.hpp"
 #include "Text3DCodepoint.hpp"
 #include "Text3DWave.hpp"
-#include <iostream>
-#include <cmath>
 
 namespace raylibcpp {
 
-bool Text3DParser::isWaveMarker(const std::string& text, int pos)
-{
-    return (pos < static_cast<int>(text.length()) - 1 && 
+bool Text3DParser::isWaveMarker(const std::string& text, int pos) {
+    return (pos < static_cast<int>(text.length()) - 1 &&
             text[pos] == '~' && text[pos + 1] == '~');
 }
 
-int Text3DParser::skipWaveMarkers(const std::string& text, int pos)
-{
+int Text3DParser::skipWaveMarkers(const std::string& text, int pos) {
     if (isWaveMarker(text, pos)) {
-        return pos + 2; // Skip both tildes
+        return pos + 2;
     }
     return pos;
 }
 
 void Text3DParser::renderWaveText(const ::Font& font, const std::string& text,
-                                 Vector3 position, float fontSize, float fontSpacing,
-                                 float lineSpacing, bool backface, 
-                                 const WaveTextConfig* config, float time, Color tint)
-{
+    Vector3 position, float fontSize, float fontSpacing,
+    float lineSpacing, bool backface,
+    const WaveTextConfig* config, float time, Color tint) {
     if (!Text3DWave::isValidConfig(config)) {
         std::cerr << "Error: WaveTextConfig is null!" << std::endl;
         return;
@@ -69,12 +66,11 @@ void Text3DParser::renderWaveText(const ::Font& font, const std::string& text,
 }
 
 void Text3DParser::processWaveCharacter(const ::Font& font, int codepoint, int index,
-                                       Vector3& position, float& textOffsetX, float& textOffsetY,
-                                       float fontSize, float fontSpacing, float lineSpacing,
-                                       float scale, bool backface, Color tint,
-                                       bool waveActive, const WaveTextConfig* config,
-                                       float time, int charIndex)
-{
+    Vector3& position, float& textOffsetX, float& textOffsetY,
+    float fontSize, float fontSpacing, float lineSpacing,
+    float scale, bool backface, Color tint,
+    bool waveActive, const WaveTextConfig* config,
+    float time, int charIndex) {
     (void)lineSpacing;
     if (codepoint != ' ' && codepoint != '\t') {
         Vector3 charPosition = {
@@ -89,8 +85,6 @@ void Text3DParser::processWaveCharacter(const ::Font& font, int codepoint, int i
 
         Text3DCodepoint::draw(font, codepoint, charPosition, fontSize, backface, tint);
     }
-
-    // Advance to next character position
     if (font.glyphs[index].advanceX == 0) {
         textOffsetX += static_cast<float>(font.recs[index].width) * scale + fontSpacing;
     } else {
@@ -99,8 +93,7 @@ void Text3DParser::processWaveCharacter(const ::Font& font, int codepoint, int i
 }
 
 void Text3DParser::handleWaveNewline(float& textOffsetX, float& textOffsetY,
-                                    float fontSize, float lineSpacing, int& charIndex)
-{
+    float fontSize, float lineSpacing, int& charIndex) {
     textOffsetY += fontSize + lineSpacing;
     textOffsetX = 0.0f;
     charIndex = 0;

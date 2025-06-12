@@ -15,17 +15,17 @@ namespace raylibcpp {
 class Text3DRenderer {
 public:
     static void renderBasicText(const ::Font& font, const std::string& text,
-                               Vector3 position, float fontSize, float fontSpacing,
-                               float lineSpacing, bool backface, Color tint);
+        Vector3 position, float fontSize, float fontSpacing,
+        float lineSpacing, bool backface, Color tint);
 
 private:
     static void processCharacter(const ::Font& font, int codepoint, int index,
-                               Vector3& position, float& textOffsetX, float& textOffsetY,
-                               float fontSize, float fontSpacing, float lineSpacing,
-                               float scale, bool backface, Color tint);
+        Vector3& position, float& textOffsetX, float& textOffsetY,
+        float fontSize, float fontSpacing, float lineSpacing,
+        float scale, bool backface, Color tint);
 
     static void handleNewline(float& textOffsetX, float& textOffsetY,
-                            float fontSize, float lineSpacing);
+        float fontSize, float lineSpacing);
 
     static float getCharacterAdvance(const ::Font& font, int index, float scale, float fontSpacing);
 };

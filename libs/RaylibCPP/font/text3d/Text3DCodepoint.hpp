@@ -13,17 +13,14 @@ namespace raylibcpp {
 
 class Text3DCodepoint {
 public:
-    // Draw a single codepoint in 3D space
-    static void draw(const ::Font& font, int codepoint, Vector3 position, 
-                    float fontSize, bool backface, Color tint);
+    static void draw(const ::Font& font, int codepoint, Vector3 position,
+        float fontSize, bool backface, Color tint);
 
 private:
-    // Render the quad for the codepoint
-    static void renderQuad(Vector3 position, float width, float height,
-                          float tx, float ty, float tw, float th, 
-                          bool backface, Color tint);
-    
-    // Draw debug boundaries if enabled
+    static void renderQuad(const ::Font& font, Vector3 position, float width, float height,
+        float tx, float ty, float tw, float th,
+        bool backface, Color tint);
+
     static void drawDebugBoundary(Vector3 position, float width, float height);
 };
 

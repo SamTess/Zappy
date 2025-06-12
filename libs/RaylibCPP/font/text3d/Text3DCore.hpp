@@ -15,14 +15,12 @@
 
 namespace raylibcpp {
 
-// Configuration structure for waving the text
 struct WaveTextConfig {
     Vector3 waveRange;
     Vector3 waveSpeed;
     Vector3 waveOffset;
 };
 
-// Debug options
 extern bool SHOW_LETTER_BOUNDRY;
 extern bool SHOW_TEXT_BOUNDRY;
 

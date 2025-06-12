@@ -13,22 +13,13 @@ namespace raylibcpp {
 
 class Text3DConfig {
 public:
-    // Create default wave configuration
     static WaveTextConfig createDefaultWaveConfig();
-    
-    // Create custom wave configuration
     static WaveTextConfig createWaveConfig(Vector3 range, Vector3 speed, Vector3 offset);
-    
-    // Validate wave configuration
     static bool isValidWaveConfig(const WaveTextConfig* config);
-    
-    // Create preset configurations
     static WaveTextConfig createSubtleWave();
     static WaveTextConfig createIntenseWave();
     static WaveTextConfig createSlowWave();
     static WaveTextConfig createFastWave();
-    
-    // Adjust existing configuration
     static void adjustWaveIntensity(WaveTextConfig& config, float multiplier);
     static void adjustWaveSpeed(WaveTextConfig& config, float multiplier);
 

@@ -15,30 +15,22 @@ namespace raylibcpp {
 
 class Text3DParser {
 public:
-    // Check if position is at wave marker
     static bool isWaveMarker(const std::string& text, int pos);
-    
-    // Skip wave markers and return new position
     static int skipWaveMarkers(const std::string& text, int pos);
-    
-    // Render text with wave effects
     static void renderWaveText(const ::Font& font, const std::string& text,
-                              Vector3 position, float fontSize, float fontSpacing,
-                              float lineSpacing, bool backface, 
-                              const WaveTextConfig* config, float time, Color tint);
+        Vector3 position, float fontSize, float fontSpacing,
+        float lineSpacing, bool backface,
+        const WaveTextConfig* config, float time, Color tint);
 
 private:
-    // Process a single character with potential wave effect
     static void processWaveCharacter(const ::Font& font, int codepoint, int index,
-                                   Vector3& position, float& textOffsetX, float& textOffsetY,
-                                   float fontSize, float fontSpacing, float lineSpacing,
-                                   float scale, bool backface, Color tint,
-                                   bool waveActive, const WaveTextConfig* config,
-                                   float time, int charIndex);
-    
-    // Handle newline character in wave text
+        Vector3& position, float& textOffsetX, float& textOffsetY,
+        float fontSize, float fontSpacing, float lineSpacing,
+        float scale, bool backface, Color tint,
+        bool waveActive, const WaveTextConfig* config,
+        float time, int charIndex);
     static void handleWaveNewline(float& textOffsetX, float& textOffsetY,
-                                float fontSize, float lineSpacing, int& charIndex);
+        float fontSize, float lineSpacing, int& charIndex);
 };
 
 }  // namespace raylibcpp

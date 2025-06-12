@@ -13,20 +13,14 @@ namespace raylibcpp {
 
 class Text3DWave {
 public:
-    // Apply wave effect to position
-    static Vector3 applyWaveEffect(Vector3 basePosition, const WaveTextConfig& config, 
-                                  float time, int charIndex);
-    
-    // Create default wave configuration
+    static Vector3 applyWaveEffect(Vector3 basePosition, const WaveTextConfig& config,
+        float time, int charIndex);
     static WaveTextConfig createDefaultConfig();
-    
-    // Validate wave configuration
     static bool isValidConfig(const WaveTextConfig* config);
 
 private:
-    // Calculate wave offset for specific axis
-    static float calculateWaveOffset(float speed, float offset, float range, 
-                                   float time, int charIndex);
+    static float calculateWaveOffset(float speed, float offset, float range,
+        float time, int charIndex);
 };
 
 }  // namespace raylibcpp

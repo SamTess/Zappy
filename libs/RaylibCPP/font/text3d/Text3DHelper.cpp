@@ -52,8 +52,8 @@ float calculateAdvanceX(const ::Font& font, int index, float scale, float fontSp
     return static_cast<float>(font.glyphs[index].advanceX) * scale + fontSpacing;
 }
 
-void calculateTextureCoordinates(const ::Font& font, Rectangle srcRec, 
-                               float& tx, float& ty, float& tw, float& th) {
+void calculateTextureCoordinates(const ::Font& font, Rectangle srcRec,
+    float& tx, float& ty, float& tw, float& th) {
     tx = srcRec.x / font.texture.width;
     ty = srcRec.y / font.texture.height;
     tw = (srcRec.x + srcRec.width) / font.texture.width;

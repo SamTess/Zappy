@@ -11,8 +11,7 @@
 namespace raylibcpp {
 
 Vector3 Text3DMeasurement::measureText(const ::Font& font, const std::string& text,
-                                     float fontSize, float fontSpacing, float lineSpacing)
-{
+                                     float fontSize, float fontSpacing, float lineSpacing) {
     if (text.empty()) {
         return {0.0f, 0.25f, 0.0f};
     }
@@ -35,7 +34,7 @@ Vector3 Text3DMeasurement::measureText(const ::Font& font, const std::string& te
 
         if (letter != '\n') {
             if (isWaveMarker(text, i)) {
-                i++; // Skip second tilde
+                i++;
             } else {
                 lenCounter++;
                 if (font.glyphs[index].advanceX != 0) {
@@ -53,9 +52,7 @@ Vector3 Text3DMeasurement::measureText(const ::Font& font, const std::string& te
 
         tempLen = std::max(tempLen, lenCounter);
     }
-
     tempTextWidth = std::max(tempTextWidth, textWidth);
-
     return {
         tempTextWidth + static_cast<float>((tempLen - 1) * fontSpacing),
         0.25f,
@@ -63,10 +60,9 @@ Vector3 Text3DMeasurement::measureText(const ::Font& font, const std::string& te
     };
 }
 
-bool Text3DMeasurement::isWaveMarker(const std::string& text, int pos)
-{
-    return (pos < static_cast<int>(text.length()) - 1 && 
-            text[pos] == '~' && text[pos + 1] == '~');
+bool Text3DMeasurement::isWaveMarker(const std::string& text, int pos) {
+    return (pos < static_cast<int>(text.length()) - 1 &&
+        text[pos] == '~' && text[pos + 1] == '~');
 }
 
 }  // namespace raylibcpp

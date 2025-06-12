@@ -19,40 +19,30 @@ WaveTextConfig Text3DConfig::createDefaultWaveConfig() {
 }
 
 WaveTextConfig Text3DConfig::createWaveConfig(Vector3 range, Vector3 speed, Vector3 offset) {
-    // Clamp values to valid ranges
     range.x = std::clamp(range.x, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
     range.y = std::clamp(range.y, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
     range.z = std::clamp(range.z, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
-    
     speed.x = std::clamp(speed.x, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
     speed.y = std::clamp(speed.y, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
     speed.z = std::clamp(speed.z, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
-    
     offset.x = std::clamp(offset.x, MIN_WAVE_OFFSET, MAX_WAVE_OFFSET);
     offset.y = std::clamp(offset.y, MIN_WAVE_OFFSET, MAX_WAVE_OFFSET);
     offset.z = std::clamp(offset.z, MIN_WAVE_OFFSET, MAX_WAVE_OFFSET);
-    
     return {range, speed, offset};
 }
 
 bool Text3DConfig::isValidWaveConfig(const WaveTextConfig* config) {
-    if (config == nullptr) return false;
-    
-    // Check ranges
+    if (config == nullptr)
+        return false;
     if (config->waveRange.x < MIN_WAVE_RANGE || config->waveRange.x > MAX_WAVE_RANGE) return false;
     if (config->waveRange.y < MIN_WAVE_RANGE || config->waveRange.y > MAX_WAVE_RANGE) return false;
     if (config->waveRange.z < MIN_WAVE_RANGE || config->waveRange.z > MAX_WAVE_RANGE) return false;
-    
-    // Check speeds
     if (config->waveSpeed.x < MIN_WAVE_SPEED || config->waveSpeed.x > MAX_WAVE_SPEED) return false;
     if (config->waveSpeed.y < MIN_WAVE_SPEED || config->waveSpeed.y > MAX_WAVE_SPEED) return false;
     if (config->waveSpeed.z < MIN_WAVE_SPEED || config->waveSpeed.z > MAX_WAVE_SPEED) return false;
-    
-    // Check offsets
     if (config->waveOffset.x < MIN_WAVE_OFFSET || config->waveOffset.x > MAX_WAVE_OFFSET) return false;
     if (config->waveOffset.y < MIN_WAVE_OFFSET || config->waveOffset.y > MAX_WAVE_OFFSET) return false;
     if (config->waveOffset.z < MIN_WAVE_OFFSET || config->waveOffset.z > MAX_WAVE_OFFSET) return false;
-    
     return true;
 }
 
