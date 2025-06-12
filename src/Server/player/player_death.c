@@ -41,8 +41,8 @@ bool check_player_starvation(server_t *server, client_t *client)
     int food_amount = 0;
     bool dead = false;
 
-    if (!client || !client->player)
-        return true;
+    if (!client || !client->player || !client->is_fully_connected)
+        return dead;
     client->player->life--;
     if (client->player->life <= 0) {
         food_amount = how_many_in_inventory(client->player, FOOD);
