@@ -18,6 +18,13 @@ on:
         default: false
         type: boolean
 
+# Permissions nécessaires pour créer des releases et pousser des tags
+permissions:
+  contents: write
+  actions: read
+  pages: write
+  id-token: write
+
 env:
   TERM: xterm
   # Binaires à inclure dans la release
@@ -363,22 +370,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📥 Télécharger les artefacts
         uses: actions/download-artifact@v4
         with:
           name: zappy-${{ needs.calculate-version.outputs.new_version }}
-
-      - name: 🏷️ Créer le tag Git
-        run: |
-          new_version="${{ needs.calculate-version.outputs.new_version }}"
-          
-          echo "🏷️ Création du tag $new_version..."
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git tag -a "$new_version" -m "Release $new_version"
-          git push origin "$new_version"
 
       - name: 🚀 Créer la release GitHub
         uses: softprops/action-gh-release@v1
