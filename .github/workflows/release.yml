@@ -145,7 +145,7 @@ jobs:
             echo "- 🤖 Client IA (zappy_ai)" >> $changelog_file
           else
             # Récupérer les commits depuis le dernier tag
-            if git rev-list "$previous_version"..HEAD --oneline | head -20 | while read line; do
+            git rev-list "$previous_version"..HEAD --oneline | head -20 | while read line; do
               echo "- $line" >> $changelog_file
             done
           fi
