@@ -24,6 +24,7 @@
   - [Serveur](#serveur)
   - [Interface Graphique](#interface-graphique)
   - [Intelligence Artificielle](#intelligence-artificielle)
+- [Releases](#-releases)
 - [Documentation](#-documentation)
 - [Développement](#-développement)
 
@@ -145,6 +146,31 @@ L'IA des clients comprend :
 - Gestion des ressources et planification
 - Communication et coordination entre agents
 - Stratégies pour les rituels d'élévation
+
+## 🚀 Releases
+
+Le projet utilise un système de release automatisé via GitHub Actions avec versioning sémantique :
+
+### 📦 Télécharger une release
+Rendez-vous sur la [page des releases](../../releases) pour télécharger la dernière version.
+
+### 🔄 Créer une nouvelle release
+Les releases sont créées automatiquement via GitHub Actions :
+
+1. **Accéder aux Actions** : GitHub → onglet Actions → workflow "🚀 Release Zappy"
+2. **Choisir le type de version** :
+   - `nouvelle-version` : Version majeure (v1.0.0 → v2.0.0)
+   - `nouvelle-feature` : Nouvelle fonctionnalité (v1.0.0 → v1.1.0)  
+   - `resolution-bug` : Correction de bug (v1.0.0 → v1.0.1)
+3. **Lancer le workflow** : Le système génère automatiquement la version, compile le projet et crée la release
+
+Chaque release contient :
+- Tous les binaires (serveur, GUI, IA)
+- Bibliothèques statiques et dynamiques
+- Script d'installation automatique
+- Documentation et changelog
+
+📖 **Guide détaillé** : [docs/release-workflow.md](docs/release-workflow.md)
 
 ## 📚 Documentation
 
