@@ -19,6 +19,7 @@ void handle_player_death(server_t *server, client_t *client)
     if (!client || !client->player)
         return;
     write_command_output(client->client_fd, "dead\n");
+    command_pdi(server, client);
     if (server->map && client->player->pos_y < server->parsed_info->height &&
         client->player->pos_x < server->parsed_info->width) {
         tile = &server->map[client->player->pos_y][client->player->pos_x];
@@ -40,8 +41,8 @@ bool check_player_starvation(server_t *server, client_t *client)
     int food_amount = 0;
     bool dead = false;
 
-    if (!client || !client->player)
-        return true;
+    if (!client || !client->player || !client->is_fully_connected)
+        return dead;
     client->player->life--;
     if (client->player->life <= 0) {
         food_amount = how_many_in_inventory(client->player, FOOD);

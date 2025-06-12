@@ -7,6 +7,7 @@
 
 #include "../include/player.h"
 #include "../include/server.h"
+#include "../include/graphical_commands.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +43,7 @@ void init_new_player_pos(server_t *server, client_t *new_client)
             new_client->player->pos_y = team_egg->pos_y;
             tile_add_player(&server->map[team_egg->pos_y][team_egg->pos_x],
                 new_client->client_id);
+            send_ebo_command(server, team_egg->egg_id);
             remove_egg(server, team_egg->egg_id,
                 &server->map[team_egg->pos_y][team_egg->pos_x]);
             return;
@@ -59,7 +61,16 @@ static void init_pending(player_t *player)
     player->pending_cmd->func = NULL;
 }
 
-void init_player(player_t *player, char *playerTeam)
+static void init_player_team(player_t *player, char *player_team)
+{
+    player->team_name = strdup(player_team);
+    if (player->team_name == NULL){
+        free(player->command_queue);
+        server_err("Strdup failed for player team name");
+    }
+}
+
+void init_player(player_t *player, char *player_team)
 {
     player->pos_x = 0;
     player->pos_y = 0;
@@ -71,10 +82,8 @@ void init_player(player_t *player, char *playerTeam)
         server_err("Malloc failed for command queue");
     player->level = 1;
     player->life = 126;
-    if (playerTeam != NULL) {
-        player->team_name = strdup(playerTeam);
-        if (player->team_name == NULL)
-            server_err("Strdup failed for player team name");
+    if (player_team != NULL) {
+        init_player_team(player, player_team);
     } else
         player->team_name = NULL;
     init_inventory(player);
