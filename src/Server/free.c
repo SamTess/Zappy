@@ -104,3 +104,12 @@ void free_all(server_t *server, parsing_info_t *parsed_info)
         server->parsed_info = NULL;
     }
 }
+
+void free_arr(char **array)
+{
+    if (!array)
+        return;
+    for (int i = 0; array[i]; i++)
+        free(array[i]);
+    free(array);
+}
