@@ -6,11 +6,14 @@
 */
 
 #include "Text3D.hpp"
+
+#include <iostream>
+#include <string>
+
 #include "text3d/Text3DCodepoint.hpp"
 #include "text3d/Text3DRenderer.hpp"
 #include "text3d/Text3DParser.hpp"
 #include "text3d/Text3DMeasurement.hpp"
-#include <iostream>
 
 namespace raylibcpp {
 
@@ -33,8 +36,8 @@ void Text3D::DrawText3D(::Font font, const std::string& text, Vector3 position,
 
 void Text3D::DrawTextWave3D(::Font font, const std::string& text, Vector3 position,
     float fontSize, float fontSpacing, float lineSpacing,
-    bool backface, WaveTextConfig* config, float time, Color tint) {
-    std::cout << "DrawTextWave3D: " << text << std::endl;
+    bool backface, const WaveTextConfigPtr& config, float time, Color tint) {
+    std::cout << "DrawTextWave3D (smart pointer): " << text << std::endl;
     Text3DParser::renderWaveText(font, text, position, fontSize, fontSpacing,
                                 lineSpacing, backface, config, time, tint);
 }

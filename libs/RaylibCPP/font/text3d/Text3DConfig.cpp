@@ -7,18 +7,19 @@
 
 #include "Text3DConfig.hpp"
 #include <algorithm>
+#include <memory>
 
 namespace raylibcpp {
 
-WaveTextConfig Text3DConfig::createDefaultWaveConfig() {
-    return {
+WaveTextConfigPtr Text3DConfig::createDefaultWaveConfig() {
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{
         .waveRange = {0.45f, 0.45f, 0.45f},
         .waveSpeed = {3.0f, 3.0f, 0.5f},
         .waveOffset = {0.35f, 0.35f, 0.35f}
-    };
+    });
 }
 
-WaveTextConfig Text3DConfig::createWaveConfig(Vector3 range, Vector3 speed, Vector3 offset) {
+WaveTextConfigPtr Text3DConfig::createWaveConfig(Vector3 range, Vector3 speed, Vector3 offset) {
     range.x = std::clamp(range.x, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
     range.y = std::clamp(range.y, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
     range.z = std::clamp(range.z, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
@@ -28,11 +29,11 @@ WaveTextConfig Text3DConfig::createWaveConfig(Vector3 range, Vector3 speed, Vect
     offset.x = std::clamp(offset.x, MIN_WAVE_OFFSET, MAX_WAVE_OFFSET);
     offset.y = std::clamp(offset.y, MIN_WAVE_OFFSET, MAX_WAVE_OFFSET);
     offset.z = std::clamp(offset.z, MIN_WAVE_OFFSET, MAX_WAVE_OFFSET);
-    return {range, speed, offset};
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{range, speed, offset});
 }
 
-bool Text3DConfig::isValidWaveConfig(const WaveTextConfig* config) {
-    if (config == nullptr)
+bool Text3DConfig::isValidWaveConfig(const WaveTextConfigPtr& config) {
+    if (!config)
         return false;
     if (config->waveRange.x < MIN_WAVE_RANGE || config->waveRange.x > MAX_WAVE_RANGE) return false;
     if (config->waveRange.y < MIN_WAVE_RANGE || config->waveRange.y > MAX_WAVE_RANGE) return false;
@@ -46,48 +47,50 @@ bool Text3DConfig::isValidWaveConfig(const WaveTextConfig* config) {
     return true;
 }
 
-WaveTextConfig Text3DConfig::createSubtleWave() {
-    return {
+WaveTextConfigPtr Text3DConfig::createSubtleWave() {
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{
         .waveRange = {0.2f, 0.2f, 0.1f},
         .waveSpeed = {1.5f, 1.5f, 0.3f},
         .waveOffset = {0.5f, 0.5f, 0.5f}
-    };
+    });
 }
 
-WaveTextConfig Text3DConfig::createIntenseWave() {
-    return {
+WaveTextConfigPtr Text3DConfig::createIntenseWave() {
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{
         .waveRange = {1.0f, 1.0f, 0.8f},
         .waveSpeed = {5.0f, 5.0f, 1.0f},
         .waveOffset = {0.2f, 0.2f, 0.2f}
-    };
+    });
 }
 
-WaveTextConfig Text3DConfig::createSlowWave() {
-    return {
+WaveTextConfigPtr Text3DConfig::createSlowWave() {
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{
         .waveRange = {0.6f, 0.6f, 0.4f},
         .waveSpeed = {1.0f, 1.0f, 0.2f},
         .waveOffset = {0.8f, 0.8f, 0.8f}
-    };
+    });
 }
 
-WaveTextConfig Text3DConfig::createFastWave() {
-    return {
+WaveTextConfigPtr Text3DConfig::createFastWave() {
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{
         .waveRange = {0.3f, 0.3f, 0.2f},
         .waveSpeed = {8.0f, 8.0f, 1.5f},
         .waveOffset = {0.1f, 0.1f, 0.1f}
-    };
+    });
 }
 
-void Text3DConfig::adjustWaveIntensity(WaveTextConfig& config, float multiplier) {
-    config.waveRange.x = std::clamp(config.waveRange.x * multiplier, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
-    config.waveRange.y = std::clamp(config.waveRange.y * multiplier, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
-    config.waveRange.z = std::clamp(config.waveRange.z * multiplier, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
+void Text3DConfig::adjustWaveIntensity(const WaveTextConfigPtr& config, float multiplier) {
+    if (!config) return;
+    config->waveRange.x = std::clamp(config->waveRange.x * multiplier, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
+    config->waveRange.y = std::clamp(config->waveRange.y * multiplier, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
+    config->waveRange.z = std::clamp(config->waveRange.z * multiplier, MIN_WAVE_RANGE, MAX_WAVE_RANGE);
 }
 
-void Text3DConfig::adjustWaveSpeed(WaveTextConfig& config, float multiplier) {
-    config.waveSpeed.x = std::clamp(config.waveSpeed.x * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
-    config.waveSpeed.y = std::clamp(config.waveSpeed.y * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
-    config.waveSpeed.z = std::clamp(config.waveSpeed.z * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
+void Text3DConfig::adjustWaveSpeed(const WaveTextConfigPtr& config, float multiplier) {
+    if (!config) return;
+    config->waveSpeed.x = std::clamp(config->waveSpeed.x * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
+    config->waveSpeed.y = std::clamp(config->waveSpeed.y * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
+    config->waveSpeed.z = std::clamp(config->waveSpeed.z * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
 }
 
 }  // namespace raylibcpp

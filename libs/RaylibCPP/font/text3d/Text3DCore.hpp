@@ -8,6 +8,7 @@
 #pragma once
 #include <raylib.h>
 #include <string>
+#include <memory>
 
 #define LETTER_BOUNDRY_SIZE     0.25f
 #define TEXT_MAX_LAYERS         32
@@ -20,6 +21,9 @@ struct WaveTextConfig {
     Vector3 waveSpeed;
     Vector3 waveOffset;
 };
+
+using WaveTextConfigPtr = std::shared_ptr<WaveTextConfig>;
+using WaveTextConfigUPtr = std::unique_ptr<WaveTextConfig>;
 
 extern bool SHOW_LETTER_BOUNDRY;
 extern bool SHOW_TEXT_BOUNDRY;

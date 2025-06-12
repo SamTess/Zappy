@@ -5,34 +5,38 @@
 ** Text3D Wave effects implementation
 */
 
-#include "Text3DWave.hpp"
 #include <math.h>
+#include <memory>
+#include "Text3DWave.hpp"
 
 namespace raylibcpp {
 
-Vector3 Text3DWave::applyWaveEffect(Vector3 basePosition, const WaveTextConfig& config,
+Vector3 Text3DWave::applyWaveEffect(Vector3 basePosition, const WaveTextConfigPtr& config,
                                    float time, int charIndex) {
+    if (!config) {
+        return basePosition;
+    }
+
     Vector3 wavePosition = basePosition;
 
-    wavePosition.x += calculateWaveOffset(config.waveSpeed.x, config.waveOffset.x,
-                        config.waveRange.x, time, charIndex);
-    wavePosition.y += calculateWaveOffset(config.waveSpeed.y, config.waveOffset.y,
-                        config.waveRange.y, time, charIndex);
-    wavePosition.z += calculateWaveOffset(config.waveSpeed.z, config.waveOffset.z,
-                        config.waveRange.z, time, charIndex);
+    wavePosition.x += calculateWaveOffset(config->waveSpeed.x, config->waveOffset.x,
+                        config->waveRange.x, time, charIndex);
+    wavePosition.y += calculateWaveOffset(config->waveSpeed.y, config->waveOffset.y,
+                        config->waveRange.y, time, charIndex);
+    wavePosition.z += calculateWaveOffset(config->waveSpeed.z, config->waveOffset.z,
+                        config->waveRange.z, time, charIndex);
     return wavePosition;
 }
 
-WaveTextConfig Text3DWave::createDefaultConfig() {
-    WaveTextConfig config;
-
-    config.waveSpeed = { 3.0f, 3.0f, 0.5f };
-    config.waveOffset = { 0.35f, 0.35f, 0.35f };
-    config.waveRange = { 0.45f, 0.45f, 0.45f };
-    return config;
+WaveTextConfigPtr Text3DWave::createDefaultConfig() {
+    return std::make_shared<WaveTextConfig>(WaveTextConfig{
+        .waveRange = { 0.45f, 0.45f, 0.45f },
+        .waveSpeed = { 3.0f, 3.0f, 0.5f },
+        .waveOffset = { 0.35f, 0.35f, 0.35f }
+    });
 }
 
-bool Text3DWave::isValidConfig(const WaveTextConfig* config) {
+bool Text3DWave::isValidConfig(const WaveTextConfigPtr& config) {
     return config != nullptr;
 }
 

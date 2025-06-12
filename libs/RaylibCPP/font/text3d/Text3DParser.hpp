@@ -9,7 +9,9 @@
 #include <raylib.h>
 #include <string>
 #include <vector>
+#include <memory>
 #include "Text3DCore.hpp"
+#include "Text3DHelper.hpp"
 
 namespace raylibcpp {
 
@@ -20,17 +22,17 @@ public:
     static void renderWaveText(const ::Font& font, const std::string& text,
         Vector3 position, float fontSize, float fontSpacing,
         float lineSpacing, bool backface,
-        const WaveTextConfig* config, float time, Color tint);
+        const WaveTextConfigPtr& config, float time, Color tint);
 
 private:
     static void processWaveCharacter(const ::Font& font, int codepoint, int index,
-        Vector3& position, float& textOffsetX, float& textOffsetY,
+        const RenderStatePtr& renderState,
         float fontSize, float fontSpacing, float lineSpacing,
         float scale, bool backface, Color tint,
-        bool waveActive, const WaveTextConfig* config,
-        float time, int charIndex);
-    static void handleWaveNewline(float& textOffsetX, float& textOffsetY,
-        float fontSize, float lineSpacing, int& charIndex);
+        bool waveActive, const WaveTextConfigPtr& config,
+        float time);
+    static void handleWaveNewline(const RenderStatePtr& renderState,
+        float fontSize, float lineSpacing);
 };
 
 }  // namespace raylibcpp

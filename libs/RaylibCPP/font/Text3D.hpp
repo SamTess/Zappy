@@ -8,6 +8,7 @@
 #pragma once
 #include <raylib.h>
 #include <string>
+#include <memory>
 #include "../../src/Shared/Common.hpp"
 #include "text3d/Text3DCore.hpp"
 
@@ -27,7 +28,7 @@ class Text3D {
 
         static void DrawTextWave3D(::Font font, const std::string& text, Vector3 position,
             float fontSize, float fontSpacing, float lineSpacing,
-            bool backface, WaveTextConfig* config, float time, Color tint);
+            bool backface, const WaveTextConfigPtr& config, float time, Color tint);
 
         static Vector3 MeasureTextWave3D(::Font font, const std::string& text,
             float fontSize, float fontSpacing, float lineSpacing);

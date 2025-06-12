@@ -17,15 +17,15 @@ void Text3DCodepoint::draw(const ::Font& font, int codepoint, Vector3 position,
         return;
     int index = Text3DHelper::getGlyphIndex(font, codepoint);
     float scale = Text3DHelper::calculateScale(font, fontSize);
-    float tx, ty, tw, th;
-    float width, height;
     Vector3 glyphPosition = Text3DHelper::calculateGlyphPosition(font, index, position, scale);
     Rectangle srcRec = Text3DHelper::calculateSourceRectangle(font, index);
-    Text3DHelper::calculateGlyphDimensions(font, index, scale, width, height);
-    Text3DHelper::calculateTextureCoordinates(font, srcRec, tx, ty, tw, th);
 
-    drawDebugBoundary(glyphPosition, width, height);
-    renderQuad(font, glyphPosition, width, height, tx, ty, tw, th, backface, tint);
+    auto dimensions = Text3DHelper::calculateGlyphDimensions(font, index, scale);
+    auto texCoords = Text3DHelper::calculateTextureCoordinates(font, srcRec);
+
+    drawDebugBoundary(glyphPosition, dimensions.width, dimensions.height);
+    renderQuad(font, glyphPosition, dimensions.width, dimensions.height,
+               texCoords.tx, texCoords.ty, texCoords.tw, texCoords.th, backface, tint);
 }
 
 void Text3DCodepoint::renderQuad(const ::Font& font, Vector3 position, float width, float height,

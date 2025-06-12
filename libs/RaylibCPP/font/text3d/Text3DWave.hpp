@@ -7,16 +7,17 @@
 
 #pragma once
 #include <raylib.h>
+#include <memory>
 #include "Text3DCore.hpp"
 
 namespace raylibcpp {
 
 class Text3DWave {
 public:
-    static Vector3 applyWaveEffect(Vector3 basePosition, const WaveTextConfig& config,
+    static Vector3 applyWaveEffect(Vector3 basePosition, const WaveTextConfigPtr& config,
         float time, int charIndex);
-    static WaveTextConfig createDefaultConfig();
-    static bool isValidConfig(const WaveTextConfig* config);
+    static WaveTextConfigPtr createDefaultConfig();
+    static bool isValidConfig(const WaveTextConfigPtr& config);
 
 private:
     static float calculateWaveOffset(float speed, float offset, float range,

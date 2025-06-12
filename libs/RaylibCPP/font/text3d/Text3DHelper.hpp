@@ -8,19 +8,37 @@
 #pragma once
 #include <raylib.h>
 #include <string>
+#include <memory>
 
 namespace raylibcpp {
+
+struct GlyphDimensions {
+    float width;
+    float height;
+};
+
+struct TextureCoordinates {
+    float tx, ty, tw, th;
+};
+
+struct RenderState {
+    Vector3 position;
+    float textOffsetX;
+    float textOffsetY;
+    int charIndex;
+};
+
+using RenderStatePtr = std::shared_ptr<RenderState>;
 
 namespace Text3DHelper {
     int getGlyphIndex(const ::Font& font, int codepoint);
     float calculateScale(const ::Font& font, float fontSize);
     Vector3 calculateGlyphPosition(const ::Font& font, int index, Vector3 basePosition, float scale);
     Rectangle calculateSourceRectangle(const ::Font& font, int index);
-    void calculateGlyphDimensions(const ::Font& font, int index, float scale, float& width, float& height);
+    GlyphDimensions calculateGlyphDimensions(const ::Font& font, int index, float scale);
     bool isRenderableCharacter(int codepoint);
     float calculateAdvanceX(const ::Font& font, int index, float scale, float fontSpacing);
-    void calculateTextureCoordinates(const ::Font& font, Rectangle srcRec,
-        float& tx, float& ty, float& tw, float& th);
+    TextureCoordinates calculateTextureCoordinates(const ::Font& font, Rectangle srcRec);
     bool isValidFont(const ::Font& font);
     bool isValidRenderParams(float fontSize, float fontSpacing, float lineSpacing);
     bool isWhitespace(int codepoint);

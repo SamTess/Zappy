@@ -36,9 +36,16 @@ Rectangle calculateSourceRectangle(const ::Font& font, int index) {
     };
 }
 
-void calculateGlyphDimensions(const ::Font& font, int index, float scale, float& width, float& height) {
-    width = static_cast<float>(font.recs[index].width + 2.0f * font.glyphPadding) * scale;
-    height = static_cast<float>(font.recs[index].height + 2.0f * font.glyphPadding) * scale;
+void calculateGlyphDimensions(const ::Font& font, int index, float scale, float* width, float* height) {
+    *width = static_cast<float>(font.recs[index].width + 2.0f * font.glyphPadding) * scale;
+    *height = static_cast<float>(font.recs[index].height + 2.0f * font.glyphPadding) * scale;
+}
+
+GlyphDimensions calculateGlyphDimensions(const ::Font& font, int index, float scale) {
+    return {
+        static_cast<float>(font.recs[index].width + 2.0f * font.glyphPadding) * scale,
+        static_cast<float>(font.recs[index].height + 2.0f * font.glyphPadding) * scale
+    };
 }
 
 bool isRenderableCharacter(int codepoint) {
@@ -53,11 +60,20 @@ float calculateAdvanceX(const ::Font& font, int index, float scale, float fontSp
 }
 
 void calculateTextureCoordinates(const ::Font& font, Rectangle srcRec,
-    float& tx, float& ty, float& tw, float& th) {
-    tx = srcRec.x / font.texture.width;
-    ty = srcRec.y / font.texture.height;
-    tw = (srcRec.x + srcRec.width) / font.texture.width;
-    th = (srcRec.y + srcRec.height) / font.texture.height;
+    float* tx, float* ty, float* tw, float* th) {
+    *tx = srcRec.x / font.texture.width;
+    *ty = srcRec.y / font.texture.height;
+    *tw = (srcRec.x + srcRec.width) / font.texture.width;
+    *th = (srcRec.y + srcRec.height) / font.texture.height;
+}
+
+TextureCoordinates calculateTextureCoordinates(const ::Font& font, Rectangle srcRec) {
+    return {
+        srcRec.x / font.texture.width,
+        srcRec.y / font.texture.height,
+        (srcRec.x + srcRec.width) / font.texture.width,
+        (srcRec.y + srcRec.height) / font.texture.height
+    };
 }
 
 bool isValidFont(const ::Font& font) {

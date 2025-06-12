@@ -7,11 +7,12 @@
 
 #include "Text3DMeasurement.hpp"
 #include <algorithm>
+#include <string>
 
 namespace raylibcpp {
 
 Vector3 Text3DMeasurement::measureText(const ::Font& font, const std::string& text,
-                                     float fontSize, float fontSpacing, float lineSpacing) {
+    float fontSize, float fontSpacing, float lineSpacing) {
     if (text.empty()) {
         return {0.0f, 0.25f, 0.0f};
     }

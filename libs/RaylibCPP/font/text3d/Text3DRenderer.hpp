@@ -9,6 +9,7 @@
 #include <raylib.h>
 #include <string>
 #include "Text3DCore.hpp"
+#include "Text3DHelper.hpp"
 
 namespace raylibcpp {
 
@@ -20,11 +21,11 @@ public:
 
 private:
     static void processCharacter(const ::Font& font, int codepoint, int index,
-        Vector3& position, float& textOffsetX, float& textOffsetY,
+        const RenderStatePtr& renderState,
         float fontSize, float fontSpacing, float lineSpacing,
         float scale, bool backface, Color tint);
 
-    static void handleNewline(float& textOffsetX, float& textOffsetY,
+    static void handleNewline(const RenderStatePtr& renderState,
         float fontSize, float lineSpacing);
 
     static float getCharacterAdvance(const ::Font& font, int index, float scale, float fontSpacing);

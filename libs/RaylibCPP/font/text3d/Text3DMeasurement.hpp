@@ -17,9 +17,6 @@ public:
         float fontSize, float fontSpacing, float lineSpacing);
 
 private:
-    static float calculateLineWidth(const ::Font& font, const std::string& text,
-                                  int start, int end, float scale);
-    static int countVisibleCharacters(const std::string& text, int start, int end);
     static bool isWaveMarker(const std::string& text, int pos);
 };
 

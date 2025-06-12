@@ -5,9 +5,12 @@
 ** Text3D Renderer implementation
 */
 
-#include <iostream>
-#include <cmath>
 #include "Text3DRenderer.hpp"
+
+#include <cmath>
+#include <iostream>
+#include <string>
+#include <memory>
 #include "Text3DCodepoint.hpp"
 #include "Text3DHelper.hpp"
 
@@ -19,8 +22,11 @@ void Text3DRenderer::renderBasicText(const ::Font& font, const std::string& text
     if (text.empty())
         return;
     int length = static_cast<int>(text.length());
-    float textOffsetY = 0.0f;
-    float textOffsetX = 0.0f;
+    auto renderState = std::make_shared<RenderState>();
+    renderState->position = position;
+    renderState->textOffsetY = 0.0f;
+    renderState->textOffsetX = 0.0f;
+    renderState->charIndex = 0;
     float scale = fontSize / static_cast<float>(font.baseSize);
 
     for (int i = 0; i < length;) {
@@ -28,35 +34,35 @@ void Text3DRenderer::renderBasicText(const ::Font& font, const std::string& text
         int codepoint = GetCodepoint(&text[i], &codepointByteCount);
         int index = GetGlyphIndex(font, codepoint);
         if (codepoint == 0x3f) codepointByteCount = 1;
-        processCharacter(font, codepoint, index, position, textOffsetX, textOffsetY,
+        processCharacter(font, codepoint, index, renderState,
                        fontSize, fontSpacing, lineSpacing, scale, backface, tint);
         i += codepointByteCount;
     }
 }
 
 void Text3DRenderer::processCharacter(const ::Font& font, int codepoint, int index,
-    Vector3& position, float& textOffsetX, float& textOffsetY,
+    const RenderStatePtr& renderState,
     float fontSize, float fontSpacing, float lineSpacing,
     float scale, bool backface, Color tint) {
     if (codepoint == '\n') {
-        handleNewline(textOffsetX, textOffsetY, fontSize, lineSpacing);
+        handleNewline(renderState, fontSize, lineSpacing);
         return;
     }
     if (codepoint != ' ' && codepoint != '\t') {
         Vector3 charPosition = {
-            position.x + textOffsetX,
-            position.y,
-            position.z + textOffsetY
+            renderState->position.x + renderState->textOffsetX,
+            renderState->position.y,
+            renderState->position.z + renderState->textOffsetY
         };
         Text3DCodepoint::draw(font, codepoint, charPosition, fontSize, backface, tint);
     }
-    textOffsetX += getCharacterAdvance(font, index, scale, fontSpacing);
+    renderState->textOffsetX += getCharacterAdvance(font, index, scale, fontSpacing);
 }
 
-void Text3DRenderer::handleNewline(float& textOffsetX, float& textOffsetY,
+void Text3DRenderer::handleNewline(const RenderStatePtr& renderState,
     float fontSize, float lineSpacing) {
-    textOffsetY += fontSize + lineSpacing;
-    textOffsetX = 0.0f;
+    renderState->textOffsetY += fontSize + lineSpacing;
+    renderState->textOffsetX = 0.0f;
 }
 
 float Text3DRenderer::getCharacterAdvance(const ::Font& font, int index, float scale, float fontSpacing) {
