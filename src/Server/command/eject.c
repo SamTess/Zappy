@@ -70,27 +70,54 @@ static char *get_string_to_send(float x, float y)
     return string_to_send;
 }
 
+static void push_single_client(server_t *server, client_t *client,
+    client_t *tmp, char *msg)
+{
+    int new_x = client->player->pos_x +
+        (int)(tmp->player->pos_x == client->player->pos_x);
+    int new_y = client->player->pos_y +
+        (int)(tmp->player->pos_y == client->player->pos_y);
+
+    wrap_position(server, &new_x, &new_y);
+    tmp->player->pos_x = new_x;
+    tmp->player->pos_y = new_y;
+    tile_add_player(&server->map[new_y][new_x], tmp->client_id);
+    send_ppo_command(server, tmp->client_id);
+    write_command_output(tmp->client_fd, msg);
+}
+
 void push_client(server_t *server, client_t *client, float x, float y)
 {
     client_t *tmp = server->client->next;
-    int new_x = client->player->pos_x + x;
-    int new_y = client->player->pos_y + y;
+    int old_x = client->player->pos_x;
+    int old_y = client->player->pos_y;
+    char *msg = get_string_to_send(x, y);
 
-    wrap_position(server, &new_x, &new_y);
     while (tmp) {
         if (tmp->client_id == client->client_id || tmp->type == GRAPHICAL) {
             tmp = tmp->next;
             continue;
         }
-        if (tmp->player->pos_x == client->player->pos_x &&
-            tmp->player->pos_y == client->player->pos_y) {
-                tmp->player->pos_x = new_x;
-                tmp->player->pos_y = new_y;
-                tile_add_player(&server->map[new_y][new_x], tmp->client_id);
-                send_ppo_command(server, tmp->client_id);
-                write_command_output(tmp->client_fd, get_string_to_send(x, y));
-        }
+        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y)
+            push_single_client(server, client, tmp, msg);
         tmp = tmp->next;
+    }
+    free(msg);
+}
+
+static void push_eggs(server_t *server, int old_x, int old_y)
+{
+    egg_t *tmp_egg = server->eggs;
+    egg_t *next_egg;
+
+    tmp_egg = server->eggs;
+    while (tmp_egg) {
+        next_egg = tmp_egg->next;
+        if (tmp_egg->pos_x == old_x && tmp_egg->pos_y == old_y) {
+            send_edi_command(server, tmp_egg->egg_id);
+            remove_egg(server, tmp_egg->egg_id, &server->map[old_y][old_x]);
+        }
+        tmp_egg = next_egg;
     }
 }
 
@@ -98,21 +125,12 @@ void eject(server_t *server, client_t *client, char **buffer)
 {
     float x = 0;
     float y = 0;
-    egg_t *tmp_egg = server->eggs;
 
-    if (arr_len(buffer) != 1)
+    if (!client || !client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
     convert_rotation_to_vector(client, &x, &y);
     push_client(server, client, x, y);
-    while (tmp_egg) {
-        if (tmp_egg->pos_x == client->player->pos_x &&
-            tmp_egg->pos_y == client->player->pos_y) {
-                send_edi_command(server, tmp_egg->egg_id);
-                remove_egg(server, tmp_egg->egg_id,
-                    &server->map[tmp_egg->pos_y][tmp_egg->pos_x]);
-        }
-        tmp_egg = tmp_egg->next;
-    }
+    push_eggs(server, client->player->pos_x, client->player->pos_y);
     command_pex(server, client);
     write_command_output(client->client_fd, "ok\n");
 }

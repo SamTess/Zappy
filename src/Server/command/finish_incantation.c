@@ -51,10 +51,11 @@ static void check_win(client_t *client, server_t *server)
     char *team_name = client->player->team_name;
     client_t *temp = server->client;
 
-    while (temp){
+    while (temp) {
         if (temp->player && temp->player->level == 8 &&
             strcmp(temp->player->team_name, team_name) == 0)
             count++;
+        temp = temp->next;
     }
     if (count >= 6)
         handle_win(team_name, server);

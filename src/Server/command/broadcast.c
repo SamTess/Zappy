@@ -49,36 +49,33 @@ static int get_base_direction(int dx, int dy)
         return 0;
     if (dx > 0 && dy == 0)
         return 1;
-    if (dx > 0 && dy > 0)
+    if (dx > 0 && dy < 0)
         return 2;
-    if (dx == 0 && dy > 0)
+    if (dx == 0 && dy < 0)
         return 3;
-    if (dx < 0 && dy > 0)
+    if (dx < 0 && dy < 0)
         return 4;
     if (dx < 0 && dy == 0)
         return 5;
-    if (dx < 0 && dy < 0)
+    if (dx < 0 && dy > 0)
         return 6;
-    if (dx == 0 && dy < 0)
+    if (dx == 0 && dy > 0)
         return 7;
+    if (dx > 0 && dy > 0)
+        return 8;
     return 8;
-}
-
-static int adjust_direction_for_rotation(int direction, int rotation)
-{
-    if (direction == 0)
-        return 0;
-    return ((direction - 1 + 2 * rotation) % 8) + 1;
 }
 
 static int calculate_direction(client_t *receiver, int dx, int dy)
 {
-    int base_direction = get_base_direction(dx, dy);
+    int base_direction;
 
+    if (dx == 0 && dy == 0)
+        return 0;
+    base_direction = get_base_direction(dx, dy);
     if (base_direction == 0)
         return 0;
-    return adjust_direction_for_rotation(base_direction,
-        receiver->player->rotation);
+    return ((base_direction - 1 + 2 * receiver->player->rotation) % 8) + 1;
 }
 
 static void send_broadcast_to_client(server_t *server, client_t *sender,
@@ -154,7 +151,7 @@ void broadcast(server_t *server, client_t *user, char **buffer)
     char *message;
     client_t *current;
 
-    if (!buffer || arr_len(buffer) < 2)
+    if (!user || !user->player || !buffer || arr_len(buffer) < 2)
         return write_command_output(user->client_fd, "ko\n");
     message = build_broadcast_message(buffer);
     if (!message)

@@ -94,9 +94,9 @@ static client_t *init_new_client(int fd)
 
 void add_fd(server_t *server, int fd)
 {
+    static int next_id = 0;
     client_t *new_c = init_new_client(fd);
     client_t *current;
-    int next_id = 0;
 
     if (server->client == NULL) {
         server->client = new_c;
@@ -105,14 +105,10 @@ void add_fd(server_t *server, int fd)
     }
     current = server->client;
     while (current->next != NULL) {
-        if (current->client_id >= next_id) {
-            next_id = current->client_id + 1;
-        }
         current = current->next;
     }
-    if (current->client_id >= next_id)
-        next_id = current->client_id + 1;
     new_c->client_id = next_id;
+    next_id++;
     current->next = new_c;
 }
 

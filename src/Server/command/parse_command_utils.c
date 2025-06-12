@@ -75,7 +75,7 @@ void cleanup_client(client_t *client)
 void write_command_output(int client_fd, char *msg)
 {
     if (fcntl(client_fd, F_GETFD) == -1) {
-        perror("Need to find better way to handle this\n");
+        perror("FD isn't up anymore\n");
     } else {
         write(client_fd, msg, strlen(msg));
     }

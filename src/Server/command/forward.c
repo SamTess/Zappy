@@ -28,9 +28,9 @@ static void change_map_pos(server_t *server, client_t *client)
         &server->map[client->player->pos_y][client->player->pos_x],
         client->client_id);
     if (client->player->rotation == UP)
-        client->player->pos_y++;
-    if (client->player->rotation == DOWN)
         client->player->pos_y--;
+    if (client->player->rotation == DOWN)
+        client->player->pos_y++;
     if (client->player->rotation == LEFT)
         client->player->pos_x--;
     if (client->player->rotation == RIGHT)
