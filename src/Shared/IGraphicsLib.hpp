@@ -17,6 +17,7 @@ public:
     virtual void InitWindow(int width, int height, const std::string& title) = 0;
     virtual void CloseWindow() = 0;
     virtual bool WindowShouldClose() = 0;
+    virtual void setFps(int fps) = 0;
     virtual void BeginDrawing() = 0;
     virtual void EndDrawing() = 0;
     virtual void ClearBackground(ZappyTypes::Color color) = 0;
@@ -42,6 +43,11 @@ public:
     virtual void LoadFont(const std::string& path) = 0;
     virtual void DrawText(const std::string& text, int x, int y, int size, ZappyTypes::Color color) = 0;
     virtual void UnloadFont() = 0;
+
+    // Texte 3D
+    virtual void DrawText3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, ZappyTypes::Color tint) = 0;
+    virtual void DrawTextWave3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, float time, ZappyTypes::Color tint) = 0;
+    virtual ZappyTypes::Vector3 MeasureText3D(const std::string& text, float fontSize, float fontSpacing, float lineSpacing) = 0;
 
     // Entrées
     virtual bool IsKeyPressed(int key) = 0;

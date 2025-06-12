@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <memory>
+#include <algorithm>
 #include "CameraController.hpp"
 #include "../Constants.hpp"
 
@@ -22,7 +23,7 @@ CameraController::CameraController(float initialDistance)
       m_cameraAngleY(0.8f),
       m_cameraAngleX(0.6f),
       m_mouseSensitivity(0.003f),
-      m_keyboardSpeed(0.5f) {
+      m_keyboardSpeed(0.01f) {
 }
 
 void CameraController::init(std::shared_ptr<IGraphicsLib> graphics) {
@@ -72,8 +73,10 @@ void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics) 
 
     float wheelMovement = graphics->GetMouseWheelMove();
     if (wheelMovement != 0) {
-        m_cameraDistance -= wheelMovement * 2.0f;
-
+        float zoomSpeed = m_cameraDistance * 0.1f;
+        if (zoomSpeed < 0.5f) zoomSpeed = 0.5f;
+        if (zoomSpeed > 3.0f) zoomSpeed = 3.0f;
+        m_cameraDistance -= wheelMovement * zoomSpeed;
         if (m_cameraDistance < 2.0f) m_cameraDistance = 2.0f;
         if (m_cameraDistance > 50.0f) m_cameraDistance = 50.0f;
     }
@@ -84,24 +87,60 @@ void CameraController::handleKeyboardInput(std::shared_ptr<IGraphicsLib> graphic
         reset();
     }
 
-    if (graphics->IsKeyDown(KEY_W) || graphics->IsKeyDown(KEY_UP)) {
-        m_cameraTarget.z -= m_keyboardSpeed;
+    // Calculer les vecteurs de direction de la caméra en ignorant la composante Y pour le déplacement horizontal
+    ZappyTypes::Vector3 forward = {
+        std::cos(m_cameraAngleY),
+        0.0f,
+        std::sin(m_cameraAngleY)
+    };
+
+    // Normaliser le vecteur forward
+    float forwardLength = std::sqrt(forward.x * forward.x + forward.z * forward.z);
+    if (forwardLength > 0.0001f) {
+        forward.x /= forwardLength;
+        forward.z /= forwardLength;
     }
+    ZappyTypes::Vector3 right = {
+        -forward.z,
+        0.0f,
+        forward.x
+    };
+
+    ZappyTypes::Vector3 newTarget = m_cameraTarget;
     if (graphics->IsKeyDown(KEY_S) || graphics->IsKeyDown(KEY_DOWN)) {
-        m_cameraTarget.z += m_keyboardSpeed;
+        newTarget.x += forward.x * m_keyboardSpeed;
+        newTarget.z += forward.z * m_keyboardSpeed;
     }
-    if (graphics->IsKeyDown(KEY_A) || graphics->IsKeyDown(KEY_LEFT)) {
-        m_cameraTarget.x -= m_keyboardSpeed;
+    if (graphics->IsKeyDown(KEY_W) || graphics->IsKeyDown(KEY_Z) || graphics->IsKeyDown(KEY_UP)) {
+        newTarget.x -= forward.x * m_keyboardSpeed;
+        newTarget.z -= forward.z * m_keyboardSpeed;
     }
     if (graphics->IsKeyDown(KEY_D) || graphics->IsKeyDown(KEY_RIGHT)) {
-        m_cameraTarget.x += m_keyboardSpeed;
+        newTarget.x -= right.x * m_keyboardSpeed;
+        newTarget.z -= right.z * m_keyboardSpeed;
     }
+    if (graphics->IsKeyDown(KEY_Q) || graphics->IsKeyDown(KEY_A) || graphics->IsKeyDown(KEY_LEFT)) {
+        newTarget.x += right.x * m_keyboardSpeed;
+        newTarget.z += right.z * m_keyboardSpeed;
+    }
+    float halfWidth = m_mapWidth * 1.2f;
+    float halfHeight = m_mapHeight * 1.2f;
+    float margin = 2.0f;
+    newTarget.x = std::max(std::min(newTarget.x, halfWidth - margin), -halfWidth + margin);
+    newTarget.z = std::max(std::min(newTarget.z, halfHeight - margin), -halfHeight + margin);
+    m_cameraTarget = newTarget;
 }
 
 void CameraController::updateCameraPosition(std::shared_ptr<IGraphicsLib> graphics) {
+    if (m_cameraDistance < 2.0f) m_cameraDistance = 2.0f;
+    if (m_cameraDistance > 50.0f) m_cameraDistance = 50.0f;
+    if (m_cameraAngleX < 0.1f) m_cameraAngleX = 0.1f;
+    if (m_cameraAngleX > 1.5f) m_cameraAngleX = 1.5f;
     m_cameraPosition.x = m_cameraTarget.x + m_cameraDistance * std::cos(m_cameraAngleY) * std::cos(m_cameraAngleX);
     m_cameraPosition.y = m_cameraTarget.y + m_cameraDistance * std::sin(m_cameraAngleX);
     m_cameraPosition.z = m_cameraTarget.z + m_cameraDistance * std::sin(m_cameraAngleY) * std::cos(m_cameraAngleX);
-
+    if (m_cameraPosition.y < 1.0f) {
+        m_cameraPosition.y = 1.0f;
+    }
     graphics->CreateCamera3D(m_cameraPosition, m_cameraTarget, m_cameraUp, 45.0f, 0);
 }

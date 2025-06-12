@@ -36,6 +36,12 @@ public:
     float& angleX() { return m_cameraAngleX; }
     float& angleY() { return m_cameraAngleY; }
 
+    // Définir les limites de la carte pour le mouvement de la caméra
+    void setMapDimensions(int width, int height) {
+        m_mapWidth = width;
+        m_mapHeight = height;
+    }
+
 private:
     ZappyTypes::Vector3 m_cameraPosition;
     ZappyTypes::Vector3 m_cameraTarget;
@@ -51,4 +57,8 @@ private:
     float m_cameraAngleX;
     float m_mouseSensitivity;
     float m_keyboardSpeed;
+    
+    // Dimensions de la carte pour la limitation du mouvement
+    int m_mapWidth = 20;
+    int m_mapHeight = 20;
 };

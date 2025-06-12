@@ -64,6 +64,8 @@ bool GameLoop::loadModels() {
 void GameLoop::setupComponents() {
     m_camera = std::make_shared<CameraController>();
     m_camera->init(m_graphics);
+    // Définir les dimensions de la carte pour limiter les mouvements de la caméra
+    m_camera->setMapDimensions(20, 20);  // Valeurs par défaut ou à mettre à jour plus tard
     m_uiRenderer = std::make_shared<UIRenderer>();
 }
 

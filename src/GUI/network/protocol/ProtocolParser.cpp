@@ -318,8 +318,8 @@ Message ProtocolParser::parseEggLaying(const std::string &message) {
         throw ProtocolParserException("Invalid egg laying parameters: " + message);
     int playerId = parseIntParameter(params[0]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(playerId, 0, 0, 0, 0);
-    return Message(PFK_HEADER, extractCommandParameter(message), playerInfoData);
+    auto eggData = std::make_shared<EggData>(0, playerId, 0, 0, EggData::EggAction::Laying);
+    return Message(PFK_HEADER, extractCommandParameter(message), eggData);
 }
 
 Message ProtocolParser::parseEggDrop(const std::string &message) {
@@ -331,7 +331,7 @@ Message ProtocolParser::parseEggDrop(const std::string &message) {
     int x = parseIntParameter(params[2]);
     int y = parseIntParameter(params[3]);
 
-    auto eggData = std::make_shared<EggData>(eggId, playerId, x, y);
+    auto eggData = std::make_shared<EggData>(eggId, playerId, x, y, EggData::EggAction::Drop);
     return Message(ENW_HEADER, extractCommandParameter(message), eggData);
 }
 
@@ -341,7 +341,7 @@ Message ProtocolParser::parseEggConnection(const std::string &message) {
         throw ProtocolParserException("Invalid egg connection parameters: " + message);
     int eggId = parseIntParameter(params[0]);
 
-    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0);
+    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0, EggData::EggAction::Connection);
     return Message(EBO_HEADER, extractCommandParameter(message), eggData);
 }
 
@@ -351,7 +351,7 @@ Message ProtocolParser::parseEggDeath(const std::string &message) {
         throw ProtocolParserException("Invalid egg death parameters: " + message);
     int eggId = parseIntParameter(params[0]);
 
-    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0);
+    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0, EggData::EggAction::Death);
     return Message(EDI_HEADER, extractCommandParameter(message), eggData);
 }
 

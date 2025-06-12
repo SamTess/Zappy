@@ -41,7 +41,9 @@ void Renderer::renderBackground(std::shared_ptr<IGraphicsLib> graphics) {
 }
 
 void Renderer::renderGrid(std::shared_ptr<IGraphicsLib> graphics) {
-    graphics->DrawPlane({0.0f, 0.0f, 0.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
+    // Position le plan pour qu'il soit aligné avec le coin inférieur gauche à l'origine (0,0,0)
+    // La grille s'étend donc de (0,0) à (20,0,20) au lieu d'être centrée sur l'origine
+    graphics->DrawPlane({10.0f, 0.0f, 10.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
 }
 
 void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
