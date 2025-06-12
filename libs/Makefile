@@ -18,7 +18,6 @@ RAYLIB_CPP_SRC = RaylibCPP/RayLib.cpp \
 				 RaylibCPP/font/Text3D.cpp \
 				 RaylibCPP/font/text3d/Text3DCodepoint.cpp \
 				 RaylibCPP/font/text3d/Text3DConfig.cpp \
-				 RaylibCPP/font/text3d/Text3DCore.cpp \
 				 RaylibCPP/font/text3d/Text3DHelper.cpp \
 				 RaylibCPP/font/text3d/Text3DMeasurement.cpp \
 				 RaylibCPP/font/text3d/Text3DParser.cpp \
