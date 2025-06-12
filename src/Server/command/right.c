@@ -31,8 +31,7 @@ static void change_rot(client_t *client)
 
 void right(server_t *server, client_t *client, char **buffer)
 {
-    (void)server;
-    (void)buffer;
+
     if (!server || !client || !client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
     if (client->player->rotation != UP && client->player->rotation != DOWN
