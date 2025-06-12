@@ -53,6 +53,8 @@ static int count_valid_tokens(char *str, char *delim)
             break;
         count++;
     }
+    if (token)
+        free(token);
     free(copy);
     return count;
 }
@@ -116,6 +118,8 @@ static char **fill_result_array(char *str, char *delim, int size)
             return free_cpy_arr(copy, array);
         pos++;
     }
+    if (token)
+        free(token);
     free(copy);
     return array;
 }
