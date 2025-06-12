@@ -7,6 +7,7 @@
 #include "../include/command.h"
 #include "../include/server.h"
 #include "../include/egg.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,13 +24,12 @@ static int get_next_egg_id(server_t *server)
     return max_id + 1;
 }
 
-void fork_c(server_t *server, client_t *client, char *buffer)
+void fork_c(server_t *server, client_t *client, char **buffer)
 {
     egg_t *new_egg;
     int egg_id;
 
-    (void)buffer;
-    if (!client || !client->player) {
+    if (!client || !client->player || arr_len(buffer) != 1) {
         write_command_output(client->client_fd, "ko\n");
         return;
     }

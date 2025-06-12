@@ -7,6 +7,7 @@
 
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -93,13 +94,14 @@ void push_client(server_t *server, client_t *client, float x, float y)
     }
 }
 
-void eject(server_t *server, client_t *client, char *buffer)
+void eject(server_t *server, client_t *client, char **buffer)
 {
     float x = 0;
     float y = 0;
     egg_t *tmp_egg = server->eggs;
 
-    (void)buffer;
+    if (arr_len(buffer) != 1)
+        return write_command_output(client->client_fd, "ko\n");
     convert_rotation_to_vector(client, &x, &y);
     push_client(server, client, x, y);
     while (tmp_egg) {

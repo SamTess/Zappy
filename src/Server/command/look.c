@@ -5,6 +5,7 @@
 ** look
 */
 #include "../include/command.h"
+#include "../include/parsing.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -101,18 +102,17 @@ static char *format_look(size_t total_len, char **level_tiles, client_t *user)
     return res;
 }
 
-void look(server_t *server, client_t *user, char *buffer)
+void look(server_t *server, client_t *user, char **buffer)
 {
     char **level_tiles = NULL;
     size_t total_len = 0;
     char *res;
 
-    (void)buffer;
+    if (!server || !user || !user->player || arr_len(buffer) != 1)
+        return write_command_output(user->client_fd, "ko\n");
     total_len = get_total_size(&level_tiles, user, server);
-    if (!level_tiles) {
-        write_command_output(user->client_fd, "ko\n");
-        return;
-    }
+    if (!level_tiles)
+        return write_command_output(user->client_fd, "ko\n");
     res = format_look(total_len, level_tiles, user);
     free(level_tiles);
     write_command_output(user->client_fd, res);

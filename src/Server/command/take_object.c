@@ -7,6 +7,7 @@
 
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -39,16 +40,14 @@ static void update_resources(server_t *server, client_t *client,
     server->current_resources[type]--;
 }
 
-void take_object(server_t *server, client_t *client, char *buffer)
+void take_object(server_t *server, client_t *client, char **buffer)
 {
-    char *resource_name;
     resource_type_t type;
 
-    if (strlen(buffer) <= 5)
+    if (!server || !client || !client->player || arr_len(buffer) != 2)
         return write_command_output(client->client_fd, "ko\n");
-    resource_name = buffer + 5;
-    type = determine_type(resource_name);
-    if (client == NULL || client->player == NULL || type == COUNT)
+    type = determine_type(buffer[1]);
+    if (type == COUNT)
         return write_command_output(client->client_fd, "ko\n");
     if (server->map[client->player->pos_y]
         [client->player->pos_x].resources[type] > 0) {

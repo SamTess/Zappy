@@ -9,6 +9,7 @@
 #include "../include/server.h"
 #include "../include/pending_cmd.h"
 #include "../include/circular_buffer.h"
+#include "../include/parsing.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +34,7 @@ command_data_t get_command_data(void)
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
         "Incantation", "Fork", "Broadcast", "msz", "bct", "mtc",
         "tna", "ppo", "plv", "pin", "sgt", "sst", NULL};
-    static void (*comm_func[])(server_t *, client_t *, char *) =
+    static void (*comm_func[])(server_t *, client_t *, char **) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
         fork_c, broadcast, command_msz, command_bct, command_mtc,
@@ -53,8 +54,10 @@ static bool execute_graphical_command(server_t *server, client_t *user,
     char *buffer, int cmd_index)
 {
     command_data_t data = get_command_data();
+    char **args = str_to_word_arr(buffer, " ");
 
-    data.functions[cmd_index](server, user, buffer);
+    data.functions[cmd_index](server, user, args);
+    free_arr(args);
     return true;
 }
 

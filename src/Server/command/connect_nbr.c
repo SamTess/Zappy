@@ -5,6 +5,7 @@
 ** connect_nbr
 */
 #include "../include/command.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,12 +45,12 @@ int connect_nbr_srv(server_t *server, char *team)
     return team_eggs;
 }
 
-void connect_nbr(server_t *server, client_t *client, char *buffer)
+void connect_nbr(server_t *server, client_t *client, char **buffer)
 {
     int team_eggs;
 
-    (void)buffer;
-    if (!client || !client->player || !client->player->team_name) {
+    if (!client || !client->player || !client->player->team_name ||
+        arr_len(buffer) != 1) {
         write_command_output(client->client_fd, "ko\n");
         return;
     }
