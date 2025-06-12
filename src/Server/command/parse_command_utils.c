@@ -5,6 +5,7 @@
 ** parse_command_utils
 */
 #include "../include/command.h"
+#include "../include/parsing.h"
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,9 +29,13 @@ void add_pending_cmd(client_t *user, server_t *server,
     char *buffer, int cmd_index)
 {
     command_data_t data = get_command_data();
+    char **tmp = NULL;
 
-    if (cmd_index == 9)
-        return start_incantation(server, user, NULL);
+    if (cmd_index == 9) {
+        tmp = str_to_word_arr(buffer, " ");
+        start_incantation(server, user, tmp);
+        return free_arr(tmp);
+    }
     if (cmd_index == 10)
         command_pfk(server, user);
     user->player->pending_cmd->args = strdup(buffer);

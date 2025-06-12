@@ -7,6 +7,7 @@
 
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -105,9 +106,10 @@ bool can_start_incantation(server_t *server, client_t *client)
     return true;
 }
 
-void start_incantation(server_t *server, client_t *client, char *buffer)
+void start_incantation(server_t *server, client_t *client, char **buffer)
 {
-    (void)buffer;
+    if (!server || !client || !client->player || arr_len(buffer) != 1)
+        return write_command_output(client->client_fd, "ko\n");
     if (!can_start_incantation(server, client))
         return write_command_output(client->client_fd, "ko\n");
     command_pic(server, client->player->pos_x, client->player->pos_y,

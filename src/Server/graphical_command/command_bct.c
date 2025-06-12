@@ -9,9 +9,11 @@
 #include "../include/client.h"
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 static int calculate_size_bct_command(int x, int y, tile_t *tile)
 {
     return snprintf(NULL, 0, "bct %d %d %d %d %d %d %d %d %d\n",
@@ -94,25 +96,14 @@ void send_tile_content_to_one_client(server_t *server, client_t *client)
     }
 }
 
-static bool check_if_length_is_valid_bct(const char *buffer, int x, int y)
-{
-    size_t expected_length = 0;
-
-    expected_length = snprintf(NULL, 0, "bct %d %d\n", x, y);
-    if (expected_length != strlen(buffer))
-        return false;
-    return true;
-}
-
-void command_bct(server_t *server, client_t *client, char *buffer)
+void command_bct(server_t *server, client_t *client, char **buffer)
 {
     int x = 0;
     int y = 0;
 
     if (!server || !client || !buffer || !server->graphical_clients ||
-        strlen(buffer) < 7 ||
-        sscanf(buffer, "bct %d %d\n", &x, &y) != 2 ||
-        !check_if_length_is_valid_bct(buffer, x, y) ||
+        arr_len(buffer) != 3 || sscanf(buffer[1], "%d", &x) != 1 ||
+        sscanf(buffer[2], "%d", &y) != 1 ||
         x < 0 || y < 0 ||
         y >= server->parsed_info->height ||
         x >= server->parsed_info->width)
@@ -120,12 +111,10 @@ void command_bct(server_t *server, client_t *client, char *buffer)
     send_bct_command(server, client, x, y);
 }
 
-void command_mtc(server_t *server, client_t *client, char *buffer)
+void command_mtc(server_t *server, client_t *client, char **buffer)
 {
-    (void)buffer;
-    if (!server || !client || !server->graphical_clients)
-        return;
-    if (client->type != GRAPHICAL)
-        return write_command_output(client->client_fd, "ko\n");
+    if (!server || !client || !server->graphical_clients
+        || arr_len(buffer) != 1)
+        return write_command_output(client->client_fd, "sbp\n");
     send_tile_content_to_one_client(server, client);
 }

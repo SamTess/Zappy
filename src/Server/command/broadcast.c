@@ -7,6 +7,7 @@
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
 #include "../include/server.h"
+#include "../include/parsing.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,16 +104,61 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     free(response);
 }
 
-void broadcast(server_t *server, client_t *user, char *buffer)
+static int calculate_message_length(char **buffer, int arr_length)
+{
+    int total_len = 0;
+
+    for (int i = 1; i < arr_length; i++) {
+        total_len += strlen(buffer[i]);
+        if (i > 1)
+            total_len += 1;
+    }
+    total_len += 1;
+    return total_len;
+}
+
+static void concatenate_message_parts(char **buffer,
+    int arr_length, char *message)
+{
+    int current_pos = 0;
+
+    message[0] = '\0';
+    for (int i = 1; i < arr_length; i++) {
+        if (i > 1) {
+            strcpy(message + current_pos, " ");
+            current_pos += 1;
+        }
+        strcpy(message + current_pos, buffer[i]);
+        current_pos += strlen(buffer[i]);
+    }
+}
+
+static char *build_broadcast_message(char **buffer)
+{
+    int arr_length = arr_len(buffer);
+    int total_len;
+    char *message;
+
+    if (!buffer || arr_length < 2)
+        return NULL;
+    total_len = calculate_message_length(buffer, arr_length);
+    message = malloc(total_len);
+    if (!message)
+        return NULL;
+    concatenate_message_parts(buffer, arr_length, message);
+    return message;
+}
+
+void broadcast(server_t *server, client_t *user, char **buffer)
 {
     char *message;
     client_t *current;
 
-    if (strlen(buffer) <= 11 || buffer[strlen(buffer) - 1] != '\n') {
-        write_command_output(user->client_fd, "ko\n");
-        return;
-    }
-    message = buffer + 10;
+    if (!buffer || arr_len(buffer) < 2)
+        return write_command_output(user->client_fd, "ko\n");
+    message = build_broadcast_message(buffer);
+    if (!message)
+        return write_command_output(user->client_fd, "ko\n");
     current = server->client;
     if (current)
         current = current->next;
@@ -122,5 +168,6 @@ void broadcast(server_t *server, client_t *user, char *buffer)
             send_broadcast_to_client(server, user, current, message);
         current = current->next;
     }
+    free(message);
     write_command_output(user->client_fd, "ok\n");
 }

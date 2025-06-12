@@ -6,6 +6,7 @@
 */
 
 #include "../include/command.h"
+#include "../include/parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,32 +28,23 @@ static int get_time_from_buffer(char *buffer)
 {
     int time = 0;
 
-    if (sscanf(buffer, "sst %d\n", &time) != 1 || time < 0) {
+    if (sscanf(buffer, "%d\n", &time) != 1 || time < 0) {
         return -1;
     }
     return time;
 }
 
-static bool check_if_length_is_valid_sst(const char *buffer, int time)
-{
-    size_t expected_length = 0;
-
-    expected_length = snprintf(NULL, 0, "sst %d\n", time);
-    if (expected_length != strlen(buffer))
-        return false;
-    return true;
-}
-
-void command_sst(server_t *server, client_t *client, char *buffer)
+void command_sst(server_t *server, client_t *client, char **buffer)
 {
     int time;
     graphical_client_t *graphical_client = NULL;
     char *tmp_buffer = NULL;
 
-    if (!buffer || client->type != GRAPHICAL || !server->graphical_clients)
-        return;
-    time = get_time_from_buffer(buffer);
-    if (time <= 0 || !check_if_length_is_valid_sst(buffer, time))
+    if (!buffer || client->type != GRAPHICAL || !server->graphical_clients ||
+        arr_len(buffer) != 2)
+        return write_command_output(client->client_fd, "sbp\n");
+    time = get_time_from_buffer(buffer[1]);
+    if (time <= 0)
         return write_command_output(client->client_fd, "sbp\n");
     tmp_buffer = get_buffer_sst(time);
     server->parsed_info->frequence = time;
