@@ -9,6 +9,7 @@
 #include "../include/client.h"
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,13 +32,10 @@ void send_msz_command(server_t *server, client_t *client)
     free(buffer);
 }
 
-void command_msz(server_t *server, client_t *client, char *buffer)
+void command_msz(server_t *server, client_t *client, char **buffer)
 {
-    if (!server || !client || !buffer || !server->graphical_clients)
-        return;
-    if (client->type != GRAPHICAL) {
-        write_command_output(client->client_fd, "ko\n");
-        return;
-    }
+    if (!server || !client || !server->graphical_clients ||
+        arr_len(buffer) != 1)
+        return write_command_output(client->client_fd, "sbp\n");
     send_msz_command(server, client);
 }

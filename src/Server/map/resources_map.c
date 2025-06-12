@@ -95,6 +95,5 @@ void respawn_resources(tile_t **map, server_t *server,
             current_resources[res] += missing;
         }
     }
-    send_smg_command(server, "Resources respawned");
     free(dist.tile_indices);
 }

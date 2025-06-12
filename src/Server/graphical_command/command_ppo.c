@@ -9,6 +9,7 @@
 #include "../include/client.h"
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,24 +65,12 @@ bool send_ppo_command(server_t *server, int id)
     return true;
 }
 
-static bool check_if_length_is_valid_ppo(const char *buffer, int id)
-{
-    size_t expected_length = 0;
-
-    expected_length = snprintf(NULL, 0, "ppo #%d\n", id);
-    if (expected_length != strlen(buffer))
-        return false;
-    return true;
-}
-
-void command_ppo(server_t *server, client_t *client, char *buffer)
+void command_ppo(server_t *server, client_t *client, char **buffer)
 {
     int id = 0;
 
     if (!server || !client || !buffer || !server->graphical_clients ||
-        client->type != GRAPHICAL ||
-        sscanf(buffer, "ppo #%d\n", &id) != 1 ||
-        !check_if_length_is_valid_ppo(buffer, id) ||
+        arr_len(buffer) != 2 || sscanf(buffer[1], "#%d\n", &id) != 1 ||
         id < 0 || !find_client_by_id(server, id) ||
         !send_ppo_command(server, id)) {
         return write_command_output(client->client_fd, "sbp\n");

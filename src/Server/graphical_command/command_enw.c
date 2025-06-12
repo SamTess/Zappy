@@ -43,3 +43,34 @@ void send_enw_command(server_t *server, client_t *client, int egg_id)
     }
     free(buffer);
 }
+
+static void send_enw_command_to_client(client_t *client,
+    egg_t *egg)
+{
+    char *buffer = NULL;
+
+    buffer = get_buffer_for_enw(egg->egg_id, -1,
+        egg->pos_x, egg->pos_y);
+    if (buffer) {
+        write_command_output(client->client_fd, buffer);
+        free(buffer);
+    }
+}
+
+void send_enw_command_start(server_t *server)
+{
+    graphical_client_t *graphical_client;
+    egg_t *egg;
+
+    if (!server || !server->graphical_clients)
+        return;
+    egg = server->eggs;
+    while (egg) {
+        graphical_client = server->graphical_clients;
+        while (graphical_client) {
+            send_enw_command_to_client(graphical_client->client, egg);
+            graphical_client = graphical_client->next;
+        }
+        egg = egg->next;
+    }
+}

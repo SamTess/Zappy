@@ -9,6 +9,7 @@
 #include "../include/client.h"
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,25 +48,14 @@ void send_plv_to_all(server_t *server, client_t *client)
     }
 }
 
-static bool check_if_length_is_valid_plv(const char *buffer, int id)
-{
-    size_t expected_length = 0;
-
-    expected_length = snprintf(NULL, 0, "plv #%d\n", id);
-    if (expected_length != strlen(buffer))
-        return false;
-    return true;
-}
-
-void command_plv(server_t *server, client_t *client, char *buffer)
+void command_plv(server_t *server, client_t *client, char **buffer)
 {
     client_t *recipient = NULL;
     int id = -1;
 
     if (!server || !client || !buffer ||
-        !server->graphical_clients ||
-        sscanf(buffer, "plv #%d\n", &id) != 1 ||
-        !check_if_length_is_valid_plv(buffer, id))
+        !server->graphical_clients || arr_len(buffer) != 2 ||
+        sscanf(buffer[1], "#%d\n", &id) != 1)
         return write_command_output(client->client_fd, "sbp\n");
     recipient = find_client_by_id(server, id);
     if (!recipient || recipient->type != AI) {
