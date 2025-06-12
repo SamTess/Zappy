@@ -65,13 +65,9 @@ static int get_base_direction(int dx, int dy)
 
 static int adjust_direction_for_rotation(int direction, int rotation)
 {
-    if (rotation == UP)
-        return direction;
-    if (rotation == RIGHT)
-        return ((direction - 2 - 1 + 8) % 8) + 1;
-    if (rotation == DOWN)
-        return ((direction - 4 - 1 + 8) % 8) + 1;
-    return ((direction + 2 - 1) % 8) + 1;
+    if (direction == 0)
+        return 0;
+    return ((direction - 1 + 2 * rotation) % 8) + 1;
 }
 
 static int calculate_direction(client_t *receiver, int dx, int dy)
