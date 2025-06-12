@@ -21,7 +21,7 @@ MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
     const std::shared_ptr<ModelManagerAdapter>& modelManagerAdapter)
     : graphicsLib(graphics),
       context(ctx),
-      strategyFactory(&modelManagerAdapter->getManager()),
+      strategyFactory(modelManagerAdapter),
       tileSize(1.0f),
       tileSpacing(0.1f),
       zoomLevel(1.0f),

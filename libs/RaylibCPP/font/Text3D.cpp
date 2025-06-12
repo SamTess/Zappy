@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** Raylib Text3D implementation - Refactored for better readability
+** Raylib Text3D implementation
 */
 
 #include "Text3D.hpp"

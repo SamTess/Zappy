@@ -12,14 +12,15 @@
 #include "SimpleTileRenderStrategy.hpp"
 #include "ModelTileRenderStrategy.hpp"
 #include "DetailedTileRenderStrategy.hpp"
+#include "../../textureManager/ModelManagerAdapter.hpp"
+
 
 namespace Zappy {
 class TileRenderStrategyFactory {
 private:
-    std::shared_ptr<ModelManager> modelManager;
+    std::shared_ptr<ModelManagerAdapter> modelManager;
 public:
-    explicit TileRenderStrategyFactory(const std::shared_ptr<ModelManager>& modelManager);
-    explicit TileRenderStrategyFactory(ModelManager* modelManager);
+    explicit TileRenderStrategyFactory(const std::shared_ptr<ModelManagerAdapter>& modelManager);
     std::shared_ptr<ITileRenderStrategy> createSimpleTileStrategy(const std::shared_ptr<GraphicalContext>& ctx);
     std::shared_ptr<ITileRenderStrategy> createModelTileStrategy(int modelId, const std::shared_ptr<GraphicalContext>& ctx);
     std::shared_ptr<ITileRenderStrategy> createDetailedTileStrategy(const std::shared_ptr<GraphicalContext>& ctx);

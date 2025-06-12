@@ -93,4 +93,24 @@ void Text3DConfig::adjustWaveSpeed(const WaveTextConfigPtr& config, float multip
     config->waveSpeed.z = std::clamp(config->waveSpeed.z * multiplier, MIN_WAVE_SPEED, MAX_WAVE_SPEED);
 }
 
+// Static members for debug options
+bool Text3DConfig::_showLetterBoundary = false;
+bool Text3DConfig::_showTextBoundary = false;
+
+void Text3DConfig::setShowLetterBoundary(bool show) {
+    _showLetterBoundary = show;
+}
+
+void Text3DConfig::setShowTextBoundary(bool show) {
+    _showTextBoundary = show;
+}
+
+bool Text3DConfig::isShowLetterBoundary() {
+    return _showLetterBoundary;
+}
+
+bool Text3DConfig::isShowTextBoundary() {
+    return _showTextBoundary;
+}
+
 }  // namespace raylibcpp

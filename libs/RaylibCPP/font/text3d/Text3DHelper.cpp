@@ -36,11 +36,6 @@ Rectangle calculateSourceRectangle(const ::Font& font, int index) {
     };
 }
 
-void calculateGlyphDimensions(const ::Font& font, int index, float scale, float* width, float* height) {
-    *width = static_cast<float>(font.recs[index].width + 2.0f * font.glyphPadding) * scale;
-    *height = static_cast<float>(font.recs[index].height + 2.0f * font.glyphPadding) * scale;
-}
-
 GlyphDimensions calculateGlyphDimensions(const ::Font& font, int index, float scale) {
     return {
         static_cast<float>(font.recs[index].width + 2.0f * font.glyphPadding) * scale,
@@ -57,14 +52,6 @@ float calculateAdvanceX(const ::Font& font, int index, float scale, float fontSp
         return static_cast<float>(font.recs[index].width) * scale + fontSpacing;
     }
     return static_cast<float>(font.glyphs[index].advanceX) * scale + fontSpacing;
-}
-
-void calculateTextureCoordinates(const ::Font& font, Rectangle srcRec,
-    float* tx, float* ty, float* tw, float* th) {
-    *tx = srcRec.x / font.texture.width;
-    *ty = srcRec.y / font.texture.height;
-    *tw = (srcRec.x + srcRec.width) / font.texture.width;
-    *th = (srcRec.y + srcRec.height) / font.texture.height;
 }
 
 TextureCoordinates calculateTextureCoordinates(const ::Font& font, Rectangle srcRec) {

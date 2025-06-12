@@ -24,6 +24,12 @@ public:
     static void adjustWaveIntensity(const WaveTextConfigPtr& config, float multiplier);
     static void adjustWaveSpeed(const WaveTextConfigPtr& config, float multiplier);
 
+    // Debug options to replace global variables
+    static void setShowLetterBoundary(bool show);
+    static void setShowTextBoundary(bool show);
+    static bool isShowLetterBoundary();
+    static bool isShowTextBoundary();
+
 private:
     static constexpr float MIN_WAVE_RANGE = 0.0f;
     static constexpr float MAX_WAVE_RANGE = 10.0f;
@@ -31,6 +37,10 @@ private:
     static constexpr float MAX_WAVE_SPEED = 20.0f;
     static constexpr float MIN_WAVE_OFFSET = 0.0f;
     static constexpr float MAX_WAVE_OFFSET = 5.0f;
+
+    // Static members to replace global variables
+    static bool _showLetterBoundary;
+    static bool _showTextBoundary;
 };
 
 }  // namespace raylibcpp

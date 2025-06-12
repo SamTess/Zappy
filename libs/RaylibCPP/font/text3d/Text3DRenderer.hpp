@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** Text3D Renderer - handles basic text rendering
+** Text3D Renderer
 */
 
 #pragma once

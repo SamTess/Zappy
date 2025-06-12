@@ -7,6 +7,7 @@
 
 #include "Text3DCodepoint.hpp"
 #include "Text3DHelper.hpp"
+#include "Text3DConfig.hpp"
 #include "rlgl.h"
 
 namespace raylibcpp {
@@ -67,7 +68,7 @@ void Text3DCodepoint::renderQuad(const ::Font& font, Vector3 position, float wid
 }
 
 void Text3DCodepoint::drawDebugBoundary(Vector3 position, float width, float height) {
-    if (SHOW_LETTER_BOUNDRY) {
+    if (Text3DConfig::isShowLetterBoundary()) {
         Vector3 boundaryPos = {
             position.x + width / 2,
             position.y,

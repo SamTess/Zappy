@@ -14,18 +14,16 @@
 
 namespace Zappy {
 
-TileRenderStrategyFactory::TileRenderStrategyFactory(const std::shared_ptr<ModelManager>& manager)
+TileRenderStrategyFactory::TileRenderStrategyFactory(const std::shared_ptr<ModelManagerAdapter>& manager)
     : modelManager(manager) {}
-
-TileRenderStrategyFactory::TileRenderStrategyFactory(ModelManager* manager)
-    : modelManager(std::shared_ptr<ModelManager>(manager, [](ModelManager*) {})) {}
 
 std::shared_ptr<ITileRenderStrategy> TileRenderStrategyFactory::createSimpleTileStrategy(const std::shared_ptr<GraphicalContext>& ctx) {
     return std::make_shared<SimpleTileRenderStrategy>(ctx);
 }
 
 std::shared_ptr<ITileRenderStrategy> TileRenderStrategyFactory::createModelTileStrategy(int modelId, const std::shared_ptr<GraphicalContext>& ctx) {
-    return std::make_shared<ModelTileRenderStrategy>(modelManager, modelId, ctx);
+    auto managerPtr = std::shared_ptr<ModelManager>(&modelManager->getManager(), [](ModelManager*){});
+    return std::make_shared<ModelTileRenderStrategy>(managerPtr, modelId, ctx);
 }
 
 std::shared_ptr<ITileRenderStrategy> TileRenderStrategyFactory::createDetailedTileStrategy(

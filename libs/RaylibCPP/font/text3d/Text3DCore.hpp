@@ -25,7 +25,4 @@ struct WaveTextConfig {
 using WaveTextConfigPtr = std::shared_ptr<WaveTextConfig>;
 using WaveTextConfigUPtr = std::unique_ptr<WaveTextConfig>;
 
-extern bool SHOW_LETTER_BOUNDRY;
-extern bool SHOW_TEXT_BOUNDRY;
-
 }  // namespace raylibcpp

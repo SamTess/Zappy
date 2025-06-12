@@ -9,7 +9,7 @@
 
 namespace raylibcpp {
 
-bool SHOW_LETTER_BOUNDRY = false;
-bool SHOW_TEXT_BOUNDRY = false;
+// Les variables globales ont été déplacées vers Text3DConfig
+// pour une meilleure encapsulation
 
 }  // namespace raylibcpp
