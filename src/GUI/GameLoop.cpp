@@ -54,7 +54,6 @@ void GameLoop::initializeManagers() {
     m_renderer->init(m_graphics);
 }
 
-// Fonction qui teste le système de chargement et de cache des modèles/textures
 bool GameLoop::loadModels() {
     auto& modelManager = ModelManager::getInstance();
     m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
@@ -64,6 +63,7 @@ bool GameLoop::loadModels() {
 void GameLoop::setupComponents() {
     m_camera = std::make_shared<CameraController>();
     m_camera->init(m_graphics);
+    m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
 }
 
@@ -103,4 +103,16 @@ void GameLoop::renderCube() {
     } else {
         std::cerr << "Modèle cube.obj non trouvé." << std::endl;
     }
+}
+
+void GameLoop::onMapSizeChanged(int width, int height) {
+    m_mapWidth = width;
+    m_mapHeight = height;
+    if (m_camera) {
+        m_camera->setMapDimensions(width, height);
+    }
+}
+
+void GameLoop::onTileChanged(int /*x*/, int /*y*/, const TileData& /*tileData*/) {
+    //TODO(Sam): Implement tile change handling
 }

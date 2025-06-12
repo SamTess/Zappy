@@ -11,6 +11,7 @@
 #include <iostream>
 #include "RayLib.hpp"
 #include "../TypeAdapter.hpp"
+#include "font/Text3D.hpp"
 
 RayLib::RayLib() {}
 
@@ -37,6 +38,10 @@ void RayLib::CloseWindow() {
 
 bool RayLib::WindowShouldClose() {
     return _window ? _window->shouldClose() : true;
+}
+
+void RayLib::setFps(int fps) {
+    _window->setFps(fps);
 }
 
 void RayLib::BeginDrawing() {
@@ -118,13 +123,42 @@ void RayLib::LoadFont(const std::string& path) {
     _font.emplace(path);
 }
 
-void RayLib::DrawText(const std::string& text, int x, int y, int size, ZappyTypes::Color color) {
-    if (_font)
-        _font->drawText(text, x, y, size, TypeAdapter::ToRaylib(color));
-}
-
 void RayLib::UnloadFont() {
     _font.reset();
+}
+
+void RayLib::DrawText(const std::string& text, int x, int y, int size, ZappyTypes::Color color) {
+    if (_font.has_value())
+        ::DrawTextEx(_font.value().get(), text.c_str(), (Vector2){static_cast<float>(x), static_cast<float>(y)}, static_cast<float>(size), 1.0f, TypeAdapter::ToRaylib(color));
+    else
+        ::DrawText(text.c_str(), x, y, size, TypeAdapter::ToRaylib(color));
+}
+
+void RayLib::DrawText3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, ZappyTypes::Color tint) {
+    ::Font font = _font.has_value() ? _font.value().get() : GetFontDefault();
+    raylibcpp::Text3D::DrawText3D(
+        font, text, TypeAdapter::ToRaylib(position),
+        fontSize, fontSpacing, lineSpacing, backface,
+        TypeAdapter::ToRaylib(tint));
+}
+
+void RayLib::DrawTextWave3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, float time, ZappyTypes::Color tint) {
+    ::Font font = _font.has_value() ? _font.value().get() : GetFontDefault();
+    auto config = std::make_shared<raylibcpp::WaveTextConfig>(raylibcpp::WaveTextConfig{
+        .waveRange = (Vector3){ 0.45f, 0.45f, 0.45f },
+        .waveSpeed = (Vector3){ 3.0f, 3.0f, 0.5f },
+        .waveOffset = (Vector3){ 0.35f, 0.35f, 0.35f }
+    });
+    raylibcpp::Text3D::DrawTextWave3D(
+        font, text, TypeAdapter::ToRaylib(position),
+        fontSize, fontSpacing, lineSpacing, backface,
+        config, time, TypeAdapter::ToRaylib(tint));
+}
+
+ZappyTypes::Vector3 RayLib::MeasureText3D(const std::string& text, float fontSize, float fontSpacing, float lineSpacing) {
+    ::Font font = _font.has_value() ? _font.value().get() : GetFontDefault();
+    Vector3 size = raylibcpp::Text3D::MeasureTextWave3D(font, text, fontSize, fontSpacing, lineSpacing);
+    return TypeAdapter::FromRaylib(size);
 }
 
 // Entrées

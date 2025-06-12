@@ -24,7 +24,13 @@ SRC = graphicalContext/GraphicalContext.cpp \
 	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
+	  renderer/MapRenderer.cpp \
+	  renderer/MapRendererObserver.cpp \
 	  renderer/UIRenderer.cpp \
+	  renderer/strategies/DetailedTileRenderStrategy.cpp \
+	  renderer/strategies/ModelTileRenderStrategy.cpp \
+	  renderer/strategies/SimpleTileRenderStrategy.cpp \
+	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
 	  GameLoop.cpp
 

@@ -34,4 +34,8 @@ void Window::clear(Color color) const {
     ClearBackground(color);
 }
 
+void Window::setFps(int fps) const {
+    SetTargetFPS(fps);
+}
+
 }  // namespace raylibcpp

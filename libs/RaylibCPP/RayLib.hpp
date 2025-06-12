@@ -29,6 +29,7 @@ public:
     void InitWindow(int width, int height, const std::string& title) override;
     void CloseWindow() override;
     bool WindowShouldClose() override;
+    void setFps(int fps) override;
     void BeginDrawing() override;
     void EndDrawing() override;
     void ClearBackground(ZappyTypes::Color color) override;
@@ -53,6 +54,11 @@ public:
     void LoadFont(const std::string& path) override;
     void DrawText(const std::string& text, int x, int y, int size, ZappyTypes::Color color) override;
     void UnloadFont() override;
+
+    // Texte 3D
+    void DrawText3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, ZappyTypes::Color tint) override;
+    void DrawTextWave3D(const std::string& text, ZappyTypes::Vector3 position, float fontSize, float fontSpacing, float lineSpacing, bool backface, float time, ZappyTypes::Color tint) override;
+    ZappyTypes::Vector3 MeasureText3D(const std::string& text, float fontSize, float fontSpacing, float lineSpacing) override;
 
     // Entrées
     bool IsKeyPressed(int key) override;
