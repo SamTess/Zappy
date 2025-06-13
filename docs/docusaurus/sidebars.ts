@@ -19,51 +19,31 @@ const sidebars: SidebarsConfig = {
     'development-guide',
     {
       type: 'category',
-      label: 'Serveur',
+      label: 'Server',
       items: [
         'server/server-overview',
       ],
     },
     {
       type: 'category',
-      label: 'Interface Graphique',
+      label: 'GUI',
       items: [
         'gui/gui-overview',
       ],
     },
     {
       type: 'category',
-      label: 'Intelligence Artificielle',
+      label: 'AI',
       items: [
         'ai/ai-overview',
       ],
     },
     {
       type: 'category',
-      label: 'Protocoles',
+      label: 'Protocols',
       items: [
         'protocols/server-ai',
         'protocols/server-gui',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Tutoriels de Base',
-      items: [
-        'tutorial-basics/create-a-document',
-        'tutorial-basics/create-a-page',
-        'tutorial-basics/create-a-blog-post',
-        'tutorial-basics/markdown-features',
-        'tutorial-basics/deploy-your-site',
-        'tutorial-basics/congratulations',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Fonctionnalités Avancées',
-      items: [
-        'tutorial-extras/manage-docs-versions',
-        'tutorial-extras/translate-your-site',
       ],
     },
   ],

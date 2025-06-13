@@ -2,15 +2,17 @@
 sidebar_position: 1
 ---
 
-# Documentation de l'Intelligence Artificielle
+# AI Client Architecture
 
-## Vue d'ensemble
+## Overview
 
-L'IA Zappy est développée en Python avec une architecture modulaire permettant des comportements adaptatifs et une communication sécurisée entre agents.
+The Zappy AI client is developed in Python with a modular architecture that enables adaptive behaviors and secure communication between agents. This section provides a detailed technical overview of the AI system architecture.
 
-## Architecture de l'Agent
+## Agent Architecture
 
-### Structure principale
+### Core Structure
+
+The AI system is built around a central `Agent` class that manages all aspects of an AI player's behavior:
 
 ```python
 class Agent:
@@ -24,42 +26,48 @@ class Agent:
         self.map_size_y = None
         self.current_behaviour = "Dyson"
         
-        # Gestionnaires principaux
+        # Core managers
         self.decisionManager = DecisionManager(self)
         self.broadcastManager = BroadcastManager(self)
         self.socketManager = SocketManager(self.sock)
-        self.logger = Logger("AI.log", message_prefix=f"(Agent n°{self.id}): ")
+        self.logger = Logger("AI.log", message_prefix=f"(Agent #{self.id}): ")
 ```
 
-## Système de Comportements
+## Behavior System
 
-### Gestionnaire de décisions
+### Decision Making Engine
+
+The decision-making system uses a sophisticated behavior selection algorithm:
 
 ```python
 class DecisionManager:
     def __init__(self, agent):
         self.agent = agent
         self.behaviors = {
-            "Dyson": DysonBehavior(),       # Collecte efficace de ressources
-            "Explorer": ExplorerBehavior(),  # Exploration de la carte
-            "Incanter": IncanterBehavior(),  # Réalisation d'incantations
+            "Dyson": DysonBehavior(),       # Efficient resource collection
+            "Explorer": ExplorerBehavior(),  # Map exploration
+            "Incanter": IncanterBehavior(),  # Ritual performer
             "Breeder": BreederBehavior(),    # Reproduction (fork)
-            "Helper": HelperBehavior()       # Assistance aux autres agents
+            "Helper": HelperBehavior()       # Assistance to other agents
         }
         self.current_behavior = None
         
     def decide_behavior(self):
-        """Choix du comportement basé sur l'état actuel"""
+        """Selects behavior based on current state"""
         agent_state = self.analyze_agent_state()
         
+        # Survival is the highest priority
         if agent_state.food_level < 10:
-            return self.behaviors["Dyson"]  # Priorité à la survie
+            return self.behaviors["Dyson"]
+        # Level up when conditions are met
         elif agent_state.can_level_up:
             return self.behaviors["Incanter"]
+        # Explore when needed
         elif agent_state.exploration_needed:
             return self.behaviors["Explorer"]
+        # Default to resource collection
         else:
-            return self.behaviors["Dyson"]  # Comportement par défaut
+            return self.behaviors["Dyson"]
     
     def execute_behavior(self):
         """Exécution du comportement sélectionné"""
@@ -194,443 +202,160 @@ class IncanterBehavior(IBehavior):
 class BroadcastManager:
     def __init__(self, agent):
         self.agent = agent
-        self.message_handlers = {
-            'INCANTATION_CALL': self.handle_incantation_call,
-            'RESOURCE_FOUND': self.handle_resource_found,
-            'DANGER_ALERT': self.handle_danger_alert,
-            'COORDINATION': self.handle_coordination
+        self.message_queue = asyncio.Queue()
+        self.team_key = self.generate_team_key(agent.team)
+        self.message_types = {
+            "RESOURCE": 1,
+            "INCANTATION": 2,
+            "DANGER": 3,
+            "POSITION": 4,
+            "REQUEST": 5
         }
-        
-    def send_encrypted_message(self, message_type, data):
-        """Envoi d'un message chiffré aux autres agents de l'équipe"""
-        message = f"{message_type}:{data}"
-        encrypted = encryption.encrypt(message, self.agent.team)
-        self.agent.send_command(f"Broadcast {encrypted}")
-        
-    def process_received_message(self, direction, encrypted_message):
-        """Traitement d'un message reçu"""
-        try:
-            decrypted = encryption.decrypt(encrypted_message, self.agent.team)
-            message_type, data = decrypted.split(':', 1)
-            
-            handler = self.message_handlers.get(message_type)
-            if handler:
-                handler(direction, data)
-            else:
-                self.agent.logger.log(f"Unknown message type: {message_type}")
-                
-        except Exception as e:
-            # Message d'une autre équipe ou corrompu
-            self.agent.logger.log(f"Failed to decrypt message: {e}")
     
-    def handle_incantation_call(self, direction, data):
-        """Réponse à un appel d'incantation"""
-        try:
-            x, y = map(int, data.split(','))
-            distance = self.calculate_distance(self.agent.x, self.agent.y, x, y)
-            
-            # Répondre si on est proche et disponible
-            if distance < 5 and self.agent.is_available_for_incantation():
-                self.agent.set_target_position(x, y)
-                self.send_encrypted_message('INCANTATION_RESPONSE', 
-                                          f"{self.agent.x},{self.agent.y}")
-        except ValueError:
-            pass
+    def generate_team_key(self, team_name):
+        """Create encryption key from team name"""
+        return hashlib.sha256(team_name.encode()).digest()[:16]
     
-    def handle_resource_found(self, direction, data):
-        """Traitement d'une découverte de ressource"""
+    def encrypt_message(self, message):
+        """Encrypt message for team-only communication"""
+        cipher = AES.new(self.team_key, AES.MODE_CFB, iv=b'0123456789abcdef')
+        return base64.b64encode(cipher.encrypt(message.encode())).decode()
+    
+    def decrypt_message(self, encrypted_message):
+        """Decrypt message from team member"""
         try:
-            resource_type, x, y = data.split(',')
-            if self.agent.needs_resource(resource_type):
-                self.agent.add_resource_target(resource_type, int(x), int(y))
-        except ValueError:
-            pass
+            cipher = AES.new(self.team_key, AES.MODE_CFB, iv=b'0123456789abcdef')
+            message = base64.b64decode(encrypted_message)
+            return cipher.decrypt(message).decode()
+        except:
+            return None  # Message from another team or invalid
 ```
 
-### Système de chiffrement
+## Pathfinding System
 
-```python
-# utils/encryption.py
-import base64
-from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
-secret_key = "default_secret"
-
-def generate_key(team_name):
-    """Génération d'une clé de chiffrement basée sur le nom d'équipe"""
-    password = (secret_key + team_name).encode()
-    salt = b"zappy_salt"  # Salt fixe pour la compatibilité entre agents
-    
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-    )
-    key = base64.urlsafe_b64encode(kdf.derive(password))
-    return key
-
-def encrypt(message, team_name):
-    """Chiffrement d'un message"""
-    key = generate_key(team_name)
-    f = Fernet(key)
-    encrypted = f.encrypt(message.encode())
-    return base64.urlsafe_b64encode(encrypted).decode()
-
-def decrypt(encrypted_message, team_name):
-    """Déchiffrement d'un message"""
-    key = generate_key(team_name)
-    f = Fernet(key)
-    decoded = base64.urlsafe_b64decode(encrypted_message.encode())
-    decrypted = f.decrypt(decoded)
-    return decrypted.decode()
-```
-
-## Gestion Réseau Asynchrone
-
-### Gestionnaire de socket
-
-```python
-class SocketManager:
-    def __init__(self, socket):
-        self.socket = socket
-        self.running = False
-        self.thread = None
-        self.message_queue = queue.Queue()
-        self.response_queue = queue.Queue()
-        
-    def start(self):
-        """Démarrage du thread de gestion réseau"""
-        self.running = True
-        self.thread = threading.Thread(target=self._network_loop)
-        self.thread.daemon = True
-        self.thread.start()
-        
-    def _network_loop(self):
-        """Boucle principale de gestion réseau"""
-        buffer = ""
-        
-        while self.running:
-            try:
-                # Lecture non-bloquante
-                self.socket.settimeout(0.1)
-                data = self.socket.recv(1024).decode('utf-8')
-                
-                if not data:
-                    break
-                    
-                buffer += data
-                
-                # Traitement des messages complets
-                while '\n' in buffer:
-                    line, buffer = buffer.split('\n', 1)
-                    if line.strip():
-                        self.response_queue.put(line.strip())
-                        
-            except socket.timeout:
-                continue
-            except Exception as e:
-                print(f"Network error: {e}")
-                break
-    
-    def send_command(self, command):
-        """Envoi d'une commande au serveur"""
-        try:
-            self.socket.send(f"{command}\n".encode('utf-8'))
-        except Exception as e:
-            print(f"Send error: {e}")
-    
-    def get_response(self, timeout=None):
-        """Récupération d'une réponse du serveur"""
-        try:
-            return self.response_queue.get(timeout=timeout)
-        except queue.Empty:
-            return None
-```
-
-## Algorithmes d'Exploration
-
-### Pattern en spirale
-
-```python
-class SpiralPattern:
-    def __init__(self):
-        self.steps = 0
-        self.direction = 0  # 0=North, 1=East, 2=South, 3=West
-        self.current_segment_length = 1
-        self.steps_in_segment = 0
-        self.segments_completed = 0
-        
-    def get_next_move(self, agent):
-        """Calcul du prochain mouvement selon le pattern spiral"""
-        # Ajuster l'orientation si nécessaire
-        if agent.orientation != self.direction:
-            if self.should_turn_right(agent.orientation, self.direction):
-                return TurnRightAction()
-            else:
-                return TurnLeftAction()
-        
-        # Avancer dans la direction actuelle
-        if self.steps_in_segment < self.current_segment_length:
-            self.steps_in_segment += 1
-            return ForwardAction()
-        
-        # Changer de segment
-        self.steps_in_segment = 0
-        self.segments_completed += 1
-        self.direction = (self.direction + 1) % 4
-        
-        # Augmenter la longueur du segment tous les 2 segments
-        if self.segments_completed % 2 == 0:
-            self.current_segment_length += 1
-            
-        return TurnRightAction()
-    
-    def should_turn_right(self, current_orientation, target_orientation):
-        """Détermine s'il faut tourner à droite pour atteindre l'orientation cible"""
-        return (target_orientation - current_orientation) % 4 == 1
-```
-
-### Pathfinding A*
+Movement planning uses a sophisticated A* algorithm adapted for the toroidal game world:
 
 ```python
 class AStarPathfinder:
-    def __init__(self, map_width, map_height):
-        self.map_width = map_width
-        self.map_height = map_height
-        self.obstacles = set()
+    def __init__(self, world_map):
+        self.world_map = world_map
         
     def find_path(self, start, goal):
-        """Algorithme A* pour trouver le chemin optimal"""
-        open_set = []
-        heapq.heappush(open_set, (0, start))
+        """Find optimal path using A* algorithm"""
+        # Initialize open and closed sets
+        open_set = PriorityQueue()
+        open_set.put((0, start))
+        came_from = {start: None}
+        cost_so_far = {start: 0}
         
-        came_from = {}
-        g_score = {start: 0}
-        f_score = {start: self.heuristic(start, goal)}
-        
-        while open_set:
-            current = heapq.heappop(open_set)[1]
+        while not open_set.empty():
+            _, current = open_set.get()
             
             if current == goal:
-                return self.reconstruct_path(came_from, current)
+                return self.reconstruct_path(came_from, start, goal)
             
             for neighbor in self.get_neighbors(current):
-                tentative_g_score = g_score[current] + 1
+                # Calculate new cost
+                new_cost = cost_so_far[current] + 1
                 
-                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                    # Update path info
+                    cost_so_far[neighbor] = new_cost
+                    priority = new_cost + self.toroidal_heuristic(neighbor, goal)
+                    open_set.put((priority, neighbor))
                     came_from[neighbor] = current
-                    g_score[neighbor] = tentative_g_score
-                    f_score[neighbor] = tentative_g_score + self.heuristic(neighbor, goal)
-                    
-                    if (f_score[neighbor], neighbor) not in open_set:
-                        heapq.heappush(open_set, (f_score[neighbor], neighbor))
         
-        return []  # Pas de chemin trouvé
+        return []  # No path found
     
-    def heuristic(self, a, b):
-        """Distance de Manhattan"""
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
-    
-    def get_neighbors(self, pos):
-        """Obtient les voisins valides d'une position"""
-        x, y = pos
-        neighbors = []
-        
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = (x + dx) % self.map_width, (y + dy) % self.map_height
-            if (nx, ny) not in self.obstacles:
-                neighbors.append((nx, ny))
-                
-        return neighbors
+    def toroidal_heuristic(self, point1, point2):
+        """Calculate Manhattan distance on a toroidal map"""
+        dx = min(abs(point2.x - point1.x), 
+                 self.world_map.width - abs(point2.x - point1.x))
+        dy = min(abs(point2.y - point1.y),
+                 self.world_map.height - abs(point2.y - point1.y))
+        return dx + dy
 ```
 
-## Système de Logging et Debug
+## Level-Specific Strategies
 
-### Logger personnalisé
+The AI implements different strategies based on the player's level:
 
-```python
-class Logger:
-    def __init__(self, filename, message_prefix=""):
-        self.filename = filename
-        self.prefix = message_prefix
-        self.log_level = LogLevel.INFO
-        
-    def log(self, message, level=LogLevel.INFO):
-        if level >= self.log_level:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            formatted_message = f"[{timestamp}] {self.prefix}{message}"
-            
-            # Écriture dans le fichier
-            with open(self.filename, 'a') as f:
-                f.write(formatted_message + '\n')
-            
-            # Affichage console si debug
-            if level >= LogLevel.DEBUG:
-                print(formatted_message)
-    
-    def debug(self, message):
-        self.log(message, LogLevel.DEBUG)
-    
-    def info(self, message):
-        self.log(message, LogLevel.INFO)
-    
-    def warning(self, message):
-        self.log(message, LogLevel.WARNING)
-    
-    def error(self, message):
-        self.log(message, LogLevel.ERROR)
+| Level | Strategy Focus | Key Resources | Team Coordination |
+|-------|---------------|---------------|-------------------|
+| 1     | Food collection, basic exploration | Food, Linemate | Minimal |
+| 2-3   | Map exploration, linemate collection | Linemate, Deraumere, Sibur | Broadcast positions |
+| 4-5   | Group formation, targeted resource gathering | Phiras, Mendiane | Position coordination |
+| 6-8   | Complex ritual planning, efficient resource sharing | Thystame | Full coordination |
 
-class LogLevel:
-    DEBUG = 0
-    INFO = 1
-    WARNING = 2
-    ERROR = 3
-```
-
-## Optimisations et Performance
-
-### Cache des états
+## State Machine Implementation
 
 ```python
-class StateCache:
-    def __init__(self, max_size=1000):
-        self.cache = {}
-        self.access_order = []
-        self.max_size = max_size
-        
-    def get_environment_hash(self, environment_data):
-        """Génère un hash de l'environnement pour la mise en cache"""
-        return hash(str(sorted(environment_data)))
-    
-    def get_cached_decision(self, environment_hash):
-        """Récupère une décision mise en cache"""
-        if environment_hash in self.cache:
-            # Mise à jour de l'ordre d'accès (LRU)
-            self.access_order.remove(environment_hash)
-            self.access_order.append(environment_hash)
-            return self.cache[environment_hash]
-        return None
-    
-    def cache_decision(self, environment_hash, decision):
-        """Met en cache une décision"""
-        if len(self.cache) >= self.max_size:
-            # Suppression du plus ancien (LRU)
-            oldest = self.access_order.pop(0)
-            del self.cache[oldest]
-        
-        self.cache[environment_hash] = decision
-        self.access_order.append(environment_hash)
-```
-
-## Configuration et Personnalisation
-
-### Paramètres d'agent
-
-```python
-class AgentConfig:
+class StateMachine:
     def __init__(self):
-        # Comportement
-        self.default_behavior = "Dyson"
-        self.behavior_switch_threshold = 0.8
+        self.states = {
+            "Explore": ExploreState(),
+            "Gather": GatherState(),
+            "Incantation": IncantationState(),
+            "Survival": SurvivalState(),
+            "Reproduction": ReproductionState(),
+            "Assist": AssistState()
+        }
+        self.current_state = "Explore"
         
-        # Communication
-        self.broadcast_frequency = 10  # Secondes entre les broadcasts
-        self.max_message_queue_size = 100
+    async def update(self, agent):
+        """Execute current state and check transitions"""
+        # Get current state
+        state = self.states[self.current_state]
         
-        # Exploration
-        self.exploration_timeout = 30  # Secondes avant changement de pattern
-        self.max_exploration_distance = 20
+        # Execute state action
+        result = await state.execute(agent)
         
-        # Survie
-        self.food_panic_threshold = 5
-        self.food_warning_threshold = 15
+        # Check for state transitions
+        next_state = state.check_transitions(agent, result)
+        if next_state != self.current_state:
+            await self.transition_to(next_state, agent)
+            
+        return result
         
-        # Performance
-        self.action_delay = 0.1  # Délai entre les actions
-        self.max_retries = 3
+    async def transition_to(self, new_state, agent):
+        """Handle state transition"""
+        old_state = self.states[self.current_state]
+        new_state_obj = self.states[new_state]
         
-    @classmethod
-    def load_from_file(cls, config_file):
-        """Chargement de la configuration depuis un fichier"""
-        config = cls()
-        try:
-            with open(config_file, 'r') as f:
-                data = json.load(f)
-                for key, value in data.items():
-                    if hasattr(config, key):
-                        setattr(config, key, value)
-        except FileNotFoundError:
-            pass  # Utiliser la configuration par défaut
-        return config
+        # Exit current state
+        await old_state.exit(agent)
+        
+        # Update state
+        self.current_state = new_state
+        
+        # Enter new state
+        await new_state_obj.enter(agent)
 ```
 
-## Tests et Validation
+## Resource Requirements by Level
 
-### Simulateur d'environnement
+The AI manages resources based on the level requirements:
 
-```python
-class EnvironmentSimulator:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.map = [[[] for _ in range(width)] for _ in range(height)]
-        
-    def add_resource(self, x, y, resource_type):
-        """Ajoute une ressource à une position"""
-        self.map[y][x].append(resource_type)
-    
-    def simulate_look(self, agent_x, agent_y, orientation):
-        """Simule la commande Look d'un agent"""
-        visible_tiles = []
-        level = 1  # Niveau de vision
-        
-        for distance in range(level + 1):
-            for offset in range(-distance, distance + 1):
-                x, y = self.calculate_visible_position(agent_x, agent_y, 
-                                                     orientation, distance, offset)
-                if 0 <= x < self.width and 0 <= y < self.height:
-                    visible_tiles.append(self.map[y][x].copy())
-                else:
-                    visible_tiles.append([])
-        
-        return visible_tiles
-
-# Tests unitaires
-class TestAgentBehavior(unittest.TestCase):
-    def setUp(self):
-        self.simulator = EnvironmentSimulator(10, 10)
-        self.agent = Agent("localhost", 4242, "test_team", 0)
-        
-    def test_dyson_behavior_resource_collection(self):
-        """Test de collecte de ressources par le comportement Dyson"""
-        # Configuration de l'environnement
-        self.simulator.add_resource(5, 5, "food")
-        
-        # Simulation du comportement
-        behavior = DysonBehavior()
-        environment = self.simulator.simulate_look(5, 4, 0)  # Agent au sud
-        
-        action = behavior.get_next_action_simulated(environment, self.agent)
-        
-        # Vérification que l'agent va vers la nourriture
-        self.assertIsInstance(action, ForwardAction)
-    
-    def test_incantation_requirements(self):
-        """Test des prérequis d'incantation"""
-        behavior = IncanterBehavior()
-        
-        # Test niveau 1->2
-        inventory = {'linemate': 1, 'food': 10}
-        missing = behavior.check_missing_resources(inventory, 
-                                                  behavior.elevation_requirements[1])
-        self.assertEqual(len(missing), 0)
-        
-        # Test niveau 2->3 avec ressources manquantes
-        inventory = {'linemate': 0, 'deraumere': 1, 'sibur': 1, 'food': 10}
-        missing = behavior.check_missing_resources(inventory, 
-                                                  behavior.elevation_requirements[2])
-        self.assertEqual(missing, ['linemate'])
 ```
+# Level 1→2: 1 player, 1 linemate
+# Level 2→3: 2 players, 1 linemate, 1 deraumere, 1 sibur
+# Level 3→4: 2 players, 2 linemate, 0 deraumere, 1 sibur, 2 phiras
+# Level 4→5: 4 players, 1 linemate, 1 deraumere, 2 sibur, 1 phiras
+# Level 5→6: 4 players, 1 linemate, 2 deraumere, 1 sibur, 3 phiras
+# Level 6→7: 6 players, 1 linemate, 2 deraumere, 3 sibur, 0 phiras, 1 thystame
+# Level 7→8: 6 players, 2 linemate, 2 deraumere, 2 sibur, 2 phiras, 2 thystame
+```
+
+## Performance Optimization
+
+The AI implementation includes several optimizations:
+
+1. **Command Batching**: Grouping commands to reduce network overhead
+2. **Perception Caching**: Storing and updating world state to minimize redundant lookups
+3. **Parallel Processing**: Using asyncio for non-blocking operations
+4. **Memory Management**: Efficient data structures for world representation
+5. **Adaptive Timeout Handling**: Dynamic timeout adjustments based on server response times
+
+---
+
+This documentation provides a comprehensive overview of the AI client architecture. For implementation details, refer to the code in the `src/AI/` directory.
