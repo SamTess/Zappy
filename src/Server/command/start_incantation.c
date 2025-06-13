@@ -73,7 +73,7 @@ static bool has_enough_resources(tile_t *tile, int level)
     };
 
     for (int i = FOOD; i < COUNT; i++) {
-        if (tile->resources[i] < required_resources[level - 1][i])
+        if (tile->resources[i] < required_resources[level][i])
             return false;
     }
     return true;
@@ -91,27 +91,31 @@ static int how_many_players_needed(int level)
 bool can_start_incantation(server_t *server, client_t *client)
 {
     int required_players = 0;
-    int prerequisite_level = client->player->level + 1;
+    int prerequisite_level = client->player->level;
     tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
     int current_players = 0;
 
     if (prerequisite_level > 7 ||
-        !has_enough_resources(tile, prerequisite_level))
+        !has_enough_resources(tile, prerequisite_level)){
+            printf("nique marin\n");
         return false;
+        }
     required_players = how_many_players_needed(prerequisite_level);
     current_players =
         nb_valid_players_on_tile(server, tile, client->player->level);
-    if (current_players < required_players)
+    if (current_players < required_players){
+        printf("nique marin 2 %d %d\n", current_players, required_players);
         return false;
+    }
     return true;
 }
 
 void start_incantation(server_t *server, client_t *client, char **buffer)
 {
     if (!server || !client || !client->player || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "ako\n");
     if (!can_start_incantation(server, client))
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output(client->client_fd, "bko\n");
     command_pic(server, client->player->pos_x, client->player->pos_y,
         client->player->level);
     set_busy_all(server, client, 300);
