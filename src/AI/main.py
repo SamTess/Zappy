@@ -7,9 +7,9 @@ from agent.agent import Agent
 from parser.paringArgsClass import parseArgs
 
 
-def run_agent(ip, port, team, agent_id):
+def run_agent(ip, port, team, agent_id, performance):
   try:
-    ai = Agent(ip, port, team, agent_id)
+    ai = Agent(ip, port, team, agent_id, performance)
     ai.start()
   except Exception as e:
     print(f"Agent {agent_id} failed: {e}")
@@ -25,12 +25,15 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
   args = parseArgs()
-  num_agents = 1
+  num_agents = 10
   port = args.getPort()
   ip = args.getMachine()
   team = args.getName()
+  performance = args.getPerformance()
 
   print(f"Starting {num_agents} agents for team {team} on {ip}:{port}")
+  if performance:
+    print("Performance mode enabled")
 
   child_pids = []
 
@@ -41,7 +44,7 @@ if __name__ == "__main__":
     pid = os.fork()
 
     if pid == 0:
-      run_agent(ip, port, team, i)
+      run_agent(ip, port, team, i, performance)
       sys.exit(0)
     else:
       child_pids.append(pid)

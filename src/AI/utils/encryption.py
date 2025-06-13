@@ -34,5 +34,4 @@ def decrypt_message(encrypted_message):
     return decrypted_data.decode()
 
   except Exception as e:
-    print(f"Decryption error: {e}, with message: {encrypted_message}")
     return None

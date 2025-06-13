@@ -1,10 +1,14 @@
 import utils.encryption as encryption
-import agent.actions as actions
 
+####! BROADCAST SYSTEM:
+#? message format: "message <emitter_direction>, <encrypted_message>"
+#? encrypted_message format: "<message_type>-<sender_id>-<message>
+#? message_type: "I" for inventory
 
 class BroadcastManager:
   def __init__(self, agent):
     self.agent = agent
+
 
   def manage_broadcast(self, full_server_message):
     if not full_server_message or len(full_server_message) < 2:
@@ -14,35 +18,87 @@ class BroadcastManager:
       print(f"Invalid broadcast message format: {full_server_message}")
       return
 
+    parts = full_server_message.split(", ", 1)
+    if len(parts) < 2:
+        print(f"Invalid broadcast message format (missing comma space separator): {full_server_message}")
+        return
+
+    header_part = parts[0]
+    broadcast_message = parts[1]
+
     try:
-      emitter_direction = int(full_server_message.split(" ")[1].split(",")[0])
-    except ValueError:
+      sender_agent_direction_str = header_part.split(" ")[1]
+      sender_agent_direction = int(sender_agent_direction_str)
+    except (IndexError, ValueError):
       print(f"Invalid emitter direction in broadcast message: {full_server_message}")
       return
-
-    broadcast_message = full_server_message.split(", ")[1]
 
     if not broadcast_message:
       print("Empty broadcast message content.")
       return
 
-    print(f"Broadcast received from direction: {emitter_direction}")
+    print(f"Broadcast received from direction: {sender_agent_direction}")
 
-    decrypted_message = encryption.decrypt_message(full_server_message.split(", ")[1])
+    decrypted_message = encryption.decrypt_message(broadcast_message)
 
     if decrypted_message is not None:
-      print(f"Decrypted broadcast message: {decrypted_message}")
+
+      msg_parts = decrypted_message.split('-', 3)
+      if len(msg_parts) != 3:
+        print(f"Invalid decrypted message format (expected 3 parts): {decrypted_message}")
+        return
+
+      msg_type, sender_agent_id_str, payload = msg_parts
+
+      try:
+        sender_agent_id = int(sender_agent_id_str)
+      except ValueError:
+        print(f"Invalid channel_id or sender_agent_id in decrypted message: {decrypted_message}")
+        return
+
+      if msg_type == 'I':
+        self._handle_inventory_message(sender_agent_id, sender_agent_direction, payload)
+      else:
+        print(f"Unknown message type: {msg_type} in decrypted message: {decrypted_message}")
     else:
-      print(f"Enemy broadcast message: {broadcast_message}")
+      print(f"Enemy broadcast message (decryption failed): {broadcast_message}")
+      self._handle_enemy_broadcast(sender_agent_direction, broadcast_message)
       return
 
-    if decrypted_message.startswith("HELP! Upgrade: "):
-      try:
-        level = int(decrypted_message.split(": ")[1])
-        if level == self.agent.level + 1:
-          actions.got_to_dir(self.agent, emitter_direction)
-          print(f"Received help request for level {level}. Moving towards the emitter.")
-        else:
-          print(f"Received help request for level {level}, but current level is {self.agent.level}. Ignoring.")
-      except ValueError:
-        print(f"Failed to parse level from message: {decrypted_message}")
+
+  def _handle_inventory_message(self, sender_agent_id, sender_agent_direction, message):
+    if not hasattr(self.agent, 'update_agent_info'):
+        print("Agent is missing 'update_agent_info' method for handling inventory messages.")
+        return
+    try:
+      self.agent.update_agent_info(sender_agent_id, sender_agent_direction, message)
+    except Exception as e:
+      print(f"Error updating agent info: {e}")
+      return
+
+
+  def _handle_enemy_broadcast(self, sender_agent_direction, message):
+    if not hasattr(self.agent, 'update_last_known_enemy_direction'):
+        print("Agent is missing 'update_last_known_enemy_direction' method for handling enemy broadcasts.")
+        return
+    try:
+      self.agent.update_last_known_enemy_direction(sender_agent_direction)
+    except Exception as e:
+      print(f"Error updating last known enemy direction: {e}")
+      return
+
+
+  def send_broadcast(self, message_type, message):
+    if not hasattr(self.agent, 'id'):
+        print("Agent is missing 'id' attribute for sending broadcast.")
+        return
+
+    agent_id = self.agent.id
+    message_content = f"{message_type}-{agent_id}-{message}"
+    encrypted_message = encryption.encrypt_message(message_content)
+
+    if encrypted_message:
+      # print(f"Agent {agent_id} sending INFO broadcast on channel {channel_id}: {message_content}")
+      self.agent.send_command("Broadcast " + encrypted_message)
+    else:
+      print(f"send_info_broadcast: Failed to encrypt message.")

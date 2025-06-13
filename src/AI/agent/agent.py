@@ -3,13 +3,14 @@ from agent.socketManager import SocketManager
 from agent.decisionManager import DecisionManager
 from agent.broadcastManager import BroadcastManager
 from logger.logger import Logger
+from constants.upgrades import get_total_upgrade_resources
 import utils.encryption as encryption
-import agent.actions as actions
+import utils.zappy as zappy
 import socket
 import sys
 
 class Agent:
-  def __init__(self, ip, port, team, agent_id=0):
+  def __init__(self, ip, port, team, agent_id=0, performance_mode=False):
     try:
       self.ip = ip
       self.port = port
@@ -19,8 +20,8 @@ class Agent:
       self.id = agent_id
       self.map_size_x = None
       self.map_size_y = None
-      self.current_behaviour = "Dyson"
-      encryption.secret_key = encryption.secret_key + self.team  # to test encryption between our teams
+      self.current_behaviour = "BigDyson"
+      encryption.secret_key = encryption.secret_key + self.team
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.ip, self.port))
@@ -31,6 +32,20 @@ class Agent:
       self.broadcastManager = BroadcastManager(self)
       self.socketManager = SocketManager(self.sock)
       self.socketManager.start()
+
+      self.performance_mode = performance_mode
+
+      # TODO(ms-tristan): garder une info sur tous les autres agents + sur la dernière direction ennemie connue
+      self.other_agents = {}                #? {"id": {"direction": "N", "inventory": {}}}
+      self.last_enemy_direction = None      #? 0 - 8
+
+      # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
+      self.current_role = "miner"           #? "fighter", "miner"
+      self.current_phase = "collecting"     #? "collecting", "rallying", "upgrading", "reproducing"
+
+      # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
+      self.last_known_inventory = {}
+      self.last_known_surroundings = {}
 
     except socket.error as e:
       print(f"Error connecting to server: {e}")
@@ -64,35 +79,65 @@ class Agent:
       print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
 
     print(f"Map size: {map_size}")
+    self._run()
+    self._stop()
 
-    self.run()
-
-
-  def stop(self):
+  def _stop(self):
     self.logger.info(f"Stopping agent {self.id}...")
     self.socketManager.stop()
     self.sock.close()
     print(f"Agent {self.id} stopped.")
 
 
-  def run(self):
+  def _run(self):
     while self.socketManager.running:
       try:
-
-        self.process_server_message()
-        self.decisionManager.take_action()
+        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
+        self._process_server_message()      # TODO(ms-tristan): update les infos des autres agents en local
+        self._update_self_state()           # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
+        self.decisionManager.take_action()  # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
         sleep(0.1)
 
       except BrokenPipeError:
         print(f"Agent {self.id}: Connection closed by server.")
-        self.stop()
-        break
       except Exception as e:
         print(f"Agent {self.id}: Error: {e}")
+
+
+  def _process_server_message(self):
+    while self.has_messages():
+      message = self.get_message()
+      if message.startswith("message "):
+        self.broadcastManager.manage_broadcast(message)
+      elif message.startswith("dead"):
+        print("Agent has died.")
         self.stop()
-        break
+      elif message.startswith("Current level: "):
+        try:
+          self.level = int(message.split(": ")[1])
+          print(f"Current level set to: {self.level}")
+        except ValueError:
+          print(f"Failed to parse level from message: {message}")
+      else:
+        print(f"Unknown server message: {message}")
+
+
+  def _update_self_state(self):
+    required_total_amount_of_resources = get_total_upgrade_resources()
+    team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
+
+    for agent_id, agent_info in self.other_agents.items():
+      agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+      for key, value in agent_inventory.items():
+          if key in team_total_amount_of_resources:
+              team_total_amount_of_resources[key] += value
+      print(f"Agent {agent_id} - Direction: {agent_info['direction']}, Inventory: {agent_info['inventory']}")
+
+    print(f"Total team resources: {team_total_amount_of_resources}")
 
   def send_command(self, command, timeout=2.0):
+    if (self.performance_mode):
+      command = " " + command
     return self.socketManager.send_command(command, timeout=timeout)
 
   def get_message(self, timeout=None):
@@ -101,22 +146,11 @@ class Agent:
   def has_messages(self):
     return self.socketManager.has_messages()
 
-  def process_server_message(self):
-    if not self.has_messages():
-      return
-    message = self.get_message()
-    if message.startswith("message "):
-      self.broadcastManager.manage_broadcast(message)
-    elif message.startswith("dead"):
-      print("Agent has died.")
-      self.stop()
-    elif message.startswith("Current level: "):
-      try:
-        self.level = int(message.split(": ")[1])
-        if self.level >= 2:
-          self.current_behaviour = "GetFoodAndMinerals"
-        print(f"Current level set to: {self.level}")
-      except ValueError:
-        print(f"Failed to parse level from message: {message}")
-    else:
-      print(f"Unknown server message: {message}")
+  def update_agent_info(self, agent_id, direction, inventory):
+    self.other_agents[agent_id] = {
+        "direction": direction,
+        "inventory": inventory
+    }
+
+  def update_last_known_enemy_direction(self, direction):
+    self.last_enemy_direction = direction
