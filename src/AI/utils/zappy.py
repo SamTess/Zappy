@@ -18,7 +18,7 @@ def get_item_relative_pos(item_position):
   return i + nb_rows + 1, nb_rows
 
 # transforms inventory string into a list of pair ressource - amount
-def parse_inventory(inventory_str):
+def inventory_to_dict(inventory_str):
   if not inventory_str:
     print("parse_inventory: Inventory string is empty or None.")
     return {}

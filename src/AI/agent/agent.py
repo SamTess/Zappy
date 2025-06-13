@@ -3,7 +3,9 @@ from agent.socketManager import SocketManager
 from agent.decisionManager import DecisionManager
 from agent.broadcastManager import BroadcastManager
 from logger.logger import Logger
+from constants.upgrades import get_total_upgrade_resources
 import utils.encryption as encryption
+import utils.zappy as zappy
 import socket
 import sys
 
@@ -121,10 +123,17 @@ class Agent:
 
 
   def _update_self_state(self):
+    required_total_amount_of_resources = get_total_upgrade_resources()
+    team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
 
     for agent_id, agent_info in self.other_agents.items():
+      agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+      for key, value in agent_inventory.items():
+          if key in team_total_amount_of_resources:
+              team_total_amount_of_resources[key] += value
       print(f"Agent {agent_id} - Direction: {agent_info['direction']}, Inventory: {agent_info['inventory']}")
 
+    print(f"Total team resources: {team_total_amount_of_resources}")
 
   def send_command(self, command, timeout=2.0):
     if (self.performance_mode):

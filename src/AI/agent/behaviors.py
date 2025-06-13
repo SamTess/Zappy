@@ -24,7 +24,7 @@ class UpgradeBehavior(Behavior):
       print("UpgradeBehavior: Surroundings or inventory is None.")
       return
 
-    inventory_dict = zappy.parse_inventory(inventory)
+    inventory_dict = zappy.inventory_to_dict(inventory)
     upgrade_info = upgrades.upgrades.get(self.agent.level, {})
 
     if not upgrade_info:
@@ -111,7 +111,7 @@ class GetFoodAndMineralsBehavior(Behavior):
       print("GetFoodAndMineralsBehaviour: Surroundings or inventory is None.")
       return
 
-    if zappy.parse_inventory(inventory).get("food", 0) < 10:
+    if zappy.inventory_to_dict(inventory).get("food", 0) < 10:
       GetFoodBehavior(self.agent).execute(surroundings, inventory)
     else:
       GetMineralsBehavior(self.agent).execute(surroundings, inventory)
