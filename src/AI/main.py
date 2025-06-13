@@ -11,7 +11,6 @@ def run_agent(ip, port, team, agent_id, performance):
   try:
     ai = Agent(ip, port, team, agent_id, performance)
     ai.start()
-    ai.send_command("Fork")
   except Exception as e:
     print(f"Agent {agent_id} failed: {e}")
     sys.exit(1)

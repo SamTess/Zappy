@@ -86,6 +86,6 @@ class BroadcastManager:
 
     if encrypted_message:
       # print(f"Agent {agent_id} sending INFO broadcast on channel {channel_id}: {message_content}")
-      self.agent.send_message("Broadcast " + encrypted_message)
+      self.agent.send_command("Broadcast " + encrypted_message)
     else:
       print(f"send_info_broadcast: Failed to encrypt message.")
