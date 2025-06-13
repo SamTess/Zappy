@@ -73,7 +73,7 @@ static bool has_enough_resources(tile_t *tile, int level)
     };
 
     for (int i = FOOD; i < COUNT; i++) {
-        if (tile->resources[i] < required_resources[level - 1][i])
+        if (tile->resources[i] < required_resources[level][i])
             return false;
     }
     return true;
@@ -91,7 +91,7 @@ static int how_many_players_needed(int level)
 bool can_start_incantation(server_t *server, client_t *client)
 {
     int required_players = 0;
-    int prerequisite_level = client->player->level + 1;
+    int prerequisite_level = client->player->level;
     tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
     int current_players = 0;
 
