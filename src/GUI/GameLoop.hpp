@@ -17,6 +17,8 @@
 #include "renderer/Renderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "graphicalContext/GraphicalContext.hpp"
+#include "ui/UserInterface.hpp"
+#include "shared/GameData.hpp"
 
 class GameLoop : public IGraphicalContextObserver {
 public:
@@ -46,6 +48,24 @@ private:
     std::shared_ptr<Renderer> m_renderer;
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
+    std::shared_ptr<GUI::UserInterface> m_userInterface;
+    GUI::GameData m_gameData;
 
     int m_cubeModelId = -1;
+    
+    // Structure pour la case sélectionnée
+    struct {
+        int x = 0;
+        int y = 0;
+        bool selected = false;
+    } m_selectedTile;
+    
+    // Méthodes pour l'interface utilisateur
+    void updateGameData();
+    void handleTileSelection(int x, int y);
+    void handleViewModeChange(int mode);
+    
+    // Méthodes pour simuler des événements de test
+    void simulateRandomEvents(float deltaTime);
+    void checkTestCommands();
 };

@@ -65,6 +65,64 @@ void GameLoop::setupComponents() {
     m_camera->init(m_graphics);
     m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
+    
+    // Initialisation de l'interface utilisateur
+    m_userInterface = std::make_shared<GUI::UserInterface>(m_gui);
+    m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    
+    // Configuration initiale des données de jeu
+    m_gameData.mapWidth = m_mapWidth;
+    m_gameData.mapHeight = m_mapHeight;
+    
+    // Ajouter quelques données de test
+    m_userInterface->addLogMessage("Interface utilisateur initialisée");
+    
+    // Ajout de données de test pour la démonstration
+    // Équipes
+    GUI::Team team1 = {"Team1", 5};
+    GUI::Team team2 = {"Team2", 3};
+    m_gameData.teams.push_back(team1);
+    m_gameData.teams.push_back(team2);
+    
+    // Joueurs
+    GUI::Player player1;
+    player1.id = 1;
+    player1.team = "Team1";
+    player1.x = 3;
+    player1.y = 4;
+    player1.orientation = 1;
+    player1.level = 2;
+    player1.inventory.food = 10;
+    player1.inventory.linemate = 2;
+    m_gameData.players.push_back(player1);
+    
+    GUI::Player player2;
+    player2.id = 2;
+    player2.team = "Team2";
+    player2.x = 8;
+    player2.y = 7;
+    player2.orientation = 3;
+    player2.level = 1;
+    player2.inventory.food = 5;
+    m_gameData.players.push_back(player2);
+    
+    // Ressources sur des cases
+    for (int i = 0; i < 10; i++) {
+        GUI::Tile tile;
+        tile.x = rand() % m_mapWidth;
+        tile.y = rand() % m_mapHeight;
+        tile.food = rand() % 5;
+        tile.linemate = rand() % 3;
+        tile.deraumere = rand() % 2;
+        tile.sibur = rand() % 2;
+        m_gameData.tiles.push_back(tile);
+    }
+    
+    // Quelques logs et broadcasts de test
+    m_userInterface->addLogMessage("Connexion au serveur établie");
+    m_userInterface->addLogMessage("Map de dimensions: " + std::to_string(m_mapWidth) + "x" + std::to_string(m_mapHeight));
+    m_userInterface->addBroadcast("Team1", "Je cherche de la nourriture!");
+    m_userInterface->addBroadcast("Team2", "Rendez-vous au point x:8 y:5");
 }
 
 int GameLoop::run() {
@@ -81,6 +139,14 @@ int GameLoop::run() {
         m_graphics->DrawPlane({0.0f, 0.0f, 0.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
         renderCube();
         m_graphics->EndCamera3D();
+        
+        // Mise à jour des données de jeu
+        updateGameData();
+        
+        // Rendu de l'interface utilisateur
+        m_userInterface->render();
+        
+        // Rendu des éléments UI additionnels si nécessaire
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -105,14 +171,5 @@ void GameLoop::renderCube() {
     }
 }
 
-void GameLoop::onMapSizeChanged(int width, int height) {
-    m_mapWidth = width;
-    m_mapHeight = height;
-    if (m_camera) {
-        m_camera->setMapDimensions(width, height);
-    }
-}
-
-void GameLoop::onTileChanged(int /*x*/, int /*y*/, const TileData& /*tileData*/) {
-    //TODO(Sam): Implement tile change handling
-}
+// Les implémentations des méthodes onMapSizeChanged et onTileChanged
+// sont définies dans GameLoop_UI.cpp

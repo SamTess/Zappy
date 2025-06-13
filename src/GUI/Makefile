@@ -32,7 +32,9 @@ SRC = graphicalContext/GraphicalContext.cpp \
 	  renderer/strategies/SimpleTileRenderStrategy.cpp \
 	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
-	  GameLoop.cpp
+	  GameLoop.cpp \
+	  GameLoop_UI.cpp \
+	  ui/UserInterface.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
