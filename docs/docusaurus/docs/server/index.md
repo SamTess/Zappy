@@ -2,90 +2,266 @@
 sidebar_position: 1
 ---
 
-# Serveur Zappy
+# Zappy Server
 
-Le serveur est le composant central du projet Zappy. Il gère l'état du jeu, la logique, les règles et coordonne la communication entre les clients IA et l'interface graphique.
+The server is the core component of the Zappy project, responsible for managing game state, enforcing rules, simulating the world, and coordinating communication between AI clients and the graphical interface.
 
-## Architecture du serveur
+## Architecture Overview
 
-Le serveur Zappy est conçu avec une architecture modulaire :
+The Zappy server is built with a modular, high-performance architecture:
 
-- **Gestionnaire de réseau** : Gère les connexions client et la communication
-- **Moteur de jeu** : Implémente les règles du jeu et la logique
-- **Gestionnaire de ressources** : Gère la carte de jeu et les ressources
-- **Gestionnaire d'équipe** : Gère les équipes et les joueurs
+- **Network Manager**: Handles client connections, message parsing, and async I/O
+- **Game Engine**: Implements core game logic, rules, and state transitions
+- **Map System**: Manages the game world, resource distribution, and spatial queries
+- **Player Manager**: Tracks player states, teams, and action processing
+- **Command Processor**: Parses and executes client commands with proper timing
+- **Resource System**: Controls resource generation, distribution, and consumption
 
-## Configuration du serveur
+## Server Configuration
 
-Le serveur accepte les paramètres de ligne de commande suivants :
+The server accepts the following command-line parameters for flexible deployment:
 
-| Paramètre | Description                                  | Valeur par défaut |
-|-----------|----------------------------------------------|-------------------|
-| `-p`      | Numéro de port                               | 4242              |
-| `-x`      | Largeur de la carte                          | 20                |
-| `-y`      | Hauteur de la carte                          | 20                |
-| `-n`      | Noms des équipes (séparés par des espaces)   | -                 |
-| `-c`      | Nombre maximal de clients par équipe         | 10                |
-| `-f`      | Fréquence d'exécution (ticks par seconde)    | 100               |
+| Parameter | Description                               | Default | Range/Format |
+|-----------|-------------------------------------------|---------|--------------|
+| `-p`      | Port number                               | 4242    | 1024-65535   |
+| `-x`      | Map width                                 | 20      | 10-100       |
+| `-y`      | Map height                                | 20      | 10-100       |
+| `-n`      | Team names (space-separated)              | *Required* | String identifiers |
+| `-c`      | Maximum clients per team                  | 10      | 1-100        |
+| `-f`      | Execution frequency (ticks per second)    | 100     | 2-10000      |
+| `-t`      | Initial food regeneration interval (ticks)| 20      | 1-1000       |
+| `-r`      | Initial resource regeneration rate        | 20      | 1-100        |
+| `-d`      | Debug mode (verbose logging)              | Off     | Flag         |
 
-## Protocole de communication
+## Internal Architecture
 
-Le serveur communique avec les clients en utilisant un protocole texte basé sur TCP. Les commandes et réponses sont envoyées sous forme de chaînes de texte terminées par un caractère de nouvelle ligne (`\n`).
+The server employs several key architectural patterns:
 
-### Commandes du client IA
+### Event-Driven Architecture
 
-Le serveur accepte les commandes suivantes des clients IA :
+The server uses an event-driven model with asynchronous I/O to handle multiple clients efficiently:
 
-- `Forward` : Avancer d'une case
-- `Right` : Tourner à droite de 90°
-- `Left` : Tourner à gauche de 90°
-- `Look` : Observer l'environnement
-- `Inventory` : Afficher l'inventaire
-- `Broadcast text` : Diffuser un message à tous les joueurs
-- `Connect_nbr` : Obtenir le nombre de places disponibles dans l'équipe
-- `Fork` : Créer un nouvel œuf (nouveau joueur)
-- `Eject` : Éjecter les joueurs sur la même case
-- `Take object` : Prendre un objet
-- `Set object` : Poser un objet
-- `Incantation` : Démarrer une incantation pour monter de niveau
-
-### Protocole GUI
-
-Le serveur envoie des mises à jour au client GUI pour lui permettre de visualiser l'état du jeu en temps réel.
-
-## Implémentation
-
-Le serveur est implémenté en C et utilise les sockets POSIX pour la communication réseau et un modèle de programmation événementiel pour gérer plusieurs clients simultanément.
-
-## Structure des fichiers
-
-Le code du serveur est organisé comme suit :
-- `main.c` : Point d'entrée du programme
-- `parsing.c` : Analyse des arguments de la ligne de commande
-- `network/*.c` : Gestion des connexions réseau
-- `map/*.c` : Gestion de la carte et des ressources
-- `player/*.c` : Gestion des joueurs et des commandes
-
-## Compilation et Exécution
-
-```bash
-# Compilation
-make -C src/Server
-
-# Exécution
-./zappy_server -p <port> -x <width> -y <height> -n <team_names> -c <clients_per_team> -f <freq>
+```c
+// Core event loop
+while (server->running) {
+    // Monitor file descriptors for activity
+    int activity = poll(server->poll_manager->pollfds, server->poll_manager->nfds, -1);
+    
+    if (activity < 0) {
+        // Handle polling error
+        continue;
+    }
+    
+    // Check for new client connections
+    if (FD_ISSET(server_fd, &readfds)) {
+        handle_new_connection(server);
+    }
+    
+    // Process client events
+    for (int i = 0; i < server->nfds; i++) {
+        if (server->poll_manager->pollfds[i].revents & POLLIN) {
+            process_client_input(server, &server->clients[i]);
+        }
+        if (server->poll_manager->pollfds[i].revents & POLLOUT) {
+            send_client_responses(server, &server->clients[i]);
+        }
+    }
+    
+    // Update game state
+    update_game_state(server);
+}
 ```
 
-## Mécanismes importants
+### Time Management
 
-### Gestion des ressources
-Le serveur génère aléatoirement les ressources sur la carte et les renouvelle à intervalles réguliers en fonction de la fréquence configurée.
+The server uses a sophisticated time management system to ensure consistent gameplay:
 
-### Gestion du temps
-Toutes les actions dans le jeu sont mesurées en unités temporelles. Le serveur utilise un système de file d'attente pour gérer les actions qui doivent être exécutées après un certain délai.
+```c
+typedef struct time_manager_s {
+    int frequency;              // Ticks per second
+    double tick_duration_ms;    // Milliseconds per tick
+    uint64_t current_tick;      // Current game time
+    uint64_t last_update;       // Timestamp of last update
+    struct timeval last_time;   // System time of last update
+} time_manager_t;
+```
 
-### Montée de niveau
-Le jeu comprend un système de montée de niveau basé sur des rituels d'incantation qui nécessitent :
-- Un nombre spécifique de joueurs
-- Des combinaisons précises de ressources
-- Tous les joueurs doivent être au même niveau
+### Command Processing Pipeline
+
+Commands from clients are processed through a multi-stage pipeline:
+
+1. **Reception**: Network layer receives raw text commands
+2. **Parsing**: Commands are parsed into structured data
+3. **Validation**: Command syntax and parameters are validated
+4. **Scheduling**: Valid commands are scheduled for execution
+5. **Execution**: Commands are executed in the game world
+6. **Response**: Results are sent back to clients
+
+## Resource Management
+
+The server implements sophisticated algorithms for resource distribution:
+
+### Distribution Algorithm
+
+Resources are distributed using a parameterized algorithm that ensures:
+- Even distribution across the map
+- Controlled rarity for higher-tier resources
+- Regeneration based on server time and consumption rates
+
+```c
+void regenerate_resources(map_t *map, resource_config_t *config) {
+    // Calculate number of resources to add based on map size and config
+    int food_to_add = (map->width * map->height * config->food_density) / 100;
+    
+    // Distribute resources with probability weighting
+    for (int y = 0; y < map->height; y++) {
+        for (int x = 0; x < map->width; x++) {
+            tile_t *tile = &map->tiles[y][x];
+            
+            // Probability decreases with resource tier
+            if (rand() % 100 < config->food_probability) {
+                tile->food += 1;
+            }
+            if (rand() % 100 < config->linemate_probability) {
+                tile->linemate += 1;
+            }
+            // ... other resources with decreasing probabilities
+        }
+    }
+}
+```
+
+## Player Lifecycle Management
+
+The server tracks player lifecycle from connection to death:
+
+1. **Connection**: TCP connection established
+2. **Authentication**: Team selection and validation
+3. **Initialization**: Player state creation and map placement
+4. **Active State**: Command processing and state updates
+5. **Death**: Food depletion or disconnection handling
+6. **Resource Recovery**: Inventory dropped on tile
+
+## Team Management
+
+Teams have specific properties and limitations:
+
+```c
+typedef struct team_s {
+    char *name;                  // Team identifier
+    int max_clients;             // Maximum players allowed
+    int connected_clients;       // Current player count
+    client_t **clients;          // Array of client pointers
+    int eggs_count;              // Available egg count
+    egg_t **eggs;                // Array of egg pointers
+} team_t;
+```
+
+## Implementation Details
+
+### Memory Management
+
+The server implements careful memory management to prevent leaks:
+
+```c
+// Resource allocation
+void* zappy_malloc(size_t size) {
+    void *ptr = malloc(size);
+    if (!ptr) {
+        server_error("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+    return ptr;
+}
+
+// Resource cleanup
+void cleanup_server(server_t *server) {
+    // Free all dynamically allocated resources
+    cleanup_clients(server->clients, server->nfds);
+    cleanup_map(server->map);
+    cleanup_teams(server->teams, server->team_count);
+    
+    // Close socket connections
+    for (int i = 0; i < server->nfds; i++) {
+        close(server->poll_manager->pollfds[i].fd);
+    }
+    
+    free(server->poll_manager);
+    free(server);
+}
+```
+
+### Concurrency Control
+
+The server uses a single-threaded event loop with non-blocking I/O to avoid race conditions while maintaining high performance.
+
+### Error Handling
+
+Comprehensive error handling ensures server stability:
+
+```c
+void handle_server_error(server_t *server, const char *message, int error_code) {
+    // Log the error
+    log_error("[SERVER] %s (Error %d: %s)", message, error_code, strerror(error_code));
+    
+    // Attempt recovery based on error type
+    switch (error_code) {
+        case ECONNRESET:
+            // Client disconnected unexpectedly
+            handle_client_disconnect(server, find_client_by_error(server));
+            break;
+        case EAGAIN:
+            // Resource temporarily unavailable, retry later
+            break;
+        // ... other error cases
+        default:
+            // Unrecoverable error
+            if (error_code > ERROR_THRESHOLD) {
+                log_critical("Fatal error, shutting down server");
+                server->running = false;
+            }
+    }
+}
+```
+
+## Performance Optimization
+
+The server includes optimizations for handling large maps and many clients:
+
+1. **Spatial Partitioning**: Grid-based spatial indexing for efficient queries
+2. **Command Batching**: Processing commands in batches for efficiency
+3. **Response Buffering**: Buffering outgoing messages to reduce system calls
+4. **Memory Pooling**: Reusing memory allocations for common operations
+5. **Efficient Data Structures**: Custom data structures for game state
+
+## File Structure
+
+The server code is organized into logical modules:
+
+```
+src/Server/
+  ├── main.c               # Entry point
+  ├── include/             # Header files
+  │   ├── server.h         # Main server definitions
+  │   ├── map.h            # Map system definitions
+  │   └── ...
+  ├── network/             # Network handling
+  │   ├── socket.c         # Socket operations
+  │   └── client.c         # Client handling
+  ├── map/                 # Map management
+  │   ├── map.c            # Map operations
+  │   └── resource.c       # Resource management
+  ├── player/              # Player management
+  │   ├── player.c         # Player operations
+  │   └── team.c           # Team operations
+  ├── command/             # Command processing
+  │   ├── command.c        # Command handler
+  │   └── ...              # Individual command implementations
+  └── util/                # Utilities
+      ├── logger.c         # Logging system
+      └── memory.c         # Memory management
+```
+
+---
+
+For more detailed information about specific server components and protocols, refer to the server components documentation and protocol specifications.

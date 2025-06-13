@@ -1,48 +1,48 @@
-# Implémentation du rendu de carte pour Zappy
+# Map Rendering Implementation for Zappy
 
-## Résumé
+## Summary
 
-Le système de rendu de carte développé pour le projet Zappy utilise plusieurs design patterns pour créer une architecture modulaire, extensible et performante. Le système permet d'afficher une grille 3D représentant la carte du jeu avec ses tuiles, ressources, joueurs et autres éléments.
+The map rendering system developed for the Zappy project uses several design patterns to create a modular, extensible, and efficient architecture. The system displays a 3D grid representing the game map with its tiles, resources, players, and other elements.
 
-## Design Patterns utilisés
+## Design Patterns Used
 
-1. **Observer Pattern** - Pour la communication entre le contexte graphique et le renderer
-2. **Strategy Pattern** - Pour les différentes approches de rendu des tuiles
-3. **Factory Pattern** - Pour la création des stratégies de rendu
-4. **Bridge Pattern** - Pour découpler le rendu logique de l'implémentation graphique
-5. **Level of Detail (LOD) Pattern** - Pour adapter le niveau de détail en fonction du zoom
+1. **Observer Pattern** - For communication between the graphical context and the renderer
+2. **Strategy Pattern** - For different approaches to tile rendering
+3. **Factory Pattern** - For creating rendering strategies
+4. **Bridge Pattern** - To decouple logical rendering from graphical implementation
+5. **Level of Detail (LOD) Pattern** - To adapt the level of detail based on zoom
 
-## Fonctionnalités clés
+## Key Features
 
-1. **Rendu adaptatif**: Choix automatique du niveau de détail en fonction du zoom
-2. **Visualisation des ressources**: Représentation visuelle des ressources présentes sur chaque tuile
-3. **Support de modèles 3D**: Possibilité d'utiliser des modèles 3D pour les tuiles via ModelManager
-4. **Optimisation pour grandes cartes**: Ajustement automatique de la taille des tuiles
+1. **Adaptive rendering**: Automatic selection of detail level based on zoom
+2. **Resource visualization**: Visual representation of resources present on each tile
+3. **3D Model Support**: Ability to use 3D models for tiles via ModelManager
+4. **Optimization for large maps**: Automatic adjustment of tile size
 
-## Fichiers modifiés/créés
+## Modified/Created Files
 
 - `src/GUI/renderer/MapRenderer.hpp`
 - `src/GUI/renderer/MapRenderer.cpp` 
-- `src/GUI/graphicalContext/GraphicalContext.hpp` (enums et structures)
-- `src/GUI/graphicalContext/GraphicalContext.cpp` (méthodes d'accès aux données)
-- `docs/design_patterns_map_renderer.md` (documentation des patterns utilisés)
-- `src/GUI/tests/test_map_renderer.cpp` (test de démonstration)
-- `src/GUI/tests/Makefile` (pour compiler le test)
+- `src/GUI/graphicalContext/GraphicalContext.hpp` (enums and structures)
+- `src/GUI/graphicalContext/GraphicalContext.cpp` (data access methods)
+- `docs/design_patterns_map_renderer.md` (documentation of used patterns)
+- `src/GUI/tests/test_map_renderer.cpp` (demonstration test)
+- `src/GUI/tests/Makefile` (to compile the test)
 
-## Critères d'acceptation
+## Acceptance Criteria
 
-Tous les critères d'acceptation de l'issue ont été respectés:
+All acceptance criteria for the issue have been met:
 
-- ✅ **La carte complète est visible**: Le système affiche correctement l'ensemble de la carte
-- ✅ **Les tuiles ne se chevauchent pas**: L'espacement est géré avec le paramètre tileSpacing
-- ✅ **Le rendu reste fluide pour des maps de grande taille**: 
-  - Ajustement automatique de la taille des tuiles
-  - Système de Level of Detail
-  - Optimisations de rendu
+- ✅ **The entire map is visible**: The system correctly displays the whole map
+- ✅ **Tiles do not overlap**: Spacing is managed with the tileSpacing parameter
+- ✅ **Rendering remains smooth for large maps**: 
+  - Automatic adjustment of tile size
+  - Level of Detail system
+  - Rendering optimizations
 
 ## Tests
 
-Un programme de test a été fourni pour vérifier le bon fonctionnement du système avec différentes tailles de carte. Pour l'exécuter:
+A test program has been provided to verify the correct functioning of the system with different map sizes. To run it:
 
 ```bash
 cd src/GUI/tests
@@ -51,13 +51,13 @@ make
 ```
 
 Controls:
-- R: Augmenter la taille de la carte
-- T: Diminuer la taille de la carte
-- Molette de souris: Zoom
+- R: Increase map size
+- T: Decrease map size
+- Mouse wheel: Zoom
 
-## Extensions possibles
+## Possible Extensions
 
-1. **Frustum culling**: Optimisation pour ne rendre que les tuiles visibles dans la caméra
-2. **Animation des ressources**: Ajouter des animations pour les ressources sur les tuiles
-3. **Effets visuels**: Particules ou effets pour les incantations et événements spéciaux
-4. **Transitions fluides**: Animation lors des changements d'état des tuiles
+1. **Frustum culling**: Optimization to render only the tiles visible in the camera
+2. **Resource animations**: Add animations for resources on tiles
+3. **Visual effects**: Particles or effects for spells and special events
+4. **Smooth transitions**: Animation when changing tile states

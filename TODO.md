@@ -1,200 +1,198 @@
 # 🎮 Zappy
 
 <div align="center">
-  <strong>Jeu multijoueur basé sur l'IA en réseau</strong><br>
-  Contrôlez des agents autonomes, collectez des ressources, évoluez et conquérez un monde régi par TCP et unités temporelles.
+  <strong>Multiplayer AI-based network game</strong><br>
+  Control autonomous agents, collect resources, evolve, and conquer a world governed by TCP and time units.
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/langage-C%2FC%2B%2B%2FPython-blue" alt="Languages">
-  <img src="https://img.shields.io/badge/architecture-client%2Fserver-green" alt="Architecture">
+  <img src="https://img.shields.io/badge/langage-C%2FC%2B%2FPython-blue" alt="Languages">
   <img src="https://img.shields.io/badge/protocole-TCP%2FIP-orange" alt="Protocol">
 </div>
 
 ---
 
-## 📑 Table des matières
+## 📑 Table of Contents
 
-- [Vue d'ensemble](#-vue-densemble)
+- [Overview](#-overview)
 - [Architecture](#-architecture)
-- [Prérequis](#-prérequis)
+- [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
-- [Utilisation](#-utilisation)
-- [Composants](#-composants)
-  - [Serveur](#serveur)
-  - [Interface Graphique](#interface-graphique)
-  - [Intelligence Artificielle](#intelligence-artificielle)
+- [Usage](#-usage)
+- [Components](#-components)
+  - [Server](#server)
+  - [Artificial Intelligence](#artificial-intelligence)
 - [Documentation](#-documentation)
-- [Développement](#-développement)
+- [Development](#-development)
 
 ---
 
-## 🌐 Vue d'ensemble
+## 🌐 Overview
 
-Zappy est un projet multi-composants développé en C/C++ et Python, reproduisant un écosystème virtuel où des agents contrôlés par IA évoluent en collectant des ressources, en communiquant, et en réalisant des rituels d'élévation. Le jeu est composé de trois éléments principaux :
+Zappy is a multi-component project developed in C/C++ and Python, reproducing a virtual ecosystem where agents controlled by AI evolve by collecting resources, communicating, and performing elevation rituals. The game consists of three main elements :
 
-- **Serveur** : Écrit en C, il gère la logique du jeu, les règles, et l'état du monde
-- **Interface Graphique** : Développée en C++, elle visualise l'état du jeu en temps réel
-- **Clients IA** : Implémentés en Python, ils contrôlent automatiquement les joueurs pour accomplir des objectifs stratégiques
+- **Server** : Written in C, it manages the game logic, rules, and world state
+- **Graphical Interface** : Developed in C++, it visualizes the game state in real-time
+- **AI Clients** : Implemented in Python, they automatically control players to achieve strategic objectives
 
 ## 🏗 Architecture
 
-Les composants communiquent via des protocoles réseau TCP/IP :
+The components communicate via TCP/IP network protocols :
 
 ```
-┌────────┐    Commandes/Réponses    ┌──────────┐
+┌────────┐    Commands/Responses    ┌──────────┐
 │        │◄────────────────────────►│          │
 │ Client │                          │          │
-│  (IA)  │                          │          │
+│  (AI)  │                          │          │
 │        │                          │          │
 └────────┘                          │          │
-                                    │ Serveur  │
-┌────────┐    Données de jeu        │          │
+                                    │ Server  │
+┌────────┐    Game data            │          │
 │        │◄────────────────────────►│          │
 │  GUI   │                          │          │
 │        │                          │          │
 └────────┘                          └──────────┘
 ```
 
-## 🔧 Prérequis
+## 🔧 Prerequisites
 
-Pour compiler et exécuter Zappy, vous aurez besoin de :
+To compile and run Zappy, you will need :
 
-- Compilateur C/C++ (GCC ou Clang)
+- C/C++ compiler (GCC or Clang)
 - Python 3.x
 - Make
-- Bibliothèques de développement graphique (pour le client GUI)
+- Graphic development libraries (for the GUI client)
 
 ## 💻 Installation
 
 ```bash
-# Cloner le dépôt
+# Clone the repository
 git clone https://github.com/Epitech/Zappy.git
 cd Zappy
 
-# Compiler tous les composants
+# Compile all components
 make
 
-# Ou compiler des composants spécifiques
+# Or compile specific components
 make zappy_server
 make zappy_gui
 make zappy_ai
 ```
 
-## 🚀 Utilisation
+## 🚀 Usage
 
-### Démarrer le serveur
+### Start the server
 
 ```bash
 ./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq>
 ```
 
-Exemple :
+Example :
 ```bash
 ./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 -c 5 -f 100
 ```
 
-### Démarrer l'interface graphique
+### Start the graphical interface
 
 ```bash
 ./zappy_gui -p <port> -h <host>
 ```
 
-Exemple :
+Example :
 ```bash
 ./zappy_gui -p 4242 -h localhost
 ```
 
-### Démarrer l'IA
+### Start the AI
 
 ```bash
 ./zappy_ai -p <port> -n <team name>
 ```
 
-Exemple :
+Example :
 ```bash
 ./zappy_ai -p 4242 -n team1
 ```
 
-## 📦 Composants
+## 📦 Components
 
-### Serveur
+### Server
 
-Le serveur est le composant central qui gère :
-- La carte de jeu et les ressources
-- Les connexions des clients (IA et GUI)
-- La logique et les règles du jeu
-- La gestion du temps et des événements
-- Le protocole de communication
-- Les rituels d'élévation et évolution des joueurs
+The server is the central component that manages :
+- The game map and resources
+- Client connections (AI and GUI)
+- The game logic and rules
+- Time and event management
+- Communication protocol
+- Elevation rituals and player evolution
 
-### Interface Graphique
+### Graphical Interface
 
-L'interface graphique offre :
-- Visualisation en temps réel de la carte du jeu
-- Affichage des joueurs et leurs inventaires
-- Visualisation des ressources sur chaque case
-- Suivi des événements (incantations, reproductions, etc.)
-- Contrôles interactifs pour la navigation et observation
+The graphical interface provides :
+- Real-time visualization of the game map
+- Display of players and their inventories
+- Visualization of resources on each tile
+- Event tracking (spells, reproductions, etc.)
+- Interactive controls for navigation and observation
 
-### Intelligence Artificielle
+### Artificial Intelligence
 
-L'IA des clients comprend :
-- Modules de perception pour l'analyse de l'environnement
-- Algorithmes de décision stratégique
-- Gestion des ressources et planification
-- Communication et coordination entre agents
-- Stratégies pour les rituels d'élévation
+The AI of the clients includes :
+- Perception modules for environment analysis
+- Strategic decision-making algorithms
+- Resource management and planning
+- Communication and coordination between agents
+- Strategies for elevation rituals
 
 ## 📚 Documentation
 
-Une documentation détaillée est disponible dans le dossier `docs/` :
-- Architecture et conception : `docs/architecture.md`
-- Guide de démarrage : `docs/getting-started.md`
-- Documentation du serveur : `docs/server/`
-- Documentation de l'interface graphique : `docs/gui/`
-- Documentation de l'IA : `docs/ai/`
+Detailed documentation is available in the `docs/` folder :
+- Architecture and design : `docs/architecture.md`
+- Getting started guide : `docs/getting-started.md`
+- Server documentation : `docs/server/`
+- Graphical interface documentation : `docs/gui/`
+- AI documentation : `docs/ai/`
 
-La documentation Docusaurus peut être consultée localement :
+The Docusaurus documentation can be viewed locally :
 ```bash
 cd docs/docusaurus
 yarn start
 ```
 
-## 🛠 Développement
+## 🛠 Development
 
-### Structure du projet
+### Project structure
 
 ```
 ├── src/
-│   ├── Server/    # Implémentation du serveur en C
-│   ├── GUI/       # Interface graphique en C++
-│   ├── AI/        # Client IA en Python
-│   └── Shared/    # Code partagé entre les composants
-├── libs/          # Bibliothèques externes (RaylibCPP, RayGUICPP)
-├── docs/          # Documentation du projet
-├── tests/         # Tests unitaires et fonctionnels
-├── assets/        # Ressources graphiques
-└── tools/         # Outils de développement
+│   ├── Server/    # Server implementation in C
+│   ├── GUI/       # Graphical interface in C++
+│   ├── AI/        # AI client in Python
+│   └── Shared/    # Code shared between components
+├── libs/          # External libraries (RaylibCPP, RayGUICPP)
+├── docs/          # Project documentation
+├── tests/         # Unit and functional tests
+├── assets/        # Graphic resources
+└── tools/         # Development tools
 ```
 
 ### Tests
 
 ```bash
-# Exécuter tous les tests
+# Run all tests
 make tests_run
 
-# Tester le réseau GUI
+# Test the GUI network
 make functionnal_tests
 
-# Compiler en mode debug
+# Compile in debug mode
 make debug
 ```
 
 ---
 
 <div align="center">
-  <p>Développé avec ❤️ par l'équipe Zappy</p>
+  <p>Developed with ❤️ by the Zappy team</p>
   <p>© 2025 Epitech</p>
 </div>
 

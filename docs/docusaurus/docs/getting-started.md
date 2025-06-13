@@ -2,124 +2,254 @@
 sidebar_position: 1
 ---
 
-# Premiers pas avec Zappy
+# Getting Started with Zappy
 
-Bienvenue dans la documentation de Zappy, un serveur de jeu multijoueur avec client GUI et bot IA.
+Welcome to Zappy, a sophisticated multi-agent virtual ecosystem. This guide will help you build, configure, and run all components of the system.
 
-## Qu'est-ce que Zappy ?
+## What is Zappy?
 
-Zappy est un projet multi-composants développé en C/C++ et Python, comprenant :
+Zappy is a high-performance multiplayer simulation featuring:
 
-- Un **serveur** écrit en C
-- Une **interface graphique (GUI)** pour visualiser le jeu
-- Des **clients IA** pour jouer automatiquement
+- **Game Server**: High-performance C engine managing world state and client connections
+- **3D Graphical Interface**: Advanced C++ visualization with real-time rendering
+- **AI Clients**: Intelligent Python agents with behavioral algorithms
 
-## Prérequis
+## System Requirements
 
-Pour compiler et exécuter Zappy, vous aurez besoin de :
+### Development Environment
+- **OS**: Linux (Ubuntu 20.04+ recommended), macOS, or WSL2
+- **Compiler**: GCC 9.0+ or Clang 10.0+
+- **Python**: 3.8 or higher
+- **Build Tools**: Make 4.0+, CMake 3.16+
+- **Version Control**: Git 2.25+
 
-- Un compilateur C/C++ (GCC ou Clang)
-- Python 3.x (pour les scripts utilitaires)
-- Make
-
-## Installation
-
-Clonez le dépôt et compilez le projet :
-
+### Runtime Dependencies
 ```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install build-essential cmake git python3-dev python3-pip
+sudo apt install libgl1-mesa-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev
+sudo apt install libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev
+
+# macOS (with Homebrew)
+brew install cmake python3 gcc
+
+# Python Dependencies
+pip3 install asyncio cryptography pytest
+```
+
+## Quick Installation
+
+### 1. Clone and Build
+```bash
+# Clone the repository
 git clone https://github.com/Epitech/Zappy.git
 cd Zappy
+
+# Initialize submodules
+git submodule update --init --recursive
+
+# Build all components
 make
+
+# Verify installation
+./zappy_server --help
+./zappy_gui --help
+python3 src/AI/main.py --help
 ```
 
-## Structure du projet
+### 2. Run a Complete Game Session
 
-Le projet est organisé en plusieurs répertoires :
-
-- `src/Server` : Code source du serveur
-- `src/GUI` : Code source de l'interface graphique
-- `src/AI` : Code source des clients IA
-- `src/Shared` : Code partagé entre les composants
-- `docs` : Documentation du projet
-- `tests` : Tests unitaires et fonctionnels
-
-## Utilisation de base
-
-### Démarrage du serveur
-
+**Terminal 1 - Start the Server:**
 ```bash
-./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq>
+./zappy_server -p 4242 -x 20 -y 20 -n TeamAlpha TeamBeta -c 5 -f 100
 ```
 
-Paramètres :
-- `-p` : Port d'écoute du serveur
-- `-x` et `-y` : Dimensions de la carte (largeur et hauteur)
-- `-n` : Noms des équipes (séparés par des espaces)
-- `-c` : Nombre maximum de clients par équipe
-- `-f` : Fréquence du serveur (unités de temps par seconde)
-
-Exemple :
-```bash
-./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 -c 5 -f 100
-```
-
-### Démarrage de l'interface graphique
-
-```bash
-./zappy_gui -p <port> -h <host>
-```
-
-Paramètres :
-- `-p` : Port du serveur
-- `-h` : Adresse du serveur
-
-Exemple :
+**Terminal 2 - Launch 3D Interface:**
 ```bash
 ./zappy_gui -p 4242 -h localhost
 ```
 
-### Démarrage de l'IA
-
+**Terminal 3 - Deploy AI Agents:**
 ```bash
-./zappy_ai -p <port> -n <team name> -h <host>
+# Launch first AI agent
+python3 src/AI/main.py -p 4242 -n TeamAlpha -h localhost &
+
+# Launch second AI agent  
+python3 src/AI/main.py -p 4242 -n TeamAlpha -h localhost &
+
+# Launch competing team
+python3 src/AI/main.py -p 4242 -n TeamBeta -h localhost &
 ```
 
-Paramètres :
-- `-p` : Port du serveur
-- `-n` : Nom de l'équipe
-- `-h` : Adresse du serveur (facultatif, par défaut localhost)
+## Server Configuration
 
-Exemple :
+### Command Line Parameters
+
+| Parameter | Description | Default | Example |
+|-----------|-------------|---------|---------|
+| `-p <port>` | Server listening port | 4242 | `-p 8080` |
+| `-x <width>` | Map width (tiles) | 20 | `-x 30` |
+| `-y <height>` | Map height (tiles) | 20 | `-y 25` |
+| `-n <teams>` | Team names (space-separated) | - | `-n Alpha Beta Gamma` |
+| `-c <clients>` | Max clients per team | 10 | `-c 3` |
+| `-f <freq>` | Server frequency (ticks/second) | 100 | `-f 200` |
+
+### Advanced Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--auto-start on\|off` | Automatic game start | off |
+| `--display-eggs true\|false` | Show eggs in GUI | true |
+| `--game-duration <seconds>` | Game time limit | unlimited |
+| `-v, --verbose` | Enable detailed logging | disabled |
+
+### Example Configurations
+
+**Development Setup:**
 ```bash
-./zappy_ai -p 4242 -n team1
+./zappy_server -p 4242 -x 10 -y 10 -n Dev Test -c 2 -f 50 --verbose
 ```
 
-## Développement
-
-### Compilation spécifique
-
-Vous pouvez compiler chaque composant individuellement :
-
+**Competition Setup:**
 ```bash
-# Compiler uniquement le serveur
-make zappy_server
-
-# Compiler uniquement l'interface graphique
-make zappy_gui
-
-# Compiler uniquement l'IA
-make zappy_ai
+./zappy_server -p 4242 -x 50 -y 50 -n TeamA TeamB TeamC TeamD -c 6 -f 100 --game-duration 1800
 ```
 
-### Tests
+## GUI Interface
 
+### Launch Parameters
 ```bash
-# Exécuter tous les tests
+./zappy_gui -p <port> -h <hostname>
+```
+
+### Controls
+- **Mouse**: Camera rotation and zoom
+- **WASD**: Camera movement
+- **Space**: Follow selected player
+- **Tab**: Cycle through players
+- **F1**: Toggle help overlay
+- **Esc**: Exit application
+
+### Interface Elements
+- **Map View**: 3D isometric world visualization
+- **Team Panel**: Real-time team statistics
+- **Player Info**: Selected player details
+- **Resource Monitor**: Map resource distribution
+- **Event Log**: Game action history
+
+## AI Client Configuration
+
+### Basic Usage
+```bash
+python3 src/AI/main.py -p <port> -n <team> -h <host>
+```
+
+### Advanced Options
+```bash
+python3 src/AI/main.py \
+  -p 4242 \
+  -n TeamAlpha \
+  -h localhost \
+  --behavior dyson \
+  --log-level debug \
+  --encryption-key mySecretKey
+```
+
+### Available Behaviors
+- **dyson**: Optimized resource collection
+- **incanter**: Evolution-focused strategy  
+- **explorer**: Map exploration specialist
+- **hybrid**: Adaptive multi-strategy
+
+## Development Workflow
+
+### Component-Specific Building
+```bash
+# Server only
+make -C src/Server
+
+# GUI only  
+make -C src/GUI
+
+# AI dependencies
+cd src/AI && pip3 install -r requirements.txt
+
+# Documentation
+make -C docs/docusaurus && npm run build
+```
+
+### Testing and Validation
+```bash
+# Run unit tests
 make tests_run
 
-# Tester le réseau GUI
-make functionnal_tests
+# Performance testing
+make benchmark
 
-# Compiler en mode debug
-make debug
+# Network stress testing
+make stress_test
+
+# Code quality analysis
+make lint
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+**Port Already in Use:**
+```bash
+# Find process using port
+lsof -i :4242
+# Kill process if needed
+kill -9 <PID>
+```
+
+**OpenGL/Graphics Issues:**
+```bash
+# Check OpenGL support
+glxinfo | grep "OpenGL version"
+# Install missing drivers
+sudo apt install mesa-utils
+```
+
+**Python Dependencies:**
+```bash
+# Create virtual environment
+python3 -m venv zappy_env
+source zappy_env/bin/activate
+pip install -r src/AI/requirements.txt
+```
+
+**Build Failures:**
+```bash
+# Clean and rebuild
+make fclean && make
+# Check compiler version
+gcc --version
+```
+
+### Performance Optimization
+
+**Server Performance:**
+- Increase frequency for faster simulation: `-f 200`
+- Reduce map size for lower latency: `-x 15 -y 15`
+- Limit client connections: `-c 3`
+
+**GUI Performance:**
+- Enable VSync in graphics settings
+- Reduce rendering distance for older hardware
+- Use windowed mode instead of fullscreen
+
+## Next Steps
+
+Now that you have Zappy running:
+
+1. **[Explore the Architecture](./architecture)** - Understand system design
+2. **[Server Development](./server/)** - Extend game mechanics  
+3. **[GUI Customization](./gui/)** - Enhance visualization
+4. **[AI Programming](./ai/)** - Create intelligent agents
+5. **[Protocol Reference](./protocols/)** - Network communication details
+
+Ready to build your first AI strategy? Check out the [AI Documentation](./ai/) to get started!

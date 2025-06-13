@@ -1,68 +1,68 @@
-# Documentation de l'Interface Graphique (GUI) Zappy
+# Zappy Graphical User Interface (GUI) Documentation
 
-## Vue d'ensemble
+## Overview
 
-L'interface graphique Zappy est responsable de la visualisation en 3D de l'environnement de jeu, permettant d'observer en temps réel :
-- Le terrain et ses ressources
-- Les joueurs et leurs actions
-- Les événements du jeu (incantations, éclosion d'œufs, etc.)
+The Zappy graphical interface is responsible for 3D visualization of the game environment, allowing real-time observation of:
+- The terrain and its resources
+- Players and their actions
+- Game events (incantations, egg hatching, etc.)
 
 ## Architecture
 
-Le GUI est développé en C++ et utilise une architecture modulaire basée sur le chargement dynamique de bibliothèques (DLLoader) :
+The GUI is developed in C++ and uses a modular architecture based on dynamic library loading (DLLoader):
 
-- **Core** : Boucle principale, gestion d'événements, coordinateur
-- **NetworkManager** : Communication avec le serveur
-- **Renderer** : Affichage graphique 3D et 2D
-- **CameraController** : Gestion de la caméra et vues
-- **GUI Components** : Éléments d'interface utilisateur
+- **Core**: Main loop, event management, coordinator
+- **NetworkManager**: Communication with the server
+- **Renderer**: 3D and 2D graphical display
+- **CameraController**: Camera management and views
+- **GUI Components**: User interface elements
 
-## Système de chargement dynamique (DLLoader)
+## Dynamic Loading System (DLLoader)
 
-Le GUI utilise un système de chargement dynamique de bibliothèques pour permettre l'utilisation de différentes implémentations graphiques :
-- Interface `IGraphicsLib` : Définit les fonctions attendues pour les bibliothèques graphiques
-- Interface `IGuiLib` : Définit les fonctions attendues pour les bibliothèques d'interface utilisateur
-- Gestionnaire `LibraryManager` : Permet de charger dynamiquement les bibliothèques
+The GUI uses a dynamic library loading system to allow the use of different graphical implementations:
+- Interface `IGraphicsLib`: Defines the expected functions for graphic libraries
+- Interface `IGuiLib`: Defines the expected functions for user interface libraries
+- Manager `LibraryManager`: Allows dynamic loading of libraries
 
-Ce système permet de changer facilement d'implémentation graphique sans modifier le code principal.
+This system enables easy switching of graphic implementations without modifying the main code.
 
-## Communication avec le serveur
+## Server Communication
 
-Le GUI communique avec le serveur via un protocole spécifique décrit dans la documentation "GUI Protocol". Les principales commandes incluent :
-- Informations sur la carte et les cellules
-- État des joueurs (position, orientation, niveau)
-- Ressources disponibles
-- Événements (incantations, éclosions, etc.)
+The GUI communicates with the server via a specific protocol described in the "GUI Protocol" documentation. The main commands include:
+- Map and cell information
+- Player status (position, orientation, level)
+- Available resources
+- Events (incantations, hatchings, etc.)
 
-## Visualisation 3D
+## 3D Visualization
 
-L'interface utilise RaylibCPP pour le rendu 3D avec les caractéristiques suivantes :
-- Rendu de la carte comme une grille 3D
-- Modèles 3D pour les joueurs et ressources
-- Caméra libre ou modes de suivi
-- Effets visuels pour les événements spéciaux
+The interface uses RaylibCPP for 3D rendering with the following features:
+- Rendering of the map as a 3D grid
+- 3D models for players and resources
+- Free camera or tracking modes
+- Visual effects for special events
 
-## Interface utilisateur
+## User Interface
 
-L'interface utilisateur utilise RayGUICPP et propose :
-- Informations sur les joueurs sélectionnés
-- Statistiques du jeu en temps réel
-- Configuration de la visualisation
-- Options de caméra
+The user interface uses RayGUICPP and offers:
+- Information on selected players
+- Real-time game statistics
+- Visualization configuration
+- Camera options
 
-## Compilation et Exécution
+## Compilation and Execution
 
 ```bash
 # Compilation
 make -C src/GUI
 
-# Exécution
+# Execution
 ./zappy_gui -p <port> -h <host>
 ```
 
-## Fichiers importants
-- `main.cpp` : Point d'entrée du programme
-- `GameLoop.cpp` : Boucle principale du jeu
-- `network/networkManager/NetworkManager.cpp` : Gestion de la communication réseau
-- `renderer/Renderer.cpp` : Rendu graphique
-- `cameraController/CameraController.cpp` : Contrôle de la caméra
+## Important Files
+- `main.cpp` : Program entry point
+- `GameLoop.cpp` : Main game loop
+- `network/networkManager/NetworkManager.cpp` : Network communication management
+- `renderer/Renderer.cpp` : Graphic rendering
+- `cameraController/CameraController.cpp` : Camera control

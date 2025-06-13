@@ -11,32 +11,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Serveur multi-joueurs',
+    title: 'Multi-player Server',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Le serveur gère la logique du jeu, les règles et l'état du monde où les 
-        agents évoluent et collectent des ressources pour s'élever.
+        The server manages the game logic, rules, and the state of the world where
+        agents evolve and collect resources to advance.
       </>
     ),
   },
   {
-    title: 'Interface graphique',
+    title: 'Graphical Interface',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        L'interface graphique permet de visualiser en temps réel l'état du jeu, les joueurs,
-        leurs actions et les ressources sur une carte en 3D.
+        The graphical interface allows real-time visualization of the game state, players,
+        their actions, and resources on a 3D map.
       </>
     ),
   },
   {
-    title: 'Intelligence artificielle',
+    title: 'Artificial Intelligence',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Des clients IA autonomes qui prennent des décisions pour explorer, collecter des 
-        ressources et collaborer afin de gagner le jeu.
+        Autonomous AI clients that make decisions to explore, collect resources,
+        and collaborate to win the game.
       </>
     ),
   },

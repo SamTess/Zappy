@@ -1,69 +1,69 @@
-# DLLoader pour les bibliothèques graphiques et GUI
+# DLLoader for Graphics and GUI Libraries
 
-Ce système permet de charger dynamiquement des bibliothèques graphiques et GUI dans l'application Zappy.
+This system allows dynamic loading of graphics and GUI libraries in the Zappy application.
 
 ## Structure
 
-- `DLLoader.hpp` : Template générique pour charger des bibliothèques dynamiques
-- `LibraryManager.hpp` : Gestionnaire de bibliothèques (pattern Singleton) pour accéder facilement aux bibliothèques chargées
-- `Common.hpp` : Types partagés (Vector3, Color, Rectangle, etc.) entre l'application et les bibliothèques
-- `IGraphicsLib.hpp` : Interface pour les bibliothèques graphiques
-- `IGuiLib.hpp` : Interface pour les bibliothèques GUI
+- `DLLoader.hpp`: Generic template for loading dynamic libraries
+- `LibraryManager.hpp`: Library manager (Singleton pattern) for easy access to loaded libraries
+- `Common.hpp`: Shared types (Vector3, Color, Rectangle, etc.) between the application and libraries
+- `IGraphicsLib.hpp`: Interface for graphics libraries
+- `IGuiLib.hpp`: Interface for GUI libraries
 
 ## Compilation
 
-1. Compiler les bibliothèques dynamiques :
+1. Compile the dynamic libraries:
 ```bash
 make -C libs/RaylibCPP
 make -C libs/RayGUICPP
 ```
 
-2. Copier les bibliothèques dans le dossier plugins :
+2. Copy the libraries to the plugins folder:
 ```bash
 mkdir -p plugins
 cp libs/RaylibCPP/libraylibcpp.so plugins/
 cp libs/RayGUICPP/libraygui.so plugins/
 ```
 
-3. Compiler l'exemple :
+3. Compile the example:
 ```bash
 make -f DLLoaderMakefile
 ```
 
-## Utilisation
+## Usage
 
-Pour charger et utiliser les bibliothèques dans votre code :
+To load and use the libraries in your code:
 
 ```cpp
 #include "Shared/LibraryManager.hpp"
 
-// Chargement des bibliothèques
+// Loading the libraries
 auto& libraryManager = LibraryManager::getInstance();
-libraryManager.loadGraphicsLib("chemin/vers/libraylibcpp.so");
-libraryManager.loadGuiLib("chemin/vers/libraygui.so");
+libraryManager.loadGraphicsLib("path/to/libraylibcpp.so");
+libraryManager.loadGuiLib("path/to/libraygui.so");
 
-// Utilisation des bibliothèques
+// Using the libraries
 auto& graphics = libraryManager.getGraphicsLib();
 auto& gui = libraryManager.getGuiLib();
 
-// Appels aux fonctions des bibliothèques
-graphics.InitWindow(800, 600, "Mon application");
-gui.DrawButton(10, 10, 200, 30, "Mon bouton");
+// Calls to the library functions
+graphics.InitWindow(800, 600, "My application");
+gui.DrawButton(10, 10, 200, 30, "My button");
 ```
 
-## Extension du système
+## Extending the System
 
-Pour ajouter une nouvelle implémentation de bibliothèque, vous devez :
+To add a new library implementation, you need to:
 
-1. Créer une classe qui implémente l'interface `IGraphicsLib` ou `IGuiLib`
-2. Exposer une fonction de création `extern "C"` :
+1. Create a class that implements the `IGraphicsLib` or `IGuiLib` interface
+2. Expose a `extern "C"` creation function:
 ```cpp
 extern "C" {
     IGraphicsLib* createGraphicsLib() {
-        static MaNouvelleBibliotheque instance;
+        static MyNewLibrary instance;
         return &instance;
     }
 }
 ```
-3. Compiler cette classe en tant que bibliothèque partagée (.so)
-4. Charger cette bibliothèque avec le `LibraryManager`
+3. Compile this class as a shared library (.so)
+4. Load this library with the `LibraryManager`

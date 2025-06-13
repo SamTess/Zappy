@@ -1,24 +1,24 @@
-# RayGUICPP - Encapsulation C++ de raygui pour Zappy
+# RayGUICPP - C++ Encapsulation of raygui for Zappy
 
-Ce dossier fournit une encapsulation moderne de la bibliothèque raygui (UI pour Raylib) en C++.
+This folder provides a modern C++ encapsulation of the raygui library (UI for Raylib).
 
-## Prérequis
-- Raylib installé sur votre système
-- Compilation sous Linux (X11, pthread, dl, rt, GL)
+## Prerequisites
+- Raylib installed on your system
+- Compilation under Linux (X11, pthread, dl, rt, GL)
 
 ## Structure
-- `include/RayGuiEncap.hpp` : encapsulation C++ de raygui
-- `raygui/src/raygui.h` : header raygui (fourni)
-- `RayGui.cpp` et `raygui_impl.cpp` : implémentation C++ et pont avec raygui
-- `test_rayguicpp.cpp` : exemple d'utilisation
+- `include/RayGuiEncap.hpp`: C++ encapsulation of raygui
+- `raygui/src/raygui.h`: raygui header (provided)
+- `RayGui.cpp` and `raygui_impl.cpp`: C++ implementation and bridge with raygui
+- `test_rayguicpp.cpp`: usage example
 
 ## Compilation
-Placez-vous dans `libs/RayGUICPP` puis compilez avec :
+Go to `libs/RayGUICPP` and compile with:
 ```sh
 g++ -Iinclude -Iraygui/src -o test_rayguicpp test_rayguicpp.cpp raygui_impl.cpp RayGui.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 ```
 
-## Exemple minimal
+## Minimal Example
 ```cpp
 #include <raylib.h>
 #include "RayGuiEncap.hpp"
@@ -36,15 +36,15 @@ int main() {
 }
 ```
 
-## Utilisation dans Zappy
-- Inclure `RayGuiEncap.hpp` dans vos fichiers C++
-- Utiliser les classes statiques du namespace `RayGUICPP` pour dessiner vos contrôles GUI (Button, Label, CheckBox, Slider, etc.)
-- Voir `test_rayguicpp.cpp` pour un exemple complet
+## Usage in Zappy
+- Include `RayGuiEncap.hpp` in your C++ files
+- Use the static classes from the `RayGUICPP` namespace to draw your GUI controls (Button, Label, CheckBox, Slider, etc.)
+- See `test_rayguicpp.cpp` for a complete example
 
-## Intégration dynamique (DLLoader)
+## Dynamic Integration (DLLoader)
 
-- RayGUICPP implémente l'interface `IGuiLib` (voir `src/Shared/IGuiLib.hpp`).
-- Exporte la fonction suivante pour l'intégration dynamique :
+- RayGUICPP implements the `IGuiLib` interface (see `src/Shared/IGuiLib.hpp`).
+- Exports the following function for dynamic integration :
 
 ```cpp
 extern "C" {
@@ -52,25 +52,25 @@ extern "C" {
 }
 ```
 
-- À compiler en bibliothèque partagée (`libraygui.so`) et placer dans le dossier `plugins/`.
-- À charger via le `LibraryManager` de Zappy (voir README dans `src/Shared/`).
+- To be compiled as a shared library (`libraygui.so`) and placed in the `plugins/` folder.
+- To be loaded via Zappy's `LibraryManager` (see README in `src/Shared/`).
 
-## Exemple d'utilisation avec DLLoader
+## Example of use with DLLoader
 
-Voir `src/GUI/test_dlloader.cpp` pour un exemple d'utilisation dynamique.
+See `src/GUI/test_dlloader.cpp` for an example of dynamic use.
 
-## Astuces
-- Pour ajouter de nouveaux contrôles, suivez le modèle des classes existantes dans `RayGuiEncap.hpp`
-- Pour personnaliser le style, utilisez `RayGui::LoadStyle("chemin/vers/style.rgs")`
-- Pour compiler dans un autre dossier, adaptez les chemins d'inclusion `-I`
+## Tips
+- To add new controls, follow the model of existing classes in `RayGuiEncap.hpp`
+- To customize the style, use `RayGui::LoadStyle("path/to/style.rgs")`
+- To compile in another folder, adapt the inclusion paths `-I`
 
-## Conseils d'extension
-- Pour ajouter un nouveau contrôle, créez une nouvelle classe dans `RayGuiEncap.hpp` et exposez-la dans le namespace `RayGUICPP`.
-- Respectez l'interface pour garantir la compatibilité avec le système de plugins.
+## Extension advice
+- To add a new control, create a new class in `RayGuiEncap.hpp` and expose it in the `RayGUICPP` namespace.
+- Respect the interface to ensure compatibility with the plugin system.
 
-## Liens utiles
-- [Documentation raygui](https://github.com/raysan5/raygui)
-- [Documentation raylib](https://www.raylib.com/)
+## Useful links
+- [raygui documentation](https://github.com/raysan5/raygui)
+- [raylib documentation](https://www.raylib.com/)
 
 ---
-Pour toute question, contactez l'équipe Zappy !
+For any questions, contact the Zappy team !
