@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 
         auto gameLoop = std::make_shared<GameLoop>();
         gameLoop->setServerInfo(parser.getMachine(), parser.getPort());
-        gameLoop->setGraphicalContext(networkManager.getGraphicalContext());
+        gameLoop->setGameController(networkManager.getGameController());
         if (!gameLoop->init()) {
             std::cerr << "Failed to initialize game components" << std::endl;
             return 84;

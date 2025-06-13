@@ -56,8 +56,8 @@ void GameLoop::initializeManagers() {
 }
 
 bool GameLoop::loadModels() {
-    auto& modelManager = ModelManager::getInstance();
-    m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
+    // auto& modelManager = ModelManager::getInstance();
+    // m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
     return true;
 }
 
@@ -66,30 +66,20 @@ void GameLoop::setupComponents() {
     m_camera->init(m_graphics);
     m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
-    if (!m_context) {
-        m_context = std::make_shared<GraphicalContext>();
-    }
     m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     m_modelManagerAdapter->setGraphicsLib(m_graphics);
-    m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_context, m_modelManagerAdapter);
-    m_mapRenderer->initialize();
-    m_mapRendererObserver = std::make_shared<Zappy::MapRendererObserver>(m_mapRenderer);
-    m_context->addObserver(m_mapRendererObserver);
+    m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
 }
 
 int GameLoop::run() {
-    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer || !m_mapRenderer) {
-        std::cerr << "Game components not initialized properly." << std::endl;
+    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer)
         return 84;
-    }
-
     while (!m_graphics->WindowShouldClose()) {
         m_camera->update(m_graphics);
         m_graphics->BeginDrawing();
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();
-        if (m_mapRenderer)
-            m_mapRenderer->render();
+        m_mapRenderer->render();
         m_graphics->EndCamera3D();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();
@@ -104,15 +94,42 @@ void GameLoop::setServerInfo(const std::string& host, int port) {
     m_port = port;
 }
 
-void GameLoop::setGraphicalContext(std::shared_ptr<GraphicalContext> context) {
-    if (m_context && m_mapRendererObserver) {
-        m_context->removeObserver(m_mapRendererObserver);
+void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
+    m_gameController = controller;
+    if (m_gameController && m_graphics && m_modelManagerAdapter) {
+        auto gameState = m_gameController->getGameState();
+        m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, gameState, m_modelManagerAdapter);
+        m_mapRenderer->initialize();
+        if (gameState->isMapInitialized()) {
+            updateCameraForMapSize();
+        }
     }
-    m_context = context;
-    std::cout << "GraphicalContext set in GameLoop" << std::endl;
-    if (m_mapRenderer && m_mapRendererObserver) {
-        m_context->addObserver(m_mapRendererObserver);
-        std::cout << "MapRenderer observer reconnected to new GraphicalContext" << std::endl;
+}
+
+void GameLoop::updateCameraForMapSize() {
+    if (!m_gameController || !m_camera)
+        return;
+    auto gameState = m_gameController->getGameState();
+    if (!gameState->isMapInitialized())
+        return;
+    int mapWidth = gameState->getMapWidth();
+    int mapHeight = gameState->getMapHeight();
+    m_camera->setMapDimensions(mapWidth, mapHeight);
+    float tileSize = 1.0f;
+    float spacing = 0.1f;
+    if (mapWidth > 20 || mapHeight > 20) {
+        tileSize = 10.0f / std::max(mapWidth, mapHeight);
+        spacing = tileSize * 0.1f;
     }
+    float mapExtentX = mapWidth * (tileSize + spacing);
+    float mapExtentZ = mapHeight * (tileSize + spacing);
+    float maxExtent = std::max(mapExtentX, mapExtentZ);
+    float cameraDistance = maxExtent * 1.5f;
+    if (cameraDistance < 10.0f)
+        cameraDistance = 10.0f;
+    if (cameraDistance > 50.0f)
+        cameraDistance = 50.0f;
+    m_camera->reset();
+    m_camera->distance() = cameraDistance;
 }
 
