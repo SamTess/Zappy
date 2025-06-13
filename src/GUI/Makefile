@@ -41,6 +41,8 @@ SRC = parsing/ParsingCLI.cpp \
 	  gameController/entities/Resource.cpp \
 	  gameController/entities/Tile.cpp \
 	  gameController/entities/PlayerInventory.cpp \
+	  GameLoop_UI.cpp \
+	  ui/UserInterface.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
