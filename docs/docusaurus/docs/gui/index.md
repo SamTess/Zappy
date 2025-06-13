@@ -2,81 +2,81 @@
 sidebar_position: 1
 ---
 
-# Interface graphique (GUI)
+# Graphical Interface (GUI)
 
-L'interface graphique permet de visualiser en temps réel l'état du jeu Zappy, les joueurs, les ressources et les actions.
+The graphical interface allows real-time visualization of the Zappy game state, players, resources, and actions.
 
-## Fonctionnalités
+## Features
 
-- Affichage de la carte de jeu en 2D ou 3D
-- Visualisation des joueurs et de leur orientation
-- Affichage des ressources présentes sur chaque case
-- Visualisation des actions des joueurs (mouvement, prise d'objet, etc.)
-- Interface pour surveiller l'état des équipes
-- Visualisation des incantations
-- Contrôles pour ajuster la vitesse de simulation
+- Display of the game map in 2D or 3D
+- Visualization of players and their orientation
+- Display of resources present on each tile
+- Visualization of player actions (movement, item pickup, etc.)
+- Interface to monitor team status
+- Visualization of incantations
+- Controls to adjust simulation speed
 
 ## Configuration
 
-Le client GUI accepte les paramètres suivants :
+The GUI client accepts the following parameters:
 
-| Paramètre | Description                    | Valeur par défaut |
-|-----------|--------------------------------|-------------------|
-| `-p`      | Numéro de port du serveur      | 4242              |
-| `-h`      | Adresse du serveur             | localhost         |
+| Parameter | Description                | Default value |
+|-----------|----------------------------|---------------|
+| `-p`      | Server port number         | 4242          |
+| `-h`      | Server address             | localhost     |
 
-## Protocole de communication
+## Communication Protocol
 
-Le client GUI se connecte au serveur et reçoit des informations sur l'état du jeu. Il utilise un protocole texte sur TCP. Le client GUI ne peut pas envoyer de commandes qui affectent le jeu, il est uniquement un observateur.
+The GUI client connects to the server and receives information about the game state. It uses a text protocol over TCP. The GUI client cannot send commands that affect the game; it is only an observer.
 
-## Interface utilisateur
+## User Interface
 
-L'interface utilisateur comprend plusieurs sections :
+The user interface includes several sections:
 
-1. **Vue de la carte** : Affiche la grille de jeu avec les joueurs et les ressources
-2. **Panneau d'information** : Affiche des détails sur l'élément sélectionné
-3. **Contrôles de visualisation** : Permettent de zoomer, faire pivoter et déplacer la vue
-4. **Liste des équipes** : Affiche les équipes et leurs statistiques
-5. **Timeline** : Permet de suivre l'historique des événements
+1. **Map View** : Displays the game grid with players and resources
+2. **Information Panel** : Shows details about the selected item
+3. **Viewing Controls** : Allow zooming, rotating, and moving the view
+4. **Team List** : Displays teams and their statistics
+5. **Timeline** : Allows tracking of event history
 
 ## Architecture
 
-Le GUI est développé en C++ et utilise une architecture modulaire basée sur le chargement dynamique de bibliothèques (DLLoader) :
+The GUI is developed in C++ and uses a modular architecture based on dynamic library loading (DLLoader):
 
-- **Core** : Boucle principale, gestion d'événements, coordinateur
-- **NetworkManager** : Communication avec le serveur
-- **Renderer** : Affichage graphique 3D et 2D
-- **CameraController** : Gestion de la caméra et vues
-- **GUI Components** : Éléments d'interface utilisateur
+- **Core** : Main loop, event management, coordinator
+- **NetworkManager** : Communication with the server
+- **Renderer** : 3D and 2D graphic display
+- **CameraController** : Camera management and views
+- **GUI Components** : User interface elements
 
-## Système de chargement dynamique (DLLoader)
+## Dynamic Loading System (DLLoader)
 
-Le GUI utilise un système de chargement dynamique de bibliothèques pour permettre l'utilisation de différentes implémentations graphiques :
-- Interface `IGraphicsLib` : Définit les fonctions attendues pour les bibliothèques graphiques
-- Interface `IGuiLib` : Définit les fonctions attendues pour les bibliothèques d'interface utilisateur
-- Gestionnaire `LibraryManager` : Permet de charger dynamiquement les bibliothèques
+The GUI uses a dynamic library loading system to allow the use of different graphic implementations:
+- `IGraphicsLib` Interface : Defines the expected functions for graphic libraries
+- `IGuiLib` Interface : Defines the expected functions for user interface libraries
+- `LibraryManager` Manager : Allows dynamic loading of libraries
 
-## Visualisation 3D
+## 3D Visualization
 
-L'interface utilise RaylibCPP pour le rendu 3D avec les caractéristiques suivantes :
-- Rendu de la carte comme une grille 3D
-- Modèles 3D pour les joueurs et ressources
-- Caméra libre ou modes de suivi
-- Effets visuels pour les événements spéciaux
+The interface uses RaylibCPP for 3D rendering with the following features:
+- Rendering the map as a 3D grid
+- 3D models for players and resources
+- Free camera or tracking modes
+- Visual effects for special events
 
-## Compilation et Exécution
+## Compilation and Execution
 
 ```bash
 # Compilation
 make -C src/GUI
 
-# Exécution
+# Execution
 ./zappy_gui -p <port> -h <host>
 ```
 
-## Fichiers importants
-- `main.cpp` : Point d'entrée du programme
-- `GameLoop.cpp` : Boucle principale du jeu
-- `network/networkManager/NetworkManager.cpp` : Gestion de la communication réseau
-- `renderer/Renderer.cpp` : Rendu graphique
-- `cameraController/CameraController.cpp` : Contrôle de la caméra
+## Important Files
+- `main.cpp` : Program entry point
+- `GameLoop.cpp` : Main game loop
+- `network/networkManager/NetworkManager.cpp` : Network communication management
+- `renderer/Renderer.cpp` : Graphic rendering
+- `cameraController/CameraController.cpp` : Camera control

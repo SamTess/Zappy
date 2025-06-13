@@ -1,56 +1,56 @@
-# Documentation du Serveur Zappy
+# Zappy Server Documentation
 
-## Vue d'ensemble
+## Overview
 
-Le serveur Zappy est le composant central du projet, gérant la logique du jeu, la communication entre les clients (IA) et l'interface graphique. Il est responsable de :
-- La gestion de la carte et des ressources
-- La gestion des joueurs et des équipes
-- Le traitement des commandes des IA
-- La communication avec l'interface graphique
+The Zappy server is the central component of the project, managing game logic, communication between clients (AI), and the graphical interface. It is responsible for:
+- Managing the map and resources
+- Managing players and teams
+- Processing AI commands
+- Communicating with the graphical interface
 
 ## Architecture
 
-Le serveur est structuré en plusieurs modules :
-- **Réseau** : Gestion des connexions, envoi/réception de messages
-- **Carte** : Gestion de la carte 2D et des ressources
-- **Joueur** : Gestion des états, inventaires et actions des joueurs
-- **Équipe** : Gestion des équipes et de leurs slots disponibles
-- **Commandes** : Traitement des requêtes des clients
+The server is structured into several modules:
+- **Network**: Connection management, message sending/receiving
+- **Map**: 2D map and resource management
+- **Player**: Player states, inventories, and actions management
+- **Team**: Team management and available slots
+- **Commands**: Client request processing
 
-## Protocole de Communication
+## Communication Protocol
 
-Le serveur utilise un protocole texte simple pour communiquer avec les clients et l'interface graphique. Les commandes sont envoyées sous forme de chaînes de caractères terminées par `\n`.
+The server uses a simple text protocol to communicate with clients and the graphical interface. Commands are sent as strings ending with `\n`.
 
-### Commandes des IA
-- `Forward` : Avancer d'une case
-- `Right` : Tourner à droite
-- `Left` : Tourner à gauche
-- `Look` : Observer les cases visibles
-- `Inventory` : Consulter l'inventaire
-- `Broadcast text` : Envoyer un message
-- `Connect_nbr` : Nombre de slots disponibles dans l'équipe
-- `Fork` : Créer un nouvel œuf
-- `Eject` : Éjecter les joueurs d'une case
-- `Take object` : Ramasser un objet
-- `Set object` : Poser un objet
-- `Incantation` : Démarrer une incantation
+### AI Commands
+- `Forward`: Move forward one square
+- `Right`: Turn right
+- `Left`: Turn left
+- `Look`: Observe visible squares
+- `Inventory`: Check inventory
+- `Broadcast text`: Send a message
+- `Connect_nbr`: Number of available slots in the team
+- `Fork`: Create a new egg
+- `Eject`: Eject players from a square
+- `Take object`: Pick up an object
+- `Set object`: Place an object
+- `Incantation`: Start an incantation
 
-### Protocole Graphique
-Le serveur communique avec l'interface graphique via un protocole spécifique détaillé dans la documentation "GUI Protocol".
+### Graphical Protocol
+The server communicates with the graphical interface via a specific protocol detailed in the "GUI Protocol" documentation.
 
-## Compilation et Exécution
+## Compilation and Execution
 
 ```bash
 # Compilation
 make -C src/Server
 
-# Exécution
+# Execution
 ./zappy_server -p <port> -x <width> -y <height> -n <team_names> -c <clients_per_team> -f <freq>
 ```
 
-## Fichiers importants
-- `main.c` : Point d'entrée du programme
-- `parsing.c` : Analyse des arguments de la ligne de commande
-- `network/*.c` : Gestion des connexions réseau
-- `map/*.c` : Gestion de la carte et des ressources
-- `player/*.c` : Gestion des joueurs et des commandes
+## Important Files
+- `main.c` : Program entry point
+- `parsing.c` : Command line argument parsing
+- `network/*.c` : Network connection management
+- `map/*.c` : Map and resource management
+- `player/*.c` : Player and command management

@@ -2,47 +2,47 @@
 sidebar_position: 1
 ---
 
-# Protocole Serveur-IA
+# Server-AI Protocol
 
-## Vue d'ensemble
+## Overview
 
-Ce document détaille le protocole de communication entre le serveur Zappy et les clients d'intelligence artificielle (IA). Le protocole est basé sur des échanges textuels avec des commandes spécifiques et leurs réponses associées.
+This document details the communication protocol between the Zappy server and artificial intelligence (AI) clients. The protocol is based on textual exchanges with specific commands and their associated responses.
 
-## Connexion
+## Connection
 
-1. L'IA se connecte au serveur via TCP/IP
-2. Le serveur répond avec : `WELCOME\n`
-3. L'IA envoie le nom de son équipe : `<team_name>\n`
-4. Le serveur répond avec : 
-   - `<client_num>\n` : Numéro du client dans l'équipe
-   - `<X> <Y>\n` : Dimensions de la carte
+1. The AI connects to the server via TCP/IP
+2. The server responds with: `WELCOME\n`
+3. The AI sends its team name: `<team_name>\n`
+4. The server responds with:
+   - `<client_num>\n`: Client number in the team
+   - `<X> <Y>\n`: Map dimensions
 
-## Format des commandes
+## Command Format
 
-- Chaque commande est une chaîne de caractères terminée par `\n`
-- Les réponses du serveur sont également terminées par `\n`
-- Chaque commande a un temps d'exécution spécifique
+- Each command is a string ending with `\n`
+- Server responses also end with `\n`
+- Each command has a specific execution time
 
-## Commandes disponibles
+## Available Commands
 
-### Commandes de base
+### Basic Commands
 
-| Commande | Description | Résultat | Durée (unité temps serveur) |
-|----------|-------------|----------|------------|
-| `Forward` | Avancer d'une case | `ok\n` | 7 |
-| `Right` | Pivoter à droite | `ok\n` | 7 |
-| `Left` | Pivoter à gauche | `ok\n` | 7 |
-| `Look` | Observer l'environnement | Liste des objets visibles | 7 |
-| `Inventory` | Consulter l'inventaire | Liste des ressources possédées | 1 |
-| `Broadcast <text>` | Communiquer avec les autres joueurs | `ok\n` | 7 |
-| `Connect_nbr` | Nombre de connexions disponibles | Nombre entier | 0 |
-| `Fork` | Créer un nouvel œuf | `ok\n` | 42 |
-| `Eject` | Éjecter les joueurs de la case | `ok\n` ou `ko\n` | 7 |
-| `Take <object>` | Ramasser un objet | `ok\n` ou `ko\n` | 7 |
-| `Set <object>` | Poser un objet | `ok\n` ou `ko\n` | 7 |
-| `Incantation` | Lancer une incantation | Succès ou échec de l'incantation | Variable |
+| Command   | Description         | Result | Duration (server time unit) |
+|-----------|---------------------|--------|----------------------------|
+| `Forward` | Move forward one tile | `ok\n` | 7 |
+| `Right`   | Turn right          | `ok\n` | 7 |
+| `Left`    | Turn left           | `ok\n` | 7 |
+| `Look`    | Observe the environment | List of visible objects | 7 |
+| `Inventory` | Check inventory    | List of owned resources | 1 |
+| `Broadcast <text>` | Communicate with other players | `ok\n` | 7 |
+| `Connect_nbr` | Number of available connections | Integer | 0 |
+| `Fork`    | Create a new egg    | `ok\n` | 42 |
+| `Eject`   | Eject players from the tile | `ok\n` or `ko\n` | 7 |
+| `Take <object>` | Pick up an object | `ok\n` or `ko\n` | 7 |
+| `Set <object>` | Place an object | `ok\n` or `ko\n` | 7 |
+| `Incantation` | Cast an incantation | Success or failure of the incantation | Variable |
 
-### Format des réponses
+### Response Format
 
 #### Look
 ```
@@ -51,12 +51,12 @@ Ce document détaille le protocole de communication entre le serveur Zappy et le
 ...
 ```
 
-Objets possibles : `player`, `food`, `linemate`, `deraumere`, `sibur`, `mendiane`, `phiras`, `thystame`, `egg`
+Possible objects: `player`, `food`, `linemate`, `deraumere`, `sibur`, `mendiane`, `phiras`, `thystame`, `egg`
 
-Le résultat de la commande `Look` est une liste de tuiles visibles, organisées comme suit:
-- La première tuile est celle où se trouve le joueur
-- Les tuiles suivantes s'organisent en cercles concentriques autour du joueur
-- Le nombre de tuiles visibles dépend du niveau du joueur
+The result of the `Look` command is a list of visible tiles, organized as follows:
+- The first tile is the one where the player is located
+- The following tiles are arranged in concentric circles around the player
+- The number of visible tiles depends on the player's level
 
 #### Inventory
 ```
@@ -64,69 +64,69 @@ Le résultat de la commande `Look` est une liste de tuiles visibles, organisées
 ```
 
 #### Broadcast
-- Les joueurs reçoivent : `message <direction>, <message>\n`
-- Direction : nombre de 1 à 8 représentant la direction du message
-  - 1 = Nord, 2 = Nord-Est, 3 = Est, 4 = Sud-Est, 5 = Sud, 6 = Sud-Ouest, 7 = Ouest, 8 = Nord-Ouest
+- Players receive: `message <direction>, <message>\n`
+- Direction: number from 1 to 8 representing the direction of the message
+  - 1 = North, 2 = North-East, 3 = East, 4 = South-East, 5 = South, 6 = South-West, 7 = West, 8 = North-West
 
 #### Incantation
-1. Serveur répond immédiatement : `Elevation underway\n`
-2. À la fin de l'incantation : `Current level: <level>\n` ou échec avec `ko\n`
+1. Server immediately responds: `Elevation underway\n`
+2. At the end of the incantation: `Current level: <level>\n` or failure with `ko\n`
 
-Pour démarrer une incantation:
-- Tous les joueurs participants doivent être sur la même case
-- Les ressources nécessaires doivent être présentes sur la case
-- Tous les joueurs doivent être du même niveau
+To start an incantation:
+- All participating players must be on the same tile
+- The required resources must be present on the tile
+- All players must be of the same level
 
-## Conditions d'élévation
+## Elevation Conditions
 
-| Niveau | Joueurs requis | Linemate | Deraumere | Sibur | Mendiane | Phiras | Thystame |
-|--------|----------------|----------|-----------|-------|----------|--------|----------|
-| 1→2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 |
-| 2→3 | 2 | 1 | 1 | 1 | 0 | 0 | 0 |
-| 3→4 | 2 | 2 | 0 | 1 | 0 | 2 | 0 |
-| 4→5 | 4 | 1 | 1 | 2 | 0 | 1 | 0 |
-| 5→6 | 4 | 1 | 2 | 1 | 3 | 0 | 0 |
-| 6→7 | 6 | 1 | 2 | 3 | 0 | 1 | 0 |
-| 7→8 | 6 | 2 | 2 | 2 | 2 | 2 | 1 |
+| Level | Required Players | Linemate | Deraumere | Sibur | Mendiane | Phiras | Thystame |
+|-------|------------------|----------|-----------|-------|----------|--------|----------|
+| 1→2   | 1                | 1        | 0         | 0     | 0        | 0      | 0        |
+| 2→3   | 2                | 1        | 1         | 1     | 0        | 0      | 0        |
+| 3→4   | 2                | 2        | 0         | 1     | 0        | 2      | 0        |
+| 4→5   | 4                | 1        | 1         | 2     | 0        | 1      | 0        |
+| 5→6   | 4                | 1        | 2         | 1     | 3        | 0      | 0        |
+| 6→7   | 6                | 1        | 2         | 3     | 0        | 1      | 0        |
+| 7→8   | 6                | 2        | 2         | 2     | 2        | 2      | 1        |
 
-## Champ de vision
+## Field of Vision
 
-Le champ de vision dépend du niveau du joueur et s'étend en cercles concentriques autour de lui:
+The field of vision depends on the player's level and extends in concentric circles around them:
 
-| Niveau | Zones visibles |
-|--------|---------------|
-| 1 | 1 (case actuelle) + 8 (cercle 1) = 9 cases |
-| 2 | 9 + 16 (cercle 2) = 25 cases |
-| 3 | 25 + 24 (cercle 3) = 49 cases |
-| Et ainsi de suite... |  |
+| Level | Visible Zones |
+|-------|---------------|
+| 1     | 1 (current tile) + 8 (circle 1) = 9 tiles |
+| 2     | 9 + 16 (circle 2) = 25 tiles |
+| 3     | 25 + 24 (circle 3) = 49 tiles |
+| And so on... |  |
 
-## Messages serveur non sollicités
+## Unsolicited Server Messages
 
-L'IA peut recevoir certains messages du serveur sans les avoir demandés:
+The AI may receive certain messages from the server without having requested them:
 
 | Message | Description |
 |---------|-------------|
-| `message <direction>, <message>\n` | Message de broadcast reçu d'un autre joueur |
-| `dead\n` | Le joueur est mort (manque de nourriture) |
-| `eject: <direction>\n` | Le joueur a été éjecté par un autre joueur |
+| `message <direction>, <message>\n` | Broadcast message received from another player |
+| `dead\n` | The player is dead (lack of food) |
+| `eject: <direction>\n` | The player has been ejected by another player |
 
-## Logique de nourriture
+## Food Logic
 
-- Chaque joueur commence avec une certaine quantité de nourriture (food)
-- La nourriture est consommée à un taux constant (par défaut: 126 unités de temps)
-- Si la nourriture atteint zéro, le joueur meurt et la connexion est fermée
+- Each player starts with a certain amount of food
+- Food is consumed at a constant rate (default: 126 time units)
+- If the food reaches zero, the player dies and the connection is closed
 
-## Système d'œufs
+## Egg System
 
-Quand un joueur utilise la commande `Fork`:
-1. Un nouvel œuf est créé sur la même case que le joueur
-2. Cet œuf permet à un nouveau joueur de rejoindre l'équipe
-3. L'éclosion de l'œuf se produit lorsqu'un nouveau client se connecte
+When a player uses the `Fork` command:
+1. A new egg is created on the same tile as the player
+2. This egg allows a new player to join the team
+3. The hatching of the egg occurs when a new client connects
 
-## Exemple d'échange
+## Example Exchange
 
 ```
-CLIENT: <connexion>
+CLIENT: <connection>
 SERVER: WELCOME\n
 CLIENT: team1\n
 SERVER: 0\n

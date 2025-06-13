@@ -2,34 +2,34 @@
 sidebar_position: 1
 ---
 
-# Protocoles de communication
+# Communication Protocols
 
-## Vue d'ensemble
+## Overview
 
-Le projet Zappy repose sur des protocoles de communication réseau qui permettent aux différents composants d'interagir. Il existe deux protocoles principaux :
+The Zappy project relies on network communication protocols that allow the different components to interact. There are two main protocols:
 
-1. **Protocole Serveur-IA** : Utilisé pour la communication entre le serveur et les clients d'intelligence artificielle
-2. **Protocole Serveur-GUI** : Utilisé pour la communication entre le serveur et l'interface graphique
+1. **Server-AI Protocol**: Used for communication between the server and artificial intelligence clients
+2. **Server-GUI Protocol**: Used for communication between the server and the graphical interface
 
-## Caractéristiques communes
+## Common Features
 
-Les deux protocoles partagent certaines caractéristiques :
-- Basés sur TCP/IP
-- Communication par messages textuels
-- Chaque message se termine par un caractère de nouvelle ligne (`\n`)
-- Format de commande/réponse
+Both protocols share some characteristics:
+- Based on TCP/IP
+- Communication via textual messages
+- Each message ends with a newline character (`\n`)
+- Command/response format
 
-## Différences principales
+## Main Differences
 
-| Caractéristique | Protocole Serveur-IA | Protocole Serveur-GUI |
-|-----------------|----------------------|------------------------|
-| **Objectif** | Contrôle des joueurs | Visualisation du jeu |
-| **Bidirectionnalité** | L'IA envoie des commandes, le serveur répond | Le GUI peut demander des informations, le serveur envoie aussi des notifications |
-| **Impact sur le jeu** | Les commandes modifient l'état du jeu | Le GUI ne modifie pas l'état du jeu (à l'exception de la commande de vitesse) |
-| **Authentification** | L'IA doit rejoindre une équipe | Le GUI s'identifie avec la commande `GRAPHIC` |
+| Feature         | Server-AI Protocol | Server-GUI Protocol |
+|-----------------|-------------------|---------------------|
+| **Purpose**     | Player control     | Game visualization  |
+| **Bidirectionality** | AI sends commands, server responds | GUI can request information, server also sends notifications |
+| **Impact on game** | Commands modify game state | GUI does not modify game state (except for speed command) |
+| **Authentication** | AI must join a team | GUI identifies itself with `GRAPHIC` command |
 
-## Utilisation
+## Usage
 
-Pour une documentation détaillée de chaque protocole, consultez les pages suivantes :
-- [Protocole Serveur-IA](./server-ai)
-- [Protocole Serveur-GUI](./server-gui)
+For detailed documentation of each protocol, see the following pages:
+- [Server-AI Protocol](./server-ai)
+- [Server-GUI Protocol](./server-gui)

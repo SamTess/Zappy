@@ -1,56 +1,56 @@
-# Documentation de l'IA Zappy
+# Zappy AI Documentation
 
-## Vue d'ensemble
+## Overview
 
-L'IA Zappy est implémentée en Python et représente les joueurs virtuels qui évoluent dans l'environnement du jeu. Chaque IA est indépendante et prend des décisions basées sur :
-- Son état actuel (niveau, inventaire)
-- Sa perception de l'environnement
-- Les objectifs à atteindre pour monter de niveau
+Zappy AI is implemented in Python and represents the virtual players evolving in the game environment. Each AI is independent and makes decisions based on:
+- Its current state (level, inventory)
+- Its perception of the environment
+- The objectives to achieve to level up
 
 ## Architecture
 
-Le code de l'IA est structuré en plusieurs modules :
-- **Agent** : Gestion de la logique décisionnelle de l'IA
-- **Parser** : Analyse des messages reçus du serveur
-- **Logger** : Journalisation des actions et événements
-- **Utils** : Fonctions utilitaires partagées
-- **Defs** : Définitions et constantes du jeu
+The AI code is structured into several modules:
+- **Agent**: Manages the AI's decision logic
+- **Parser**: Analyzes messages received from the server
+- **Logger**: Logs actions and events
+- **Utils**: Shared utility functions
+- **Defs**: Game definitions and constants
 
-## Logique de l'IA
+## AI Logic
 
-L'IA suit une machine à états hiérarchique permettant de :
-1. Explorer la carte pour trouver des ressources
-2. Collecter les ressources nécessaires pour l'incantation
-3. Rechercher d'autres joueurs de son équipe pour l'incantation
-4. Réaliser des incantations pour monter de niveau
-5. Coordonner ses actions avec les autres joueurs via le broadcast
+The AI follows a hierarchical state machine allowing it to:
+1. Explore the map to find resources
+2. Collect the resources needed for incantation
+3. Search for other team players for incantation
+4. Perform incantations to level up
+5. Coordinate its actions with other players via broadcast
 
-## États et Transitions
+## States and Transitions
 
-L'agent possède plusieurs états principaux :
-- **Exploration** : Recherche de nourriture et ressources
-- **Collecte** : Ramassage des ressources identifiées
-- **Regroupement** : Recherche d'autres joueurs pour incantation
-- **Incantation** : Exécution du rituel de montée de niveau
-- **SOS** : État d'urgence quand la nourriture est faible
+The agent has several main states:
+- **Exploration**: Searching for food and resources
+- **Collection**: Picking up identified resources
+- **Regrouping**: Searching for other players for incantation
+- **Incantation**: Executing the level-up ritual
+- **SOS**: Emergency state when food is low
 
 ## Communication
 
-Les agents communiquent entre eux via le mécanisme de broadcast du serveur en utilisant un protocole simple :
-- Préfixe : Identifiant de l'équipe
-- Type de message : Action, Demande, Information
-- Contenu : Dépend du type de message
+Agents communicate with each other via the server's broadcast mechanism using a simple protocol:
+- Prefix: Team identifier
+- Message type: Action, Request, Information
+- Content: Depends on the message type
 
-## Utilisation
+## Usage
 
 ```bash
-# Exécution
+# Run
 ./zappy_ai -p <port> -n <team_name> -h <host>
 ```
 
-## Fichiers importants
-- `main.py` : Point d'entrée du programme
-- `agent/agent.py` : Classe principale de l'agent IA
-- `defs/zappy.py` : Définitions des constantes du jeu
-- `utils/*.py` : Fonctions utilitaires
-- `logger/logger.py` : Système de journalisation
+## Important Files
+- `main.py`: Entry point of the program
+- `agent/agent.py`: Main class of the AI agent
+- `defs/zappy.py`: Definitions of game constants
+- `utils/*.py`: Utility functions
+- `logger/logger.py`: Logging system

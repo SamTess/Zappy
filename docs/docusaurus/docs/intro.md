@@ -4,25 +4,25 @@ sidebar_position: 1
 
 # Zappy - Introduction
 
-Bienvenue dans la documentation de **Zappy**, un écosystème virtuel multi-agents avec serveur de jeu, interface graphique et intelligence artificielle.
+Welcome to the documentation of **Zappy**, a multi-agent virtual ecosystem with game server, graphical interface and artificial intelligence.
 
-## Qu'est-ce que Zappy ?
+## What is Zappy?
 
-Zappy est un projet multi-composants développé en C/C++ et Python, reproduisant un écosystème virtuel où des agents contrôlés par IA évoluent en collectant des ressources, en communiquant, et en réalisant des rituels d'élévation.
+Zappy is a multi-component project developed in C/C++ and Python, reproducing a virtual ecosystem where AI-controlled agents evolve by collecting resources, communicating, and performing elevation rituals.
 
-## Composants principaux
+## Main Components
 
-Le projet se compose de trois éléments principaux :
+The project consists of three main elements:
 
-- **Serveur** : Écrit en C, il gère la logique du jeu, les règles, et l'état du monde
-- **Interface Graphique** : Développée en C++, elle visualise l'état du jeu en temps réel
-- **Clients IA** : Implémentés en Python, ils contrôlent automatiquement les joueurs pour accomplir des objectifs stratégiques
+- **Server**: Written in C, it manages game logic, rules, and world state
+- **Graphical Interface**: Developed in C++, it visualizes the game state in real-time
+- **AI Clients**: Implemented in Python, they automatically control players to achieve strategic objectives
 
-## Prérequis
+## Prerequisites
 
-Pour compiler et exécuter Zappy, vous aurez besoin de :
+To compile and run Zappy, you will need:
 
-- Compilateur C/C++ (GCC ou Clang)
+- C/C++ Compiler (GCC or Clang)
 - Python 3.x
 - Make
 - Bibliothèques de développement graphique (pour le client GUI)

@@ -1,28 +1,28 @@
-# RaylibCPP - Encapsulation C++ de Raylib
+# RaylibCPP - C++ Encapsulation of Raylib
 
-Ce dossier propose une encapsulation complète de Raylib en C++ pour le projet Zappy.
+This folder provides a complete C++ encapsulation of Raylib for the Zappy project.
 
-## Fonctionnalités principales
-- Gestion de la fenêtre (création, fermeture, drawing)
-- Dessin de formes 2D et 3D (rectangle, cercle, cube, sphère, grille, cylindre, ligne 3D, etc.)
-- Gestion avancée des caméras 2D et 3D (création, modes, manipulation)
-- Gestion des textures 2D et 3D (chargement, binding, déchargement)
-- Gestion des modèles 3D (chargement, dessin, déchargement)
-- Gestion des polices et rendu de texte
-- Gestion de l'audio (sons, musiques, volume)
-- Gestion des entrées clavier/souris
+## Main Features
+- Window management (creation, closing, drawing)
+- 2D and 3D shape drawing (rectangle, circle, cube, sphere, grid, cylinder, 3D line, etc.)
+- Advanced 2D and 3D camera management (creation, modes, manipulation)
+- 2D and 3D texture management (loading, binding, unloading)
+- 3D model management (loading, drawing, unloading)
+- Font management and text rendering
+- Audio management (sounds, music, volume)
+- Keyboard/mouse input management
 
-## Structure du dossier
-- `window/` : gestion de la fenêtre
-- `shape/` : formes 2D/3D
-- `texture/` : textures 2D/3D et modèles 3D
-- `font/` : polices et texte
-- `audio/` : sons et musiques
-- `input/` : entrées clavier/souris
-- `camera/` : caméras 2D/3D
-- `utils/` : utilitaires (vecteurs, couleurs, etc.)
+## Folder Structure
+- `window/`: window management
+- `shape/`: 2D/3D shapes
+- `texture/`: 2D/3D textures and 3D models
+- `font/`: fonts and text
+- `audio/`: sounds and music
+- `input/`: keyboard/mouse input
+- `camera/`: 2D/3D cameras
+- `utils/`: utilities (vectors, colors, etc.)
 
-## Exemple d'utilisation
+## Usage Example
 ```cpp
 #include "RayLib.hpp"
 
@@ -43,12 +43,12 @@ int main() {
 }
 ```
 
-## Intégration dynamique (DLLoader)
+## Dynamic Integration (DLLoader)
 
-Cette bibliothèque est conçue pour être chargée dynamiquement via le système DLLoader de Zappy.
+This library is designed to be dynamically loaded via Zappy's DLLoader system.
 
-- Implémente l'interface `IGraphicsLib` (voir `src/Shared/IGraphicsLib.hpp`).
-- Exporte la fonction suivante pour l'intégration dynamique :
+- Implements the `IGraphicsLib` interface (see `src/Shared/IGraphicsLib.hpp`).
+- Exports the following function for dynamic integration :
 
 ```cpp
 extern "C" {
@@ -56,16 +56,16 @@ extern "C" {
 }
 ```
 
-- À compiler en bibliothèque partagée (`libraylibcpp.so`) et placer dans le dossier `plugins/`.
-- À charger via le `LibraryManager` de Zappy (voir README dans `src/Shared/`).
+- To be compiled as a shared library (`libraylibcpp.so`) and placed in the `plugins/` folder.
+- To be loaded via Zappy's `LibraryManager` (see README in `src/Shared/`).
 
-## Exemple d'utilisation avec DLLoader
+## Usage Example with DLLoader
 
-Voir `src/GUI/test_dlloader.cpp` pour un exemple d'utilisation dynamique.
+See `src/GUI/test_dlloader.cpp` for an example of dynamic usage.
 
-## Notes avancées
-- Toute nouvelle fonctionnalité Raylib doit être encapsulée dans une classe dédiée (voir structure du dossier).
-- Pour étendre, suivez le modèle des classes existantes et exposez les méthodes via l'interface.
+## Advanced Notes
+- Any new Raylib feature must be encapsulated in a dedicated class (see folder structure).
+- To extend, follow the model of existing classes and expose methods via the interface.
 
 ---
-Pour toute question, contactez l'équipe Zappy !
+For any questions, contact the Zappy team !

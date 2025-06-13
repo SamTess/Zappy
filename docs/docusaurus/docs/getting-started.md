@@ -2,29 +2,29 @@
 sidebar_position: 1
 ---
 
-# Premiers pas avec Zappy
+# Getting Started with Zappy
 
-Bienvenue dans la documentation de Zappy, un serveur de jeu multijoueur avec client GUI et bot IA.
+Welcome to the Zappy documentation, a multiplayer game server with GUI client and AI bot.
 
-## Qu'est-ce que Zappy ?
+## What is Zappy?
 
-Zappy est un projet multi-composants développé en C/C++ et Python, comprenant :
+Zappy is a multi-component project developed in C/C++ and Python, including:
 
-- Un **serveur** écrit en C
-- Une **interface graphique (GUI)** pour visualiser le jeu
-- Des **clients IA** pour jouer automatiquement
+- A **server** written in C
+- A **graphical interface (GUI)** to visualize the game
+- **AI clients** to play automatically
 
-## Prérequis
+## Prerequisites
 
-Pour compiler et exécuter Zappy, vous aurez besoin de :
+To compile and run Zappy, you will need:
 
-- Un compilateur C/C++ (GCC ou Clang)
-- Python 3.x (pour les scripts utilitaires)
+- A C/C++ compiler (GCC or Clang)
+- Python 3.x (for utility scripts)
 - Make
 
 ## Installation
 
-Clonez le dépôt et compilez le projet :
+Clone the repository and compile the project:
 
 ```bash
 git clone https://github.com/Epitech/Zappy.git
@@ -32,35 +32,41 @@ cd Zappy
 make
 ```
 
-## Structure du projet
+## Project Structure
 
-Le projet est organisé en plusieurs répertoires :
+The project is organized into several directories:
 
-- `src/Server` : Code source du serveur
-- `src/GUI` : Code source de l'interface graphique
-- `src/AI` : Code source des clients IA
-- `src/Shared` : Code partagé entre les composants
-- `docs` : Documentation du projet
-- `tests` : Tests unitaires et fonctionnels
+- `src/Server`: Server source code
+- `src/GUI`: Graphical interface source code
+- `src/AI`: AI clients source code
+- `src/Shared`: Code shared between components
+- `docs`: Project documentation
+- `tests`: Unit and functional tests
 
-## Utilisation de base
+## Basic Usage
 
-### Démarrage du serveur
+### Starting the Server
 
 ```bash
-./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq>
+./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq> [options]
 ```
 
-Paramètres :
+Paramètres obligatoires :
 - `-p` : Port d'écoute du serveur
 - `-x` et `-y` : Dimensions de la carte (largeur et hauteur)
 - `-n` : Noms des équipes (séparés par des espaces)
 - `-c` : Nombre maximum de clients par équipe
 - `-f` : Fréquence du serveur (unités de temps par seconde)
 
+Paramètres optionnels :
+- `--auto-start on|off` : Démarrage automatique du jeu
+- `--display-eggs true|false` : Visibilité des œufs
+- `--game_duration <time>` : Durée de la partie en secondes
+- `-v` ou `--verbose` : Mode verbeux
+
 Exemple :
 ```bash
-./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 -c 5 -f 100
+./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 -c 5 -f 100 --auto-start on --display-eggs true
 ```
 
 ### Démarrage de l'interface graphique

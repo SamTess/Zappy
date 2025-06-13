@@ -2,90 +2,90 @@
 sidebar_position: 1
 ---
 
-# Serveur Zappy
+# Zappy Server
 
-Le serveur est le composant central du projet Zappy. Il gère l'état du jeu, la logique, les règles et coordonne la communication entre les clients IA et l'interface graphique.
+The server is the central component of the Zappy project. It manages the game state, logic, rules, and coordinates communication between AI clients and the graphical interface.
 
-## Architecture du serveur
+## Server Architecture
 
-Le serveur Zappy est conçu avec une architecture modulaire :
+The Zappy server is designed with a modular architecture:
 
-- **Gestionnaire de réseau** : Gère les connexions client et la communication
-- **Moteur de jeu** : Implémente les règles du jeu et la logique
-- **Gestionnaire de ressources** : Gère la carte de jeu et les ressources
-- **Gestionnaire d'équipe** : Gère les équipes et les joueurs
+- **Network Manager**: Manages client connections and communication
+- **Game Engine**: Implements game rules and logic
+- **Resource Manager**: Manages the game map and resources
+- **Team Manager**: Manages teams and players
 
-## Configuration du serveur
+## Server Configuration
 
-Le serveur accepte les paramètres de ligne de commande suivants :
+The server accepts the following command-line parameters:
 
-| Paramètre | Description                                  | Valeur par défaut |
-|-----------|----------------------------------------------|-------------------|
-| `-p`      | Numéro de port                               | 4242              |
-| `-x`      | Largeur de la carte                          | 20                |
-| `-y`      | Hauteur de la carte                          | 20                |
-| `-n`      | Noms des équipes (séparés par des espaces)   | -                 |
-| `-c`      | Nombre maximal de clients par équipe         | 10                |
-| `-f`      | Fréquence d'exécution (ticks par seconde)    | 100               |
+| Parameter | Description                                  | Default value |
+|-----------|----------------------------------------------|---------------|
+| `-p`      | Port number                                  | 4242          |
+| `-x`      | Map width                                    | 20            |
+| `-y`      | Map height                                   | 20            |
+| `-n`      | Team names (separated by spaces)             | -             |
+| `-c`      | Maximum number of clients per team           | 10            |
+| `-f`      | Execution frequency (ticks per second)       | 100           |
 
-## Protocole de communication
+## Communication Protocol
 
-Le serveur communique avec les clients en utilisant un protocole texte basé sur TCP. Les commandes et réponses sont envoyées sous forme de chaînes de texte terminées par un caractère de nouvelle ligne (`\n`).
+The server communicates with clients using a text-based protocol over TCP. Commands and responses are sent as newline-terminated text strings.
 
-### Commandes du client IA
+### AI Client Commands
 
-Le serveur accepte les commandes suivantes des clients IA :
+The server accepts the following commands from AI clients:
 
-- `Forward` : Avancer d'une case
-- `Right` : Tourner à droite de 90°
-- `Left` : Tourner à gauche de 90°
-- `Look` : Observer l'environnement
-- `Inventory` : Afficher l'inventaire
-- `Broadcast text` : Diffuser un message à tous les joueurs
-- `Connect_nbr` : Obtenir le nombre de places disponibles dans l'équipe
-- `Fork` : Créer un nouvel œuf (nouveau joueur)
-- `Eject` : Éjecter les joueurs sur la même case
-- `Take object` : Prendre un objet
-- `Set object` : Poser un objet
-- `Incantation` : Démarrer une incantation pour monter de niveau
+- `Forward`: Move forward one space
+- `Right`: Turn right 90°
+- `Left`: Turn left 90°
+- `Look`: Observe the environment
+- `Inventory`: Show inventory
+- `Broadcast text`: Broadcast a message to all players
+- `Connect_nbr`: Get the number of available spots in the team
+- `Fork`: Create a new egg (new player)
+- `Eject`: Eject players on the same tile
+- `Take object`: Take an object
+- `Set object`: Place an object
+- `Incantation`: Start an incantation to level up
 
-### Protocole GUI
+### GUI Protocol
 
-Le serveur envoie des mises à jour au client GUI pour lui permettre de visualiser l'état du jeu en temps réel.
+The server sends updates to the GUI client to allow real-time visualization of the game state.
 
-## Implémentation
+## Implementation
 
-Le serveur est implémenté en C et utilise les sockets POSIX pour la communication réseau et un modèle de programmation événementiel pour gérer plusieurs clients simultanément.
+The server is implemented in C and uses POSIX sockets for network communication and an event-driven programming model to handle multiple clients simultaneously.
 
-## Structure des fichiers
+## File Structure
 
-Le code du serveur est organisé comme suit :
-- `main.c` : Point d'entrée du programme
-- `parsing.c` : Analyse des arguments de la ligne de commande
-- `network/*.c` : Gestion des connexions réseau
-- `map/*.c` : Gestion de la carte et des ressources
-- `player/*.c` : Gestion des joueurs et des commandes
+The server code is organized as follows:
+- `main.c`: Program entry point
+- `parsing.c`: Command-line argument parsing
+- `network/*.c`: Network connection management
+- `map/*.c`: Map and resource management
+- `player/*.c`: Player and command management
 
-## Compilation et Exécution
+## Compilation and Execution
 
 ```bash
 # Compilation
 make -C src/Server
 
-# Exécution
+# Execution
 ./zappy_server -p <port> -x <width> -y <height> -n <team_names> -c <clients_per_team> -f <freq>
 ```
 
-## Mécanismes importants
+## Important Mechanisms
 
-### Gestion des ressources
-Le serveur génère aléatoirement les ressources sur la carte et les renouvelle à intervalles réguliers en fonction de la fréquence configurée.
+### Resource Management
+The server randomly generates resources on the map and renews them at regular intervals based on the configured frequency.
 
-### Gestion du temps
-Toutes les actions dans le jeu sont mesurées en unités temporelles. Le serveur utilise un système de file d'attente pour gérer les actions qui doivent être exécutées après un certain délai.
+### Time Management
+All actions in the game are measured in time units. The server uses a queue system to manage actions that must be executed after a certain delay.
 
-### Montée de niveau
-Le jeu comprend un système de montée de niveau basé sur des rituels d'incantation qui nécessitent :
-- Un nombre spécifique de joueurs
-- Des combinaisons précises de ressources
-- Tous les joueurs doivent être au même niveau
+### Leveling Up
+The game includes a leveling system based on incantation rituals that require:
+- A specific number of players
+- Precise combinations of resources
+- All players to be at the same level

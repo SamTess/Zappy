@@ -2,75 +2,75 @@
 sidebar_position: 2
 ---
 
-# Protocole Serveur-GUI
+# Server-GUI Protocol
 
-## Vue d'ensemble
+## Overview
 
-Ce document détaille le protocole de communication entre le serveur Zappy et l'interface graphique (GUI). Le protocole est basé sur des échanges textuels permettant à l'interface de visualiser l'état du jeu en temps réel.
+This document details the communication protocol between the Zappy server and the graphical interface (GUI). The protocol is based on textual exchanges allowing the interface to visualize the game state in real time.
 
-## Connexion
+## Connection
 
-1. Le GUI se connecte au serveur via TCP/IP
-2. Pour se différencier d'un client IA, le GUI envoie la commande : `GRAPHIC\n`
-3. Le serveur répond avec les informations initiales sur la carte et les équipes
+1. The GUI connects to the server via TCP/IP
+2. To differentiate itself from an AI client, the GUI sends the command: `GRAPHIC\n`
+3. The server responds with initial information about the map and teams
 
-## Format des commandes
+## Command Format
 
-- Chaque commande est envoyée comme une chaîne de caractères terminée par `\n`
-- Les réponses du serveur sont également terminées par `\n`
-- Le GUI ne peut pas envoyer de commandes qui modifient le jeu, uniquement des requêtes d'information
+- Each command is sent as a string ending with `\n`
+- Server responses also end with `\n`
+- The GUI cannot send commands that modify the game, only information requests
 
-## Informations initiales
+## Initial Information
 
-Après la connexion avec la commande `GRAPHIC`, le serveur envoie :
+After connecting with the `GRAPHIC` command, the server sends:
 
-1. Dimensions de la carte : `msz X Y\n` (largeur X, hauteur Y)
-2. Unité de temps : `sgt T\n` (temps par action en ms)
-3. Contenu de chaque case : `bct X Y q0 q1 q2 q3 q4 q5 q6\n` (pour chaque case)
-4. Noms des équipes : `tna N\n` (pour chaque équipe)
-5. Positions et états des joueurs : `pnw # X Y O L N\n` (pour chaque joueur)
+1. Map dimensions: `msz X Y\n` (width X, height Y)
+2. Time unit: `sgt T\n` (time per action in ms)
+3. Content of each tile: `bct X Y q0 q1 q2 q3 q4 q5 q6\n` (for each tile)
+4. Team names: `tna N\n` (for each team)
+5. Player positions and states: `pnw # X Y O L N\n` (for each player)
 
-## Commandes du GUI
+## GUI Commands
 
-Le GUI peut envoyer les commandes suivantes :
+The GUI can send the following commands:
 
-| Commande | Description | Réponse |
+| Command | Description | Response |
 |----------|-------------|---------|
-| `msz` | Dimensions de la carte | `msz X Y\n` |
-| `bct X Y` | Contenu d'une case | `bct X Y q0 q1 q2 q3 q4 q5 q6\n` |
-| `mct` | Contenu de toutes les cases | série de `bct` |
-| `tna` | Noms des équipes | série de `tna N\n` |
-| `ppo #` | Position d'un joueur | `ppo # X Y O\n` |
-| `plv #` | Niveau d'un joueur | `plv # L\n` |
-| `pin #` | Inventaire d'un joueur | `pin # X Y q0 q1 q2 q3 q4 q5 q6\n` |
-| `sgt` | Unité de temps | `sgt T\n` |
-| `sst T` | Modifier l'unité de temps | `sst T\n` |
+| `msz` | Map dimensions | `msz X Y\n` |
+| `bct X Y` | Content of a tile | `bct X Y q0 q1 q2 q3 q4 q5 q6\n` |
+| `mct` | Content of all tiles | series of `bct` |
+| `tna` | Team names | series of `tna N\n` |
+| `ppo #` | Position of a player | `ppo # X Y O\n` |
+| `plv #` | Level of a player | `plv # L\n` |
+| `pin #` | Inventory of a player | `pin # X Y q0 q1 q2 q3 q4 q5 q6\n` |
+| `sgt` | Time unit | `sgt T\n` |
+| `sst T` | Modify the time unit | `sst T\n` |
 
-## Notifications du serveur
+## Server Notifications
 
-Le serveur envoie des notifications des événements du jeu au GUI :
+The server sends notifications of game events to the GUI:
 
 | Notification | Description |
 |--------------|-------------|
-| `pnw # X Y O L N` | Nouveau joueur |
-| `pex #` | Expulsion d'un joueur |
-| `pbc # M` | Diffusion d'un message |
-| `pic X Y L #n` | Début d'incantation |
-| `pie X Y R` | Fin d'incantation |
-| `pfk #` | Ponte d'un œuf |
-| `pdr # i` | Joueur lâche ressource |
-| `pgt # i` | Joueur prend ressource |
-| `pdi #` | Mort d'un joueur |
-| `enw # X Y` | Création d'un œuf |
-| `eht #e` | Éclosion d'un œuf |
-| `edi #e` | Mort d'un œuf |
-| `sgr` | Fin de partie |
-| `smg M` | Message du serveur |
+| `pnw # X Y O L N` | New player |
+| `pex #` | Player expelled |
+| `pbc # M` | Broadcast a message |
+| `pic X Y L #n` | Start of incantation |
+| `pie X Y R` | End of incantation |
+| `pfk #` | Laying of an egg |
+| `pdr # i` | Player drops resource |
+| `pgt # i` | Player takes resource |
+| `pdi #` | Player death |
+| `enw # X Y` | Egg creation |
+| `eht #e` | Egg hatching |
+| `edi #e` | Egg death |
+| `sgr` | End of game |
+| `smg M` | Server message |
 
-## Format des ressources
+## Resource Format
 
-Le contenu des cases et inventaires (q0-q6) correspond aux ressources :
-- q0 : nourriture
+The content of tiles and inventories (q0-q6) corresponds to the resources:
+- q0 : food
 - q1 : linemate
 - q2 : deraumere
 - q3 : sibur
@@ -78,7 +78,7 @@ Le contenu des cases et inventaires (q0-q6) correspond aux ressources :
 - q5 : phiras
 - q6 : thystame
 
-## Exemple d'échange
+## Example Exchange
 
 ```
 GUI: GRAPHIC\n
@@ -97,12 +97,12 @@ SERVER: pnw 1 3 2 1 1 Team1\n
 SERVER: pic 3 2 1 1\n
 ```
 
-## Remarques
+## Remarks
 
-- Les coordonnées X et Y commencent à 0
-- L'orientation O est un nombre de 1 à 4 (1: Nord, 2: Est, 3: Sud, 4: Ouest)
-- Le niveau L des joueurs va de 1 à 8
-- # représente l'ID d'un joueur
-- #n représente une liste d'IDs de joueurs
-- #e représente l'ID d'un œuf
-- R est 0 (échec) ou 1 (succès) pour les incantations
+- Coordinates X and Y start at 0
+- Orientation O is a number from 1 to 4 (1: North, 2: East, 3: South, 4: West)
+- Player level L ranges from 1 to 8
+- # represents a player's ID
+- #n represents a list of player IDs
+- #e represents an egg's ID
+- R is 0 (failure) or 1 (success) for incantations

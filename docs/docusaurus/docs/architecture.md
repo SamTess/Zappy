@@ -2,33 +2,136 @@
 sidebar_position: 2
 ---
 
-# Architecture du projet
+# Architecture du Projet Zappy
 
 ## Vue d'ensemble
 
-Zappy est composé de trois composants principaux qui interagissent entre eux :
+Zappy est conçu selon une architecture client-serveur modulaire permettant la communication entre plusieurs composants distincts via des protocoles réseau standardisés.
 
-1. **Serveur** - Le cœur du jeu qui gère la logique, les règles et l'état du jeu
-2. **GUI (Interface graphique)** - Représentation visuelle de l'état du jeu
-3. **IA** - Clients automatisés qui jouent au jeu
+## Architecture Globale
 
-## Communication entre composants
-
-Les composants communiquent via des protocoles réseau TCP/IP :
-
+```mermaid
+graph TB
+    subgraph "Clients IA (Python)"
+        AI1[Agent IA 1]
+        AI2[Agent IA 2]
+        AI3[Agent IA N...]
+    end
+    
+    subgraph "Serveur Central (C)"
+        Server[Serveur Zappy]
+        GameLogic[Logique de Jeu]
+        Network[Gestionnaire Réseau]
+        Map[Gestionnaire Carte]
+    end
+    
+    subgraph "Interface Graphique (C++)"
+        GUI[Client GUI]
+        Renderer[Moteur 3D]
+        Camera[Contrôleur Caméra]
+        UI[Interface Utilisateur]
+    end
+    
+    AI1 -->|Commandes TCP| Server
+    AI2 -->|Commandes TCP| Server
+    AI3 -->|Commandes TCP| Server
+    
+    Server -->|Données Jeu TCP| GUI
+    Server -->|Réponses TCP| AI1
+    Server -->|Réponses TCP| AI2
+    Server -->|Réponses TCP| AI3
 ```
-┌────────┐    Commandes/Réponses    ┌──────────┐
-│        │◄────────────────────────►│          │
-│ Client │                          │          │
-│  (IA)  │                          │          │
-│        │                          │          │
-└────────┘                          │          │
-                                    │ Serveur  │
-┌────────┐    Données de jeu        │          │
-│        │◄────────────────────────►│          │
-│  GUI   │                          │          │
-│        │                          │          │
-└────────┘                          └──────────┘
+
+## Composants Principaux
+
+### 1. Serveur (C)
+
+**Responsabilités :**
+- Gestion de l'état du jeu global
+- Traitement des commandes clients
+- Simulation temporelle et règles du jeu
+- Communication réseau multi-clients
+
+**Modules clés :**
+
+#### Gestionnaire Réseau (`network/`)
+```c
+typedef struct server_s {
+    int nfds;                    // Nombre de descripteurs de fichiers
+    int s_fd;                    // Socket serveur
+    client_t *client;            // Liste des clients connectés
+    graphical_client_t *graphical_clients; // Clients graphiques
+    poll_manager_t *poll_manager; // Gestionnaire de polling
+} server_t;
+```
+
+#### Gestionnaire de Carte (`map/`)
+```c
+typedef struct tile_s {
+    int food;           // Nourriture sur la case
+    int linemate;       // Ressource linemate
+    int deraumere;      // Ressource deraumere
+    int sibur;          // Ressource sibur
+    int mendiane;       // Ressource mendiane
+    int phiras;         // Ressource phiras
+    int thystame;       // Ressource thystame
+    player_t *players;  // Joueurs sur la case
+} tile_t;
+```
+
+#### Gestionnaire de Joueurs (`player/`)
+```c
+typedef struct player_s {
+    int id;             // Identifiant unique
+    int x, y;           // Position sur la carte
+    int orientation;    // Direction (North, East, South, West)
+    int level;          // Niveau du joueur
+    int food;           // Nourriture possédée
+    // ... autres ressources
+    char *team_name;    // Nom de l'équipe
+} player_t;
+```
+
+### 2. Interface Graphique (C++)
+
+**Architecture Orientée Composants :**
+
+#### GameLoop Principal
+```cpp
+class GameLoop : public IGraphicalContextObserver {
+private:
+    std::shared_ptr<IGraphicsLib> m_graphics;    // Abstraction graphique
+    std::shared_ptr<IGuiLib> m_gui;              // Interface utilisateur
+    std::shared_ptr<Renderer> m_renderer;        // Moteur de rendu
+    std::shared_ptr<CameraController> m_camera;  // Contrôle caméra
+    std::shared_ptr<UIRenderer> m_uiRenderer;    // Rendu UI
+};
+```
+
+#### Système de Bibliothèques Dynamiques
+```cpp
+class LibraryManager {
+private:
+    std::unordered_map<std::string, void*> loadedLibraries;
+    
+public:
+    template<typename T>
+    std::shared_ptr<T> getInterface(const std::string& libraryName);
+};
+```
+
+### 3. Intelligence Artificielle (Python)
+
+**Architecture Comportementale :**
+
+#### Agent Principal
+```python
+class Agent:
+    def __init__(self, ip, port, team, agent_id=0):
+        self.decisionManager = DecisionManager(self)      # Prise de décision
+        self.broadcastManager = BroadcastManager(self)    # Communication
+        self.socketManager = SocketManager(self.sock)     # Réseau
+        self.current_behaviour = "Dyson"                  # Comportement actuel
 ```
 
 ## Structure des fichiers
@@ -38,16 +141,48 @@ Le code source est organisé comme suit :
 - `src/Server/` - Implémentation du serveur en C
   - `main.c` - Point d'entrée
   - `include/` - En-têtes du serveur
-  - ...
+  - `network/` - Gestion réseau et protocoles
+  - `map/` - Système de carte et tiles
+  - `player/` - Gestion des joueurs
+  - `command/` - Traitement des commandes
 
 - `src/GUI/` - Implémentation de l'interface graphique en C++
   - `main.cpp` - Point d'entrée
-  - ...
+  - `GameLoop.cpp/.hpp` - Boucle principale
+  - `renderer/` - Moteur de rendu 3D
+  - `cameraController/` - Gestion de la caméra
+  - `network/` - Communication avec le serveur
+  - `textureManager/` - Gestion des textures
 
-- `src/AI/` - Implémentation du client IA
-  - ...
+- `src/AI/` - Implémentation du client IA en Python
+  - `main.py` - Point d'entrée
+  - `agent/` - Logique des agents
+  - `parser/` - Analyse des arguments
+  - `logger/` - Système de logging
+  - `utils/` - Utilitaires et chiffrement
 
 - `src/Shared/` - Code partagé entre les composants
+  - Interfaces abstraites
+  - Gestionnaire de bibliothèques dynamiques
+
+## Protocoles de Communication
+
+### Protocole Serveur-IA
+- Communication basée sur des commandes textuelles
+- Chaque commande a un coût temporel spécifique
+- Gestion des états de jeu synchronisés
+
+### Protocole Serveur-GUI
+- Commandes spécialisées pour l'affichage
+- Mise à jour en temps réel de l'état visuel
+- Synchronisation des données de jeu
+
+## Patterns de Conception
+
+- **Observer Pattern** : Mise à jour de l'interface graphique
+- **Strategy Pattern** : Comportements d'IA adaptatifs
+- **Command Pattern** : Gestion des commandes serveur
+- **Factory Pattern** : Création dynamique des composants
   - ...
 
 ## Technologies utilisées
