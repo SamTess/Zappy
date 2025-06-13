@@ -43,7 +43,9 @@ static void change_map_pos(server_t *server, client_t *client)
 
 void forward(server_t *server, client_t *client, char **buffer)
 {
-    if (!client || !client->player || arr_len(buffer) != 1) {
+    if (!client)
+        return;
+    if (!client->player || arr_len(buffer) != 1) {
         write_command_output(client->client_fd, "ko\n");
         return;
     }

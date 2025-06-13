@@ -106,11 +106,9 @@ zappy_ai:
 	avec succès !$(RESET)"
 
 tests_run: all
-	@echo "$(MAGENTA)[$(BOLD)TEST$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Compilation\
-	 et exécution des tests unitaires...$(RESET)"
+	@echo "$(MAGENTA)[$(BOLD)TEST$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Compilation et exécution des tests unitaires...$(RESET)"
 	@$(MAKE) -C $(TESTS_DIR) tests_run
-	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Tests unitaires\
-	 exécutés !$(RESET)"
+	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Tests unitaires exécutés !$(RESET)"
 
 functional_tests: zappy_server zappy_gui zappy_ai
 	@echo "$(MAGENTA)[$(BOLD)TEST$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Compilation\

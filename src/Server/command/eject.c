@@ -86,7 +86,7 @@ static void push_single_client(server_t *server, client_t *client,
     write_command_output(tmp->client_fd, msg);
 }
 
-void push_client(server_t *server, client_t *client, float x, float y)
+static void push_client(server_t *server, client_t *client, float x, float y)
 {
     client_t *tmp = server->client->next;
     int old_x = client->player->pos_x;
@@ -126,7 +126,9 @@ void eject(server_t *server, client_t *client, char **buffer)
     float x = 0;
     float y = 0;
 
-    if (!client || !client->player || arr_len(buffer) != 1)
+    if (!client)
+        return;
+    if (!client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
     convert_rotation_to_vector(client, &x, &y);
     push_client(server, client, x, y);
