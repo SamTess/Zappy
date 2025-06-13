@@ -16,36 +16,36 @@
 
 /**
  * @brief Structure de gestion du polling non-bloquant
- * 
+ *
  * Cette structure gère les descripteurs de fichiers pour le polling
  * et optimise les performances en évitant les reconstructions inutiles.
  */
 typedef struct poll_manager_s {
     struct pollfd *fds;         ///< Tableau des descripteurs de fichiers
     int capacity;               ///< Capacité du tableau
-    bool needs_rebuild;         ///< Flag indiquant si une reconstruction est nécessaire
+    bool needs_rebuild; /// Flag indiquant si une reconstruction est nécessaire
 } poll_manager_t;
 
 /**
  * @brief Structure principale du serveur Zappy
- * 
+ *
  * Cette structure contient tous les éléments nécessaires au fonctionnement
  * du serveur : connexions clients, état du jeu, configuration, etc.
  */
 typedef struct server_s {
-    int nfds;                           ///< Nombre de descripteurs de fichiers actifs
-    int s_fd;                           ///< Socket d'écoute du serveur
-    struct sockaddr_in *serv_add;       ///< Adresse du serveur
-    client_t *client;                   ///< Liste chaînée des clients IA connectés
+    int nfds;   ///< Nombre de descripteurs de fichiers actifs
+    int s_fd;      ///< Socket d'écoute du serveur
+    struct sockaddr_in *serv_add;    ///< Adresse du serveur
+    client_t *client;    ///< Liste chaînée des clients IA connectés
     graphical_client_t *graphical_clients; ///< Liste des clients graphiques
-    egg_t *eggs;                        ///< Liste des œufs présents sur la carte
-    tile_t **map;                       ///< Carte du jeu (tableau 2D de tiles)
-    int current_tick;                   ///< Tick actuel du serveur pour la synchronisation
-    parsing_info_t *parsed_info;        ///< Informations de configuration du serveur
-    int *total_resources;               ///< Nombre total de chaque type de ressource
-    int *current_resources;             ///< Nombre actuel de chaque type de ressource
-    int should_run;                     ///< Flag de contrôle de la boucle principale
-    poll_manager_t *poll_manager;       ///< Gestionnaire de polling pour les performances
+    egg_t *eggs;   ///< Liste des œufs présents sur la carte
+    tile_t **map;     ///< Carte du jeu (tableau 2D de tiles)
+    int current_tick;      ///< Tick actuel du serveur pour la synchronisation
+    parsing_info_t *parsed_info;  ///< Informations de configuration du serveur
+    int *total_resources;   ///< Nombre total de chaque type de ressource
+    int *current_resources;   ///< Nombre actuel de chaque type de ressource
+    int should_run; ///< Flag de contrôle de la boucle principale
+    poll_manager_t *poll_manager; ///< Gestionnaire de polling
 } server_t;
 
 /**
