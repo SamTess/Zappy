@@ -1,6 +1,5 @@
 import utils.encryption as encryption
 import agent.behaviors as behaviors
-import utils.agentActions as agentActions
 import utils.zappy as zappy
 from random import choices
 

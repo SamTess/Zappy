@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from time import sleep
 import utils.zappy as zappy
 import utils.encryption as encryption
-import utils.agentActions as agentActions
+from agent.agentActions import AgentActionManager
 import constants.upgrades as upgrades
 
 class Behavior(ABC):
@@ -15,7 +15,7 @@ class Behavior(ABC):
 
 class GetFoodBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    agentActions.go_take_item(self.agent, "food")
+    AgentActionManager(self.agent).go_take_item("food")
 
 
 class UpgradeBehavior(Behavior):
@@ -53,7 +53,7 @@ class GetMineralsBehavior(Behavior):
     if not surroundings:
       print("GetMineralsBehavior: Surroundings is None.")
       return
-    agentActions.go_take_item(self.agent, zappy.get_best_available_resource(surroundings))
+    AgentActionManager(self.agent).go_take_item(zappy.get_best_available_resource(surroundings))
 
 
 class DysonBehavior(Behavior):
@@ -64,7 +64,7 @@ class DysonBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     self.current_index += 1
     self.agent.send_command("Forward")
-    agentActions.take_everything_here(self.agent)
+    AgentActionManager(self.agent).take_everything_here()
 
     max_index = 10
     if self.agent.map_size_x is not None:
@@ -102,5 +102,5 @@ class JoinTeamMatesBehavior(Behavior):
       print("Already at the same position as a teammate.")
       return
 
-    agentActions.go_to_pos_with_distance(self.agent, closest_player_distance)
+    AgentActionManager(self.agent).go_to_pos_with_distance(closest_player_distance)
     print(f"Moving towards teammate at distance {closest_player_distance}.")
