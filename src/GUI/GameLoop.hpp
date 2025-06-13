@@ -18,6 +18,9 @@
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "gameController/GameController.hpp"
+#include "graphicalContext/GraphicalContext.hpp"
+#include "ui/UserInterface.hpp"
+#include "shared/GameData.hpp"
 
 namespace Zappy {
     class MapRenderer;
@@ -54,6 +57,16 @@ private:
     std::shared_ptr<GameController> m_gameController;
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
+    std::shared_ptr<GUI::UserInterface> m_userInterface;
+    GUI::GameData m_gameData;
 
     int m_cubeModelId = -1;
+    struct {
+        int x = 0;
+        int y = 0;
+        bool selected = false;
+    } m_selectedTile;
+    void updateGameData();
+    void handleTileSelection(int x, int y);
+    void handleViewModeChange(int mode);
 };

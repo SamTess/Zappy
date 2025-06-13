@@ -70,6 +70,8 @@ void GameLoop::setupComponents() {
     m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     m_modelManagerAdapter->setGraphicsLib(m_graphics);
     m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
+    m_userInterface = std::make_shared<GUI::UserInterface>(m_gui);
+    m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 }
 
 int GameLoop::run() {
@@ -82,6 +84,8 @@ int GameLoop::run() {
         m_graphics->BeginCamera3D();
         m_mapRenderer->render();
         m_graphics->EndCamera3D();
+        updateGameData();
+        m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
