@@ -8,7 +8,7 @@
 #pragma once
 #include <memory>
 #include "ITileRenderStrategy.hpp"
-#include "../../graphicalContext/GraphicalContext.hpp"
+#include "../../gameController/GameState.hpp"
 #include "../../textureManager/ModelManager.hpp"
 
 namespace Zappy {
@@ -17,9 +17,9 @@ class ModelTileRenderStrategy : public ITileRenderStrategy {
 private:
     std::shared_ptr<ModelManager> modelManager;
     int modelId;
-    const std::shared_ptr<GraphicalContext> context;
+    const std::shared_ptr<const GameState> gameState;
 public:
-    ModelTileRenderStrategy(const std::shared_ptr<ModelManager>& manager, int modelId, const std::shared_ptr<GraphicalContext>& ctx);
+    ModelTileRenderStrategy(const std::shared_ptr<ModelManager>& manager, int modelId, const std::shared_ptr<const GameState>& gameState);
     void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         int x, int y,
         const ZappyTypes::Color& color,
