@@ -39,13 +39,13 @@ class UpgradeBehavior(Behavior):
     for resource, amount in upgrade_cost.items():
       if resource == "players":
         if zappy.how_much_of_item_here(surroundings, "player") < amount:
-          self.agent.send_command(" Broadcast " + encryption.encrypt_message("HELP! Upgrade: 2"))
+          self.agent.send_command("Broadcast " + encryption.encrypt_message("HELP! Upgrade: 2"))
           return
         continue
       elif inventory_dict.get(resource, 0) < amount:
         return
 
-    self.agent.send_command(" Incantation")
+    self.agent.send_command("Incantation")
 
 
 class GetMineralsBehavior(Behavior):
@@ -63,7 +63,7 @@ class DysonBehavior(Behavior):
 
   def execute(self, surroundings=None, inventory=None):
     self.current_index += 1
-    self.agent.send_command(" Forward")
+    self.agent.send_command("Forward")
     agentActions.take_everything_here(self.agent)
 
     max_index = 10
@@ -71,9 +71,9 @@ class DysonBehavior(Behavior):
       max_index = self.agent.map_size_x
 
     if self.current_index >= max_index:
-      self.agent.send_command(" Right")
-      self.agent.send_command(" Forward")
-      self.agent.send_command(" Left")
+      self.agent.send_command("Right")
+      self.agent.send_command("Forward")
+      self.agent.send_command("Left")
       self.current_index = 0
 
 class GetFoodAndMineralsBehavior(Behavior):
