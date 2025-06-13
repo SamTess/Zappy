@@ -103,22 +103,21 @@ class Agent:
 
 
   def _process_server_message(self):
-    if not self.has_messages():
-      return
-    message = self.get_message()
-    if message.startswith("message "):
-      self.broadcastManager.manage_broadcast(message)
-    elif message.startswith("dead"):
-      print("Agent has died.")
-      self.stop()
-    elif message.startswith("Current level: "):
-      try:
-        self.level = int(message.split(": ")[1])
-        print(f"Current level set to: {self.level}")
-      except ValueError:
-        print(f"Failed to parse level from message: {message}")
-    else:
-      print(f"Unknown server message: {message}")
+    while self.has_messages():
+      message = self.get_message()
+      if message.startswith("message "):
+        self.broadcastManager.manage_broadcast(message)
+      elif message.startswith("dead"):
+        print("Agent has died.")
+        self.stop()
+      elif message.startswith("Current level: "):
+        try:
+          self.level = int(message.split(": ")[1])
+          print(f"Current level set to: {self.level}")
+        except ValueError:
+          print(f"Failed to parse level from message: {message}")
+      else:
+        print(f"Unknown server message: {message}")
 
 
   def _update_self_state(self):
