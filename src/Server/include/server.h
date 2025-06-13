@@ -32,6 +32,7 @@ typedef struct server_s {
     int *total_resources;
     int *current_resources;
     int should_run;
+    poll_manager_t *poll_manager;
 } server_t;
 
 void update_game_tick(server_t *server);
@@ -47,7 +48,7 @@ void check_client(server_t *server);
 void create_map(server_t *server, parsing_info_t *parsed_info);
 void init_new_player_pos(server_t *server, client_t *new_client);
 void process_next_queued_command(server_t *server, client_t *client);
-void add_to_command_queue(client_t *client, char *command);
+void add_to_command_queue(server_t *server, client_t *client, char *command);
 void free_node(client_t *node, server_t *server);
 void init_server_eggs(server_t *n_server);
 void free_all(server_t *server, parsing_info_t *parsed_info);

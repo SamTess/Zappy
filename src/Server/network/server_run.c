@@ -89,6 +89,19 @@ static void setup_poll_manager(poll_manager_t *poll_mana, int size)
     poll_mana->needs_rebuild = true;
 }
 
+static void smart_polling(client_t *current, poll_manager_t *poll_mana,
+    server_t *server, int i)
+{
+    if (current->type == GRAPHICAL) {
+        poll_mana->fds[i].events = POLLIN;
+    } else if (current->player &&
+        current->player->busy_until > server->current_tick &&
+        current->player->queue_size >= 10) {
+        poll_mana->fds[i].events = 0;
+    } else
+        poll_mana->fds[i].events = POLLIN;
+}
+
 static void fill_poll_array(server_t *server, poll_manager_t *poll_mana)
 {
     client_t *current = server->client;
@@ -98,6 +111,7 @@ static void fill_poll_array(server_t *server, poll_manager_t *poll_mana)
     current = current->next;
     for (int i = 1; i < size && current != NULL; i++) {
         poll_mana->fds[i] = *(current->client_poll);
+        smart_polling(current, poll_mana, server, i);
         current = current->next;
     }
     poll_mana->needs_rebuild = false;
@@ -136,13 +150,12 @@ static void handle_game_tick(server_t *server)
 
 void check_client(server_t *server)
 {
-    static poll_manager_t poll_mana = {0};
     int size = server->nfds + 1;
 
-    setup_poll_manager(&poll_mana, size);
+    setup_poll_manager(server->poll_manager, size);
     handle_game_tick(server);
-    if (poll_mana.needs_rebuild)
-        fill_poll_array(server, &poll_mana);
-    if (poll(poll_mana.fds, size, 10) > 0)
-        poll_client(server, &poll_mana);
+    if (server->poll_manager->needs_rebuild)
+        fill_poll_array(server, server->poll_manager);
+    if (poll(server->poll_manager->fds, size, 10) > 0)
+        poll_client(server, server->poll_manager);
 }

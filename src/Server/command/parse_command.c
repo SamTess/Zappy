@@ -5,9 +5,11 @@
 ** parse_command
 */
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include "../include/server.h"
 #include "../include/pending_cmd.h"
 #include "../include/circular_buffer.h"
+#include "../include/parsing.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,14 +32,19 @@ command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
-        "Incantation", "Fork", "Broadcast", "msz", NULL};
-    static void (*comm_func[])(server_t *, client_t *, char *) =
+        "Incantation", "Fork", "Broadcast", "msz", "bct", "mtc",
+        "tna", "ppo", "plv", "pin", "sgt", "sst", NULL};
+    static void (*comm_func[])(server_t *, client_t *, char **) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
-        fork_c, broadcast, command_msz, NULL};
-    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0};
+        fork_c, broadcast, command_msz, command_bct, command_mtc,
+        command_tna, command_ppo, command_plv, command_pin,
+        command_sgt, command_sst, NULL};
+    static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0,
+        0, 0, 0, 0, 0, 0, 0, 0};
     static enum client_type_e accepted_types[] = {AI, AI, AI, AI, AI,
-        AI, AI, AI, AI, AI, AI, AI, GRAPHICAL};
+        AI, AI, AI, AI, AI, AI, AI, GRAPHICAL, GRAPHICAL, GRAPHICAL,
+        GRAPHICAL, GRAPHICAL, GRAPHICAL, GRAPHICAL, GRAPHICAL};
     command_data_t data = {comm_char, comm_func, comm_times, accepted_types};
 
     return data;
@@ -47,8 +54,10 @@ static bool execute_graphical_command(server_t *server, client_t *user,
     char *buffer, int cmd_index)
 {
     command_data_t data = get_command_data();
+    char **args = str_to_word_arr(buffer, " ");
 
-    data.functions[cmd_index](server, user, buffer);
+    data.functions[cmd_index](server, user, args);
+    free_arr(args);
     return true;
 }
 
@@ -62,7 +71,7 @@ static bool execute_if_free(server_t *server, client_t *user,
         return true;
     } else {
         if (user->player->queue_size < 10) {
-            add_to_command_queue(user, buffer);
+            add_to_command_queue(server, user, buffer);
             return true;
         } else
             return true;
@@ -77,35 +86,6 @@ static bool find_and_execute(server_t *server, client_t *user, char *buffer)
         if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0 &&
             user->type == data.accepted_types[i])
             return execute_if_free(server, user, buffer, i);
-    }
-    return false;
-}
-
-// if you want to test with telnet
-// (void)team_name;
-// (void)server;
-// return true;
-static bool is_valid_team_name(char *team_name, server_t *server,
-    client_t *user)
-{
-    if (!team_name || !server ||
-        !server->parsed_info || !server->parsed_info->names)
-        return false;
-    if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
-        return false;
-    team_name[strlen(team_name) - 1] = '\0';
-    if (strcmp(team_name, "GRAPHIC") == 0) {
-        user->type = GRAPHICAL;
-        user->player = NULL;
-        return true;
-    }
-    for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
-        if (strcmp(team_name, server->parsed_info->names[i]) == 0){
-            user->player->team_name = strdup(team_name);
-            user->type = AI;
-            init_new_player_pos(server, user);
-            return true;
-        }
     }
     return false;
 }
@@ -129,17 +109,14 @@ static void send_info_new_client(server_t *server, client_t *user)
         server->parsed_info->height);
     write_command_output(user->client_fd, tmp_string);
     free(tmp_string);
+    send_pnw_command_to_all(server, user);
 }
 
 void execute_com(server_t *server, client_t *user, char *buffer)
 {
     if (!user)
         return;
-    if (!user->is_fully_connected) {
-        if (!is_valid_team_name(buffer, server, user)
-            || (user->type != GRAPHICAL &&
-                connect_nbr_srv(server, user->player->team_name) < 0))
-            return write_command_output(user->client_fd, "ko\n");
+    if (!user->is_fully_connected && can_connect(server, user, buffer)){
         user->is_fully_connected = true;
         if (user->type == GRAPHICAL) {
             add_graphic_client(server, user);
@@ -148,8 +125,11 @@ void execute_com(server_t *server, client_t *user, char *buffer)
         } else
             return send_info_new_client(server, user);
     }
-    if (!find_and_execute(server, user, buffer))
+    if (!find_and_execute(server, user, buffer)){
+        if (user->type == GRAPHICAL)
+            return write_command_output(user->client_fd, "suc\n");
         write_command_output(user->client_fd, "ko\n");
+    }
 }
 
 static void check_command(circular_buffer_t *temp_buffer, int cmd_length,

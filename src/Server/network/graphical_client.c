@@ -9,8 +9,10 @@
 #include "../include/client.h"
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void add_to_graphical_list(server_t *server, graphical_client_t *new)
 {
@@ -81,12 +83,20 @@ void send_message_to_all_graphic(server_t *server, char *message)
 
 void send_map_info_to_one_client(server_t *server, client_t *client)
 {
+    char **tmp;
+
     if (!server || !client)
         return;
+    tmp = malloc(sizeof(char *) * 2);
+    if (!tmp)
+        return;
+    tmp[0] = strdup("sgt\n");
+    tmp[1] = NULL;
     send_msz_command(server, client);
-    send_sgt_command(server, client);
+    command_sgt(server, client, tmp);
     send_tile_content_to_one_client(server, client);
     send_tna_command(server, client);
     send_all_player_info_to_one_client(server, client);
-    write_command_output(client->client_fd, "egg send missing\n");
+    send_enw_command_start(server);
+    free_arr(tmp);
 }

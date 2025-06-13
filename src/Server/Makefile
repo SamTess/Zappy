@@ -28,6 +28,7 @@ SRC = 	help.c								\
 		map/resources_map.c					\
 		command/parse_command.c				\
 		command/parse_command_utils.c		\
+		command/parse_command_utils_bis.c	\
 		command/forward.c					\
 		command/right.c						\
 		command/left.c						\
@@ -58,6 +59,22 @@ SRC = 	help.c								\
 		graphical_command/command_pnw.c		\
 		graphical_command/command_sgt.c		\
 		graphical_command/command_tna.c		\
+		graphical_command/command_ebo.c		\
+		graphical_command/command_ppo.c		\
+		graphical_command/command_pie.c		\
+		graphical_command/command_pex.c		\
+		graphical_command/command_pfk.c		\
+		graphical_command/command_pdr.c		\
+		graphical_command/command_enw.c		\
+		graphical_command/command_edi.c		\
+		graphical_command/command_pic.c		\
+		graphical_command/command_sst.c		\
+		graphical_command/command_pdi.c		\
+		graphical_command/command_pbc.c		\
+		graphical_command/command_pgt.c		\
+		graphical_command/command_seg.c		\
+		graphical_command/command_smg.c		\
+		network/array_function.c			\
 
 MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))

@@ -9,6 +9,7 @@
 #include "../include/client.h"
 #include "../include/command.h"
 #include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,18 +39,11 @@ void send_tna_command(server_t *server, client_t *client)
     }
 }
 
-void command_tna(server_t *server, client_t *client, char *buffer)
+void command_tna(server_t *server, client_t *client, char **buffer)
 {
-    if (!server || !client || !buffer)
-        return;
-    (void)buffer;
-    if (client->type != GRAPHICAL) {
-        write_command_output(client->client_fd, "ko\n");
-        return;
-    }
-    if (!server->parsed_info || !server->parsed_info->names) {
-        write_command_output(client->client_fd, "ko\n");
-        return;
-    }
+    if (!server || !client || !buffer || !server->parsed_info ||
+        !server->parsed_info->names || !server->graphical_clients
+        || arr_len(buffer) != 1)
+        return write_command_output(client->client_fd, "sbp\n");
     send_tna_command(server, client);
 }
