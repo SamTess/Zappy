@@ -9,7 +9,7 @@ import socket
 import sys
 
 class Agent:
-  def __init__(self, ip, port, team, agent_id=0):
+  def __init__(self, ip, port, team, agent_id=0, performance_mode=False):
     try:
       self.ip = ip
       self.port = port
@@ -31,6 +31,19 @@ class Agent:
       self.broadcastManager = BroadcastManager(self)
       self.socketManager = SocketManager(self.sock)
       self.socketManager.start()
+
+      self.performance_mode = performance_mode
+
+      # TODO(ms-tristan): garder une info sur tous les autres agents + sur la dernière direction ennemie connue
+      # self.other_agents = {} #? {"id": {"direction": "N", "inventory": {}}}
+      # self.last_enemy_direction = None #? 0 - 8
+      # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
+      # self.current_role = "miner" #? "fighter", "miner"
+      # self.current_phase = "collecting" #? "collecting", "rallying", "upgrading"
+
+      # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
+      self.last_known_inventory = {} #? {"food": 0, "linemate": 0, ...}
+      self.last_known_surroundings = {} #? {"N": {"id": 0, "inventory": {}}, "NE": {"id": 1, "inventory": {}}, ...}
 
     except socket.error as e:
       print(f"Error connecting to server: {e}")
@@ -77,9 +90,11 @@ class Agent:
   def run(self):
     while self.socketManager.running:
       try:
-
-        self.process_server_message()
-        self.decisionManager.take_action()
+        # TODO(ms-tristan): envoyer les infos de l'agent aux autres
+        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")
+        self.process_server_message() #TODO(ms-tristan): update les infos des autres agents en local
+        # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
+        self.decisionManager.take_action() # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
         sleep(0.1)
 
       except BrokenPipeError:
@@ -92,6 +107,8 @@ class Agent:
         break
 
   def send_command(self, command, timeout=2.0):
+    if (self.performance_mode):
+      command = " " + command
     return self.socketManager.send_command(command, timeout=timeout)
 
   def get_message(self, timeout=None):
@@ -117,3 +134,7 @@ class Agent:
         print(f"Failed to parse level from message: {message}")
     else:
       print(f"Unknown server message: {message}")
+
+  def update_agent_info(self, agent_id, direction, inventory):
+    # TODO(ms-tristan): update the agent's information with the received data
+    print(f"Updating agent {agent_id} info: direction={direction}, inventory={inventory}")

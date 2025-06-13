@@ -1,4 +1,3 @@
-
 import sys
 
 class ParsingArgsError(Exception):
@@ -13,9 +12,10 @@ class parseArgs:
         self.port = 0
         self.name = ""
         self.machine = "localhost"
+        self.performance = False
         try:
             if (len(self.args) == 0):
-                raise ParsingArgsError("No arguments provided. Use -p <port> -n <name> -h <machine> to specify the required parameters.")
+                raise ParsingArgsError("No arguments provided. Use -p <port> -n <n> -h <machine> to specify the required parameters.")
             self.parsed_args = self.parseArgs()
         except ParsingArgsError:
             sys.exit(84)
@@ -42,6 +42,9 @@ class parseArgs:
     def searchUnknownFlag(self, flag):
         i = 0
         while (i < len(self.args)):
+            if self.args[i] == "--performance":
+                i += 1
+                continue
             if self.args[i] not in flag:
                 raise ParsingArgsError(f"Unknown argument: {self.args[i]}")
             i += 2
@@ -49,7 +52,10 @@ class parseArgs:
     def parseArgs(self):
         # add flags if wanted
         self.searchUnknownFlag(["-p", "-n", "-h"])
-        # maybe to a for loop to check if the flags are in the args
+
+        if "--performance" in self.args:
+            self.performance = True
+
         if (self.hasFlagAndValue("-p")):
             self.setPort(self.getFlagValue("-p"))
         else:
@@ -92,3 +98,6 @@ class parseArgs:
         if not isinstance(machine, str):
             raise ParsingArgsError("Machine must be a string.")
         self.machine = machine
+
+    def getPerformance(self):
+        return self.performance
