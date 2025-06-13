@@ -144,7 +144,7 @@ Message ProtocolParser::parseMapSize(const std::string &message) {
 
 Message ProtocolParser::parseTileContent(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
-    if (params.size() < 8)
+    if (params.size() < 9)
         throw ProtocolParserException("Invalid tile content parameters: " + message);
     int x = parseIntParameter(params[0]);
     int y = parseIntParameter(params[1]);

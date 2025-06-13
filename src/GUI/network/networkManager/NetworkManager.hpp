@@ -20,7 +20,7 @@
 #include "../protocol/HeaderMessage.hpp"
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
-#include "../../graphicalContext/GraphicalContext.hpp"
+#include "../../gameController/GameController.hpp"
 
 class NetworkManager {
     public:
@@ -39,8 +39,8 @@ class NetworkManager {
         void setConnectionCallback(ConnectionCallback callback);
         void networkThreadLoop();
 
-        std::shared_ptr<GraphicalContext> getGraphicalContext() const;
-        void setGraphicalContext(std::shared_ptr<GraphicalContext> context);
+        std::shared_ptr<GameController> getGameController() const;
+        void setGameController(std::shared_ptr<GameController> controller);
 
     private:
         std::unique_ptr<TcpConnection> _connection;
@@ -49,7 +49,7 @@ class NetworkManager {
         std::unique_ptr<MessageQueue> _incomingQueue;
         std::unique_ptr<MessageQueue> _outgoingQueue;
         std::string _receiveBuffer;
-        std::shared_ptr<GraphicalContext> _graphicalContext;
+        std::shared_ptr<GameController> _gameController;
 
         bool _isConnected;
         std::mutex _logMutex;
