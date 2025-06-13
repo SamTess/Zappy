@@ -2,6 +2,7 @@ import random
 from constants.resources import resources
 from constants.upgrades import upgrades
 
+# translates the "cone" look position into an x y relative pos
 def get_item_relative_pos(item_position):
   i = item_position
   nb_rows = 0

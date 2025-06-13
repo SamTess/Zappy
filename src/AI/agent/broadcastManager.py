@@ -9,6 +9,7 @@ class BroadcastManager:
   def __init__(self, agent):
     self.agent = agent
 
+
   def manage_broadcast(self, full_server_message):
     if not full_server_message or len(full_server_message) < 2:
       print("Empty broadcast message received.")
@@ -61,7 +62,9 @@ class BroadcastManager:
         print(f"Unknown message type: {msg_type} in decrypted message: {decrypted_message}")
     else:
       print(f"Enemy broadcast message (decryption failed): {broadcast_message}")
+      self._handle_enemy_broadcast(sender_agent_direction, broadcast_message)
       return
+
 
   def _handle_inventory_message(self, sender_agent_id, sender_agent_direction, message):
     if not hasattr(self.agent, 'update_agent_info'):
@@ -72,6 +75,18 @@ class BroadcastManager:
     except Exception as e:
       print(f"Error updating agent info: {e}")
       return
+
+
+  def _handle_enemy_broadcast(self, sender_agent_direction, message):
+    if not hasattr(self.agent, 'update_last_known_enemy_direction'):
+        print("Agent is missing 'update_last_known_enemy_direction' method for handling enemy broadcasts.")
+        return
+    try:
+      self.agent.update_last_known_enemy_direction(sender_agent_direction)
+    except Exception as e:
+      print(f"Error updating last known enemy direction: {e}")
+      return
+
 
   def send_broadcast(self, message_type, message):
     if not hasattr(self.agent, 'id'):

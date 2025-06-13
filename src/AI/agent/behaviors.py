@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from time import sleep
 import utils.zappy as zappy
 import utils.encryption as encryption
-from agent.agentActions import AgentActionManager
+from agent.agentActionsService import AgentActionManager
 import constants.upgrades as upgrades
 
 class Behavior(ABC):
@@ -39,7 +39,6 @@ class UpgradeBehavior(Behavior):
     for resource, amount in upgrade_cost.items():
       if resource == "players":
         if zappy.how_much_of_item_here(surroundings, "player") < amount:
-          self.agent.send_command("Broadcast " + encryption.encrypt_message("HELP! Upgrade: 2"))
           return
         continue
       elif inventory_dict.get(resource, 0) < amount:

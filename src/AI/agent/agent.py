@@ -34,15 +34,16 @@ class Agent:
       self.performance_mode = performance_mode
 
       # TODO(ms-tristan): garder une info sur tous les autres agents + sur la dernière direction ennemie connue
-      # self.other_agents = {} #? {"id": {"direction": "N", "inventory": {}}}
-      # self.last_enemy_direction = None #? 0 - 8
+      self.other_agents = {}                #? {"id": {"direction": "N", "inventory": {}}}
+      self.last_enemy_direction = None      #? 0 - 8
+
       # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
-      # self.current_role = "miner" #? "fighter", "miner"
-      # self.current_phase = "collecting" #? "collecting", "rallying", "upgrading"
+      self.current_role = "miner"           #? "fighter", "miner"
+      self.current_phase = "collecting"     #? "collecting", "rallying", "upgrading"
 
       # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
-      self.last_known_inventory = {} #? {"food": 0, "linemate": 0, ...}
-      self.last_known_surroundings = {} #? {"N": {"id": 0, "inventory": {}}, "NE": {"id": 1, "inventory": {}}, ...}
+      self.last_known_inventory = {}
+      self.last_known_surroundings = {}
 
     except socket.error as e:
       print(f"Error connecting to server: {e}")
@@ -76,17 +77,17 @@ class Agent:
       print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
 
     print(f"Map size: {map_size}")
-    self.run()
+    self._run()
+    self._stop()
 
-
-  def stop(self):
+  def _stop(self):
     self.logger.info(f"Stopping agent {self.id}...")
     self.socketManager.stop()
     self.sock.close()
     print(f"Agent {self.id} stopped.")
 
 
-  def run(self):
+  def _run(self):
     i = 0
     while self.socketManager.running:
       i += 1
@@ -95,20 +96,16 @@ class Agent:
       try:
         if i % 10 == 0:
           self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
-
-        self.process_server_message() #TODO(ms-tristan): update les infos des autres agents en local
-        # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
-        self.decisionManager.take_action() # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
+        self._process_server_message()      #TODO(ms-tristan): update les infos des autres agents en local
+        self._update_self_state()           # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
+        self.decisionManager.take_action()  # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
         sleep(0.1)
 
       except BrokenPipeError:
         print(f"Agent {self.id}: Connection closed by server.")
-        self.stop()
-        break
       except Exception as e:
         print(f"Agent {self.id}: Error: {e}")
-        self.stop()
-        break
+
 
   def send_command(self, command, timeout=2.0):
     if (self.performance_mode):
@@ -121,7 +118,7 @@ class Agent:
   def has_messages(self):
     return self.socketManager.has_messages()
 
-  def process_server_message(self):
+  def _process_server_message(self):
     if not self.has_messages():
       return
     message = self.get_message()
@@ -140,5 +137,14 @@ class Agent:
       print(f"Unknown server message: {message}")
 
   def update_agent_info(self, agent_id, direction, inventory):
-    # TODO(ms-tristan): update the agent's information with the received data
-    print(f"Updating agent {agent_id} info: direction={direction}, inventory={inventory}")
+    self.other_agents[agent_id] = {
+        "direction": direction,
+        "inventory": inventory
+    }
+
+  def update_last_known_enemy_direction(self, direction):
+    self.last_enemy_direction = direction
+
+  def _update_self_state(self):
+    
+    print("")

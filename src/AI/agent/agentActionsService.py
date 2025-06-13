@@ -1,8 +1,10 @@
 import utils.zappy as zappy
 
+
 class AgentActionManager:
   def __init__(self, agent):
     self.agent = agent
+
 
   # translates the "cone" look position into an x y relative pos and gets to the position
   def go_to_pos_with_distance(self, distance):
@@ -21,6 +23,7 @@ class AgentActionManager:
     for _ in range(abs(xrelative)):
       self.agent.send_command("Forward")
 
+
   def take_all_of_item_here(self, item):
     surroundings = self.agent.send_command("Look")
     distance_to_item, amount_found = zappy.get_closest_of_item(surroundings, item)
@@ -34,6 +37,7 @@ class AgentActionManager:
     else:
       return
 
+
   def take_everything_here(self):
     surroundings = self.agent.send_command("Look")
     if surroundings is None or "ko" in surroundings:
@@ -46,6 +50,7 @@ class AgentActionManager:
         item = item.strip(", .")
       if item != "player":
         self.agent.send_command("Take " + item)
+
 
   def go_take_item(self, item):
     nb_turns = 0
@@ -75,6 +80,7 @@ class AgentActionManager:
 
     self.go_to_pos_with_distance(distance_to_item)
     self.take_all_of_item_here(item)
+
 
   def got_to_dir(self, direction):
     if direction == 1 or direction == 2:
