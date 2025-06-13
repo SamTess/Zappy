@@ -8,6 +8,9 @@
 #include "GameState.hpp"
 #include <iostream>
 #include <algorithm>
+#include <memory>
+#include <vector>
+#include <string>
 
 GameState::GameState() {
 }

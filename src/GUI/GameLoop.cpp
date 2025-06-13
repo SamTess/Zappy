@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <chrono>
+#include <algorithm>
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
