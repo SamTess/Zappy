@@ -75,6 +75,36 @@ class DysonBehavior(Behavior):
       self.agent.send_command("Left")
       self.current_index = 0
 
+
+class FoodDysonBehavior(Behavior):
+  def __init__(self, agent):
+    super().__init__(agent)
+    self.current_index = 0
+
+  def execute(self, surroundings=None, inventory=None):
+    self.current_index += 1
+    self.agent.send_command("Forward")
+    AgentActionManager(self.agent).take_all_of_item_here("food")
+
+    max_index = 10
+    if self.agent.map_size_x is not None:
+      max_index = self.agent.map_size_x
+
+    if self.current_index >= max_index:
+      self.agent.send_command("Right")
+      self.agent.send_command("Forward")
+      self.agent.send_command("Left")
+      self.current_index = 0
+
+class BigDysonBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    for _ in range(self.agent.map_size_x):
+      AgentActionManager(self.agent).take_everything_here()
+      self.agent.send_command("Forward")
+    self.agent.send_command("Right")
+    self.agent.send_command("Forward")
+    self.agent.send_command("Left")
+
 class GetFoodAndMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if not surroundings or not inventory:
@@ -85,6 +115,7 @@ class GetFoodAndMineralsBehavior(Behavior):
       GetFoodBehavior(self.agent).execute(surroundings, inventory)
     else:
       GetMineralsBehavior(self.agent).execute(surroundings, inventory)
+
 
 class JoinTeamMatesBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):

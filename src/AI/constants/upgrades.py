@@ -1,4 +1,3 @@
-
 upgrades = {
     1 : {
         "name": "lvl 1 -> 2",
@@ -85,3 +84,31 @@ upgrades = {
         }
     },
 }
+
+def get_total_upgrade_resources(start_level=1, target_level=8):
+    if start_level >= target_level or start_level < 1 or target_level > 8:
+        return {
+            "linemate": 0,
+            "deraumere": 0,
+            "sibur": 0,
+            "mendiane": 0,
+            "phiras": 0,
+            "thystame": 0
+        }
+
+    total_resources = {
+        "linemate": 0,
+        "deraumere": 0,
+        "sibur": 0,
+        "mendiane": 0,
+        "phiras": 0,
+        "thystame": 0
+    }
+
+    for level in range(start_level, target_level):
+        if level in upgrades:
+            for resource, amount in upgrades[level]["cost"].items():
+                if resource != "players":
+                    total_resources[resource] += amount
+
+    return total_resources

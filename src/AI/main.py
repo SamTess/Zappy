@@ -25,7 +25,7 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
   args = parseArgs()
-  num_agents = 1
+  num_agents = 10
   port = args.getPort()
   ip = args.getMachine()
   team = args.getName()

@@ -18,8 +18,8 @@ class Agent:
       self.id = agent_id
       self.map_size_x = None
       self.map_size_y = None
-      self.current_behaviour = "Dyson"
-      encryption.secret_key = encryption.secret_key + self.team  # to test encryption locally // need tests
+      self.current_behaviour = "BigDyson"
+      encryption.secret_key = encryption.secret_key + self.team
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.ip, self.port))
@@ -39,7 +39,7 @@ class Agent:
 
       # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
       self.current_role = "miner"           #? "fighter", "miner"
-      self.current_phase = "collecting"     #? "collecting", "rallying", "upgrading"
+      self.current_phase = "collecting"     #? "collecting", "rallying", "upgrading", "reproducing"
 
       # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
       self.last_known_inventory = {}
@@ -88,15 +88,10 @@ class Agent:
 
 
   def _run(self):
-    i = 0
     while self.socketManager.running:
-      i += 1
-      if i > 100000:
-        i = 0
       try:
-        if i % 10 == 0:
-          self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
-        self._process_server_message()      #TODO(ms-tristan): update les infos des autres agents en local
+        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
+        self._process_server_message()      # TODO(ms-tristan): update les infos des autres agents en local
         self._update_self_state()           # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
         self.decisionManager.take_action()  # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
         sleep(0.1)
@@ -106,17 +101,6 @@ class Agent:
       except Exception as e:
         print(f"Agent {self.id}: Error: {e}")
 
-
-  def send_command(self, command, timeout=2.0):
-    if (self.performance_mode):
-      command = " " + command
-    return self.socketManager.send_command(command, timeout=timeout)
-
-  def get_message(self, timeout=None):
-    return self.socketManager.get_message(timeout=timeout)
-
-  def has_messages(self):
-    return self.socketManager.has_messages()
 
   def _process_server_message(self):
     if not self.has_messages():
@@ -136,6 +120,24 @@ class Agent:
     else:
       print(f"Unknown server message: {message}")
 
+
+  def _update_self_state(self):
+
+    for agent_id, agent_info in self.other_agents.items():
+      print(f"Agent {agent_id} - Direction: {agent_info['direction']}, Inventory: {agent_info['inventory']}")
+
+
+  def send_command(self, command, timeout=2.0):
+    if (self.performance_mode):
+      command = " " + command
+    return self.socketManager.send_command(command, timeout=timeout)
+
+  def get_message(self, timeout=None):
+    return self.socketManager.get_message(timeout=timeout)
+
+  def has_messages(self):
+    return self.socketManager.has_messages()
+
   def update_agent_info(self, agent_id, direction, inventory):
     self.other_agents[agent_id] = {
         "direction": direction,
@@ -144,7 +146,3 @@ class Agent:
 
   def update_last_known_enemy_direction(self, direction):
     self.last_enemy_direction = direction
-
-  def _update_self_state(self):
-    
-    print("")

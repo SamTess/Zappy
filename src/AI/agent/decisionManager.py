@@ -11,7 +11,8 @@ class DecisionManager:
       "GetMinerals": behaviors.GetMineralsBehavior(agent),
       "GetFoodAndMinerals": behaviors.GetFoodAndMineralsBehavior(agent),
       "Upgrade": behaviors.UpgradeBehavior(agent),
-      "Dyson": behaviors.DysonBehavior(agent)
+      "Dyson": behaviors.DysonBehavior(agent),
+      "BigDyson": behaviors.BigDysonBehavior(agent)
     }
 
 
