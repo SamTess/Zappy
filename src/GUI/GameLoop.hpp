@@ -15,25 +15,30 @@
 #include "cameraController/CameraController.hpp"
 #include "renderer/UIRenderer.hpp"
 #include "renderer/Renderer.hpp"
+#include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
-#include "graphicalContext/GraphicalContext.hpp"
+#include "gameController/GameController.hpp"
 
-class GameLoop : public IGraphicalContextObserver {
+namespace Zappy {
+    class MapRenderer;
+    class ModelManagerAdapter;
+}
+
+class GameLoop {
 public:
     GameLoop();
     ~GameLoop() = default;
     bool init();
     int run();
     void setServerInfo(const std::string& host, int port);
-    void renderCube();
-    void onMapSizeChanged(int width, int height) override;
-    void onTileChanged(int x, int y, const TileData& tileData) override;
+    void setGameController(std::shared_ptr<GameController> controller);
 
 private:
     bool loadLibraries();
     void initializeManagers();
     void setupComponents();
     bool loadModels();
+    void updateCameraForMapSize();
 
     std::string m_host;
     int m_port;
@@ -46,6 +51,9 @@ private:
     std::shared_ptr<Renderer> m_renderer;
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
+    std::shared_ptr<GameController> m_gameController;
+    std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
+    std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
 
     int m_cubeModelId = -1;
 };

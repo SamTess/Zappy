@@ -9,14 +9,13 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include "../graphicalContext/GraphicalContext.hpp"
+#include "../gameController/GameState.hpp"
 #include "../../Shared/IGraphicsLib.hpp"
 #include "../textureManager/ModelManager.hpp"
 #include "../textureManager/ModelManagerAdapter.hpp"
 #include "strategies/DetailedTileRenderStrategy.hpp"
 #include "strategies/ModelTileRenderStrategy.hpp"
 #include "strategies/TileRenderStrategyFactory.hpp"
-#include "MapRendererObserver.hpp"
 #include "strategies/ITileRenderStrategy.hpp"
 
 namespace Zappy {
@@ -28,7 +27,7 @@ namespace Zappy {
 class MapRenderer {
 private:
     std::shared_ptr<IGraphicsLib> graphicsLib;
-    std::shared_ptr<GraphicalContext> context;
+    std::shared_ptr<const GameState> gameState;
     std::shared_ptr<ITileRenderStrategy> tileRenderStrategy;
     std::shared_ptr<ITileRenderStrategy> detailedTileStrategy;  // Stratégie détaillée pour le zoom proche
     TileRenderStrategyFactory strategyFactory;
@@ -36,8 +35,8 @@ private:
     // Paramètres de rendu de la carte
     float tileSize;
     float tileSpacing;
-    float zoomLevel;           // Niveau de zoom actuel
-    float detailThreshold;     // Seuil de zoom pour afficher les détails
+    float zoomLevel;
+    float detailThreshold;
     std::unordered_map<int, ZappyTypes::Color> resourceColors;
 
     // Map de stratégies de rendu par type de ressource
@@ -45,7 +44,7 @@ private:
 
 public:
     MapRenderer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-               const std::shared_ptr<GraphicalContext>& context,
+               const std::shared_ptr<const GameState>& gameState,
                const std::shared_ptr<ModelManagerAdapter>& modelManagerAdapter);
     /**
      * @brief Initialise le renderer de carte

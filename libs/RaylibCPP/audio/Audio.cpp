@@ -54,6 +54,8 @@ Sound& SoundWrap::get() {
 }
 
 MusicWrap::MusicWrap(const std::string& path) {
+    if (path.empty())
+        return;
     music = LoadMusicStream(path.c_str());
     if (music.ctxData == nullptr)
         throw std::runtime_error("Erreur chargement music: " + path);
