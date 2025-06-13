@@ -6,16 +6,25 @@
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/badge/langage-C%2FC%2B%2FPython-blue" alt="Languages">
-  <img src="https://img.shields.io/badge/protocole-TCP%2FIP-orange" alt="Protocol">
+  <img src="https://img.shields.io/badge/language-C%2FC%2B%2B%2FPython-blue" alt="Languages">
+  <img src="https://img.shields.io/badge/protocol-TCP%2FIP-orange" alt="Protocol">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey" alt="Platform">
+  <img src="https://img.shields.io/badge/version-1.0.0-green" alt="Version">
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/license/Epitech/Zappy" alt="License">
-  <img src="https://img.shields.io/github/workflow/status/Epitech/Zappy/CI" alt="CI Status">
-  <img src="https://img.shields.io/github/issues/Epitech/Zappy" alt="Issues">
-  <img src="https://img.shields.io/github/forks/Epitech/Zappy" alt="Forks">
-  <img src="https://img.shields.io/github/stars/Epitech/Zappy" alt="Stars">
+  <img src="https://img.shields.io/github/license/SamTess/Zappy" alt="License">
+  <img src="https://img.shields.io/github/actions/workflow/status/SamTess/Zappy/zappyCICD.yml" alt="CI Status">
+  <img src="https://img.shields.io/github/issues/SamTess/Zappy" alt="Issues">
+  <img src="https://img.shields.io/github/forks/SamTess/Zappy" alt="Forks">
+  <img src="https://img.shields.io/github/stars/SamTess/Zappy" alt="Stars">
+</div>
+
+<div align="center">
+  <img src="https://img.shields.io/github/last-commit/SamTess/Zappy" alt="Last Commit">
+  <img src="https://img.shields.io/github/contributors/SamTess/Zappy" alt="Contributors">
+  <img src="https://img.shields.io/github/release/SamTess/Zappy" alt="Release">
+  <img src="https://img.shields.io/github/downloads/SamTess/Zappy/total" alt="Downloads">
 </div>
 
 ---
