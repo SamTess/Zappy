@@ -14,7 +14,7 @@
 
 <div align="center">
   <img src="https://img.shields.io/github/license/SamTess/Zappy" alt="License">
-  <img src="https://img.shields.io/github/actions/workflow/status/SamTess/Zappy/zappyCICD.yml" alt="CI Status">
+  <img src="https://img.shields.io/github/actions/workflow/status/SamTess/Zappy/zappyCICD.yaml" alt="CI Status">
   <img src="https://img.shields.io/github/issues/SamTess/Zappy" alt="Issues">
   <img src="https://img.shields.io/github/forks/SamTess/Zappy" alt="Forks">
   <img src="https://img.shields.io/github/stars/SamTess/Zappy" alt="Stars">
