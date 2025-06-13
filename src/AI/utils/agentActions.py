@@ -36,13 +36,12 @@ def take_everything_here(agent):
     print(f"take_everything_here: Failed to look around. Response: {surroundings}")
     return
 
-  items_on_ground = surroundings.strip("[ ]").split(",")[0].split(" ")
-
-  for item in items_on_ground:
+  items_on_current_tile = surroundings.strip("[ ]").split(",")[0].split(" ")
+  for item in items_on_current_tile:
     if item:
       item = item.strip(", .")
     if item != "player":
-      take_all_of_item_here(agent, item)
+      agent.send_command("Take " + item)
 
 def go_take_item(agent, item):
   nb_turns = 0
