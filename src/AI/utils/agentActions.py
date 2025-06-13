@@ -19,15 +19,16 @@ def go_to_pos_with_distance(agent, distance):
 
 def take_all_of_item_here(agent, item):
   surroundings = agent.send_command("Look")
-  while zappy.get_closest_of_item(surroundings, item) == 0:
-    if surroundings is None or "ko" in surroundings:
-      print(f"take_all_of_item_here: Failed to look around. Response: {surroundings}")
-      return
-    response = agent.send_command("Take " + item)
-    if (response is None or "ko" in response):
-      print(f"Failed to take {item}. Response: {response}")
-      break
-    surroundings = agent.send_command("Look")
+  distance_to_item, amount_found = zappy.get_closest_of_item(surroundings, item)
+
+  if distance_to_item == 0:
+    for _ in range(amount_found):
+      response = agent.send_command("Take " + item)
+      if response is None or "ko" in response:
+        print(f"Failed to take {item}. Response: {response}")
+        break
+  else:
+    return
 
 def take_everything_here(agent):
   surroundings = agent.send_command("Look")

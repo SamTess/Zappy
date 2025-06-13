@@ -42,7 +42,6 @@ class BroadcastManager:
     decrypted_message = encryption.decrypt_message(broadcast_message)
 
     if decrypted_message is not None:
-      print(f"Decrypted broadcast message: {decrypted_message}")
 
       msg_parts = decrypted_message.split('-', 3)
       if len(msg_parts) != 3:

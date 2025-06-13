@@ -88,10 +88,15 @@ class Agent:
 
 
   def run(self):
+    i = 0
     while self.socketManager.running:
+      i += 1
+      if i > 100000:
+        i = 0
       try:
-        # TODO(ms-tristan): envoyer les infos de l'agent aux autres
-        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")
+        if i % 10 == 0:
+          self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
+
         self.process_server_message() #TODO(ms-tristan): update les infos des autres agents en local
         # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
         self.decisionManager.take_action() # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions

@@ -40,6 +40,7 @@ def parse_inventory(inventory_str):
 
 # tries to find the closest item in surroundings string
 # returns distance to the item if found, otherwise -1
+# also returns the amount of the item on that tile
 def get_closest_of_item(surroundings_str, item):
   if not surroundings_str:
     print("get_closest_of_item: Surroundings data is empty or None.")
@@ -47,13 +48,20 @@ def get_closest_of_item(surroundings_str, item):
 
   cleaned = surroundings_str.strip("[ ]")
   tiles = cleaned.split(", ")
+  distance = None
+  amount_found = 0
 
   for i, tile in enumerate(tiles):
     parts = tile.strip().split()
     for part in parts:
+      part = part.strip(", .")
       if part == item:
-        return int(i)
-  return -1
+        distance = int(i)
+        amount_found += 1
+      if distance is not None:
+        return distance, amount_found
+
+  return -1, 0
 
 def go_get_item(surroundings, item):
   distance_to_item = get_closest_of_item(surroundings, item)
