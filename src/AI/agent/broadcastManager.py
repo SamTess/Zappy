@@ -37,8 +37,6 @@ class BroadcastManager:
       print("Empty broadcast message content.")
       return
 
-    print(f"Broadcast received from direction: {sender_agent_direction}")
-
     decrypted_message = encryption.decrypt_message(broadcast_message)
 
     if decrypted_message is not None:

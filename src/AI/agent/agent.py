@@ -92,8 +92,8 @@ class Agent:
   def _run(self):
     while self.socketManager.running:
       try:
-        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
-        self._process_server_message()      # TODO(ms-tristan): update les infos des autres agents en local
+        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")  #? Envoyer ses infos aux autres
+        self._process_server_message()
         self._update_self_state()           # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
         self.decisionManager.take_action()  # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
         sleep(0.1)
@@ -123,17 +123,42 @@ class Agent:
 
 
   def _update_self_state(self):
-    required_total_amount_of_resources = get_total_upgrade_resources()
-    team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
 
-    for agent_id, agent_info in self.other_agents.items():
-      agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
-      for key, value in agent_inventory.items():
-          if key in team_total_amount_of_resources:
-              team_total_amount_of_resources[key] += value
-      print(f"Agent {agent_id} - Direction: {agent_info['direction']}, Inventory: {agent_info['inventory']}")
+    #? On détermine le rôle de l'agent en fonction de son id
+    agent_ids = list(self.other_agents.keys())
+    agent_ids.append(self.id)
+    agent_ids.sort()
+    if agent_ids.index(self.id) < 6:
+      self.current_role = "miner"
+    else:
+      self.current_role = "fighter"
 
-    print(f"Total team resources: {team_total_amount_of_resources}")
+    #? On check si l'inventaire de tout le monde permet d'upgrade de 0 à 8
+    if self.current_phase == "collecting":
+      required_total_amount_of_resources = get_total_upgrade_resources()
+      team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
+
+      for agent_id, agent_info in self.other_agents.items():
+        agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+        for key, value in agent_inventory.items():
+            if key in team_total_amount_of_resources:
+                team_total_amount_of_resources[key] += value
+            else:
+                team_total_amount_of_resources[key] = value
+
+      have_enough_resources = True
+      for key, required_value in required_total_amount_of_resources.items():
+        available_value = team_total_amount_of_resources.get(key, 0)
+        if available_value < required_value:
+          have_enough_resources = False
+
+      if have_enough_resources:
+        print("All required resources for upgrade are available.")
+        self.current_phase = "rallying"
+        self.current_behaviour = "Dyson"
+      else:
+        print("Not all required resources for upgrade are available.")
+
 
   def send_command(self, command, timeout=2.0):
     if (self.performance_mode):
