@@ -10,18 +10,18 @@ agents = []
 
 def run_agent(ip, port, team, agent_id, performance):
   try:
-    ai = Agent(ip, port, team, agent_id, performance)
-    agents.append(ai)
-    ai.start()
+    agent = Agent(ip, port, team, agent_id, performance)
+    agents.append(agent)
+    agent.start()
   except Exception as e:
     print(f"Agent {agent_id} failed: {e}")
     sys.exit(1)
 
 def signal_handler(sig, frame):
   print("Received termination signal. Stopping all agents...")
-  for ai in agents:
+  for agent in agents:
     try:
-      ai.stop()
+      agent.stop()
     except Exception as e:
       print(f"Error stopping agent: {e}")
 

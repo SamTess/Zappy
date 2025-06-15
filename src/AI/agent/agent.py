@@ -65,6 +65,9 @@ class Agent:
     team_slots = self.send_command(self.team)
     map_size = self.get_message(timeout=4)
 
+    if map_size is None:
+      print("Failed to retrieve map size from server.")
+      sys.exit(1)
     self.map_size_x = int(map_size.split()[0])
     self.map_size_y = int(map_size.split()[1])
 
@@ -133,7 +136,7 @@ class Agent:
     agent_ids = list(self.other_agents.keys())
     agent_ids.append(self.id)
     agent_ids.sort()
-    if agent_ids.index(self.id) < 6:
+    if agent_ids.index(self.id) < 8:
       self.current_role = "miner"
     else:
       self.current_role = "fighter"
@@ -163,6 +166,14 @@ class Agent:
         self.current_behaviour = "Dyson"
       else:
         print("Not all required resources for upgrade are available.")
+
+    elif self.current_phase == "rallying":
+      distance_to_player, amount_of_players = zappy.get_closest_of_item(self.last_known_surroundings, "player")
+      print("amount_of_players", amount_of_players)
+      print(self.last_known_surroundings)
+      if amount_of_players >= 6:
+        print("Enough players gathered for upgrade.")
+        self.current_phase = "upgrading"
 
 
   def send_command(self, command, timeout=2.0):
