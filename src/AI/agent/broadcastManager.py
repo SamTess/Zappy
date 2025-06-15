@@ -41,12 +41,17 @@ class BroadcastManager:
 
     if decrypted_message is not None:
 
-      msg_parts = decrypted_message.split('-', 3)
-      if len(msg_parts) != 3:
-        print(f"Invalid decrypted message format (expected 3 parts): {decrypted_message}")
+      msg_parts = decrypted_message.split('-', 4)
+      if len(msg_parts) != 4:
+        print(f"Invalid decrypted message format (expected 4 parts): {decrypted_message}")
         return
 
-      msg_type, sender_agent_id_str, payload = msg_parts
+      team_key, msg_type, sender_agent_id_str, payload = msg_parts
+
+      if not team_key or team_key != self.agent.team:
+        print(f"Broadcast message from different team: {team_key} != {self.agent.team}")
+        self._handle_enemy_broadcast(sender_agent_direction, broadcast_message)
+        return
 
       try:
         sender_agent_id = int(sender_agent_id_str)
@@ -87,12 +92,13 @@ class BroadcastManager:
 
 
   def send_broadcast(self, message_type, message):
-    if not hasattr(self.agent, 'id'):
+    if not hasattr(self.agent, 'id') or not hasattr(self.agent, 'team'):
         print("Agent is missing 'id' attribute for sending broadcast.")
         return
 
     agent_id = self.agent.id
-    message_content = f"{message_type}-{agent_id}-{message}"
+    team = self.agent.team
+    message_content = f"{team}-{message_type}-{agent_id}-{message}"
     encrypted_message = encryption.encrypt_message(message_content)
 
     if encrypted_message:
