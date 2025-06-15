@@ -13,6 +13,12 @@ class Behavior(ABC):
     pass
 
 
+class NoActionBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    sleep(0.1)
+    return
+
+
 class GetFoodBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     AgentActionManager(self.agent).go_take_item("food")
@@ -123,19 +129,30 @@ class JoinTeamMatesBehavior(Behavior):
       print("JoinTeamMatesBehavior: Surroundings is None.")
       return
 
-    closest_player_distance = zappy.get_closest_of_item(surroundings, "player")
-    if closest_player_distance == -1:
-      print("No teammates found nearby.")
+    if not self.agent.other_agents:
+      print("JoinTeamMatesBehavior: No other agents known.")
       return
 
-    if closest_player_distance == 0:
-      print("Already at the same position as a teammate.")
+    lowest_id = min([int(agent_id) for agent_id in self.agent.other_agents.keys()])
+    if self.agent.id <= lowest_id:
       return
 
-    AgentActionManager(self.agent).go_to_pos_with_distance(closest_player_distance)
-    print(f"Moving towards teammate at distance {closest_player_distance}.")
+    self.agent.other_agents[lowest_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[lowest_id]["direction"])
 
-class NoActionBehavior(Behavior):
+
+class TakeEverythingHereBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    sleep(0.1)
-    return
+    if not surroundings:
+      print("TakeEverythingHereBehavior: Surroundings is None.")
+      return
+
+    AgentActionManager(self.agent).take_everything_here()
+
+
+class TakeAllFoodHereBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not surroundings:
+      print("TakeAllFoodHereBehavior: Surroundings is None.")
+      return
+
+    AgentActionManager(self.agent).take_all_of_item_here("food")
