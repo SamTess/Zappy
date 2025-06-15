@@ -13,43 +13,53 @@ class DecisionManager:
       "Upgrade": behaviors.UpgradeBehavior(agent),
       "Dyson": behaviors.DysonBehavior(agent),
       "BigDyson": behaviors.BigDysonBehavior(agent),
-      "": behaviors.NoActionBehavior(agent),
+      "JoinTeamMates": behaviors.JoinTeamMatesBehavior(agent),
+      "FoodDyson": behaviors.FoodDysonBehavior(agent),
+      "TakeEverythingHere": behaviors.TakeEverythingHereBehavior(agent),
+      "TakeAllFoodHere": behaviors.TakeAllFoodHereBehavior(agent),
       "None": behaviors.NoActionBehavior(agent),
+      "": behaviors.NoActionBehavior(agent),
     }
 
 
-  def upgradePhase(self): # TODO(ms-tristan): implement
-    if self.agent.role == "miner":
+  def upgradePhase(self, surroundings, inventory): # TODO(ms-tristan): implement
+    if self.agent.current_role == "miner":
       print("Upgrading with da bros")
-    elif self.agent.role == "fighter":
+    elif self.agent.current_role == "fighter":
       print("Feeding da bros")
 
 
-  def rallyPhase(self):
-    if (self.agent.role == "miner"): # TODO(ms-tristan): implement
-      print("Going to the agent with the lowest id")
-    elif (self.agent.role == "fighter"):
-      print("Going onto the ennemies")
+  def rallyPhase(self, surroundings, inventory):
+    if (self.agent.current_role == "miner"): # TODO(ms-tristan): implement
+      self.behaviors["JoinTeamMates"].execute(surroundings, inventory)
+      self.behaviors["TakeAllFoodHere"].execute(surroundings, inventory)
+    elif (self.agent.current_role == "fighter"):
+      self.behaviors["FoodDyson"].execute(surroundings, inventory)
 
 
-  def collectPhase(self):
-    if (self.agent.role == "miner"): # TODO(ms-tristan): implement
-      print("Collecting everything")
-    elif (self.agent.role == "fighter"):
-      print("Collecting food only")
+  def collectPhase(self, surroundings, inventory):
+    if (self.agent.current_role == "miner"):
+      self.behaviors["BigDyson"].execute(surroundings, inventory)
+    elif (self.agent.current_role == "fighter"):
+      self.behaviors["FoodDyson"].execute(surroundings, inventory)
 
 
   def take_action(self):
-    self.agent.last_known_inventory = self.agent.send_command("Inventory")
-    self.agent.last_known_surroundings = self.agent.send_command("Look")
+    inventory = self.agent.send_command("Inventory")
+    surroundings = self.agent.send_command("Look")
 
-    inventory = self.agent.last_known_inventory
-    surroundings = self.agent.last_known_surroundings
+    self.agent.last_known_inventory = inventory
+    self.agent.last_known_surroundings = surroundings
 
     if inventory is None or surroundings is None:
       print("Failed to retrieve inventory or surroundings.")
       return
 
-    print(inventory)
+    if self.agent.current_phase == "collecting":
+      self.collectPhase(surroundings, inventory)
+    elif self.agent.current_phase == "rallying":
+      self.rallyPhase(surroundings, inventory)
+    elif self.agent.current_phase == "upgrading":
+      self.upgradePhase(surroundings, inventory)
 
-    self.behaviors[self.agent.current_behaviour].execute(surroundings, inventory)
+    # print(inventory)
