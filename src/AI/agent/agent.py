@@ -47,6 +47,8 @@ class Agent:
       self.last_known_inventory = {}
       self.last_known_surroundings = {}
 
+      self.running = False
+
     except socket.error as e:
       print(f"Error connecting to server: {e}")
       sys.exit(1)
@@ -79,18 +81,21 @@ class Agent:
       print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
 
     print(f"Map size: {map_size}")
+    self.running = True
     self._run()
     self._stop()
 
-  def _stop(self):
-    self.logger.info(f"Stopping agent {self.id}...")
-    self.socketManager.stop()
-    self.sock.close()
-    print(f"Agent {self.id} stopped.")
+  def stop(self):
+    if self.running:
+      self.logger.info(f"Stopping agent {self.id}...")
+      self.socketManager.stop()
+      self.sock.close()
+      print(f"Agent {self.id} stopped.")
+      self.running = False
 
 
   def _run(self):
-    while self.socketManager.running:
+    while self.socketManager.running and self.running:
       try:
         self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")  #? Envoyer ses infos aux autres
         self._process_server_message()
