@@ -81,17 +81,40 @@ class AgentActionManager:
     self.go_to_pos_with_distance(distance_to_item)
     self.take_all_of_item_here(item)
 
-
+# retourne la nouvelle direction de la cible après les actions
   def got_to_dir(self, direction):
-    if direction == 1 or direction == 2:
+    if direction == 1:
       self.agent.send_command("Forward")
-    elif direction == 3 or direction == 4:
+      return 1
+    elif direction == 2:
+      self.agent.send_command("Forward")
       self.agent.send_command("Left")
       self.agent.send_command("Forward")
-    elif direction == 5 or direction == 6:
+      self.agent.send_command("Right")
+      return 2
+    elif direction == 3:
+      self.agent.send_command("Left")
+      self.agent.send_command("Forward")
+      return 1
+    elif direction == 4:
+      self.agent.send_command("Left")
+      self.agent.send_command("Forward")
+      return 2
+    elif direction == 5:
       self.agent.send_command("Left")
       self.agent.send_command("Left")
       self.agent.send_command("Forward")
-    elif direction == 7 or direction == 8:
+      return 1
+    elif direction == 6:
+      self.agent.send_command("Left")
+      self.agent.send_command("Left")
+      self.agent.send_command("Forward")
+      return 2
+    elif direction == 7:
       self.agent.send_command("Right")
       self.agent.send_command("Forward")
+      return 1
+    elif direction == 8:
+      self.agent.send_command("Right")
+      self.agent.send_command("Forward")
+      return 2
