@@ -60,7 +60,7 @@ def get_closest_of_item(surroundings_str, item):
         distance = int(i)
         amount_found += 1
     if distance is not None:
-      return distance, amount_fou nd
+      return distance, amount_found
 
   return -1, 0
 
