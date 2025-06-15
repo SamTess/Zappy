@@ -12,7 +12,9 @@ class DecisionManager:
       "GetFoodAndMinerals": behaviors.GetFoodAndMineralsBehavior(agent),
       "Upgrade": behaviors.UpgradeBehavior(agent),
       "Dyson": behaviors.DysonBehavior(agent),
-      "BigDyson": behaviors.BigDysonBehavior(agent)
+      "BigDyson": behaviors.BigDysonBehavior(agent),
+      "": behaviors.NoActionBehavior(agent),
+      "None": behaviors.NoActionBehavior(agent),
     }
 
 
@@ -51,4 +53,3 @@ class DecisionManager:
     print(inventory)
 
     self.behaviors[self.agent.current_behaviour].execute(surroundings, inventory)
-    self.behaviors["Upgrade"].execute(surroundings, inventory)
