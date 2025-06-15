@@ -59,8 +59,8 @@ def get_closest_of_item(surroundings_str, item):
       if part == item:
         distance = int(i)
         amount_found += 1
-      if distance is not None:
-        return distance, amount_found
+    if distance is not None:
+      return distance, amount_fou nd
 
   return -1, 0
 
