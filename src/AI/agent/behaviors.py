@@ -134,3 +134,8 @@ class JoinTeamMatesBehavior(Behavior):
 
     AgentActionManager(self.agent).go_to_pos_with_distance(closest_player_distance)
     print(f"Moving towards teammate at distance {closest_player_distance}.")
+
+class NoActionBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    sleep(0.1)
+    return
