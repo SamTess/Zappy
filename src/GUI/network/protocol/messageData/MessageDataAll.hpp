@@ -13,6 +13,7 @@
 #include "TileContentData.hpp"
 #include "PlayerInfoData.hpp"
 #include "PlayerInventoryData.hpp"
+#include "PlayerExpulsionData.hpp"
 #include "BroadcastData.hpp"
 #include "IncantationData.hpp"
 #include "IncantationEndData.hpp"

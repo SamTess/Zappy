@@ -70,15 +70,16 @@ static char *get_string_to_send(float x, float y)
     return string_to_send;
 }
 
-static void push_single_client(server_t *server, client_t *client,
-    client_t *tmp, char *msg)
+static void push_single_client(server_t *server,
+    client_t *tmp, char *msg, float direction_x, float direction_y)
 {
-    int new_x = client->player->pos_x +
-        (int)(tmp->player->pos_x == client->player->pos_x);
-    int new_y = client->player->pos_y +
-        (int)(tmp->player->pos_y == client->player->pos_y);
+    int old_x = tmp->player->pos_x;
+    int old_y = tmp->player->pos_y;
+    int new_x = tmp->player->pos_x + (int)direction_x;
+    int new_y = tmp->player->pos_y + (int)direction_y;
 
     wrap_position(server, &new_x, &new_y);
+    tile_remove_player(&server->map[old_y][old_x], tmp->client_id);
     tmp->player->pos_x = new_x;
     tmp->player->pos_y = new_y;
     tile_add_player(&server->map[new_y][new_x], tmp->client_id);
@@ -98,8 +99,11 @@ void push_client(server_t *server, client_t *client, float x, float y)
             tmp = tmp->next;
             continue;
         }
-        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y)
-            push_single_client(server, client, tmp, msg);
+        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y) {
+            printf("old position client %d: (%d, %d)\n", tmp->client_id, old_x, old_y);
+            printf("Pushing client %d to (%d, %d)\n", tmp->client_id, old_x + (int)x, old_y + (int)y);
+            push_single_client(server, tmp, msg, x, y);
+        }
         tmp = tmp->next;
     }
     free(msg);
@@ -128,9 +132,12 @@ void eject(server_t *server, client_t *client, char **buffer)
 
     if (!client || !client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
+    printf("eject command received from client %d, direction: (%f, %f)\n", client->client_id, x, y);
+    printf("Client %d is at (%d, %d)\n", client->client_id, client->player->pos_x, client->player->pos_y);
     convert_rotation_to_vector(client, &x, &y);
     push_client(server, client, x, y);
     push_eggs(server, client->player->pos_x, client->player->pos_y);
     command_pex(server, client);
+    printf("Client %d ejected in direction (%f, %f)\n", client->client_id, x, y);
     write_command_output(client->client_fd, "ok\n");
 }

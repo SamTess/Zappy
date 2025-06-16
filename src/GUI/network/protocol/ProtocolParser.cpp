@@ -241,8 +241,8 @@ Message ProtocolParser::parsePlayerExpulsion(const std::string &message) {
         throw ProtocolParserException("Invalid player expulsion parameters: " + message);
     int id = parseIntParameter(params[0]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
-    return Message(PEX_HEADER, extractCommandParameter(message), playerInfoData);
+    auto playerExpulsionData = std::make_shared<PlayerExpulsionData>(id);
+    return Message(PEX_HEADER, extractCommandParameter(message), playerExpulsionData);
 }
 
 Message ProtocolParser::parsePlayerBroadcast(const std::string &message) {
