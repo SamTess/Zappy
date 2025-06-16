@@ -18,12 +18,13 @@
 #include "HeaderMessage.hpp"
 #include "messageData/MessageDataAll.hpp"
 #include "../../shared/exception/AException.hpp"
+#include "../../logger/Logger.hpp"
 
 class ProtocolParser {
     public:
         typedef std::function<Message(const std::string&)> ParseFunction;
 
-        ProtocolParser();
+        ProtocolParser(std::shared_ptr<Logger> logger);
         ~ProtocolParser() = default;
 
         Message parseMessage(const std::string &message);
@@ -78,6 +79,7 @@ class ProtocolParser {
 
     private:
         std::map<std::string, ParseFunction> _headerHandlers;
+        std::shared_ptr<Logger> _logger;
         class ProtocolParserException : public AException {
             public:
                 explicit ProtocolParserException(const std::string &message)

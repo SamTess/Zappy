@@ -18,6 +18,7 @@
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "gameController/GameController.hpp"
+#include "logger/Logger.hpp"
 
 namespace Zappy {
     class MapRenderer;
@@ -26,7 +27,7 @@ namespace Zappy {
 
 class GameLoop {
 public:
-    GameLoop();
+    GameLoop(std::shared_ptr<Logger> logger);
     ~GameLoop() = default;
     bool init();
     int run();
@@ -54,6 +55,5 @@ private:
     std::shared_ptr<GameController> m_gameController;
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
-
-    int m_cubeModelId = -1;
+    std::shared_ptr<Logger> m_logger;
 };

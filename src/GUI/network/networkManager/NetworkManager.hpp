@@ -21,10 +21,11 @@
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
 #include "../../gameController/GameController.hpp"
+#include "../../logger/Logger.hpp"
 
 class NetworkManager {
     public:
-        NetworkManager();
+        NetworkManager(std::shared_ptr<Logger> logger);
         ~NetworkManager();
 
         bool connect(const std::string& host, int port);
@@ -50,8 +51,8 @@ class NetworkManager {
         std::unique_ptr<MessageQueue> _outgoingQueue;
         std::string _receiveBuffer;
         std::shared_ptr<GameController> _gameController;
-
         bool _isConnected;
+        std::shared_ptr<Logger> _logger;
         std::mutex _logMutex;
         mutable std::mutex _mutex;
         std::condition_variable _cv;

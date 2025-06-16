@@ -17,6 +17,7 @@
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 #include "../network/protocol/HeaderMessage.hpp"
 #include "../network/protocol/ProtocolParser.hpp"
+#include "../logger/Logger.hpp"
 #include "GameState.hpp"
 
 /**
@@ -33,7 +34,7 @@ public:
  */
 class GameController : public INetworkObserver {
 public:
-    GameController();
+    GameController(std::shared_ptr<Logger> logger);
     ~GameController() = default;
 
     void onMessageReceived(const Message& message) override;
@@ -64,6 +65,7 @@ private:
 
     std::shared_ptr<GameState> _gameState;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
+    std::shared_ptr<Logger> _logger;
     void initializeMessageHandlers();
 };
 

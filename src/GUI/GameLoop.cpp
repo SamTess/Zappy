@@ -16,8 +16,8 @@
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
 
-GameLoop::GameLoop()
-    : m_host("localhost"), m_port(4242) {
+GameLoop::GameLoop(std::shared_ptr<Logger> logger)
+    : m_host("localhost"), m_port(4242), m_logger(logger) {
 }
 
 bool GameLoop::init() {
