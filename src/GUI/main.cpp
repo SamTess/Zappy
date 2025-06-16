@@ -33,7 +33,6 @@ int main(int argc, char** argv) {
             std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
         }
-        std::thread networkThread(&NetworkManager::networkThreadLoop, &networkManager);
 
         auto gameLoop = std::make_shared<GameLoop>();
         gameLoop->setServerInfo(parser.getMachine(), parser.getPort());
@@ -42,7 +41,9 @@ int main(int argc, char** argv) {
             std::cerr << "Failed to initialize game components" << std::endl;
             return 84;
         }
-        return gameLoop->run();
+        gameLoop->run();
+        networkManager.disconnect();
+        return 0;
     } catch (const AException &e) {
         std::cerr << e.getFormattedMessage() << std::endl;
         return 84;
