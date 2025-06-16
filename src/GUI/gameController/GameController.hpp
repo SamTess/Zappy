@@ -63,6 +63,8 @@ private:
     void handleServerMessage(std::shared_ptr<IMessageData> data);
 
     std::shared_ptr<GameState> _gameState;
+    std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
+    void initializeMessageHandlers();
 };
 
 #endif /* !GAME_CONTROLLER_HPP_ */

@@ -10,6 +10,47 @@
 #include <algorithm>
 
 GameController::GameController() : _gameState(std::make_shared<GameState>()) {
+    initializeMessageHandlers();
+}
+
+// pas beau mais efficace
+void GameController::initializeMessageHandlers() {
+    _messageHandlers[MessageType::MapSize] = [this](std::shared_ptr<IMessageData> data) {
+        handleMapSize(data);
+    };
+    _messageHandlers[MessageType::TileContent] = [this](std::shared_ptr<IMessageData> data) {
+        handleTileContent(data);
+    };
+    _messageHandlers[MessageType::TeamName] = [this](std::shared_ptr<IMessageData> data) {
+        handleTeamName(data);
+    };
+    _messageHandlers[MessageType::PlayerInfo] = [this](std::shared_ptr<IMessageData> data) {
+        handlePlayerInfo(data);
+    };
+    _messageHandlers[MessageType::PlayerInventory] = [this](std::shared_ptr<IMessageData> data) {
+        handlePlayerInventory(data);
+    };
+    _messageHandlers[MessageType::Broadcast] = [this](std::shared_ptr<IMessageData> data) {
+        handlePlayerBroadcast(data);
+    };
+    _messageHandlers[MessageType::Incantation] = [this](std::shared_ptr<IMessageData> data) {
+        handleIncantationStart(data);
+    };
+    _messageHandlers[MessageType::IncantationEnd] = [this](std::shared_ptr<IMessageData> data) {
+        handleIncantationEnd(data);
+    };
+    _messageHandlers[MessageType::TimeUnit] = [this](std::shared_ptr<IMessageData> data) {
+        handleTimeUnit(data);
+    };
+    _messageHandlers[MessageType::EndGame] = [this](std::shared_ptr<IMessageData> data) {
+        handleEndGame(data);
+    };
+    _messageHandlers[MessageType::ServerMessage] = [this](std::shared_ptr<IMessageData> data) {
+        handleServerMessage(data);
+    };
+    _messageHandlers[MessageType::Egg] = [this](std::shared_ptr<IMessageData> data) {
+        handleEggDrop(data);
+    };
 }
 
 void GameController::onMessageReceived(const Message& message) {
@@ -22,46 +63,11 @@ void GameController::processMessage(const Message& message) {
         return;
     MessageType messageType = message.getStructuredData()->getType();
 
-    switch (messageType) {
-        case MessageType::MapSize:
-            handleMapSize(message.getStructuredData());
-            break;
-        case MessageType::TileContent:
-            handleTileContent(message.getStructuredData());
-            break;
-        case MessageType::TeamName:
-            handleTeamName(message.getStructuredData());
-            break;
-        case MessageType::PlayerInfo:
-            handlePlayerInfo(message.getStructuredData());
-            break;
-        case MessageType::PlayerInventory:
-            handlePlayerInventory(message.getStructuredData());
-            break;
-        case MessageType::Broadcast:
-            handlePlayerBroadcast(message.getStructuredData());
-            break;
-        case MessageType::Incantation:
-            handleIncantationStart(message.getStructuredData());
-            break;
-        case MessageType::IncantationEnd:
-            handleIncantationEnd(message.getStructuredData());
-            break;
-        case MessageType::TimeUnit:
-            handleTimeUnit(message.getStructuredData());
-            break;
-        case MessageType::EndGame:
-            handleEndGame(message.getStructuredData());
-            break;
-        case MessageType::ServerMessage:
-            handleServerMessage(message.getStructuredData());
-            break;
-        case MessageType::Egg:
-            handleEggDrop(message.getStructuredData());
-            break;
-        default:
-            std::cerr << "[GameController] No handler for message type: " << static_cast<int>(messageType) << std::endl;
-            break;
+    auto it = _messageHandlers.find(messageType);
+    if (it != _messageHandlers.end()) {
+        it->second(message.getStructuredData());
+    } else {
+        std::cerr << "[GameController] No handler for message type: " << static_cast<int>(messageType) << std::endl;
     }
 }
 
@@ -159,9 +165,6 @@ void GameController::handleEggDrop(std::shared_ptr<IMessageData> data) {
 
     switch (eggData->getAction()) {
         case EggData::EggAction::Drop: {
-            // int eggId = eggData->getEggId();
-            // int x = eggData->getX();
-            // int y = eggData->getY();
             _gameState->addEgg(*eggData);
             break;
         }
