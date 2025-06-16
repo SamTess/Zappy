@@ -121,7 +121,8 @@ void GameController::handlePlayerInventory(std::shared_ptr<IMessageData> data) {
 
 void GameController::handlePlayerExpulsion(std::shared_ptr<IMessageData> data) {
     auto expulsionData = std::static_pointer_cast<PlayerExpulsionData>(data);
-    int playerId = expulsionData->getPlayerId();
+
+    // faire une animation ici
 }
 
 void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {

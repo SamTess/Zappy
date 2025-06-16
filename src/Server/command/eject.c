@@ -100,8 +100,6 @@ void push_client(server_t *server, client_t *client, float x, float y)
             continue;
         }
         if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y) {
-            printf("old position client %d: (%d, %d)\n", tmp->client_id, old_x, old_y);
-            printf("Pushing client %d to (%d, %d)\n", tmp->client_id, old_x + (int)x, old_y + (int)y);
             push_single_client(server, tmp, msg, x, y);
         }
         tmp = tmp->next;
@@ -132,12 +130,9 @@ void eject(server_t *server, client_t *client, char **buffer)
 
     if (!client || !client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
-    printf("eject command received from client %d, direction: (%f, %f)\n", client->client_id, x, y);
-    printf("Client %d is at (%d, %d)\n", client->client_id, client->player->pos_x, client->player->pos_y);
     convert_rotation_to_vector(client, &x, &y);
     push_client(server, client, x, y);
     push_eggs(server, client->player->pos_x, client->player->pos_y);
     command_pex(server, client);
-    printf("Client %d ejected in direction (%f, %f)\n", client->client_id, x, y);
     write_command_output(client->client_fd, "ok\n");
 }
