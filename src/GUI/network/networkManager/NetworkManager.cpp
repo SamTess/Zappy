@@ -305,10 +305,10 @@ void NetworkManager::handleWelcomeMessage(const std::string& message) {
 }
 
 void NetworkManager::handleRegularMessage(const std::string& message) {
-    std::cout << "[NetworkManager] Attempting to parse message: " << message.substr(0, 20) << std::endl;
+    _logger->logDebug("[NetworkManager] Attempting to parse message: " + message.substr(0, 20));
     try {
         Message parsedMessage = _protocolParser->parseMessage(message);
-        std::cout << "[NetworkManager] Message parsed successfully, sending to GameController" << std::endl;
+        _logger->logDebug("[NetworkManager] Message parsed successfully, sending to GameController");
 
         if (_gameController)
             _gameController->onMessageReceived(parsedMessage);
@@ -332,8 +332,8 @@ void NetworkManager::handleRegularMessage(const std::string& message) {
             }
         }
     } catch (const std::exception& e) {
-        std::cout << "[NetworkManager] Failed to parse message: " << e.what() << std::endl;
-        std::cout << "[NetworkManager] Problem message was: " << message << std::endl;
+        _logger->logDebug("[NetworkManager] Failed to parse message: " + std::string(e.what()));
+        _logger->logDebug("[NetworkManager] Problem message was: " + message);
         MessageCallback localCallback;
         {
             std::lock_guard<std::mutex> lock(_mutex);

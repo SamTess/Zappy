@@ -82,7 +82,6 @@ void Logger::logMessage(LogLevel level, const std::string &message) {
 
     std::ostringstream logEntry;
     logEntry << "[" << timestamp.str() << "] " << levelStr << " " << message;
-    std::cout << logEntry.str() << std::endl;
     if (!_logFilePath.empty()) {
         logToFile(logEntry.str());
     }
