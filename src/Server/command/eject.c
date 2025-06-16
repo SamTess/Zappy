@@ -71,12 +71,12 @@ static char *get_string_to_send(float x, float y)
 }
 
 static void push_single_client(server_t *server,
-    client_t *tmp, char *msg, float direction_x, float direction_y)
+    client_t *tmp, char *msg, float *direction)
 {
     int old_x = tmp->player->pos_x;
     int old_y = tmp->player->pos_y;
-    int new_x = tmp->player->pos_x + (int)direction_x;
-    int new_y = tmp->player->pos_y + (int)direction_y;
+    int new_x = tmp->player->pos_x + (int)direction[0];
+    int new_y = tmp->player->pos_y + (int)direction[1];
 
     wrap_position(server, &new_x, &new_y);
     tile_remove_player(&server->map[old_y][old_x], tmp->client_id);
@@ -100,7 +100,7 @@ void push_client(server_t *server, client_t *client, float x, float y)
             continue;
         }
         if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y)
-            push_single_client(server, tmp, msg, x, y);
+            push_single_client(server, tmp, msg, (float[]){x, y});
         tmp = tmp->next;
     }
     free(msg);
