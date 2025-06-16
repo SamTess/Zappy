@@ -126,7 +126,7 @@ void execute_com(server_t *server, client_t *user, char *buffer)
             return send_info_new_client(server, user);
     }
     if (!find_and_execute(server, user, buffer)){
-        if (user->type == GRAPHICAL)
+        if (user->is_fully_connected && user->type == GRAPHICAL)
             return write_command_output(user->client_fd, "suc\n");
         write_command_output(user->client_fd, "ko\n");
     }
