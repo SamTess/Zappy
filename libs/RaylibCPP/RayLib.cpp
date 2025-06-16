@@ -215,6 +215,8 @@ void RayLib::SetSoundVolume(float volume) {
 }
 
 void RayLib::PlayMusic(const std::string& path) {
+    if (path.empty())
+        return;
     _music.emplace(path);
     _music->play();
 }

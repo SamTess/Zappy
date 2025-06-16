@@ -11,8 +11,9 @@ BUILD_DIR = ../../build/GUI
 
 MAIN = main.cpp
 # Source files
-SRC = graphicalContext/GraphicalContext.cpp \
-	  parsing/ParsingCLI.cpp \
+SRC = parsing/ParsingCLI.cpp \
+      gameController/GameController.cpp \
+	  gameController/GameState.cpp \
 	  shared/exception/AException.cpp \
 	  network/buffer/MessageQueue.cpp \
 	  network/connection/TcpConnection.cpp \
@@ -25,7 +26,6 @@ SRC = graphicalContext/GraphicalContext.cpp \
 	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
 	  renderer/MapRenderer.cpp \
-	  renderer/MapRendererObserver.cpp \
 	  renderer/UIRenderer.cpp \
 	  renderer/strategies/DetailedTileRenderStrategy.cpp \
 	  renderer/strategies/ModelTileRenderStrategy.cpp \
@@ -79,7 +79,6 @@ all: setup_dirs display_banner $(NAME)
 
 # Create the necessary build directories
 setup_dirs:
-	@mkdir -p $(BUILD_DIR)/graphicalContext
 	@mkdir -p $(BUILD_DIR)/parsing
 	@mkdir -p $(BUILD_DIR)/shared/exception
 	@mkdir -p $(BUILD_DIR)/network/buffer

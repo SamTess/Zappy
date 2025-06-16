@@ -11,8 +11,10 @@
 #include <memory>
 #include <string>
 #include <chrono>
+#include <algorithm>
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
+#include "textureManager/ModelManagerAdapter.hpp"
 
 GameLoop::GameLoop()
     : m_host("localhost"), m_port(4242) {
@@ -22,8 +24,8 @@ bool GameLoop::init() {
     if (!loadLibraries())
         return false;
     initializeManagers();
-    if (!loadModels())
-        return false;
+    // if (!loadModels())
+    //     return false;
     setupComponents();
     return true;
 }
@@ -55,8 +57,8 @@ void GameLoop::initializeManagers() {
 }
 
 bool GameLoop::loadModels() {
-    auto& modelManager = ModelManager::getInstance();
-    m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
+    // auto& modelManager = ModelManager::getInstance();
+    // m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
     return true;
 }
 
@@ -65,21 +67,20 @@ void GameLoop::setupComponents() {
     m_camera->init(m_graphics);
     m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
+    m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
+    m_modelManagerAdapter->setGraphicsLib(m_graphics);
+    m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
 }
 
 int GameLoop::run() {
-    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer) {
-        std::cerr << "Game components not initialized properly." << std::endl;
+    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer)
         return 84;
-    }
-
     while (!m_graphics->WindowShouldClose()) {
         m_camera->update(m_graphics);
         m_graphics->BeginDrawing();
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();
-        m_graphics->DrawPlane({0.0f, 0.0f, 0.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
-        renderCube();
+        m_mapRenderer->render();
         m_graphics->EndCamera3D();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();
@@ -94,25 +95,42 @@ void GameLoop::setServerInfo(const std::string& host, int port) {
     m_port = port;
 }
 
-void GameLoop::renderCube() {
-    auto& modelManager = ModelManager::getInstance();
-    if (m_cubeModelId != -1) {
-        ZappyTypes::Vector3 cubePosition = {2.0f, 0.0f, 2.0f};
-        ZappyTypes::Color cubeColor = {255, 255, 255, 255};
-        modelManager.drawModel(m_cubeModelId, cubePosition, cubeColor);
-    } else {
-        std::cerr << "Modèle cube.obj non trouvé." << std::endl;
+void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
+    m_gameController = controller;
+    if (m_gameController && m_graphics && m_modelManagerAdapter) {
+        auto gameState = m_gameController->getGameState();
+        m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, gameState, m_modelManagerAdapter);
+        m_mapRenderer->initialize();
+        if (gameState->isMapInitialized()) {
+            updateCameraForMapSize();
+        }
     }
 }
 
-void GameLoop::onMapSizeChanged(int width, int height) {
-    m_mapWidth = width;
-    m_mapHeight = height;
-    if (m_camera) {
-        m_camera->setMapDimensions(width, height);
+void GameLoop::updateCameraForMapSize() {
+    if (!m_gameController || !m_camera)
+        return;
+    auto gameState = m_gameController->getGameState();
+    if (!gameState->isMapInitialized())
+        return;
+    int mapWidth = gameState->getMapWidth();
+    int mapHeight = gameState->getMapHeight();
+    m_camera->setMapDimensions(mapWidth, mapHeight);
+    float tileSize = 1.0f;
+    float spacing = 0.1f;
+    if (mapWidth > 20 || mapHeight > 20) {
+        tileSize = 10.0f / std::max(mapWidth, mapHeight);
+        spacing = tileSize * 0.1f;
     }
+    float mapExtentX = mapWidth * (tileSize + spacing);
+    float mapExtentZ = mapHeight * (tileSize + spacing);
+    float maxExtent = std::max(mapExtentX, mapExtentZ);
+    float cameraDistance = maxExtent * 1.5f;
+    if (cameraDistance < 10.0f)
+        cameraDistance = 10.0f;
+    if (cameraDistance > 50.0f)
+        cameraDistance = 50.0f;
+    m_camera->reset();
+    m_camera->distance() = cameraDistance;
 }
 
-void GameLoop::onTileChanged(int /*x*/, int /*y*/, const TileData& /*tileData*/) {
-    //TODO(Sam): Implement tile change handling
-}

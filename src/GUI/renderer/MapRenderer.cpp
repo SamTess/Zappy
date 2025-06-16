@@ -11,25 +11,22 @@
 #include <string>
 #include "MapRenderer.hpp"
 #include "strategies/TileRenderStrategyFactory.hpp"
-#include "MapRendererObserver.hpp"
-#include "../graphicalContext/GraphicalContext.hpp"
+#include "../gameController/GameState.hpp"
 
 namespace Zappy {
 
 MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
-    const std::shared_ptr<GraphicalContext>& ctx,
+    const std::shared_ptr<const GameState>& state,
     const std::shared_ptr<ModelManagerAdapter>& modelManagerAdapter)
     : graphicsLib(graphics),
-      context(ctx),
+      gameState(state),
       strategyFactory(modelManagerAdapter),
       tileSize(1.0f),
       tileSpacing(0.1f),
       zoomLevel(1.0f),
       detailThreshold(2.0f) {
-    tileRenderStrategy = strategyFactory.createSimpleTileStrategy(ctx);
-    detailedTileStrategy = strategyFactory.createDetailedTileStrategy(ctx);
-    std::shared_ptr<MapRenderer> selfPtr(this, [](MapRenderer*) {});
-    context->addObserver(std::make_shared<MapRendererObserver>(selfPtr));
+    tileRenderStrategy = strategyFactory.createSimpleTileStrategy(gameState);
+    detailedTileStrategy = strategyFactory.createDetailedTileStrategy(gameState);
 }
 
 void MapRenderer::initialize() {
@@ -44,15 +41,19 @@ void MapRenderer::initialize() {
 }
 
 void MapRenderer::render() {
-    if (!context || !graphicsLib)
+    if (!gameState)
         return;
-    int mapWidth = context->getMapWidth();
-    int mapHeight = context->getMapHeight();
+    int mapWidth = gameState->getMapWidth();
+    int mapHeight = gameState->getMapHeight();
+
     if (mapWidth <= 0 || mapHeight <= 0)
         return;
+    static bool firstRender = true;
+    if (firstRender)
+        firstRender = false;
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {
-            ResourceType dominantResource = context->getDominantResourceType(x, y);
+            ResourceType dominantResource = gameState->getDominantResourceType(x, y);
             int resourceIndex = static_cast<int>(dominantResource);
             renderTile(x, y, resourceIndex);
         }
@@ -98,11 +99,11 @@ void MapRenderer::renderTile(int x, int y, int /*resourceType*/) {
 ZappyTypes::Color MapRenderer::calculateTileColor(int x, int y) {
     if (resourceColors.find(-1) == resourceColors.end())
         return {150, 150, 150, 255};
-    const TileData& tileData = context->getTileData(x, y);
+    const TileData& tileData = gameState->getTileData(x, y);
     if (tileData.isIncantating) {
         return {50, 50, 255, 200};
     }
-    ResourceType dominantType = context->getDominantResourceType(x, y);
+    ResourceType dominantType = gameState->getDominantResourceType(x, y);
     int resourceIndex = static_cast<int>(dominantType);
     if (dominantType == ResourceType::COUNT || resourceColors.find(resourceIndex) == resourceColors.end()) {
         return resourceColors[-1];

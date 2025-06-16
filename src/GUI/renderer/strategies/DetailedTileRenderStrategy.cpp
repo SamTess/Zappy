@@ -8,24 +8,25 @@
 #include "DetailedTileRenderStrategy.hpp"
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <memory>
 #include <string>
 
 namespace Zappy {
 
-DetailedTileRenderStrategy::DetailedTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx)
-    : context(ctx) {}
+DetailedTileRenderStrategy::DetailedTileRenderStrategy(const std::shared_ptr<const GameState>& gameState)
+    : gameState(gameState) {}
 
 void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     int x, int y,
     const ZappyTypes::Color& color,
     float tileSize,
     float spacing) {
-    float mapOffset = context->getMapWidth() / 2.0f;
+    float mapOffset = gameState->getMapWidth() / 2.0f;
     ZappyTypes::Vector3 position = {
         (x - mapOffset + 0.5f) * (tileSize + spacing),
         0.0f,
-        (y - mapOffset + 0.5f) * (tileSize + spacing)
+        (y - gameState->getMapHeight() / 2.0f + 0.5f) * (tileSize + spacing)
     };
     graphicsLib->DrawCube(position, tileSize, 0.1f, tileSize, color);
     ZappyTypes::Color borderColor = {100, 100, 100, 255};
@@ -42,7 +43,7 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
     graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z + offset},
                            {position.x - offset, position.y + 0.05f, position.z - offset},
                            borderColor);
-    const TileData& tileData = context->getTileData(x, y);
+    const TileData& tileData = gameState->getTileData(x, y);
     for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
         int quantity = tileData.resources[i];
         if (quantity > 0) {
@@ -117,7 +118,7 @@ void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGr
     ZappyTypes::Vector3 position,
     int playerId,
     float tileSize) {
-    const std::shared_ptr<PlayerInfoData> playerInfo = context->getPlayerInfo(playerId);
+    auto playerInfo = gameState->getPlayerInfo(playerId);
     if (!playerInfo) return;
     ZappyTypes::Color playerColor = {255, 0, 0, 255};
     ZappyTypes::Color borderColor = {80, 80, 80, 255};
