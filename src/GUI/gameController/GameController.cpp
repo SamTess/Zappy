@@ -9,7 +9,7 @@
 #include <iostream>
 #include <algorithm>
 
-GameController::GameController() : _gameState(std::make_shared<GameState>()) {
+GameController::GameController(std::shared_ptr<NetworkManager> networkManager) : _gameState(std::make_shared<GameState>()), _networkManager(networkManager) {
     initializeMessageHandlers();
 }
 
@@ -66,6 +66,11 @@ void GameController::processMessage(const Message& message) {
         return;
     MessageType messageType = message.getStructuredData()->getType();
 
+    // la faire le check du map size
+    if (messageType != MessageType::MapSize && !_gameState->isMapInitialized()) {
+        auto mapSizeData = std::static_pointer_cast<MapSizeData>(message.getStructuredData());
+        _gameState->setMapSize(mapSizeData->getWidth(), mapSizeData->getHeight());
+    }
     auto it = _messageHandlers.find(messageType);
     if (it != _messageHandlers.end()) {
         it->second(message.getStructuredData());
@@ -81,6 +86,11 @@ void GameController::handleMapSize(std::shared_ptr<IMessageData> data) {
 }
 
 void GameController::handleTileContent(std::shared_ptr<IMessageData> data) {
+    if (!_gameState->isMapInitialized()) {
+        _networkManager->sendCommand("msz\n");
+        _networkManager->sendCommand("mct\n");
+        return;
+    }
     auto tileData = std::static_pointer_cast<TileContentData>(data);
     int x = tileData->getX();
     int y = tileData->getY();

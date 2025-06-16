@@ -18,6 +18,7 @@
 #include "../network/protocol/HeaderMessage.hpp"
 #include "../network/protocol/ProtocolParser.hpp"
 #include "GameState.hpp"
+#include "../network/networkManager/NetworkManager.hpp"
 
 /**
  * @brief Interface pour recevoir les messages du réseau
@@ -33,7 +34,7 @@ public:
  */
 class GameController : public INetworkObserver {
 public:
-    GameController();
+    GameController(std::shared_ptr<NetworkManager> networkManager);
     ~GameController() = default;
 
     void onMessageReceived(const Message& message) override;
@@ -63,6 +64,7 @@ private:
     void handleServerMessage(std::shared_ptr<IMessageData> data);
 
     std::shared_ptr<GameState> _gameState;
+    std::shared_ptr<NetworkManager> _networkManager;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
     void initializeMessageHandlers();
 };
