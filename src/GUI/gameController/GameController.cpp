@@ -101,6 +101,10 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     auto existingPlayer = _gameState->getPlayerInfo(playerId);
 
     if (existingPlayer) {
+        if (!playerData->isAlive()) {
+            _gameState->removePlayer(playerId);
+            return;
+        }
         int oldX = existingPlayer->getX();
         int oldY = existingPlayer->getY();
         int newX = playerData->getX();
@@ -135,13 +139,6 @@ void GameController::handleResourceDrop(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleResourceCollect(std::shared_ptr<IMessageData> data) {
     auto resourceData = std::static_pointer_cast<ResourceData>(data);
-}
-
-void GameController::handlePlayerDeath(std::shared_ptr<IMessageData> data) {
-    auto playerData = std::static_pointer_cast<PlayerInfoData>(data);
-    int playerId = playerData->getId();
-
-    _gameState->removePlayer(playerId);
 }
 
 void GameController::handleIncantationStart(std::shared_ptr<IMessageData> data) {
