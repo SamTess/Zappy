@@ -24,7 +24,7 @@ typedef enum {
 
 class Logger {
     public:
-        Logger(std::string logFilePath, bool isLoggingEnabled = true);
+        explicit Logger(std::string logFilePath, bool isLoggingEnabled = true);
         ~Logger();
         void setLoggingEnabled(bool isEnabled);
         bool isLoggingEnabled() const;
@@ -41,8 +41,6 @@ class Logger {
         bool _isLoggingEnabled;
         void logMessage(LogLevel level, const std::string &message);
         void logToFile(const std::string &message);
-
-
 };
 
 #endif /* !LOGGER_HPP_ */

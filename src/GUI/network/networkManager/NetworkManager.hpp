@@ -25,7 +25,7 @@
 
 class NetworkManager {
     public:
-        NetworkManager(std::shared_ptr<Logger> logger);
+        explicit NetworkManager(std::shared_ptr<Logger> logger);
         ~NetworkManager();
 
         bool connect(const std::string& host, int port);

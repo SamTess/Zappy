@@ -7,66 +7,54 @@
 
 #include "Logger.hpp"
 #include <memory>
+#include <string>
+#include <iostream>
 
 Logger::Logger(std::string logFilePath, bool isLoggingEnabled)
-    : _logFilePath(logFilePath), _isLoggingEnabled(isLoggingEnabled)
-{
+    : _logFilePath(logFilePath), _isLoggingEnabled(isLoggingEnabled) {
 }
 
-Logger::~Logger()
-{
+Logger::~Logger() {
 }
 
-void Logger::setLoggingEnabled(bool isEnabled)
-{
+void Logger::setLoggingEnabled(bool isEnabled) {
     _isLoggingEnabled = isEnabled;
 }
 
-bool Logger::isLoggingEnabled() const
-{
+bool Logger::isLoggingEnabled() const {
     return _isLoggingEnabled;
 }
 
-void Logger::logInfo(const std::string &message)
-{
-    if (_isLoggingEnabled) {
+void Logger::logInfo(const std::string &message) {
+    if (_isLoggingEnabled)
         logMessage(LOG_INFO, message);
-    }
 }
 
-void Logger::logWarning(const std::string &message)
-{
+void Logger::logWarning(const std::string &message) {
     if (_isLoggingEnabled) {
         logMessage(LOG_WARNING, message);
     }
 }
 
-void Logger::logError(const std::string &message)
-{
-    if (_isLoggingEnabled) {
+void Logger::logError(const std::string &message) {
+    if (_isLoggingEnabled)
         logMessage(LOG_ERROR, message);
-    }
 }
 
-void Logger::logDebug(const std::string &message)
-{
-    if (_isLoggingEnabled) {
+void Logger::logDebug(const std::string &message) {
+    if (_isLoggingEnabled)
         logMessage(LOG_DEBUG, message);
-    }
 }
 
-std::string Logger::getLogFilePath() const
-{
+std::string Logger::getLogFilePath() const {
     return _logFilePath;
 }
 
-void Logger::setLogFilePath(const std::string &logFilePath)
-{
+void Logger::setLogFilePath(const std::string &logFilePath) {
     _logFilePath = logFilePath;
 }
 
-void Logger::logMessage(LogLevel level, const std::string &message)
-{
+void Logger::logMessage(LogLevel level, const std::string &message) {
     std::time_t now = std::time(nullptr);
     std::tm timeinfo_obj;
     localtime_r(&now, &timeinfo_obj);
@@ -100,8 +88,7 @@ void Logger::logMessage(LogLevel level, const std::string &message)
     }
 }
 
-void Logger::logToFile(const std::string &message)
-{
+void Logger::logToFile(const std::string &message) {
     std::ofstream logFile(_logFilePath, std::ios::app);
     if (logFile.is_open()) {
         logFile << message << std::endl;

@@ -34,7 +34,7 @@ public:
  */
 class GameController : public INetworkObserver {
 public:
-    GameController(std::shared_ptr<Logger> logger);
+    explicit GameController(std::shared_ptr<Logger> logger);
     ~GameController() = default;
 
     void onMessageReceived(const Message& message) override;

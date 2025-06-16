@@ -27,7 +27,7 @@ namespace Zappy {
 
 class GameLoop {
 public:
-    GameLoop(std::shared_ptr<Logger> logger);
+    explicit GameLoop(std::shared_ptr<Logger> logger);
     ~GameLoop() = default;
     bool init();
     int run();

@@ -8,6 +8,7 @@
 #include "GameController.hpp"
 #include <iostream>
 #include <algorithm>
+#include <string>
 
 GameController::GameController(std::shared_ptr<Logger> logger) : _gameState(std::make_shared<GameState>()), _logger(logger) {
     _logger->logInfo("GameController initialized with shared logger");

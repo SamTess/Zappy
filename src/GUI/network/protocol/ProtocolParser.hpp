@@ -24,7 +24,7 @@ class ProtocolParser {
     public:
         typedef std::function<Message(const std::string&)> ParseFunction;
 
-        ProtocolParser(std::shared_ptr<Logger> logger);
+        explicit ProtocolParser(std::shared_ptr<Logger> logger);
         ~ProtocolParser() = default;
 
         Message parseMessage(const std::string &message);
