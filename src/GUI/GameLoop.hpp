@@ -27,7 +27,7 @@ namespace Zappy {
 
 class GameLoop {
 public:
-    GameLoop(std::shared_ptr<NetworkManager> networkManager);
+    explicit GameLoop(std::shared_ptr<NetworkManager> networkManager);
     ~GameLoop() = default;
     bool init();
     int run();
