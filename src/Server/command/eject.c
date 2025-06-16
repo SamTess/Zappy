@@ -99,9 +99,8 @@ void push_client(server_t *server, client_t *client, float x, float y)
             tmp = tmp->next;
             continue;
         }
-        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y) {
+        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y)
             push_single_client(server, tmp, msg, x, y);
-        }
         tmp = tmp->next;
     }
     free(msg);

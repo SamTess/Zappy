@@ -12,7 +12,7 @@
 
 class PlayerExpulsionData : public IMessageData {
     public:
-        PlayerExpulsionData(int playerId) : _playerId(playerId) {}
+        explicit PlayerExpulsionData(int playerId) : _playerId(playerId) {}
 
         MessageType getType() const override { return MessageType::PlayerExpulsion; }
 
