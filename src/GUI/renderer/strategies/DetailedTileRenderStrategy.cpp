@@ -50,8 +50,9 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
             renderResourceIndicator(graphicsLib, position, static_cast<ResourceType>(i), quantity, tileSize);
         }
     }
-    for (int playerId : tileData.playerIds) {
-        renderPlayerIndicator(graphicsLib, position, playerId, tileSize);
+    for (int i = 0; i < static_cast<int>(tileData.playerIds.size()); ++i) {
+        int playerId = tileData.playerIds[i];
+        renderPlayerIndicator(graphicsLib, position, playerId, tileSize, i, tileData.playerIds.size());
     }
     for (int eggId : tileData.eggIds) {
         renderEggIndicator(graphicsLib, position, eggId, tileSize);
@@ -115,17 +116,28 @@ void DetailedTileRenderStrategy::renderResourceIndicator(const std::shared_ptr<I
 }
 
 void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-    ZappyTypes::Vector3 position,
-    int playerId,
-    float tileSize) {
+    ZappyTypes::Vector3 position, int playerId, float tileSize, int playerIndex, int totalPlayers) {
     auto playerInfo = gameState->getPlayerInfo(playerId);
-    if (!playerInfo) return;
+    if (!playerInfo) {
+        std::cout << "WARNING: Player " << playerId << " not found in gameState during rendering!" << std::endl;
+        return;
+    }
+    int orientation = playerInfo->getOrientation();
+    std::string teamName = playerInfo->getTeamName();
+    if (orientation < 1 || orientation > 4)
+        orientation = 1;
+    ZappyTypes::Vector3 playerPos = position;
+    if (totalPlayers > 1) {
+        float offsetRadius = tileSize * 0.3f;
+        float angle = (2.0f * M_PI * playerIndex) / totalPlayers;
+        playerPos.x += offsetRadius * std::cos(angle);
+        playerPos.z += offsetRadius * std::sin(angle);
+    }
     ZappyTypes::Color playerColor = {255, 0, 0, 255};
     ZappyTypes::Color borderColor = {80, 80, 80, 255};
     ZappyTypes::Color directionColor = {255, 255, 0, 255};
     float playerSize = tileSize * 0.25f;
     float playerHeight = tileSize * 0.5f;
-    ZappyTypes::Vector3 playerPos = position;
     playerPos.y = position.y + 0.4f;
     graphicsLib->DrawCylinder(playerPos, playerSize, playerSize, playerHeight, 8, playerColor);
     float halfSize = playerSize;
@@ -167,83 +179,70 @@ void DetailedTileRenderStrategy::renderPlayerIndicator(const std::shared_ptr<IGr
     graphicsLib->DrawLine3D({playerPos.x - halfSize, bottomY, playerPos.z + halfSize},
                            {playerPos.x - halfSize, topY, playerPos.z + halfSize},
                            borderColor);
-    if (playerInfo) {
-        float arrowSize = playerSize * 1.5f;
-        float arrowHeight = topY + 0.5f;
-        ZappyTypes::Vector3 arrowStart = playerPos;
-        arrowStart.y = arrowHeight;
-        ZappyTypes::Vector3 arrowEnd = arrowStart;
-        int orientation = playerInfo->getOrientation();
-        switch (orientation) {
-            case 1: // North
-                arrowEnd.z -= arrowSize;
-                break;
-            case 2: // East
-                arrowEnd.x += arrowSize;
-                break;
-            case 3: // South
-                arrowEnd.z += arrowSize;
-                break;
-            case 4: // West
-                arrowEnd.x -= arrowSize;
-                break;
-            default:
-                break;
-        }
-        graphicsLib->DrawLine3D(arrowStart, arrowEnd, directionColor);
-        float arrowHeadSize = arrowSize * 0.3f;
-        ZappyTypes::Vector3 arrowHeadLeft = arrowEnd;
-        ZappyTypes::Vector3 arrowHeadRight = arrowEnd;
 
-        switch (orientation) {
-            case 1: // North
-                arrowHeadLeft.x -= arrowHeadSize * 0.5f;
-                arrowHeadLeft.z += arrowHeadSize;
-                arrowHeadRight.x += arrowHeadSize * 0.5f;
-                arrowHeadRight.z += arrowHeadSize;
-                break;
-            case 2: // East
-                arrowHeadLeft.x -= arrowHeadSize;
-                arrowHeadLeft.z -= arrowHeadSize * 0.5f;
-                arrowHeadRight.x -= arrowHeadSize;
-                arrowHeadRight.z += arrowHeadSize * 0.5f;
-                break;
-            case 3: // South
-                arrowHeadLeft.x -= arrowHeadSize * 0.5f;
-                arrowHeadLeft.z -= arrowHeadSize;
-                arrowHeadRight.x += arrowHeadSize * 0.5f;
-                arrowHeadRight.z -= arrowHeadSize;
-                break;
-            case 4: // West
-                arrowHeadLeft.x += arrowHeadSize;
-                arrowHeadLeft.z -= arrowHeadSize * 0.5f;
-                arrowHeadRight.x += arrowHeadSize;
-                arrowHeadRight.z += arrowHeadSize * 0.5f;
-                break;
-            default:
-                break;
-        }
-        graphicsLib->DrawLine3D(arrowEnd, arrowHeadLeft, directionColor);
-        graphicsLib->DrawLine3D(arrowEnd, arrowHeadRight, directionColor);
-        if (!playerInfo->getTeamName().empty()) {
-            ZappyTypes::Vector3 textPosition = playerPos;
-            textPosition.y = position.y + playerHeight + 1.0f;
-            std::string teamName = playerInfo->getTeamName();
-            if (teamName.length() > 10) {
-                teamName = teamName.substr(0, 8) + "...";
-            }
-            ZappyTypes::Color textColor = {255, 255, 255, 255};
-            unsigned int hash = 0;
-            for (char c : playerInfo->getTeamName()) {
-                hash = hash * 31 + c;
-            }
-            textColor.r = 128 + (hash % 128);
-            textColor.g = 128 + ((hash / 256) % 128);
-            textColor.b = 128 + ((hash / 65536) % 128);
-            float textSize = 0.1f * playerSize;
-            renderText3D(graphicsLib, teamName, textPosition, textSize, textColor);
-        }
+    float arrowSize = playerSize * 1.5f;
+    float arrowHeight = topY + 0.5f;
+    ZappyTypes::Vector3 arrowStart = playerPos;
+    arrowStart.y = arrowHeight;
+    ZappyTypes::Vector3 arrowEnd = arrowStart;
+    switch (orientation) {
+        case 1: // North
+            arrowEnd.z += arrowSize;
+            break;
+        case 4: // WEST
+            arrowEnd.x += arrowSize;
+            break;
+        case 3: // South
+            arrowEnd.z -= arrowSize;
+            break;
+        case 2: // EAST
+            arrowEnd.x -= arrowSize;
+            break;
     }
+    graphicsLib->DrawLine3D(arrowStart, arrowEnd, directionColor);
+    float arrowHeadSize = arrowSize * 0.3f;
+    ZappyTypes::Vector3 arrowHeadLeft = arrowEnd;
+    ZappyTypes::Vector3 arrowHeadRight = arrowEnd;
+
+    switch (orientation) {
+        case 1: // North
+            arrowHeadLeft.x -= arrowHeadSize * 0.5f;
+            arrowHeadLeft.z -= arrowHeadSize;
+            arrowHeadRight.x += arrowHeadSize * 0.5f;
+            arrowHeadRight.z -= arrowHeadSize;
+            break;
+        case 4: // WEST
+            arrowHeadLeft.x -= arrowHeadSize;
+            arrowHeadLeft.z -= arrowHeadSize * 0.5f;
+            arrowHeadRight.x -= arrowHeadSize;
+            arrowHeadRight.z += arrowHeadSize * 0.5f;
+            break;
+        case 3: // South
+            arrowHeadLeft.x -= arrowHeadSize * 0.5f;
+            arrowHeadLeft.z += arrowHeadSize;
+            arrowHeadRight.x += arrowHeadSize * 0.5f;
+            arrowHeadRight.z += arrowHeadSize;
+            break;
+        case 2: // EAST
+            arrowHeadLeft.x += arrowHeadSize;
+            arrowHeadLeft.z -= arrowHeadSize * 0.5f;
+            arrowHeadRight.x += arrowHeadSize;
+            arrowHeadRight.z += arrowHeadSize * 0.5f;
+            break;
+    }
+    graphicsLib->DrawLine3D(arrowEnd, arrowHeadLeft, directionColor);
+    graphicsLib->DrawLine3D(arrowEnd, arrowHeadRight, directionColor);
+    ZappyTypes::Vector3 textPosition = playerPos;
+    textPosition.y = position.y + playerHeight + 0.5f + (playerIndex * 0.3f);
+    std::string displayText = teamName.empty() ? ("P" + std::to_string(playerId)) : teamName;
+    if (displayText.length() > 10)
+        displayText = displayText.substr(0, 8) + "...";
+    float textSize = 0.4f;
+    float textWidth = displayText.length() * textSize * 0.6f;
+    textPosition.x -= textWidth / 2.0f;
+    textPosition.y += 0.1f;
+    ZappyTypes::Color textColor = ZappyTypes::Color{0, 0, 0, 255};
+    renderText3D(graphicsLib, displayText, textPosition, textSize, textColor);
 }
 
 void DetailedTileRenderStrategy::renderText3D(const std::shared_ptr<IGraphicsLib>& graphicsLib,
@@ -251,10 +250,9 @@ void DetailedTileRenderStrategy::renderText3D(const std::shared_ptr<IGraphicsLib
     ZappyTypes::Vector3 position,
     float fontSize,
     ZappyTypes::Color color) {
-    if (text.empty()) {
+    if (text.empty() || fontSize <= 0.05f)
         return;
-    }
-    float fontSpacing = 0.05f;
+    float fontSpacing = 0.1f;
     float lineSpacing = -0.1f;
     bool backface = true;
     graphicsLib->DrawText3D(text, position, fontSize, fontSpacing, lineSpacing, backface, color);
