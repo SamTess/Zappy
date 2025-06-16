@@ -128,7 +128,8 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     if (!find_and_execute(server, user, buffer)){
         if (user->is_fully_connected && user->type == GRAPHICAL)
             return write_command_output(user->client_fd, "suc\n");
-        write_command_output(user->client_fd, "ko\n");
+        if (user->is_fully_connected)
+            write_command_output(user->client_fd, "ko\n");
     }
 }
 
