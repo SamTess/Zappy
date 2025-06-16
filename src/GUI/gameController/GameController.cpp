@@ -100,7 +100,7 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     int playerId = playerData->getId();
     auto existingPlayer = _gameState->getPlayerInfo(playerId);
 
-    if (existingPlayer) {
+    if (existingPlayer && playerData->getOrientation() != -1) {
         if (!playerData->isAlive()) {
             _gameState->removePlayer(playerId);
             return;
@@ -113,6 +113,12 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
             _gameState->addOrUpdatePlayer(*playerData);
             return;
         }
+    }
+    if (playerData->getOrientation() == -1) {
+        playerData->setTeamName(existingPlayer->getTeamName());
+        playerData->setX(existingPlayer->getX());
+        playerData->setY(existingPlayer->getY());
+        playerData->setOrientation(existingPlayer->getOrientation());
     }
     _gameState->addOrUpdatePlayer(*playerData);
 }
