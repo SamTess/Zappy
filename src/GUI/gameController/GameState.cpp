@@ -181,10 +181,22 @@ void GameState::addOrUpdatePlayer(const PlayerInfoData& playerData) {
 
     if (_players.find(playerId) != _players.end()) {
         const auto& oldPlayer = _players[playerId];
-        removePlayerFromTile(playerId, oldPlayer.getX(), oldPlayer.getY());
+        PlayerInfoData updatedPlayer = playerData;
+        if (updatedPlayer.getTeamName().empty() && !oldPlayer.getTeamName().empty())
+            updatedPlayer.setTeamName(oldPlayer.getTeamName());
+        if (updatedPlayer.getLevel() == 0 && oldPlayer.getLevel() > 0)
+            updatedPlayer.setLevel(oldPlayer.getLevel());
+        if (oldPlayer.getX() != updatedPlayer.getX() || oldPlayer.getY() != updatedPlayer.getY()) {
+            removePlayerFromTile(playerId, oldPlayer.getX(), oldPlayer.getY());
+            _players[playerId] = updatedPlayer;
+            addPlayerToTile(playerId, updatedPlayer.getX(), updatedPlayer.getY());
+        } else {
+            _players[playerId] = updatedPlayer;
+        }
+    } else {
+        _players[playerId] = playerData;
+        addPlayerToTile(playerId, playerData.getX(), playerData.getY());
     }
-    _players[playerId] = playerData;
-    addPlayerToTile(playerId, playerData.getX(), playerData.getY());
 }
 
 void GameState::removePlayer(int playerId) {
