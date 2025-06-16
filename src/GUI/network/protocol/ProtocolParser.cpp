@@ -142,9 +142,11 @@ std::string ProtocolParser::extractCommandParameter(const std::string &message) 
 
 int ProtocolParser::parseIntParameter(const std::string &param) {
     try {
-        int result = std::stoi(param);
-        _logger->logDebug("Parsed integer parameter: " + param + " -> " + std::to_string(result));
-        return result;
+        std::string cleanParam = param;
+        if (!cleanParam.empty() && cleanParam[0] == '#') {
+            cleanParam = cleanParam.substr(1);
+        }
+        return std::stoi(cleanParam);
     } catch (const std::exception &e) {
         _logger->logError("Failed to parse integer parameter: " + param + " - " + e.what());
         throw ProtocolParserException("Invalid integer parameter: " + param);
