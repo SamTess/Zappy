@@ -2,85 +2,112 @@
 sidebar_position: 1
 ---
 
-# Protocole Serveur-IA
+# Server-AI Protocol
 
-## Vue d'ensemble
+## Overview
 
-Ce document détaille le protocole de communication entre le serveur Zappy et les clients d'intelligence artificielle (IA). Le protocole est basé sur des échanges textuels avec des commandes spécifiques et leurs réponses associées.
+This document details the communication protocol between the Zappy server and artificial intelligence (AI) clients. The protocol uses text-based exchanges over TCP/IP with specified commands and responses, enabling AI clients to interact with the game world.
 
-## Connexion
+## Connection Sequence
 
-1. L'IA se connecte au serveur via TCP/IP
-2. Le serveur répond avec : `WELCOME\n`
-3. L'IA envoie le nom de son équipe : `<team_name>\n`
-4. Le serveur répond avec : 
-   - `<client_num>\n` : Numéro du client dans l'équipe
-   - `<X> <Y>\n` : Dimensions de la carte
+1. **TCP Connection**: AI client connects to the server via TCP/IP
+2. **Welcome Message**: Server responds with: `WELCOME\n`
+3. **Team Selection**: AI client sends team name: `<team_name>\n`
+4. **Connection Confirmation**: Server responds with:
+   - `<client_num>\n`: Client's sequence number within the team
+   - `<X> <Y>\n`: Map dimensions (width × height)
 
-## Format des commandes
+## Message Format
 
-- Chaque commande est une chaîne de caractères terminée par `\n`
-- Les réponses du serveur sont également terminées par `\n`
-- Chaque commande a un temps d'exécution spécifique
+- All commands and responses are terminated with a newline character (`\n`)
+- Commands have specific execution times measured in server time units
+- Multi-line responses end with an empty line (`\n`)
 
-## Commandes disponibles
+## Command Reference
 
-### Commandes de base
+### Basic Commands
 
-| Commande | Description | Résultat | Durée (unité temps serveur) |
-|----------|-------------|----------|------------|
-| `Forward` | Avancer d'une case | `ok\n` | 7 |
-| `Right` | Pivoter à droite | `ok\n` | 7 |
-| `Left` | Pivoter à gauche | `ok\n` | 7 |
-| `Look` | Observer l'environnement | Liste des objets visibles | 7 |
-| `Inventory` | Consulter l'inventaire | Liste des ressources possédées | 1 |
-| `Broadcast <text>` | Communiquer avec les autres joueurs | `ok\n` | 7 |
-| `Connect_nbr` | Nombre de connexions disponibles | Nombre entier | 0 |
-| `Fork` | Créer un nouvel œuf | `ok\n` | 42 |
-| `Eject` | Éjecter les joueurs de la case | `ok\n` ou `ko\n` | 7 |
-| `Take <object>` | Ramasser un objet | `ok\n` ou `ko\n` | 7 |
-| `Set <object>` | Poser un objet | `ok\n` ou `ko\n` | 7 |
-| `Incantation` | Lancer une incantation | Succès ou échec de l'incantation | Variable |
+| Command | Description | Response Format | Duration (time units) | Failure Response |
+|---------|-------------|-----------------|----------------------|------------------|
+| `Forward` | Move forward one tile | `ok\n` | 7 | N/A |
+| `Right` | Turn 90° clockwise | `ok\n` | 7 | N/A |
+| `Left` | Turn 90° counter-clockwise | `ok\n` | 7 | N/A |
+| `Look` | Survey the environment | Multi-line tile contents | 7 | N/A |
+| `Inventory` | Check inventory contents | Multi-line resource list | 1 | N/A |
+| `Broadcast <text>` | Send message to all players | `ok\n` | 7 | N/A |
+| `Connect_nbr` | Get available team slots | `<n>\n` (integer) | 0 | N/A |
+| `Fork` | Create a new player egg | `ok\n` | 42 | N/A |
+| `Eject` | Push players from current tile | `ok\n` or `ko\n` | 7 | `ko\n` |
+| `Take <object>` | Pick up a resource | `ok\n` or `ko\n` | 7 | `ko\n` |
+| `Set <object>` | Place a resource | `ok\n` or `ko\n` | 7 | `ko\n` |
+| `Incantation` | Start level-up ritual | Start: `Elevation underway\n`<br />End: `Current level: <level>\n` or `ko\n` | Variable | `ko\n` |
 
-### Format des réponses
+### Resource Types
 
-#### Look
+Valid object names for `Take` and `Set` commands:
+- `food`: Food units (hunger management)
+- `linemate`: Level 1 resource (green)
+- `deraumere`: Level 2 resource (blue)
+- `sibur`: Level 3 resource (red)
+- `mendiane`: Level 4 resource (purple)
+- `phiras`: Level 5 resource (yellow)
+- `thystame`: Level 6 resource (cyan)
+
+## Response Formats
+
+### Look Command
+
+The `Look` command returns a multi-line response representing the visible area:
 ```
-[<object1> <object2> ...],
-[<object1> <object2> ...],
+[<obj1> <obj2> ...],
+[<obj1> <obj2> ...],
 ...
 ```
 
-Objets possibles : `player`, `food`, `linemate`, `deraumere`, `sibur`, `mendiane`, `phiras`, `thystame`, `egg`
+- The first line shows the contents of the player's tile
+- Subsequent lines represent tiles in expanding vision squares
+- Vision range depends on player level (levels 1-8: 1-9 tiles per side)
+- Objects can be: `player`, `food`, or any resource type
 
-Le résultat de la commande `Look` est une liste de tuiles visibles, organisées comme suit:
-- La première tuile est celle où se trouve le joueur
-- Les tuiles suivantes s'organisent en cercles concentriques autour du joueur
-- Le nombre de tuiles visibles dépend du niveau du joueur
+#### Vision Pattern by Level
 
-#### Inventory
 ```
-{food <n>, linemate <n>, deraumere <n>, sibur <n>, mendiane <n>, phiras <n>, thystame <n>}
+Level 1: 3×3 square (9 tiles)
+Level 2: 5×5 square (25 tiles)
+Level 3: 7×7 square (49 tiles)
+Level 4: 9×9 square (81 tiles)
+Level 5: 11×11 square (121 tiles)
+...etc
 ```
 
-#### Broadcast
-- Les joueurs reçoivent : `message <direction>, <message>\n`
-- Direction : nombre de 1 à 8 représentant la direction du message
-  - 1 = Nord, 2 = Nord-Est, 3 = Est, 4 = Sud-Est, 5 = Sud, 6 = Sud-Ouest, 7 = Ouest, 8 = Nord-Ouest
+### Inventory Command
 
-#### Incantation
-1. Serveur répond immédiatement : `Elevation underway\n`
-2. À la fin de l'incantation : `Current level: <level>\n` ou échec avec `ko\n`
+The `Inventory` command returns the player's current inventory:
+```
+[food <qty>, linemate <qty>, deraumere <qty>, sibur <qty>, mendiane <qty>, phiras <qty>, thystame <qty>]
+```
 
-Pour démarrer une incantation:
-- Tous les joueurs participants doivent être sur la même case
-- Les ressources nécessaires doivent être présentes sur la case
-- Tous les joueurs doivent être du même niveau
+### Broadcast Command
 
-## Conditions d'élévation
+When a player receives a broadcast, they receive a message:
+```
+message <K>, <text>
+```
 
-| Niveau | Joueurs requis | Linemate | Deraumere | Sibur | Mendiane | Phiras | Thystame |
-|--------|----------------|----------|-----------|-------|----------|--------|----------|
+Where `K` is a direction index (1-8) indicating where the message came from:
+```
+     2 1 8
+     3 X 7
+     4 5 6
+```
+(`X` represents the player's position)
+
+## Incantation Requirements
+
+Each level upgrade requires specific resources on the tile and player participation:
+
+| Level Transition | Players | linemate | deraumere | sibur | mendiane | phiras | thystame |
+|------------------|---------|----------|-----------|-------|----------|--------|----------|
 | 1→2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 |
 | 2→3 | 2 | 1 | 1 | 1 | 0 | 0 | 0 |
 | 3→4 | 2 | 2 | 0 | 1 | 0 | 2 | 0 |
@@ -89,56 +116,42 @@ Pour démarrer une incantation:
 | 6→7 | 6 | 1 | 2 | 3 | 0 | 1 | 0 |
 | 7→8 | 6 | 2 | 2 | 2 | 2 | 2 | 1 |
 
-## Champ de vision
+## Player States
 
-Le champ de vision dépend du niveau du joueur et s'étend en cercles concentriques autour de lui:
+### Orientation
+Player orientation is one of four cardinal directions:
+1. North (top of map)
+2. East (right of map)
+3. South (bottom of map)
+4. West (left of map)
 
-| Niveau | Zones visibles |
-|--------|---------------|
-| 1 | 1 (case actuelle) + 8 (cercle 1) = 9 cases |
-| 2 | 9 + 16 (cercle 2) = 25 cases |
-| 3 | 25 + 24 (cercle 3) = 49 cases |
-| Et ainsi de suite... |  |
+### Food Management
+- Each player consumes 1 food unit every 126 time units
+- Death occurs when a player runs out of food
+- Initial inventory contains 10 food units
 
-## Messages serveur non sollicités
+## Technical Details
 
-L'IA peut recevoir certains messages du serveur sans les avoir demandés:
+### Time Units
+- Server operates on discrete time units (ticks)
+- Default frequency is 100 ticks per second (configurable via server `-f` parameter)
+- Command costs are measured in ticks
 
-| Message | Description |
-|---------|-------------|
-| `message <direction>, <message>\n` | Message de broadcast reçu d'un autre joueur |
-| `dead\n` | Le joueur est mort (manque de nourriture) |
-| `eject: <direction>\n` | Le joueur a été éjecté par un autre joueur |
+### Error Handling
+- Invalid commands receive `ko\n` 
+- Malformed commands may disconnect the client
+- Commands during execution of another command are enqueued
 
-## Logique de nourriture
+### Concurrency
+- Multiple commands can be sent without waiting for responses
+- Responses arrive in same order as commands were sent
+- Command execution is sequential per player
 
-- Chaque joueur commence avec une certaine quantité de nourriture (food)
-- La nourriture est consommée à un taux constant (par défaut: 126 unités de temps)
-- Si la nourriture atteint zéro, le joueur meurt et la connexion est fermée
+### Map Properties
+- The map is toroidal (wraps around edges)
+- Coordinates range from 0 to width-1 (X) and 0 to height-1 (Y)
+- Map can contain multiple players on one tile
 
-## Système d'œufs
+---
 
-Quand un joueur utilise la commande `Fork`:
-1. Un nouvel œuf est créé sur la même case que le joueur
-2. Cet œuf permet à un nouveau joueur de rejoindre l'équipe
-3. L'éclosion de l'œuf se produit lorsqu'un nouveau client se connecte
-
-## Exemple d'échange
-
-```
-CLIENT: <connexion>
-SERVER: WELCOME\n
-CLIENT: team1\n
-SERVER: 0\n
-SERVER: 8 8\n
-CLIENT: Look\n
-SERVER: [player food],[],[food],\n
-CLIENT: Forward\n
-SERVER: ok\n
-CLIENT: Inventory\n
-SERVER: {food 9, linemate 0, deraumere 0, sibur 0, mendiane 0, phiras 0, thystame 0}\n
-CLIENT: Broadcast Hello team!\n
-SERVER: ok\n
-CLIENT: Take food\n
-SERVER: ok\n
-```
+This protocol documentation provides a comprehensive reference for developers implementing AI clients for the Zappy server. For implementation guidance, refer to the AI client architecture documentation.

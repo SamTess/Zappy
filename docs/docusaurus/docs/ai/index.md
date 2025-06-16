@@ -2,116 +2,94 @@
 sidebar_position: 1
 ---
 
-# Client IA
+# AI Client
 
-Le client IA représente un joueur automatisé qui se connecte au serveur et prend des décisions pour jouer au jeu de façon autonome.
+The AI client is an autonomous player that connects to the Zappy server and makes decisions to play the game independently, optimizing resource collection, team coordination, and progression through levels.
 
-## Fonctionnalités
+## Features
 
-- Connexion au serveur Zappy
-- Analyse de l'environnement de jeu
-- Prise de décision basée sur l'état du jeu et les objectifs
-- Gestion des ressources
-- Collaboration avec d'autres IA de la même équipe
+- Full TCP/IP connectivity with the Zappy server
+- Environment analysis and world state tracking
+- Decision-making based on game state and objectives
+- Advanced resource management system
+- Team coordination through encrypted broadcast messages
+- Multi-state behavior with adaptive transitions
+- Pathfinding with A* algorithm optimized for toroidal maps
 
-## Architecture d'une IA
+## Core Architecture
 
-Chaque client IA suit généralement une architecture basée sur des agents qui comprend :
+Each AI client follows an agent-based architecture comprising:
 
-1. **Module de perception** : Interprète les informations reçues du serveur
-2. **Module de décision** : Détermine les actions à entreprendre
-3. **Module d'action** : Exécute les actions choisies
-4. **Gestionnaire d'état** : Maintient une représentation interne de l'état du jeu
+1. **Perception Module**: Processes and interprets server information
+   - Look command interpretation
+   - Inventory tracking
+   - Broadcast message decoding
 
-## Stratégies d'IA
+2. **Decision Module**: Determines optimal actions
+   - State machine with hierarchical behaviors
+   - Priority-based action selection
+   - Resource allocation algorithms
 
-Les IA peuvent mettre en œuvre diverses stratégies :
+3. **Action Module**: Executes selected commands
+   - Command scheduling and queuing
+   - Action failure handling
+   - Action cost optimization
 
-- **Collecte de ressources** : Recherche et collecte des ressources nécessaires
-- **Élévation de niveau** : Réalisation des incantations pour monter de niveau
-- **Exploration** : Cartographie de l'environnement
-- **Communication** : Coordination avec les autres membres de l'équipe
+4. **State Manager**: Maintains internal representation of game world
+   - Tile-based world map model
+   - Resource availability tracking
+   - Team member position tracking
 
-## Développement
+## AI Strategies
 
-Pour développer une IA efficace, vous devez comprendre :
+The AI implements several sophisticated strategies:
 
-1. Le protocole de communication avec le serveur
-2. Les règles du jeu et les mécanismes
-3. Les algorithmes de prise de décision
-4. Les structures de données efficaces pour représenter l'état du jeu
+- **Resource Collection**: Optimized algorithms for finding and gathering needed resources
+- **Level Progression**: Calculations to determine the most efficient path to level up
+- **Exploration**: Map discovery with minimal redundancy
+- **Team Coordination**: Synchronized actions with other team members
 
-## Exemple simplifié
+## States and Transitions
 
-Voici un exemple simplifié du cycle de vie d'une IA :
+The agent utilizes multiple primary states:
 
-```
-1. Se connecter au serveur
-2. Rejoindre une équipe
-3. Boucle principale :
-   a. Observer l'environnement (Look)
-   b. Vérifier l'inventaire
-   c. Prendre une décision basée sur les besoins
-   d. Exécuter des actions (se déplacer, prendre des objets, etc.)
-   e. Communiquer avec les autres joueurs si nécessaire
-```
+- **Exploration**: Searching for food and resources
+- **Collection**: Gathering identified resources
+- **Assembly**: Finding other players for incantation
+- **Incantation**: Performing level-up ritual
+- **Emergency**: High-priority state when food is low
 
-## Test et optimisation
+## Team Communication
 
-Pour améliorer votre IA :
+Agents communicate via the server's broadcast mechanism using a secure protocol:
 
-- Testez contre différentes stratégies
-- Analysez les performances dans différentes situations
-- Optimisez la prise de décision
-- Ajustez les priorités des actions
+- **Prefix**: Team identifier with encryption
+- **Message Type**: Action, Request, Information, Coordination
+- **Content**: Type-specific data payload
+- **Encryption**: AES-based team-specific encryption
 
-## Structure du code
+## Technical Implementation
 
-Le code de l'IA est structuré en plusieurs modules :
-- **Agent** : Gestion de la logique décisionnelle de l'IA
-- **Parser** : Analyse des messages reçus du serveur
-- **Logger** : Journalisation des actions et événements
-- **Utils** : Fonctions utilitaires partagées
-- **Defs** : Définitions et constantes du jeu
+The AI client is implemented in Python with these key technical features:
 
-## Logique de l'IA
+- **Asynchronous Operation**: Uses Python's asyncio for non-blocking communication
+- **Cryptography**: Implements AES encryption for team communication
+- **Memory-Efficient Design**: Optimized data structures for world representation
+- **Logging System**: Comprehensive debug and performance tracking
+- **Error Recovery**: Robust error handling and reconnection logic
 
-L'IA suit une machine à états hiérarchique permettant de :
-1. Explorer la carte pour trouver des ressources
-2. Collecter les ressources nécessaires pour l'incantation
-3. Rechercher d'autres joueurs de son équipe pour l'incantation
-4. Réaliser des incantations pour monter de niveau
-5. Coordonner ses actions avec les autres joueurs via le broadcast
+## Key Files
 
-## États et transitions
+- `main.py`: Program entry point and argument parsing
+- `agent/agent.py`: Primary agent implementation
+- `agent/state_machine.py`: State management system
+- `agent/behaviors.py`: Behavior implementations
+- `utils/pathfinder.py`: A* pathfinding algorithm
+- `utils/world_map.py`: Internal world representation
+- `utils/communication.py`: Team broadcast utilities
+- `utils/zappy.py`: Server communication interface
+- `logger/logger.py`: Logging system
 
-L'agent possède plusieurs états principaux :
-- **Exploration** : Recherche de nourriture et ressources
-- **Collecte** : Ramassage des ressources identifiées
-- **Regroupement** : Recherche d'autres joueurs pour incantation
-- **Incantation** : Exécution du rituel de montée de niveau
-- **SOS** : État d'urgence quand la nourriture est faible
+---
 
-## Communication
-
-Les agents communiquent entre eux via le mécanisme de broadcast du serveur en utilisant un protocole simple :
-- Préfixe : Identifiant de l'équipe
-- Type de message : Action, Demande, Information
-- Contenu : Dépend du type de message
-
-## Compilation et exécution
-
-```bash
-# Compilation (si nécessaire)
-make -C src/AI
-
-# Exécution
-./zappy_ai -p <port> -n <team_name> -h <host>
-```
-
-## Fichiers importants
-- `main.py` : Point d'entrée du programme
-- `agent/agent.py` : Classe principale de l'agent IA
-- `defs/zappy.py` : Définitions des constantes du jeu
-- `utils/*.py` : Fonctions utilitaires
-- `logger/logger.py` : Système de journalisation
+For detailed implementation specifics, refer to the source code in `src/AI/` and the API documentation.

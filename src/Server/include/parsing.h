@@ -20,5 +20,7 @@ typedef struct parsing_info_s {
 
 void parse_args(int ac, char **av, parsing_info_t *parsed_info);
 void parsing_error(char *error_message, parsing_info_t *parsed_info);
-
+int arr_len(char **array);
+void free_arr(char **array);
+char **str_to_word_arr(char *str, char *delim);
 #endif /* !PARSING_H_ */

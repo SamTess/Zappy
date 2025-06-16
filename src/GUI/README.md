@@ -1,81 +1,81 @@
-# Utilisation de DLLoader et des bibliothèques dynamiques graphiques dans Zappy GUI
+# Using DLLoader and Dynamic Graphics Libraries in Zappy GUI
 
-Ce dossier contient le code source de l'interface graphique de Zappy. L'application utilise un système de chargement dynamique de bibliothèques (DLLoader) pour permettre l'utilisation de différentes implémentations graphiques et GUI sans modifier le code principal.
+This folder contains the source code for the Zappy graphical interface. The application uses a dynamic library loading system (DLLoader) to allow the use of different graphics and GUI implementations without modifying the main code.
 
-## Fonctionnement général
+## General Operation
 
-- Les interfaces `IGraphicsLib` et `IGuiLib` définissent les fonctions attendues pour les bibliothèques graphiques et GUI.
-- Le gestionnaire `LibraryManager` (pattern Singleton) permet de charger dynamiquement des bibliothèques partagées (`.so`) et d'accéder à leurs fonctionnalités via les interfaces.
-- Les bibliothèques concrètes (ex : RaylibCPP, RayGUICPP) sont compilées séparément et placées dans le dossier `plugins/`.
+- The `IGraphicsLib` and `IGuiLib` interfaces define the expected functions for graphics and GUI libraries.
+- The `LibraryManager` (Singleton pattern) allows dynamic loading of shared libraries (`.so`) and access to their features via the interfaces.
+- Concrete libraries (e.g., RaylibCPP, RayGUICPP) are compiled separately and placed in the `plugins/` folder.
 
-## Exemple d'utilisation
+## Usage Example
 
 ```cpp
 #include "Shared/LibraryManager.hpp"
 
-// Chargement des bibliothèques dynamiques
+// Loading dynamic libraries
 auto& libraryManager = LibraryManager::getInstance();
 libraryManager.loadGraphicsLib("plugins/libraylibcpp.so");
 libraryManager.loadGuiLib("plugins/libraygui.so");
 
-// Récupération des interfaces
+// Retrieving interfaces
 auto& graphics = libraryManager.getGraphicsLib();
 auto& gui = libraryManager.getGuiLib();
 
-// Utilisation
+// Usage
 graphics.InitWindow(1280, 720, "Zappy");
-gui.DrawButton(100, 100, 200, 50, "Lancer la partie");
+gui.DrawButton(100, 100, 200, 50, "Start Game");
 ```
 
-## Ajouter une nouvelle bibliothèque
+## Adding a New Library
 
-1. Implémentez l'interface `IGraphicsLib` ou `IGuiLib` dans une nouvelle classe.
-2. Exposez une fonction de création compatible C :
+1. Implement the `IGraphicsLib` or `IGuiLib` interface in a new class.
+2. Expose a C-compatible creation function:
 ```cpp
 extern "C" {
     IGraphicsLib* createGraphicsLib() {
-        static MaLib instance;
+        static MyLib instance;
         return &instance;
     }
 }
 ```
-3. Compilez la bibliothèque en `.so` et placez-la dans `plugins/`.
-4. Chargez-la via le `LibraryManager` dans votre code.
+3. Compile the library as a `.so` and place it in `plugins/`.
+4. Load it via the `LibraryManager` in your code.
 
-## Avantages
-- Permet de changer de moteur graphique ou GUI sans recompiler toute l'application.
-- Favorise l'extensibilité et la modularité du projet.
+## Advantages
+- Allows switching graphic or GUI engines without recompiling the entire application.
+- Promotes extensibility and modularity of the project.
 
-## Exemple minimal
+## Minimal Example
 
-Voir `test_dlloader.cpp` pour un exemple de code qui charge dynamiquement les bibliothèques graphiques et GUI, puis affiche une fenêtre avec un bouton.
+See `test_dlloader.cpp` for an example code that dynamically loads graphic and GUI libraries, then displays a window with a button.
 
 ### Compilation
 
-Assurez-vous d'avoir compilé les bibliothèques dynamiques :
+Make sure you have compiled the dynamic libraries:
 ```sh
 make -C ../../libs/RaylibCPP
 make -C ../../libs/RayGUICPP
 ```
 
-Puis compilez l'exemple :
+Then compile the example:
 ```sh
 g++ -I../../libs/RaylibCPP -I../../libs/RayGUICPP/include -I../Shared -o test_dlloader test_dlloader.cpp -ldl -lraylib -lGL -lm -lpthread -lrt -lX11
 ```
 
-### Exécution
+### Execution
 
-Placez les fichiers `libraylibcpp.so` et `libraygui.so` dans le dossier `plugins/` à la racine du projet, puis lancez :
+Place the `libraylibcpp.so` and `libraygui.so` files in the `plugins/` folder at the root of the project, then run:
 ```sh
 ./test_dlloader
 ```
 
-## Fonctionnement
+## Operation
 
-- Le `LibraryManager` charge dynamiquement les bibliothèques graphiques et GUI via leurs interfaces (`IGraphicsLib`, `IGuiLib`).
-- Vous pouvez ensuite utiliser les méthodes de ces interfaces comme si elles étaient natives.
+- The `LibraryManager` dynamically loads graphic and GUI libraries via their interfaces (`IGraphicsLib`, `IGuiLib`).
+- You can then use the methods of these interfaces as if they were native.
 
-## Pour aller plus loin
+## Further Exploration
 
-- Consultez le README dans `src/Shared/` pour plus de détails sur le système de plugins.
-- Adaptez l'exemple pour tester vos propres bibliothèques dynamiques !
+- Check the README in `src/Shared/` for more details on the plugin system.
+- Adapt the example to test your own dynamic libraries!

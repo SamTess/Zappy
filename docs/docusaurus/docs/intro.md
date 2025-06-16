@@ -2,58 +2,112 @@
 sidebar_position: 1
 ---
 
-# Zappy - Introduction
+# Zappy - Multi-Agent Virtual Ecosystem
 
-Bienvenue dans la documentation de **Zappy**, un écosystème virtuel multi-agents avec serveur de jeu, interface graphique et intelligence artificielle.
+Welcome to the **Zappy** documentation, a sophisticated multi-agent virtual ecosystem featuring a game server, 3D graphical interface, and intelligent AI clients.
 
-## Qu'est-ce que Zappy ?
+## What is Zappy?
 
-Zappy est un projet multi-composants développé en C/C++ et Python, reproduisant un écosystème virtuel où des agents contrôlés par IA évoluent en collectant des ressources, en communiquant, et en réalisant des rituels d'élévation.
+Zappy is an advanced multiplayer simulation where AI-controlled agents compete for survival and evolution in a resource-constrained virtual world. Players must collect resources, communicate with teammates, and perform complex rituals to advance through difficulty levels.
 
-## Composants principaux
+### Game Mechanics
 
-Le projet se compose de trois éléments principaux :
+- **Resource Management**: Agents must collect food to survive and minerals for evolution
+- **Team Collaboration**: Players work together to perform incantation rituals
+- **Strategic Communication**: Encrypted broadcast system for team coordination
+- **Spatial Intelligence**: Dynamic pathfinding and exploration algorithms
+- **Level Progression**: Eight levels of increasing complexity and requirements
 
-- **Serveur** : Écrit en C, il gère la logique du jeu, les règles, et l'état du monde
-- **Interface Graphique** : Développée en C++, elle visualise l'état du jeu en temps réel
-- **Clients IA** : Implémentés en Python, ils contrôlent automatiquement les joueurs pour accomplir des objectifs stratégiques
+## System Architecture
 
-## Prérequis
+The project consists of three main components communicating via TCP/IP protocols:
 
-Pour compiler et exécuter Zappy, vous aurez besoin de :
+### 🎮 Game Server (C)
+High-performance game engine managing:
+- Real-time world simulation
+- Multi-client networking
+- Game rules enforcement
+- Resource distribution algorithms
 
-- Compilateur C/C++ (GCC ou Clang)
-- Python 3.x
-- Make
-- Bibliothèques de développement graphique (pour le client GUI)
+### 🎨 3D Graphical Interface (C++)
+Advanced visualization system featuring:
+- Real-time 3D rendering with Raylib
+- Dynamic camera controls
+- Resource and player visualization
+- Game state monitoring tools
 
-## Architecture simplifiée
+### 🤖 AI Clients (Python)
+Intelligent agents with:
+- Behavioral state machines
+- A* pathfinding algorithms
+- Encrypted team communication
+- Adaptive decision-making systems
 
-Les composants communiquent via des protocoles réseau TCP/IP :
+## Network Architecture
 
+```mermaid
+flowchart TB
+    subgraph "AI Clients (Python)"
+        AI1[AI Agent 1]
+        AI2[AI Agent 2]
+        AI3[AI Agent N...]
+    end
+    
+    subgraph "Game Server (C)"
+        Server[Core Engine]
+    end
+    
+    subgraph "Visualization"
+        GUI[3D Interface C++]
+    end
+    
+    AI1 -->|TCP Commands| Server
+    AI2 -->|TCP Commands| Server
+    AI3 -->|TCP Commands| Server
+    Server -->|Game State| GUI
+    Server -->|Responses| AI1
+    Server -->|Responses| AI2
+    Server -->|Responses| AI3
 ```
-┌────────┐    Commandes/Réponses    ┌──────────┐
-│        │◄────────────────────────►│          │
-│ Client │                          │          │
-│  (IA)  │                          │          │
-│        │                          │          │
-└────────┘                          │          │
-                                    │ Serveur  │
-┌────────┐    Données de jeu        │          │
-│        │◄────────────────────────►│          │
-│  GUI   │                          │          │
-│        │                          │          │
-└────────┘                          └──────────┘
-```
 
-## Comment utiliser cette documentation
+## Key Features
 
-Cette documentation est organisée par sections :
+### Advanced AI Behaviors
+- **Dyson Collector**: Optimized resource gathering patterns
+- **Incanter**: Strategic evolution and ritual coordination  
+- **Explorer**: Intelligent map exploration with spiral patterns
+- **Communicator**: Encrypted inter-agent messaging
 
-- **Premiers pas** : Installation et configuration du projet
-- **Architecture** : Vue d'ensemble de la conception
-- **Serveur** : Documentation du composant serveur
-- **Interface graphique** : Documentation de la visualisation
-- **IA** : Documentation des clients intelligents
+### Performance Optimizations
+- Asynchronous network communication
+- State caching systems
+- Efficient resource algorithms
+- Real-time rendering optimizations
 
-Explorez la barre latérale pour accéder aux différentes sections.
+### Development Tools
+- Comprehensive logging system
+- Unit testing frameworks
+- Performance profiling tools
+- Documentation generation
+
+## Getting Started
+
+Choose your path to explore Zappy:
+
+- **[Quick Start Guide](./getting-started)**: Build and run the project
+- **[Architecture Overview](./architecture)**: Deep dive into system design
+- **[Server Documentation](./server/)**: Game engine implementation
+- **[GUI Documentation](./gui/)**: 3D interface development
+- **[AI Documentation](./ai/)**: Intelligent agent programming
+- **[Protocol Reference](./protocols/)**: Network communication specs
+
+## Technology Stack
+
+| Component | Language | Framework | Purpose |
+|-----------|----------|-----------|---------|
+| Server | C | POSIX Sockets | Game engine & networking |
+| GUI | C++ | Raylib/RayGUI | 3D visualization |
+| AI | Python | AsyncIO | Intelligent agents |
+| Docs | TypeScript | Docusaurus | Documentation |
+
+Ready to dive into the world of intelligent multi-agent systems? Let's get started!

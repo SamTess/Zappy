@@ -7,6 +7,7 @@
 
 #include "ProtocolParser.hpp"
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -124,7 +125,11 @@ std::string ProtocolParser::extractCommandParameter(const std::string &message) 
 
 int ProtocolParser::parseIntParameter(const std::string &param) {
     try {
-        return std::stoi(param);
+        std::string cleanParam = param;
+        if (!cleanParam.empty() && cleanParam[0] == '#') {
+            cleanParam = cleanParam.substr(1);
+        }
+        return std::stoi(cleanParam);
     } catch (const std::exception &e) {
         throw ProtocolParserException("Failed to parse integer parameter: " + param);
     }
@@ -140,7 +145,7 @@ Message ProtocolParser::parseMapSize(const std::string &message) {
 
 Message ProtocolParser::parseTileContent(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
-    if (params.size() < 8)
+    if (params.size() < 9)
         throw ProtocolParserException("Invalid tile content parameters: " + message);
     int x = parseIntParameter(params[0]);
     int y = parseIntParameter(params[1]);
@@ -172,6 +177,7 @@ Message ProtocolParser::parseTeamNames(const std::string &message) {
 }
 
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
+    printf("Parsing player connection message: %s\n", message.c_str());
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 6)
         throw ProtocolParserException("Invalid player connection parameters: " + message);
@@ -235,8 +241,8 @@ Message ProtocolParser::parsePlayerExpulsion(const std::string &message) {
         throw ProtocolParserException("Invalid player expulsion parameters: " + message);
     int id = parseIntParameter(params[0]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
-    return Message(PEX_HEADER, extractCommandParameter(message), playerInfoData);
+    auto playerExpulsionData = std::make_shared<PlayerExpulsionData>(id);
+    return Message(PEX_HEADER, extractCommandParameter(message), playerExpulsionData);
 }
 
 Message ProtocolParser::parsePlayerBroadcast(const std::string &message) {
@@ -318,8 +324,8 @@ Message ProtocolParser::parseEggLaying(const std::string &message) {
         throw ProtocolParserException("Invalid egg laying parameters: " + message);
     int playerId = parseIntParameter(params[0]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(playerId, 0, 0, 0, 0);
-    return Message(PFK_HEADER, extractCommandParameter(message), playerInfoData);
+    auto eggData = std::make_shared<EggData>(0, playerId, 0, 0, EggData::EggAction::Laying);
+    return Message(PFK_HEADER, extractCommandParameter(message), eggData);
 }
 
 Message ProtocolParser::parseEggDrop(const std::string &message) {
@@ -331,7 +337,7 @@ Message ProtocolParser::parseEggDrop(const std::string &message) {
     int x = parseIntParameter(params[2]);
     int y = parseIntParameter(params[3]);
 
-    auto eggData = std::make_shared<EggData>(eggId, playerId, x, y);
+    auto eggData = std::make_shared<EggData>(eggId, playerId, x, y, EggData::EggAction::Drop);
     return Message(ENW_HEADER, extractCommandParameter(message), eggData);
 }
 
@@ -341,7 +347,7 @@ Message ProtocolParser::parseEggConnection(const std::string &message) {
         throw ProtocolParserException("Invalid egg connection parameters: " + message);
     int eggId = parseIntParameter(params[0]);
 
-    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0);
+    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0, EggData::EggAction::Connection);
     return Message(EBO_HEADER, extractCommandParameter(message), eggData);
 }
 
@@ -351,7 +357,7 @@ Message ProtocolParser::parseEggDeath(const std::string &message) {
         throw ProtocolParserException("Invalid egg death parameters: " + message);
     int eggId = parseIntParameter(params[0]);
 
-    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0);
+    auto eggData = std::make_shared<EggData>(eggId, 0, 0, 0, EggData::EggAction::Death);
     return Message(EDI_HEADER, extractCommandParameter(message), eggData);
 }
 

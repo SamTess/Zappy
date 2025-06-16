@@ -19,6 +19,7 @@ class Window {
         void beginDrawing() const;
         void endDrawing() const;
         void clear(Color color = RAYWHITE) const;
+        void setFps(int fps) const;
 };
 
 }  // namespace raylibcpp

@@ -7,6 +7,8 @@
 
 #include "../include/tile.h"
 #include "../include/server.h"
+#include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -24,7 +26,8 @@ static void shuffle_indices(int *indices, int total_tiles)
     }
 }
 
-static void distribute_one_resource(resource_dist_t *dist, int res, int total)
+static void distribute_one_resource(resource_dist_t *dist, int res,
+    int total, server_t *server)
 {
     int idx;
     int y;
@@ -36,6 +39,7 @@ static void distribute_one_resource(resource_dist_t *dist, int res, int total)
         y = idx / dist->width;
         x = idx % dist->width;
         dist->map[y][x].resources[res]++;
+        send_bct_to_all_graphical_clients(server, x, y);
     }
 }
 
@@ -71,7 +75,7 @@ void distribute_resources(tile_t **map, server_t *server,
             total = 1;
         total_resources[res] = total;
         current_resources[res] = total;
-        distribute_one_resource(&dist, res, total);
+        distribute_one_resource(&dist, res, total, server);
     }
     free(dist.tile_indices);
 }
@@ -87,9 +91,10 @@ void respawn_resources(tile_t **map, server_t *server,
     for (int res = 0; res < COUNT; ++res) {
         missing = total_resources[res] - current_resources[res];
         if (missing > 0) {
-            distribute_one_resource(&dist, res, missing);
+            distribute_one_resource(&dist, res, missing, server);
             current_resources[res] += missing;
         }
     }
+    send_smg_command(server, "Resources respawned");
     free(dist.tile_indices);
 }

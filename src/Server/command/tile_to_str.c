@@ -15,7 +15,7 @@ static char *repeat_word(char *word, int nb)
 
     if (nb <= 0)
         return strdup("");
-    res = malloc(sizeof(char) * ((strlen(word) * nb) + (nb + 1)));
+    res = calloc(((strlen(word) * nb) + (nb + 1)), sizeof(char));
     if (!res)
         server_err("Malloc failed for res repeat_word");
     res[0] = '\0';

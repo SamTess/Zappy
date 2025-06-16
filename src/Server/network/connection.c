@@ -15,6 +15,7 @@
 #include <linux/limits.h>
 #include "../include/server.h"
 #include "../include/parsing.h"
+#include "../include/command.h"
 
 static bool remove_head_client(server_t *server, int fd)
 {
@@ -93,9 +94,9 @@ static client_t *init_new_client(int fd)
 
 void add_fd(server_t *server, int fd)
 {
+    static int next_id = 0;
     client_t *new_c = init_new_client(fd);
     client_t *current;
-    int next_id = 0;
 
     if (server->client == NULL) {
         server->client = new_c;
@@ -104,14 +105,10 @@ void add_fd(server_t *server, int fd)
     }
     current = server->client;
     while (current->next != NULL) {
-        if (current->client_id >= next_id) {
-            next_id = current->client_id + 1;
-        }
         current = current->next;
     }
-    if (current->client_id >= next_id)
-        next_id = current->client_id + 1;
     new_c->client_id = next_id;
+    next_id++;
     current->next = new_c;
 }
 
@@ -184,6 +181,7 @@ static void init_server(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->frequence = parsed_info->frequence;
     server->eggs = NULL;
     server->should_run = true;
+    server->poll_manager = calloc(1, sizeof(poll_manager_t));
     init_server_resources(server);
     copy_names(server, parsed_info);
 }

@@ -26,7 +26,7 @@ public:
 
     bool isDragging() const { return m_isDragging; }
     void setDragging(bool dragging) { m_isDragging = dragging; }
-    void setMousePosition(int x, int y) { m_lastMouseX = x; m_lastMouseY = y; }
+    void setMousePosition(int x, int y);
 
     ZappyTypes::Vector3& position() { return m_cameraPosition; }
     ZappyTypes::Vector3& target() { return m_cameraTarget; }
@@ -35,6 +35,12 @@ public:
     float& distance() { return m_cameraDistance; }
     float& angleX() { return m_cameraAngleX; }
     float& angleY() { return m_cameraAngleY; }
+
+    // Définir les limites de la carte pour le mouvement de la caméra
+    void setMapDimensions(int width, int height) {
+        m_mapWidth = width;
+        m_mapHeight = height;
+    }
 
 private:
     ZappyTypes::Vector3 m_cameraPosition;
@@ -51,4 +57,7 @@ private:
     float m_cameraAngleX;
     float m_mouseSensitivity;
     float m_keyboardSpeed;
+
+    int m_mapWidth = 20;
+    int m_mapHeight = 20;
 };

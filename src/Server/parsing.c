@@ -57,6 +57,8 @@ static char **parse_names(char **av, int i)
     while (av[j] != NULL && av[j][0] != '-'){
         result[count] = strdup(av[j]);
         result = realloc(result, (sizeof(char *) * (count + 2)));
+        if (!result)
+            server_err("Realloc failed in parse_names");
         j++;
         count++;
     }

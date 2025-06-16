@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <signal.h>
-#include "../include/server.h"
+#include "include/server.h"
 
 static int *get_running_flag(void)
 {
@@ -28,15 +28,31 @@ static void sigint_handler(int signum)
     *flag = 0;
 }
 
+static void sigpipe_handler(int signum)
+{
+    (void)signum;
+    perror("SIGPIPE Caught do not disconnect a client during function\n");
+}
+
 static int setup_signal_handler(void)
 {
-    struct sigaction sa = {0};
+    struct sigaction sa_int;
+    struct sigaction sa_pipe;
 
-    sa.sa_handler = sigint_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    if (sigaction(SIGINT, &sa, NULL) == -1) {
+    memset(&sa_int, 0, sizeof(sa_int));
+    memset(&sa_pipe, 0, sizeof(sa_pipe));
+    sa_int.sa_handler = sigint_handler;
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;
+    if (sigaction(SIGINT, &sa_int, NULL) == -1) {
         perror("Failed to setup SIGINT handler");
+        return -1;
+    }
+    sa_pipe.sa_handler = sigpipe_handler;
+    sigemptyset(&sa_pipe.sa_mask);
+    sa_pipe.sa_flags = 0;
+    if (sigaction(SIGPIPE, &sa_pipe, NULL) == -1) {
+        perror("Failed to setup SIGPIPE handler");
         return -1;
     }
     return 0;
@@ -80,8 +96,9 @@ static void disp_args(parsing_info_t *parsed_info)
 
 static void server_loop(server_t *server)
 {
-    while (should_continue_running() && server->should_run) {
-        check_client(server);
+    while (should_continue_running()) {
+        if (server->should_run)
+            check_client(server);
     }
     printf("Server is shutting down\n");
 }

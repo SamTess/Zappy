@@ -15,7 +15,14 @@
 #include "cameraController/CameraController.hpp"
 #include "renderer/UIRenderer.hpp"
 #include "renderer/Renderer.hpp"
+#include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
+#include "gameController/GameController.hpp"
+
+namespace Zappy {
+    class MapRenderer;
+    class ModelManagerAdapter;
+}
 
 class GameLoop {
 public:
@@ -24,22 +31,29 @@ public:
     bool init();
     int run();
     void setServerInfo(const std::string& host, int port);
-    void renderCube();
+    void setGameController(std::shared_ptr<GameController> controller);
 
 private:
     bool loadLibraries();
     void initializeManagers();
-    bool loadModels();
     void setupComponents();
+    bool loadModels();
+    void updateCameraForMapSize();
 
     std::string m_host;
     int m_port;
+
+    int m_mapWidth = 20;
+    int m_mapHeight = 20;
 
     std::shared_ptr<IGraphicsLib> m_graphics;
     std::shared_ptr<IGuiLib> m_gui;
     std::shared_ptr<Renderer> m_renderer;
     std::shared_ptr<CameraController> m_camera;
     std::shared_ptr<UIRenderer> m_uiRenderer;
+    std::shared_ptr<GameController> m_gameController;
+    std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
+    std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
 
     int m_cubeModelId = -1;
 };

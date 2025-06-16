@@ -12,11 +12,19 @@
 
 class EggData : public IMessageData {
     public:
-        EggData() : _eggId(0), _playerId(0), _x(0), _y(0) {}
-        EggData(int eggId, int playerId, int x, int y)
-            : _eggId(eggId), _playerId(playerId), _x(x), _y(y) {}
+        enum class EggAction {
+            Drop,       // enw - Egg creation
+            Connection, // ebo - Egg hatching/connection
+            Death,      // edi - Egg death
+            Laying      // pfk - Player starts laying an egg
+        };
+
+        EggData() : _eggId(0), _playerId(0), _x(0), _y(0), _action(EggAction::Drop) {}
+        EggData(int eggId, int playerId, int x, int y, EggAction action = EggAction::Drop)
+            : _eggId(eggId), _playerId(playerId), _x(x), _y(y), _action(action) {}
 
         MessageType getType() const override { return MessageType::Egg; }
+        EggAction getAction() const { return _action; }
 
         int getEggId() const { return _eggId; }
         int getPlayerId() const { return _playerId; }
@@ -33,6 +41,7 @@ class EggData : public IMessageData {
         int _playerId;
         int _x;
         int _y;
+        EggAction _action;
 };
 
 #endif /* !EGG_DATA_HPP_ */

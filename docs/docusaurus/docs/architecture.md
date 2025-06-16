@@ -2,106 +2,131 @@
 sidebar_position: 2
 ---
 
-# Architecture du projet
+# System Architecture
 
-## Vue d'ensemble
+## Overview
 
-Zappy est composé de trois composants principaux qui interagissent entre eux :
+Zappy is a high-performance, multi-agent simulation platform built with a modular client-server architecture. The system enables real-time interaction between intelligent AI agents, a robust C server, and a modern 3D graphical interface.
 
-1. **Serveur** - Le cœur du jeu qui gère la logique, les règles et l'état du jeu
-2. **GUI (Interface graphique)** - Représentation visuelle de l'état du jeu
-3. **IA** - Clients automatisés qui jouent au jeu
+## Architecture Diagram
 
-## Communication entre composants
-
-Les composants communiquent via des protocoles réseau TCP/IP :
-
+```mermaid
+flowchart TB
+    subgraph "Client Layer"
+        subgraph "AI Agents (Python)"
+            AI1[Agent 1]
+            AI2[Agent 2]
+            AI3[Agent N]
+        end
+        subgraph "Visualization (C++)"
+            GUI[3D Interface]
+        end
+    end
+    subgraph "Server Layer (C)"
+        NET[Network Manager]
+        GAME[Game Engine]
+        MAP[Map Manager]
+        PLAYER[Player Manager]
+    end
+    subgraph "Data Layer"
+        WORLD[World State]
+        TEAMS[Team Data]
+        RESOURCES[Resource Map]
+    end
+    AI1 -->|TCP Commands| NET
+    AI2 -->|TCP Commands| NET
+    AI3 -->|TCP Commands| NET
+    GUI -->|State Queries| NET
+    NET --> GAME
+    GAME --> MAP
+    GAME --> PLAYER
+    GAME --> WORLD
+    PLAYER --> TEAMS
+    MAP --> RESOURCES
+    WORLD -->|Updates| GUI
+    TEAMS -->|Statistics| GUI
+    RESOURCES -->|Visualization| GUI
 ```
-┌────────┐    Commandes/Réponses    ┌──────────┐
-│        │◄────────────────────────►│          │
-│ Client │                          │          │
-│  (IA)  │                          │          │
-│        │                          │          │
-└────────┘                          │          │
-                                    │ Serveur  │
-┌────────┐    Données de jeu        │          │
-│        │◄────────────────────────►│          │
-│  GUI   │                          │          │
-│        │                          │          │
-└────────┘                          └──────────┘
-```
 
-## Structure des fichiers
+## Core Components
 
-Le code source est organisé comme suit :
+### 1. Game Server (C)
 
-- `src/Server/` - Implémentation du serveur en C
-  - `main.c` - Point d'entrée
-  - `include/` - En-têtes du serveur
-  - ...
+The server is the authoritative component managing all game logic and world state.
 
-- `src/GUI/` - Implémentation de l'interface graphique en C++
-  - `main.cpp` - Point d'entrée
-  - ...
+**Responsibilities:**
+- Real-time world simulation and physics
+- Multi-client network management (async I/O)
+- Game rule enforcement and validation
+- Resource distribution algorithms
+- Event broadcasting and state synchronization
 
-- `src/AI/` - Implémentation du client IA
-  - ...
+**Key Modules:**
+- **Network Manager:** Handles client connections, command queues, and asynchronous I/O.
+- **Map Manager:** Manages the world grid, resource spawning, and tile entities.
+- **Player Manager:** Tracks player state, inventory, and actions.
 
-- `src/Shared/` - Code partagé entre les composants
-  - ...
+### 2. 3D Graphical Interface (C++)
 
-## Technologies utilisées
+A modern, component-based architecture for real-time 3D visualization using Raylib/OpenGL. Features include:
+- Real-time rendering and camera controls
+- Dynamic library loading for graphics abstraction
+- Modular UI system
+- Performance optimizations (LOD, culling)
 
-- **Serveur** : C, sockets, gestion des threads
-- **GUI** : C++, bibliothèque graphique
-- **IA** : Algorithmes de prise de décision, stratégies
+### 3. AI Client System (Python)
 
-## Bibliothèques utilisées
+Sophisticated agent architecture with behavioral state machines and advanced AI algorithms:
+- Asynchronous network communication
+- Behavioral state machines for complex decision making
+- A* pathfinding and dynamic obstacle avoidance
+- Encrypted team communication
 
-Le projet utilise plusieurs bibliothèques spécifiques :
+## File Structure
 
-### RaylibCPP
-Une encapsulation C++ de la bibliothèque Raylib pour faciliter le rendu graphique 3D dans l'interface GUI. La bibliothèque fournit des classes pour :
-- Gestion des fenêtres
-- Rendu de formes et textures
-- Gestion des entrées utilisateur
-- Manipulation de la caméra 3D
+- `src/Server/` — C server implementation
+- `src/GUI/` — C++ graphical interface
+- `src/AI/` — Python AI client
+- `src/Shared/` — Shared interfaces and dynamic library loader
 
-### RayGUICPP
-Une encapsulation C++ de la bibliothèque raygui pour créer l'interface utilisateur du client GUI. Elle offre :
-- Des widgets d'interface utilisateur
-- Des contrôles interactifs
-- Des boîtes de dialogue
-- Des layouts et groupes
+## Communication Protocols
 
-### DLLoader
-Un système de chargement dynamique de bibliothèques qui permet :
-- Le chargement de bibliothèques à l'exécution
-- L'abstraction de l'implémentation graphique
-- L'interchangeabilité des modules
+- **Server-AI Protocol:** Text-based commands, state synchronization, action costs
+- **Server-GUI Protocol:** Specialized for visualization, real-time updates
 
-## Flux de données
+## Design Patterns
 
-Les données circulent entre les composants comme suit :
+- **Observer:** GUI state updates
+- **Strategy:** Adaptive AI behaviors
+- **Command:** Server command processing
+- **Factory:** Dynamic component creation
 
-1. **Serveur → IA** : État du jeu, résultats des actions
-2. **IA → Serveur** : Commandes et actions du joueur  
-3. **Serveur → GUI** : État complet du jeu pour visualisation
-4. **GUI → Serveur** : Requêtes d'information uniquement (pas d'action)
+## Key Technologies
 
-## Mécanismes de jeu principaux
+- **Server:** C, POSIX sockets, event-driven model
+- **GUI:** C++, Raylib, dynamic library loading
+- **AI:** Python, asyncio, decision algorithms
 
-### Cycle de vie du joueur
-1. Connexion au serveur et rejoindre une équipe
-2. Exploration et collecte de ressources
-3. Évolution par incantation
-4. Mort éventuelle par manque de nourriture
+## Libraries
 
-### Génération et distribution des ressources
-Les ressources sont générées aléatoirement sur la carte avec une distribution qui dépend du type de ressource. La régénération se produit périodiquement en fonction de la fréquence du serveur.
+- **RaylibCPP:** C++ wrapper for Raylib (3D rendering, input, camera)
+- **RayGUICPP:** C++ wrapper for raygui (UI widgets, dialogs)
+- **DLLoader:** Dynamic library loader for modularity
 
-### Système d'énergie
-Les joueurs consomment de la nourriture au fil du temps. Si un joueur n'a plus de nourriture, il meurt et est supprimé du jeu.
+## Data Flow
 
-### Communication entre joueurs
-Les joueurs peuvent communiquer entre eux via un système de diffusion qui permet à un joueur d'envoyer un message à tous les autres joueurs. Les messages sont reçus avec une indication de direction pour simuler une communication réaliste.
+1. **Server → AI:** Game state, action results
+2. **AI → Server:** Player commands
+3. **Server → GUI:** Full game state for visualization
+4. **GUI → Server:** Information requests only
+
+## Main Game Mechanisms
+
+- **Player Lifecycle:** Connect, join team, explore, collect, evolve, possible death by starvation
+- **Resource Generation:** Randomized, periodic, type-dependent
+- **Energy System:** Players consume food over time; starvation leads to death
+- **Player Communication:** Broadcast system with directional context
+
+---
+
+This document provides a technical overview of Zappy's architecture. For detailed protocol and module documentation, see the dedicated sections.

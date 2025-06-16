@@ -1,56 +1,56 @@
-# Documentation de RaylibCPP
+# RaylibCPP Documentation
 
-## Vue d'ensemble
+## Overview
 
-RaylibCPP est une encapsulation C++ de la bibliothèque Raylib, conçue pour le projet Zappy. Elle permet d'utiliser les fonctionnalités de Raylib de manière orientée objet et avec une syntaxe moderne C++.
+RaylibCPP is a C++ wrapper for the Raylib library, designed for the Zappy project. It allows you to use Raylib features in an object-oriented way with modern C++ syntax.
 
-## Fonctionnalités
+## Features
 
-RaylibCPP fournit des classes et méthodes pour :
-- **Gestion de fenêtre** : Création, configuration et fermeture de fenêtres
-- **Rendu 2D/3D** : Dessin de formes, modèles et textures
-- **Gestion de caméra** : Caméras 2D et 3D avec différents modes
-- **Gestion d'entrées** : Clavier, souris et autre périphériques
-- **Audio** : Lecture de sons et musiques
-- **Textures et images** : Chargement et manipulation d'images et textures
-- **Modèles 3D** : Chargement et rendu de modèles 3D
+RaylibCPP provides classes and methods for:
+- **Window management**: Creating, configuring, and closing windows
+- **2D/3D rendering**: Drawing shapes, models, and textures
+- **Camera management**: 2D and 3D cameras with different modes
+- **Input management**: Keyboard, mouse, and other devices
+- **Audio**: Playing sounds and music
+- **Textures and images**: Loading and manipulating images and textures
+- **3D models**: Loading and rendering 3D models
 
 ## Structure
 
-La bibliothèque est divisée en plusieurs modules :
-- **Window** : Gestion de la fenêtre et du contexte de rendu
-- **Shape** : Primitives de dessin 2D et 3D
-- **Texture** : Gestion des textures et images
-- **Camera** : Contrôle des caméras
-- **Input** : Gestion des entrées utilisateur
-- **Audio** : Lecture et contrôle audio
-- **Font** : Chargement et rendu de texte
+The library is divided into several modules:
+- **Window**: Window and rendering context management
+- **Shape**: 2D and 3D drawing primitives
+- **Texture**: Texture and image management
+- **Camera**: Camera control
+- **Input**: User input management
+- **Audio**: Audio playback and control
+- **Font**: Text loading and rendering
 
-## Utilisation
+## Usage
 
-### Initialisation
+### Initialization
 
 ```cpp
 #include "RayLib.hpp"
 
 int main() {
-    // Création d'une fenêtre
-    RaylibCPP::Window window(800, 600, "Mon Application");
+    // Create a window
+    RaylibCPP::Window window(800, 600, "My Application");
     
-    // Initialisation de la caméra 3D
+    // Initialize 3D camera
     RaylibCPP::Camera camera(RaylibCPP::Camera::Mode::CAMERA_FREE);
     camera.setPosition({10.0f, 10.0f, 10.0f});
     
     while (!window.shouldClose()) {
-        // Logique et rendu
+        // Logic and rendering
         window.beginDrawing();
         window.clearBackground(RaylibCPP::Color::RAYWHITE);
         
         window.begin3DMode(camera);
-        // Rendu 3D ici
+        // 3D rendering here
         window.end3DMode();
         
-        // Rendu 2D ici
+        // 2D rendering here
         
         window.endDrawing();
     }
@@ -59,35 +59,35 @@ int main() {
 }
 ```
 
-## Avantages de RaylibCPP
+## Advantages of RaylibCPP
 
-- **Orienté objet** : API plus intuitive pour les programmeurs C++
-- **Gestion RAII** : Libération automatique des ressources
-- **Chaînage de méthodes** : Style de programmation fluide
-- **Encapsulation** : Meilleure organisation du code
+- **Object-oriented**: More intuitive API for C++ programmers
+- **RAII management**: Automatic resource release
+- **Method chaining**: Fluent programming style
+- **Encapsulation**: Better code organization
 
 ## Compilation
 
-Pour compiler un programme utilisant RaylibCPP :
+To compile a program using RaylibCPP:
 
 ```bash
-g++ -std=c++17 -Ilibs/RaylibCPP mon_programme.cpp libs/RaylibCPP/*.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+g++ -std=c++17 -Ilibs/RaylibCPP my_program.cpp libs/RaylibCPP/*.cpp -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 ```
 
-## Intégration avec Zappy
+## Integration with Zappy
 
-RaylibCPP est utilisé dans le projet Zappy pour :
-- Afficher la carte du jeu en 3D
-- Visualiser les joueurs et leurs actions
-- Gérer la caméra et les vues
-- Dessiner l'interface utilisateur (en collaboration avec RayGUICPP)
+RaylibCPP is used in the Zappy project to:
+- Display the game map in 3D
+- Visualize players and their actions
+- Manage the camera and views
+- Draw the user interface (in collaboration with RayGUICPP)
 
-## Classes principales
+## Main Classes
 
-- **RaylibCPP::Window** : Gestion de la fenêtre et contexte de rendu
-- **RaylibCPP::Shape** : Dessin de formes 2D/3D
-- **RaylibCPP::Texture** : Gestion des textures
-- **RaylibCPP::Camera** : Contrôle de la caméra
-- **RaylibCPP::Input** : Gestion des entrées
-- **RaylibCPP::Audio** : Lecture audio
-- **RaylibCPP::Font** : Rendu de texte
+- **RaylibCPP::Window**: Window and rendering context management
+- **RaylibCPP::Shape**: 2D/3D shape drawing
+- **RaylibCPP::Texture**: Texture management
+- **RaylibCPP::Camera**: Camera control
+- **RaylibCPP::Input**: Input management
+- **RaylibCPP::Audio**: Audio playback
+- **RaylibCPP::Font**: Text rendering

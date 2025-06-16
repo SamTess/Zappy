@@ -1,35 +1,35 @@
-# Protocole de Communication Serveur-IA
+# Server-AI Communication Protocol
 
-## Vue d'ensemble
+## Overview
 
-Ce document détaille le protocole de communication entre le serveur Zappy et les clients d'intelligence artificielle (IA). Le protocole est basé sur des échanges textuels avec des commandes spécifiques et leurs réponses associées.
+This document details the communication protocol between the Zappy server and artificial intelligence (AI) clients. The protocol is based on textual exchanges with specific commands and their associated responses.
 
-## Connexion
+## Connection
 
-1. L'IA se connecte au serveur via TCP/IP
-2. Le serveur répond avec : `WELCOME\n`
-3. L'IA envoie le nom de son équipe : `<team_name>\n`
-4. Le serveur répond avec : 
-   - `<client_num>\n` : Numéro du client dans l'équipe
-   - `<X> <Y>\n` : Dimensions de la carte
+1. The AI connects to the server via TCP/IP
+2. The server responds with: `WELCOME\n`
+3. The AI sends its team name: `<team_name>\n`
+4. The server responds with:
+   - `<client_num>\n`: Client number in the team
+   - `<X> <Y>\n`: Map dimensions
 
-## Format des commandes
+## Command Format
 
-- Chaque commande est une chaîne de caractères terminée par `\n`
-- Les réponses du serveur sont également terminées par `\n`
-- Chaque commande a un temps d'exécution spécifique
+- Each command is a string ending with `\n`
+- Server responses also end with `\n`
+- Each command has a specific execution time
 
-## Commandes disponibles
+## Available Commands
 
-### Commandes de base
+### Basic Commands
 
-| Commande | Description | Résultat | Durée (unité temps serveur) |
-|----------|-------------|----------|------------|
-| `Forward` | Avancer d'une case | `ok\n` | 7 |
-| `Right` | Pivoter à droite | `ok\n` | 7 |
-| `Left` | Pivoter à gauche | `ok\n` | 7 |
-| `Look` | Observer l'environnement | Liste des objets visibles | 7 |
-| `Inventory` | Consulter l'inventaire | Liste des ressources possédées | 1 |
+| Command   | Description         | Result | Duration (server time unit) |
+|-----------|---------------------|--------|----------------------------|
+| `Forward` | Move forward one tile | `ok\n` | 7 |
+| `Right`   | Turn right          | `ok\n` | 7 |
+| `Left`    | Turn left           | `ok\n` | 7 |
+| `Look`    | Observe the environment | List of visible objects | 7 |
+| `Inventory` | Check inventory    | List of
 | `Broadcast <text>` | Communiquer avec les autres joueurs | `ok\n` | 7 |
 | `Connect_nbr` | Nombre de connexions disponibles | Nombre entier | 0 |
 | `Fork` | Créer un nouvel œuf | `ok\n` | 42 |

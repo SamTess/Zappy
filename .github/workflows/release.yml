@@ -1,0 +1,393 @@
+name: 🚀 Release Zappy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Type de version à créer'
+        required: true
+        default: 'resolution-bug'
+        type: choice
+        options:
+          - 'nouvelle-version'    # Major version (v1.0.0 -> v2.0.0)
+          - 'nouvelle-feature'    # Minor version (v1.0.0 -> v1.1.0)
+          - 'resolution-bug'      # Patch version (v1.0.0 -> v1.0.1)
+      pre_release:
+        description: 'Marquer comme pré-release'
+        required: false
+        default: false
+        type: boolean
+
+# Permissions nécessaires pour créer des releases et pousser des tags
+permissions:
+  contents: write
+  actions: read
+  pages: write
+  id-token: write
+
+env:
+  TERM: xterm
+  # Binaires à inclure dans la release
+  BINARIES: "zappy_gui zappy_server zappy_ai"
+  # Bibliothèques statiques à inclure
+  LIBRARIES: "libgui.a libserver.a libraylib_cpp.a libraygui_cpp.a"
+  # Bibliothèques dynamiques à inclure
+  DYNAMIC_LIBS: "libraygui.so libraylibcpp.so"
+
+jobs:
+  check-permissions:
+    name: 🔐 Vérifier les permissions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier les droits de création de release
+        run: |
+          echo "🔍 Vérification des permissions pour créer une release..."
+          echo "👤 Utilisateur: ${{ github.actor }}"
+          echo "📦 Repository: ${{ github.repository }}"
+
+  calculate-version:
+    name: 📊 Calculer la nouvelle version
+    runs-on: ubuntu-latest
+    needs: check-permissions
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+      previous_version: ${{ steps.version.outputs.previous_version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Récupérer la dernière version
+        id: get_latest_tag
+        run: |
+          # Récupérer le dernier tag qui suit le format semantic versioning
+          latest_tag=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          if [ -z "$latest_tag" ]; then
+            echo "Aucun tag trouvé, initialisation à v0.0.0"
+            latest_tag="v0.0.0"
+          fi
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          echo "📋 Dernière version trouvée: $latest_tag"
+
+      - name: 🧮 Calculer la nouvelle version
+        id: version
+        run: |
+          latest_tag="${{ steps.get_latest_tag.outputs.latest_tag }}"
+          
+          # Extraire les numéros de version (retirer le 'v')
+          version_numbers=${latest_tag#v}
+          
+          # Séparer major, minor, patch
+          IFS='.' read -r major minor patch <<< "$version_numbers"
+          
+          # Calculer la nouvelle version selon le type choisi
+          case "${{ github.event.inputs.version_type }}" in
+            "nouvelle-version")
+              major=$((major + 1))
+              minor=0
+              patch=0
+              echo "🆕 Nouvelle version majeure"
+              ;;
+            "nouvelle-feature")
+              minor=$((minor + 1))
+              patch=0
+              echo "✨ Nouvelle fonctionnalité"
+              ;;
+            "resolution-bug")
+              patch=$((patch + 1))
+              echo "🐛 Correction de bug"
+              ;;
+          esac
+          
+          new_version="v${major}.${minor}.${patch}"
+          
+          echo "previous_version=$latest_tag" >> $GITHUB_OUTPUT
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          
+          echo "📈 Évolution: $latest_tag → $new_version"
+
+      - name: 📝 Générer le changelog
+        id: changelog
+        run: |
+          previous_version="${{ steps.version.outputs.previous_version }}"
+          new_version="${{ steps.version.outputs.new_version }}"
+          
+          echo "Génération du changelog depuis $previous_version..."
+          
+          # Créer un changelog basé sur les commits depuis le dernier tag
+          changelog_file=$(mktemp)
+          
+          echo "## 🎮 Zappy $new_version" > $changelog_file
+          echo "" >> $changelog_file
+          echo "### 📅 Date de release: $(date '+%d/%m/%Y à %H:%M')" >> $changelog_file
+          echo "" >> $changelog_file
+          
+          # Ajouter le type de release
+          case "${{ github.event.inputs.version_type }}" in
+            "nouvelle-version")
+              echo "### 🆕 Nouvelle version majeure" >> $changelog_file
+              echo "Cette version introduit des changements majeurs et peut contenir des breaking changes." >> $changelog_file
+              ;;
+            "nouvelle-feature")
+              echo "### ✨ Nouvelle fonctionnalité" >> $changelog_file
+              echo "Cette version ajoute de nouvelles fonctionnalités tout en maintenant la compatibilité." >> $changelog_file
+              ;;
+            "resolution-bug")
+              echo "### 🐛 Correction de bugs" >> $changelog_file
+              echo "Cette version corrige des bugs et améliore la stabilité." >> $changelog_file
+              ;;
+          esac
+          
+          echo "" >> $changelog_file
+          echo "### 📋 Changements" >> $changelog_file
+          
+          # Si c'est le premier tag
+          if [ "$previous_version" = "v0.0.0" ]; then
+            echo "- 🎉 Release initiale du projet Zappy" >> $changelog_file
+            echo "- 🖥️ Serveur de jeu (zappy_server)" >> $changelog_file
+            echo "- 🎨 Interface graphique (zappy_gui)" >> $changelog_file
+            echo "- 🤖 Client IA (zappy_ai)" >> $changelog_file
+          else
+            # Récupérer les commits depuis le dernier tag
+            git rev-list "$previous_version"..HEAD --oneline | head -20 | while read line; do
+              echo "- $line" >> $changelog_file
+            done
+          fi
+          
+          echo "" >> $changelog_file
+          echo "### 📦 Contenu de la release" >> $changelog_file
+          echo "- **Binaires**: zappy_server, zappy_gui, zappy_ai" >> $changelog_file
+          echo "- **Bibliothèques**: libgui.a, libserver.a, libraylib_cpp.a, libraygui_cpp.a" >> $changelog_file
+          echo "- **Plugins**: libraygui.so, libraylibcpp.so" >> $changelog_file
+          echo "- **Documentation**: Guide d'utilisation et API" >> $changelog_file
+          
+          # Lire le contenu et l'encoder pour GitHub
+          changelog_content=$(cat $changelog_file)
+          
+          # Utiliser un délimiteur pour le contenu multiline
+          {
+            echo 'changelog<<EOF'
+            echo "$changelog_content"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+          
+          echo "📝 Changelog généré avec succès"
+
+  build-release:
+    name: 🏗️ Compiler pour la release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: calculate-version
+    outputs:
+      artifact_name: ${{ steps.upload.outputs.artifact_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 📦 Installer les dépendances
+        timeout-minutes: 10
+        run: |
+          echo "🔧 Installation des dépendances système..."
+          sudo apt-get update
+          sudo apt-get install -y \
+            make gcc g++ \
+            libsfml-dev libcriterion-dev \
+            build-essential cmake gcovr \
+            libx11-dev libxcursor-dev libxrandr-dev \
+            libxinerama-dev libxi-dev libgl1-mesa-dev \
+            libglu1-mesa-dev libasound2-dev \
+            libwayland-dev libxkbcommon-dev xorg-dev \
+            python3 python3-pip
+          
+          echo "📚 Installation de Raylib..."
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DBUILD_SHARED_LIBS=ON -DUSE_EXTERNAL_GLFW=OFF -DCMAKE_BUILD_TYPE=Release ..
+          make -j$(nproc)
+          sudo make install
+          cd ../..
+          sudo ldconfig
+          
+          echo "🐍 Installation des dépendances Python..."
+          pip3 install --upgrade pip wheel setuptools
+
+      - name: 🏗️ Compiler le projet
+        timeout-minutes: 15
+        run: |
+          echo "🚀 Compilation de tous les composants..."
+          make clean
+          make all
+          
+          echo "✅ Compilation terminée avec succès"
+
+      - name: 🧪 Installer les dépendances IA
+        run: |
+          echo "🤖 Installation des dépendances IA..."
+          make install_ai
+
+      - name: ✅ Vérifier les binaires
+        run: |
+          echo "🔍 Vérification des binaires..."
+          for binary in ${{ env.BINARIES }}; do
+            if [ ! -f "./$binary" ]; then
+              echo "❌ Binaire $binary introuvable"
+              exit 1
+            elif [ ! -x "./$binary" ]; then
+              echo "❌ Binaire $binary non exécutable"
+              exit 1
+            else
+              echo "✅ Binaire $binary OK"
+              ls -la "./$binary"
+            fi
+          done
+
+      - name: ✅ Vérifier les bibliothèques
+        run: |
+          echo "🔍 Vérification des bibliothèques..."
+          
+          # Bibliothèques statiques
+          for library in ${{ env.LIBRARIES }}; do
+            if [ -f "./build/$library" ]; then
+              echo "✅ Bibliothèque statique $library OK"
+              ls -la "./build/$library"
+            else
+              echo "⚠️ Bibliothèque statique $library introuvable"
+            fi
+          done
+          
+          # Bibliothèques dynamiques
+          for library in ${{ env.DYNAMIC_LIBS }}; do
+            if [ -f "./plugins/$library" ]; then
+              echo "✅ Bibliothèque dynamique $library OK"
+              ls -la "./plugins/$library"
+            else
+              echo "⚠️ Bibliothèque dynamique $library introuvable"
+            fi
+          done
+
+      - name: 📦 Préparer l'archive de release
+        id: prepare_archive
+        run: |
+          new_version="${{ needs.calculate-version.outputs.new_version }}"
+          release_dir="zappy-$new_version"
+          
+          echo "📁 Création du répertoire de release: $release_dir"
+          mkdir -p "$release_dir"
+          
+          # Copier les binaires
+          echo "📋 Copie des binaires..."
+          for binary in ${{ env.BINARIES }}; do
+            if [ -f "./$binary" ]; then
+              cp "./$binary" "$release_dir/"
+              echo "✅ $binary copié"
+            fi
+          done
+          
+          # Créer les répertoires pour les bibliothèques
+          mkdir -p "$release_dir/lib"
+          mkdir -p "$release_dir/plugins"
+          
+          # Copier les bibliothèques statiques
+          echo "📚 Copie des bibliothèques statiques..."
+          for library in ${{ env.LIBRARIES }}; do
+            if [ -f "./build/$library" ]; then
+              cp "./build/$library" "$release_dir/lib/"
+              echo "✅ $library copié"
+            fi
+          done
+          
+          # Copier les bibliothèques dynamiques
+          echo "🔌 Copie des bibliothèques dynamiques..."
+          for library in ${{ env.DYNAMIC_LIBS }}; do
+            if [ -f "./plugins/$library" ]; then
+              cp "./plugins/$library" "$release_dir/plugins/"
+              echo "✅ $library copié"
+            fi
+          done
+          
+          # Copier la documentation
+          echo "📖 Copie de la documentation..."
+          cp README.md "$release_dir/"
+          
+          # Créer un script d'installation
+          cat > "$release_dir/install.sh" << 'EOF'
+          #!/bin/bash
+          echo "🎮 Installation de Zappy"
+          echo "========================"
+
+          # Copier les binaires
+          echo "📋 Installation des binaires..."
+          sudo cp zappy_* /usr/local/bin/
+          sudo chmod +x /usr/local/bin/zappy_*
+
+          # Copier les bibliothèques
+          echo "📚 Installation des bibliothèques..."
+          sudo cp lib/* /usr/local/lib/ 2>/dev/null || true
+          sudo cp plugins/* /usr/local/lib/ 2>/dev/null || true
+          sudo ldconfig
+
+          echo "✅ Installation terminée !"
+          echo "💡 Utilisation:"
+          echo "   zappy_server -p <port> -x <width> -y <height> -n <teams> -c <clients> -f <freq>"
+          echo "   zappy_gui -p <port> -h <host>"
+          echo "   zappy_ai -p <port> -n <team>"
+          EOF
+                chmod +x "$release_dir/install.sh"
+                # Créer un fichier de version
+                cat > "$release_dir/VERSION" << EOF
+          $new_version
+          EOF
+                    
+          # Afficher le contenu
+          echo "📋 Contenu de la release:"
+          find "$release_dir" -type f -exec ls -la {} \;
+          
+          # Créer l'archive
+          echo "🗜️ Création de l'archive..."
+          tar -czf "$release_dir.tar.gz" "$release_dir"
+          
+          echo "release_dir=$release_dir" >> $GITHUB_OUTPUT
+          echo "archive_name=$release_dir.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: 📤 Upload des artefacts
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: zappy-${{ needs.calculate-version.outputs.new_version }}
+          path: ${{ steps.prepare_archive.outputs.archive_name }}
+          retention-days: 90
+
+  create-release:
+    name: 🚀 Créer la release GitHub
+    runs-on: ubuntu-latest
+    needs: [calculate-version, build-release]
+    steps:
+      - name: 📥 Télécharger les artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: zappy-${{ needs.calculate-version.outputs.new_version }}
+
+      - name: 🚀 Créer la release GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.calculate-version.outputs.new_version }}
+          name: "🎮 Zappy ${{ needs.calculate-version.outputs.new_version }}"
+          body: ${{ needs.calculate-version.outputs.changelog }}
+          files: zappy-${{ needs.calculate-version.outputs.new_version }}.tar.gz
+          prerelease: ${{ github.event.inputs.pre_release }}
+          draft: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🎉 Release créée avec succès
+        run: |
+          echo "🎉 Release ${{ needs.calculate-version.outputs.new_version }} créée avec succès !"
+          echo "📦 Archive: zappy-${{ needs.calculate-version.outputs.new_version }}.tar.gz"
+          echo "🔗 URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.calculate-version.outputs.new_version }}"

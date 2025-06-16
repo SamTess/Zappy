@@ -5,6 +5,7 @@
 ** connect_nbr
 */
 #include "../include/command.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,25 +37,23 @@ static void format_response(int available_slots, client_t *client)
 
 int connect_nbr_srv(server_t *server, char *team)
 {
-    int team_eggs;
+    int team_eggs = count_team_eggs(server, team);
+    int available_slots = team_eggs;
 
-    team_eggs = count_team_eggs(server, team);
-    if (team_eggs < 0)
-        team_eggs = -1;
-    return team_eggs;
+    if (available_slots < 0)
+        available_slots = 0;
+    return available_slots;
 }
 
-void connect_nbr(server_t *server, client_t *client, char *buffer)
+void connect_nbr(server_t *server, client_t *client, char **buffer)
 {
-    int team_eggs;
+    int available_slots;
 
-    (void)buffer;
-    if (!client || !client->player || !client->player->team_name) {
+    if (!client || !client->player || !client->player->team_name ||
+        arr_len(buffer) != 1) {
         write_command_output(client->client_fd, "ko\n");
         return;
     }
-    team_eggs = count_team_eggs(server, client->player->team_name);
-    if (team_eggs < 0)
-        team_eggs = 0;
-    format_response(team_eggs, client);
+    available_slots = connect_nbr_srv(server, client->player->team_name);
+    format_response(available_slots, client);
 }

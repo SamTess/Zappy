@@ -21,7 +21,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="/docs/intro">
-            Découvrez Zappy 🎮
+            Discover Zappy 🎮
           </Link>
         </div>
       </div>
@@ -34,7 +34,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title={`${siteConfig.title} - Documentation`}
-      description="Documentation officielle du projet Zappy - un jeu multijoueur basé sur l'IA en réseau">
+      description="Official documentation of the Zappy project - a multiplayer network-based AI game">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

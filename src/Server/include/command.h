@@ -14,7 +14,7 @@
 
 typedef struct command_data_s {
     const char **commands;
-    void (**functions)(server_t *, client_t *, char *);
+    void (**functions)(server_t *, client_t *, char **);
     int *times;
     enum client_type_e *accepted_types;
 } command_data_t;
@@ -25,27 +25,28 @@ void process_next_queued_command(server_t *server, client_t *client);
 void cleanup_player_queue(player_t *player);
 void cleanup_client(client_t *client);
 char *tile_to_str(tile_t *tile);
-void add_to_command_queue(client_t *client, char *command);
 void get_message(server_t *server, client_t *user);
 void execute_com(server_t *server, client_t *user, char *buffer);
 void write_command_output(int client_fd, char *msg);
-void forward(server_t *server, client_t *client, char *buffer);
-void right(server_t *server, client_t *client, char *buffer);
-void left(server_t *server, client_t *client, char *buffer);
-void inventory(server_t *server, client_t *client, char *buffer);
-void look(server_t *server, client_t *client, char *buffer);
-void eject(server_t *server, client_t *client, char *buffer);
-void connect_nbr(server_t *server, client_t *client, char *buffer);
-void take_object(server_t *server, client_t *client, char *buffer);
-void set_object(server_t *server, client_t *client, char *buffer);
-void fork_c(server_t *server, client_t *client, char *buffer);
-void broadcast(server_t *server, client_t *user, char *buffer);
+void forward(server_t *server, client_t *client, char **buffer);
+void right(server_t *server, client_t *client, char **buffer);
+void left(server_t *server, client_t *client, char **buffer);
+void inventory(server_t *server, client_t *client, char **buffer);
+void look(server_t *server, client_t *client, char **buffer);
+void eject(server_t *server, client_t *client, char **buffer);
+void connect_nbr(server_t *server, client_t *client, char **buffer);
+void take_object(server_t *server, client_t *client, char **buffer);
+void set_object(server_t *server, client_t *client, char **buffer);
+void fork_c(server_t *server, client_t *client, char **buffer);
+void broadcast(server_t *server, client_t *user, char **buffer);
 int connect_nbr_srv(server_t *server, char *team);
+bool can_connect(server_t *server, client_t *user, char *buffer);
+client_t *find_client_by_id(server_t *server, int id);
 
 // Death and starvation management functions
 void handle_player_death(server_t *server, client_t *client);
 bool check_player_starvation(server_t *server, client_t *client);
-void start_incantation(server_t *server, client_t *client, char *buffer);
+void start_incantation(server_t *server, client_t *client, char **buffer);
 void finish_incantation(server_t *server, client_t *client);
 bool can_start_incantation(server_t *server, client_t *client);
 command_data_t get_command_data(void);
@@ -55,6 +56,30 @@ void add_pending_cmd(client_t *user, server_t *server,
 void cleanup_pending(player_t *player);
 
 // client graphical commands
-void command_msz(server_t *server, client_t *client, char *buffer);
+void command_msz(server_t *server, client_t *client, char **buffer);
+void command_bct(server_t *server, client_t *client, char **buffer);
+void command_mtc(server_t *server, client_t *client, char **buffer);
+void command_tna(server_t *server, client_t *client, char **buffer);
+void command_ppo(server_t *server, client_t *client, char **buffer);
+void command_plv(server_t *server, client_t *client, char **buffer);
+void command_pie(server_t *server, int x, int y, int result);
+void command_pex(server_t *server, client_t *client);
+void command_pin(server_t *server, client_t *client, char **buffer);
+void command_pfk(server_t *server, client_t *client);
+void command_pdr(server_t *server, client_t *client,
+    resource_type_t resource_type);
+void command_pgt(server_t *server, client_t *client,
+    resource_type_t resource_type);
+void send_enw_command(server_t *server, client_t *client, int egg_id);
+void command_sst(server_t *server, client_t *client, char **buffer);
+void command_pdi(server_t *server, client_t *client);
+void send_enw_command_start(server_t *server);
 
+// send to all graphical clients
+void send_mtc_to_all_graphical_clients(server_t *server);
+void send_bct_to_all_graphical_clients(server_t *server, int x, int y);
+void send_pnw_command_to_all(server_t *server, client_t *client);
+
+
+char **str_to_word_arr(char *str, char *delim);
 #endif /* !COMMAND_H_ */

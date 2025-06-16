@@ -5,6 +5,8 @@
 ** forward
 */
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
+#include "../include/parsing.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -26,9 +28,9 @@ static void change_map_pos(server_t *server, client_t *client)
         &server->map[client->player->pos_y][client->player->pos_x],
         client->client_id);
     if (client->player->rotation == UP)
-        client->player->pos_y++;
-    if (client->player->rotation == DOWN)
         client->player->pos_y--;
+    if (client->player->rotation == DOWN)
+        client->player->pos_y++;
     if (client->player->rotation == LEFT)
         client->player->pos_x--;
     if (client->player->rotation == RIGHT)
@@ -39,17 +41,20 @@ static void change_map_pos(server_t *server, client_t *client)
         client->client_id);
 }
 
-void forward(server_t *server, client_t *client, char *buffer)
+void forward(server_t *server, client_t *client, char **buffer)
 {
-    (void)server;
-    (void)buffer;
+    if (!client || !client->player || arr_len(buffer) != 1) {
+        write_command_output(client->client_fd, "ko\n");
+        return;
+    }
     if (client->player->rotation != UP && client->player->rotation != DOWN
         && client->player->rotation != LEFT
-        && client->player->rotation != RIGHT){
+        && client->player->rotation != RIGHT) {
         perror("Unexpected forward rotation");
         write_command_output(client->client_fd, "ko\n");
         return;
     }
     change_map_pos(server, client);
+    send_ppo_command(server, client->client_id);
     write_command_output(client->client_fd, "ok\n");
 }

@@ -15,6 +15,14 @@ RAYLIB_CPP_SRC = RaylibCPP/RayLib.cpp \
 				 RaylibCPP/shape/Shape.cpp \
 				 RaylibCPP/input/Input.cpp \
 				 RaylibCPP/font/Font.cpp \
+				 RaylibCPP/font/Text3D.cpp \
+				 RaylibCPP/font/text3d/Text3DCodepoint.cpp \
+				 RaylibCPP/font/text3d/Text3DConfig.cpp \
+				 RaylibCPP/font/text3d/Text3DHelper.cpp \
+				 RaylibCPP/font/text3d/Text3DMeasurement.cpp \
+				 RaylibCPP/font/text3d/Text3DParser.cpp \
+				 RaylibCPP/font/text3d/Text3DRenderer.cpp \
+				 RaylibCPP/font/text3d/Text3DWave.cpp \
 				 RaylibCPP/camera/Camera.cpp \
 				 RaylibCPP/audio/Audio.cpp \
 				 RaylibCPP/utils/Utils.cpp

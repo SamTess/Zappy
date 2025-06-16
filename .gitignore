@@ -20,9 +20,6 @@ tests/Functionnal/Test3
 *.gcno
 *.gcda
 *.gcov
-*.html
-*.css
-*.js
 coverage_html/
 
 # IDE and editor files

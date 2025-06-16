@@ -12,7 +12,7 @@ typedef struct server_s server_t;
 struct client_s;
 typedef struct client_s client_t;
 
-typedef void (*cmd_func_t)(server_t *, client_t *, char *);
+typedef void (*cmd_func_t)(server_t *, client_t *, char **);
 
 typedef struct pending_cmd_s {
     cmd_func_t func;
