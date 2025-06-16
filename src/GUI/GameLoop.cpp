@@ -86,7 +86,6 @@ int GameLoop::run() {
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
-    m_graphics->CloseWindow();
     return 0;
 }
 

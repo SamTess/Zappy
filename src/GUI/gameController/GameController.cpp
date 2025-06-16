@@ -30,6 +30,9 @@ void GameController::initializeMessageHandlers() {
     _messageHandlers[MessageType::PlayerInventory] = [this](std::shared_ptr<IMessageData> data) {
         handlePlayerInventory(data);
     };
+    _messageHandlers[MessageType::PlayerExpulsion] = [this](std::shared_ptr<IMessageData> data) {
+        handlePlayerExpulsion(data);
+    };
     _messageHandlers[MessageType::Broadcast] = [this](std::shared_ptr<IMessageData> data) {
         handlePlayerBroadcast(data);
     };
@@ -96,6 +99,7 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     auto playerData = std::static_pointer_cast<PlayerInfoData>(data);
     int playerId = playerData->getId();
     auto existingPlayer = _gameState->getPlayerInfo(playerId);
+
     if (existingPlayer) {
         int oldX = existingPlayer->getX();
         int oldY = existingPlayer->getY();
@@ -116,7 +120,9 @@ void GameController::handlePlayerInventory(std::shared_ptr<IMessageData> data) {
 }
 
 void GameController::handlePlayerExpulsion(std::shared_ptr<IMessageData> data) {
-    auto playerData = std::static_pointer_cast<PlayerInfoData>(data);
+    auto expulsionData = std::static_pointer_cast<PlayerExpulsionData>(data);
+
+    // faire une animation ici
 }
 
 void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
