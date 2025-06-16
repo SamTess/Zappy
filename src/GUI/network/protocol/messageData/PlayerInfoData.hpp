@@ -13,9 +13,9 @@
 
 class PlayerInfoData : public IMessageData {
     public:
-        PlayerInfoData() : _id(0), _x(0), _y(0), _orientation(0), _level(0), _teamName("") {}
+        PlayerInfoData() : _id(0), _x(0), _y(0), _orientation(0), _level(0), _teamName(""), _isAlive(true) {}
         PlayerInfoData(int id, int x, int y, int orientation, int level, const std::string& teamName = "")
-            : _id(id), _x(x), _y(y), _orientation(orientation), _level(level), _teamName(teamName) {}
+            : _id(id), _x(x), _y(y), _orientation(orientation), _level(level), _teamName(teamName), _isAlive(true) {}
         MessageType getType() const override { return MessageType::PlayerInfo; }
 
         int getId() const { return _id; }
@@ -31,6 +31,8 @@ class PlayerInfoData : public IMessageData {
         void setOrientation(int value) { _orientation = value; }
         void setLevel(int value) { _level = value; }
         void setTeamName(const std::string& value) { _teamName = value; }
+        void setIsAlive(bool value) { _isAlive = value; }
+        bool isAlive() const { return _isAlive; }
 
     private:
         int _id;
@@ -39,6 +41,7 @@ class PlayerInfoData : public IMessageData {
         int _orientation;
         int _level;
         std::string _teamName;
+        bool _isAlive;
 };
 
 #endif /* !PLAYER_INFO_DATA_HPP_ */
