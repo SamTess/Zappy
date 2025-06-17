@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+
 GameState::GameState() {
     _entityFactory = std::make_shared<EntityFactoryManager>();
 }

@@ -225,4 +225,5 @@ void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
 
 void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {
     _gameState = std::make_shared<GameState>(factory);
+    initializeMessageHandlers();
 }
