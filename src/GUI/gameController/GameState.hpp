@@ -16,42 +16,27 @@
 #include <mutex>
 
 #include "../network/protocol/messageData/MessageDataAll.hpp"
-
-
-struct TileData {
-    std::array<int, 7> resources{0};
-    std::vector<int> playerIds;
-    std::vector<int> eggIds;
-    bool isIncantating{false};
-};
-
-
-enum class ResourceType {
-    FOOD = 0,
-    LINEMATE,
-    DERAUMERE,
-    SIBUR,
-    MENDIANE,
-    PHIRAS,
-    THYSTAME,
-    COUNT
-};
+#include "IGameEntity.hpp"
+#include "GameEntitiesAll.hpp"
+#include "EntityFactory.hpp"
 
 class GameState {
 public:
     GameState();
+    explicit GameState(std::shared_ptr<EntityFactoryManager> factory);
     ~GameState() = default;
     int getMapWidth() const;
     int getMapHeight() const;
     bool isMapInitialized() const;
-    const TileData& getTileData(int x, int y) const;
+    std::shared_ptr<const ITile> getTile(int x, int y) const;
+    std::shared_ptr<ITile> getTileMutable(int x, int y);
     int getResourceQuantity(int x, int y, ResourceType resourceType) const;
     ResourceType getDominantResourceType(int x, int y) const;
-    std::shared_ptr<const PlayerInfoData> getPlayerInfo(int playerId) const;
-    std::shared_ptr<const PlayerInventoryData> getPlayerInventory(int playerId) const;
+    std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const;
+    std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const;
     bool isPlayerOnTile(int x, int y, int playerId) const;
     std::vector<int> getPlayersOnTile(int x, int y) const;
-    std::shared_ptr<const EggData> getEggInfo(int eggId) const;
+    std::shared_ptr<const IEgg> getEggInfo(int eggId) const;
     std::vector<int> getEggsOnTile(int x, int y) const;
     const std::vector<std::string>& getTeamNames() const;
     int getTimeUnit() const;
@@ -81,14 +66,15 @@ private:
     int _mapWidth = 0;
     int _mapHeight = 0;
     bool _isMapInitialized = false;
-    std::vector<std::vector<TileData>> _mapTiles;
-    std::map<int, PlayerInfoData> _players;
-    std::map<int, PlayerInventoryData> _inventories;
-    std::map<int, EggData> _eggs;
+    std::vector<std::vector<std::shared_ptr<ITile>>> _tiles;
+    std::map<int, std::shared_ptr<IPlayer>> _players;
+    std::map<int, std::shared_ptr<IPlayerInventory>> _inventories;
+    std::map<int, std::shared_ptr<IEgg>> _eggs;
     std::vector<std::string> _teamNames;
     int _timeUnit = 100;
     bool _gameEnded = false;
     std::string _winningTeam;
+    std::shared_ptr<EntityFactoryManager> _entityFactory;
 };
 
 #endif /* !GAME_STATE_HPP_ */

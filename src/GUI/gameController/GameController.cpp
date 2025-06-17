@@ -9,7 +9,14 @@
 #include <iostream>
 #include <algorithm>
 
-GameController::GameController() : _gameState(std::make_shared<GameState>()) {
+GameController::GameController() {
+    auto entityFactory = std::make_shared<EntityFactoryManager>();
+    _gameState = std::make_shared<GameState>(entityFactory);
+    initializeMessageHandlers();
+}
+
+GameController::GameController(std::shared_ptr<EntityFactoryManager> entityFactory) {
+    _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
 }
 
@@ -213,4 +220,8 @@ void GameController::handleEndGame(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
     auto serverData = std::static_pointer_cast<ServerMessageData>(data);
+}
+
+void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {
+    _gameState = std::make_shared<GameState>(factory);
 }

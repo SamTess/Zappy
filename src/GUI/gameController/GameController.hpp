@@ -18,27 +18,19 @@
 #include "../network/protocol/HeaderMessage.hpp"
 #include "../network/protocol/ProtocolParser.hpp"
 #include "GameState.hpp"
-
-/**
- * @brief Interface pour recevoir les messages du réseau
- */
-class INetworkObserver {
-public:
-    virtual ~INetworkObserver() = default;
-    virtual void onMessageReceived(const Message& message) = 0;
-};
+#include "EntityFactory.hpp"
 
 /**
  * @brief Contrôleur principal du jeu - gère la logique métier et orchestre les mises à jour
  */
-class GameController : public INetworkObserver {
+class GameController {
 public:
     GameController();
+    explicit GameController(std::shared_ptr<EntityFactoryManager> entityFactory);
     ~GameController() = default;
-
-    void onMessageReceived(const Message& message) override;
-
+    void onMessageReceived(const Message& message);
     std::shared_ptr<const GameState> getGameState() const { return _gameState; }
+    void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory);
 
 private:
     void processMessage(const Message& message);
