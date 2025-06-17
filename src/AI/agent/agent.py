@@ -47,6 +47,8 @@ class Agent:
       self.last_known_inventory = {}
       self.last_known_surroundings = {}
 
+      self.running = False
+
     except socket.error as e:
       print(f"Error connecting to server: {e}")
       sys.exit(1)
@@ -63,6 +65,9 @@ class Agent:
     team_slots = self.send_command(self.team)
     map_size = self.get_message(timeout=4)
 
+    if map_size is None:
+      print("Failed to retrieve map size from server.")
+      sys.exit(1)
     self.map_size_x = int(map_size.split()[0])
     self.map_size_y = int(map_size.split()[1])
 
@@ -79,21 +84,24 @@ class Agent:
       print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
 
     print(f"Map size: {map_size}")
+    self.running = True
     self._run()
     self._stop()
 
-  def _stop(self):
-    self.logger.info(f"Stopping agent {self.id}...")
-    self.socketManager.stop()
-    self.sock.close()
-    print(f"Agent {self.id} stopped.")
+  def stop(self):
+    if self.running:
+      self.logger.info(f"Stopping agent {self.id}...")
+      self.socketManager.stop()
+      self.sock.close()
+      print(f"Agent {self.id} stopped.")
+      self.running = False
 
 
   def _run(self):
-    while self.socketManager.running:
+    while self.socketManager.running and self.running:
       try:
-        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}") #? Envoyer les infos aux autres
-        self._process_server_message()      # TODO(ms-tristan): update les infos des autres agents en local
+        self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")  #? Envoyer ses infos aux autres
+        self._process_server_message()
         self._update_self_state()           # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
         self.decisionManager.take_action()  # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
         sleep(0.1)
@@ -123,17 +131,50 @@ class Agent:
 
 
   def _update_self_state(self):
-    required_total_amount_of_resources = get_total_upgrade_resources()
-    team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
 
-    for agent_id, agent_info in self.other_agents.items():
-      agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
-      for key, value in agent_inventory.items():
-          if key in team_total_amount_of_resources:
-              team_total_amount_of_resources[key] += value
-      print(f"Agent {agent_id} - Direction: {agent_info['direction']}, Inventory: {agent_info['inventory']}")
+    #? On détermine le rôle de l'agent en fonction de son id
+    agent_ids = list(self.other_agents.keys())
+    agent_ids.append(self.id)
+    agent_ids.sort()
+    if agent_ids.index(self.id) < 8:
+      self.current_role = "miner"
+    else:
+      self.current_role = "fighter"
 
-    print(f"Total team resources: {team_total_amount_of_resources}")
+    #? On check si l'inventaire de tout le monde permet d'upgrade de 0 à 8
+    if self.current_phase == "collecting":
+      required_total_amount_of_resources = get_total_upgrade_resources()
+      team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
+
+      for agent_id, agent_info in self.other_agents.items():
+        agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+        for key, value in agent_inventory.items():
+            if key in team_total_amount_of_resources:
+                team_total_amount_of_resources[key] += value
+            else:
+                team_total_amount_of_resources[key] = value
+
+      have_enough_resources = True
+      for key, required_value in required_total_amount_of_resources.items():
+        available_value = team_total_amount_of_resources.get(key, 0)
+        if available_value < required_value:
+          have_enough_resources = False
+
+      if have_enough_resources:
+        print("All required resources for upgrade are available.")
+        self.current_phase = "rallying"
+        self.current_behaviour = "Dyson"
+      else:
+        print("Not all required resources for upgrade are available.")
+
+    elif self.current_phase == "rallying":
+      distance_to_player, amount_of_players = zappy.get_closest_of_item(self.last_known_surroundings, "player")
+      print("amount_of_players", amount_of_players)
+      print(self.last_known_surroundings)
+      if amount_of_players >= 6:
+        print("Enough players gathered for upgrade.")
+        self.current_phase = "upgrading"
+
 
   def send_command(self, command, timeout=2.0):
     if (self.performance_mode):

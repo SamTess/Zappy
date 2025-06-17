@@ -339,6 +339,7 @@ Message ProtocolParser::parsePlayerDeath(const std::string &message) {
     int id = parseIntParameter(params[0]);
 
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
+    playerInfoData->setIsAlive(false);
     return Message(PDI_HEADER, extractCommandParameter(message), playerInfoData);
 }
 

@@ -127,6 +127,10 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     auto existingPlayer = _gameState->getPlayerInfo(playerId);
 
     if (existingPlayer) {
+        if (!playerData->isAlive()) {
+            _gameState->removePlayer(playerId);
+            return;
+        }
         int oldX = existingPlayer->getX();
         int oldY = existingPlayer->getY();
         int newX = playerData->getX();
