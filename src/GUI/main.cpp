@@ -11,6 +11,7 @@
 #include "parsing/ParsingCLI.hpp"
 #include "GameLoop.hpp"
 #include "network/networkManager/NetworkManager.hpp"
+#include "gameController/EntityFactory.hpp"
 
 void displayHelp() {
     std::cout << "USAGE: ./zappy_gui -p port -h machine" << std::endl;
@@ -34,7 +35,8 @@ int main(int argc, char** argv) {
             return 84;
         }
 
-        auto gameController = std::make_shared<GameController>(networkManager);
+        auto entityFactory = std::make_shared<EntityFactoryManager>();
+        auto gameController = std::make_shared<GameController>(networkManager, entityFactory);
         networkManager->setGameController(gameController);
 
         auto gameLoop = std::make_shared<GameLoop>(networkManager);

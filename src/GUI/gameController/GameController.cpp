@@ -8,8 +8,11 @@
 #include "GameController.hpp"
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
-GameController::GameController(std::shared_ptr<NetworkManager> networkManager) : _gameState(std::make_shared<GameState>()), _networkManager(networkManager) {
+GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
+    std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
+    _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
 }
 
@@ -229,4 +232,9 @@ void GameController::handleEndGame(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
     auto serverData = std::static_pointer_cast<ServerMessageData>(data);
+}
+
+void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {
+    _gameState = std::make_shared<GameState>(factory);
+    initializeMessageHandlers();
 }
