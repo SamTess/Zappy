@@ -45,7 +45,11 @@ private:
     void setupComponents();
     bool loadModels();
     void updateCameraForMapSize();
-
+    void updateGameData();
+    void handleTileSelection(int x, int y);
+    void handleViewModeChange(int mode);
+    void onMapSizeChanged(int width, int height);
+    void onTileChanged(int x, int y, const TileData& tileData);
     std::string m_host;
     int m_port;
 
