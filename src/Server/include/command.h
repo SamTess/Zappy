@@ -23,7 +23,6 @@ resource_type_t determine_type(char *resource_string);
 
 void process_next_queued_command(server_t *server, client_t *client);
 void cleanup_player_queue(player_t *player);
-void cleanup_client(client_t *client);
 char *tile_to_str(tile_t *tile);
 void get_message(server_t *server, client_t *user);
 void execute_com(server_t *server, client_t *user, char *buffer);
@@ -82,4 +81,5 @@ void send_pnw_command_to_all(server_t *server, client_t *client);
 
 
 char **str_to_word_arr(char *str, char *delim);
+bool handle_socket_read(client_t *user, server_t *server);
 #endif /* !COMMAND_H_ */

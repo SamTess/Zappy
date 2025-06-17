@@ -60,18 +60,6 @@ void cleanup_player_queue(player_t *player)
     player->queue_size = 0;
 }
 
-void cleanup_client(client_t *client)
-{
-    if (!client)
-        return;
-    if (client->player) {
-        cleanup_player_queue(client->player);
-        cleanup_pending(client->player);
-        free(client->player);
-        client->player = NULL;
-    }
-}
-
 void write_command_output(int client_fd, char *msg)
 {
     if (fcntl(client_fd, F_GETFD) == -1) {

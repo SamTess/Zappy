@@ -25,14 +25,11 @@ static bool remove_head_client(server_t *server, int fd)
     if (current->client_fd != fd)
         return false;
     client_id = current->client_id;
-    if (current->client_fd == server->s_fd) {
-        printf("Error: Attempting to remove server listening socket\n");
+    if (current->client_fd == server->s_fd)
         return true;
-    }
     server->client = current->next;
     free_node(current, server);
     server->nfds -= 1;
-    printf("Client %d disconnected\n", client_id);
     return true;
 }
 
@@ -46,15 +43,12 @@ static bool remove_other_client(server_t *server, int fd)
         prev = current;
         current = current->next;
     }
-    if (current == NULL) {
-        printf("Error: Client with fd %d not found during removal\n", fd);
+    if (current == NULL)
         return false;
-    }
     client_id = current->client_id;
     prev->next = current->next;
     free_node(current, server);
     server->nfds -= 1;
-    printf("Client %d disconnected\n", client_id);
     return true;
 }
 
@@ -88,7 +82,7 @@ static client_t *init_new_client(int fd)
     new_c->is_fully_connected = false;
     if (new_c->player == NULL)
         server_err("Failed to allocate player");
-    init_player(new_c->player, NULL);
+    init_struct(new_c);
     return new_c;
 }
 
