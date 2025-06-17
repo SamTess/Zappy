@@ -55,6 +55,7 @@ public:
     void setTeamNames(const std::vector<std::string>& teamNames);
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
+    std::map<int, std::shared_ptr<IPlayer>> getPlayers() {return _players;};
 
 private:
     bool isValidCoordinates(int x, int y) const;

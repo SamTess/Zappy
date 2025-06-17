@@ -62,6 +62,7 @@ private:
     void handleTimeUnit(std::shared_ptr<IMessageData> data);
     void handleEndGame(std::shared_ptr<IMessageData> data);
     void handleServerMessage(std::shared_ptr<IMessageData> data);
+    bool unknownPlayerId(int playerID);
 
     std::shared_ptr<GameState> _gameState;
     std::shared_ptr<NetworkManager> _networkManager;
