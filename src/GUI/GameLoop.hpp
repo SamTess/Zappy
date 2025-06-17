@@ -66,7 +66,3 @@ private:
         int y = 0;
         bool selected = false;
     } m_selectedTile;
-    void updateGameData();
-    void handleTileSelection(int x, int y);
-    void handleViewModeChange(int mode);
-};
