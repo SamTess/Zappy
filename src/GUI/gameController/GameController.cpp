@@ -195,14 +195,6 @@ void GameController::handleResourceCollect(std::shared_ptr<IMessageData> data) {
         std::to_string(resourceData->getResourceType()));
 }
 
-void GameController::handlePlayerDeath(std::shared_ptr<IMessageData> data) {
-    auto playerData = std::static_pointer_cast<PlayerInfoData>(data);
-    int playerId = playerData->getId();
-
-    _logger->logInfo("Player " + std::to_string(playerId) + " died and removed from game");
-    _gameState->removePlayer(playerId);
-}
-
 void GameController::handleIncantationStart(std::shared_ptr<IMessageData> data) {
     auto incantationData = std::static_pointer_cast<IncantationData>(data);
     int x = incantationData->getX();
