@@ -16,13 +16,17 @@
 
 client_t *find_client_by_socket(server_t *server, int socket_fd)
 {
-    client_t *temp = server->client;
-
+    
+    client_t *temp;
+    
+    if (!server || !server->client)
+        return NULL;
+    temp = server->client;
     if (temp && temp->client_fd == server->s_fd)
-        temp = temp->next;
+    temp = temp->next;
     while (temp) {
         if (temp->client_fd == socket_fd)
-            return temp;
+        return temp;
         temp = temp->next;
     }
     printf("Error: Could not find client for socket %d\n", socket_fd);

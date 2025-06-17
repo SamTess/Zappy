@@ -109,6 +109,14 @@ void print_co(char *client_ip, struct sockaddr_in *client_addr,
 void check_client(server_t *server);
 
 /**
+ * @brief Trouve un client par son descripteur de socket
+ * @param server Pointeur vers la structure du serveur
+ * @param socket_fd Descripteur de fichier du socket à rechercher
+ * @return Pointeur vers le client trouvé, NULL si non trouvé
+ */
+client_t *find_client_by_socket(server_t *server, int socket_fd);
+
+/**
  * @brief Initialise et génère la carte de jeu
  * @param server Pointeur vers la structure du serveur
  * @param parsed_info Informations de configuration pour la carte
