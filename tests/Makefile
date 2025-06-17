@@ -29,18 +29,59 @@ TEST_LDFLAGS = --coverage $(shell pkg-config --libs criterion) \
 	-Wl,--wrap=tile_add_player \
 	-Wl,--wrap=tile_remove_player \
 	-Wl,--wrap=remove_egg \
-	-Wl,--wrap=server_err \
 	-Wl,--wrap=command_pie \
-	-Wl,--wrap=command_seg \
 	-Wl,--wrap=send_plv_to_all \
 	-Wl,--wrap=can_start_incantation \
 	-Wl,--wrap=command_pic \
-	-Wl,--wrap=create_egg \
-	-Wl,--wrap=add_egg \
 	-Wl,--wrap=send_enw_command \
 	-Wl,--wrap=command_pgt \
 	-Wl,--wrap=command_pdr \
-	-Wl,--wrap=arr_len
+	-Wl,--wrap=arr_len \
+	-Wl,--wrap=can_connect \
+	-Wl,--wrap=send_pnw_command_to_all \
+	-Wl,--wrap=add_pending_cmd \
+	-Wl,--wrap=command_msz \
+	-Wl,--wrap=command_bct \
+	-Wl,--wrap=command_mtc \
+	-Wl,--wrap=command_tna \
+	-Wl,--wrap=command_ppo \
+	-Wl,--wrap=command_plv \
+	-Wl,--wrap=command_pin \
+	-Wl,--wrap=command_sst \
+	-Wl,--wrap=start_incantation \
+	-Wl,--wrap=fork_c \
+	-Wl,--wrap=broadcast \
+	-Wl,--wrap=right \
+	-Wl,--wrap=left \
+	-Wl,--wrap=eject \
+	-Wl,--wrap=connect_nbr \
+	-Wl,--wrap=take_object \
+	-Wl,--wrap=set_object \
+	-Wl,--wrap=forward \
+	-Wl,--wrap=look \
+	-Wl,--wrap=malloc \
+	-Wl,--wrap=send_bct_to_all_graphical_clients \
+	-Wl,--wrap=send_smg_command \
+	-Wl,--wrap=send_ebo_command \
+	-Wl,--wrap=init_inventory \
+	-Wl,--wrap=command_pdi \
+	-Wl,--wrap=remove_fd \
+	-Wl,--wrap=how_many_in_inventory \
+	-Wl,--wrap=remove_item_from_inventory \
+	-Wl,--wrap=accept \
+	-Wl,--wrap=add_fd \
+	-Wl,--wrap=get_message \
+	-Wl,--wrap=update_game_tick \
+	-Wl,--wrap=poll \
+	-Wl,--wrap=gettimeofday \
+	-Wl,--wrap=perror \
+	-Wl,--wrap=execute_com \
+	-Wl,--wrap=send_msz_command \
+	-Wl,--wrap=send_tile_content_to_one_client \
+	-Wl,--wrap=send_tna_command \
+	-Wl,--wrap=send_all_player_info_to_one_client \
+	-Wl,--wrap=send_enw_command_start \
+	-Wl,--wrap=free_arr
 
 TESTS_SRC = $(SERVER_SRC_DIR)/buffer/circular_buffer.c \
 	$(SERVER_SRC_DIR)/command/connect_nbr.c \
@@ -107,20 +148,38 @@ TESTS_SRC = $(SERVER_SRC_DIR)/buffer/circular_buffer.c \
 	$(SERVER_SRC_DIR)/parsing.c \
 	./test_circular_buffer.c \
 	./test_broadcast.c \
+	./test_command_ebo.c \
+	./test_command_edi.c \
+	./test_command_seg.c \
+	./test_command_sgt.c \
 	./test_connect_nbr.c \
+	./test_connection_err.c \
+	./test_connection_utils.c \
 	./test_eject.c \
 	./test_finish_incantation.c \
 	./test_fork.c \
+	./test_help.c \
 	./test_movement_commands.c \
 	./test_mocks.c \
-	# ./test_left_right.c \
 	./test_inventory.c \
+	./test_inventory_real.c \
 	./test_look.c \
+	./test_player_init.c \
+	./test_player_death.c \
+	./test_parsing.c \
+	./test_parsing_err.c \
+	./test_pending_cmd_utils.c \
 	./test_take_set_object.c \
 	./test_start_incantation.c \
 	./test_parse_command.c \
-	# ./test_tile_pending_utils.c \
-	./test_forward.c \
+	./test_utility_functions.c \
+	./test_player_inventory_funcs.c \
+	./test_tile.c \
+	./test_map_creation.c \
+	./test_resources_map.c \
+	./test_server_run.c \
+	./test_queue_connection.c \
+	./test_graphical_client.c
 
 
 all: tests_run
