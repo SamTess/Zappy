@@ -30,26 +30,6 @@ class UpgradeBehavior(Behavior):
       print("UpgradeBehavior: Surroundings or inventory is None.")
       return
 
-    inventory_dict = zappy.inventory_to_dict(inventory)
-    upgrade_info = upgrades.upgrades.get(self.agent.level, {})
-
-    if not upgrade_info:
-      print(f"UpgradeBehavior: No upgrade defined for level {self.agent.level}.")
-      return
-    if not inventory_dict:
-      print("UpgradeBehavior: Inventory is empty or not properly parsed.")
-      return
-
-    upgrade_cost = upgrade_info.get("cost", {})
-
-    for resource, amount in upgrade_cost.items():
-      if resource == "players":
-        if zappy.how_much_of_item_here(surroundings, "player") < amount:
-          return
-        continue
-      elif inventory_dict.get(resource, 0) < amount:
-        return
-
     self.agent.send_command("Incantation")
 
 

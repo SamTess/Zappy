@@ -169,8 +169,6 @@ class Agent:
 
     elif self.current_phase == "rallying":
       distance_to_player, amount_of_players = zappy.get_closest_of_item(self.last_known_surroundings, "player")
-      print("amount_of_players", amount_of_players)
-      print(self.last_known_surroundings)
       if amount_of_players >= 6:
         print("Enough players gathered for upgrade.")
         self.current_phase = "setting"
