@@ -17,31 +17,18 @@ class DecisionManager:
       "FoodDyson": behaviors.FoodDysonBehavior(agent),
       "TakeEverythingHere": behaviors.TakeEverythingHereBehavior(agent),
       "TakeAllFoodHere": behaviors.TakeAllFoodHereBehavior(agent),
+      "DropEveryMinerals": behaviors.DropEveryMineralsBehavior(agent),
       "None": behaviors.NoActionBehavior(agent),
       "": behaviors.NoActionBehavior(agent),
     }
 
 
-  def upgradePhase(self, surroundings, inventory): # TODO(ms-tristan): implement
-    if self.agent.current_role == "miner":
-      print("Upgrading with da bros")
-    elif self.agent.current_role == "fighter":
-      print("Feeding da bros")
-
-
-  def rallyPhase(self, surroundings, inventory):
-    if (self.agent.current_role == "miner"): # TODO(ms-tristan): implement
-      self.behaviors["JoinTeamMates"].execute(surroundings, inventory)
-      self.behaviors["TakeAllFoodHere"].execute(surroundings, inventory)
-    elif (self.agent.current_role == "fighter"):
-      self.behaviors["FoodDyson"].execute(surroundings, inventory)
-
-
-  def collectPhase(self, surroundings, inventory):
-    if (self.agent.current_role == "miner"):
-      self.behaviors["BigDyson"].execute(surroundings, inventory)
-    elif (self.agent.current_role == "fighter"):
-      self.behaviors["FoodDyson"].execute(surroundings, inventory)
+    self.decisions = {
+      "collecting": {"miner": ["BigDyson"], "fighter": ["FoodDyson"]},
+      "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["FoodDyson"]},
+      "setting": {"miner": ["DropEveryMinerals"], "fighter": ["FoodDyson"]},
+      "upgrading": {"miner": ["Upgrade"], "fighter": ["FoodDyson"]}
+    }
 
 
   def take_action(self):
@@ -55,11 +42,7 @@ class DecisionManager:
       print("Failed to retrieve inventory or surroundings.")
       return
 
-    if self.agent.current_phase == "collecting":
-      self.collectPhase(surroundings, inventory)
-    elif self.agent.current_phase == "rallying":
-      self.rallyPhase(surroundings, inventory)
-    elif self.agent.current_phase == "upgrading":
-      self.upgradePhase(surroundings, inventory)
-
+    for action in self.decisions[self.agent.current_phase][self.agent.current_role]:
+      self.behaviors[action].execute(surroundings, inventory)
+      print(f"Executed action: {action}")
     # print(inventory)

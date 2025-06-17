@@ -156,3 +156,18 @@ class TakeAllFoodHereBehavior(Behavior):
       return
 
     AgentActionManager(self.agent).take_all_of_item_here("food")
+
+
+class DropEveryMineralsBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not inventory:
+      print("DropEveryMineralsBehavior: Inventory is None.")
+      return
+
+    inventory_dict = zappy.inventory_to_dict(inventory)
+    minerals = [item for item in inventory_dict if item != "food"]
+
+    for mineral in minerals:
+      amount = inventory_dict[mineral]
+      for _ in range(amount):
+        self.agent.send_command(f"Set {mineral}")
