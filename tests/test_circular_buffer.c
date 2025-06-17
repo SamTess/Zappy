@@ -10,6 +10,19 @@
 #include "circular_buffer.h"
 #include <string.h>
 #include <stdlib.h>
+#include <dlfcn.h>
+
+// Global flag to control malloc behavior
+static int should_malloc_fail = 0;
+
+// Custom malloc wrapper for testing malloc failure
+void *__real_malloc(size_t size);
+void *__wrap_malloc(size_t size) {
+    if (should_malloc_fail) {
+        return NULL;
+    }
+    return __real_malloc(size);
+}
 
 // Helper function to initialize and fill buffer for tests
 static void setup_buffer(circular_buffer_t *cb, const char *data)
@@ -248,7 +261,15 @@ Test(circular_buffer, extract_command_single_char) {
 }
 
 Test(circular_buffer, extract_command_malloc_failure) {
-    // This test is hard to reliably trigger without deeper hooks into malloc
-    // For now, we'll skip this test as it requires mocking malloc
-    cr_skip_test("Skipping malloc failure test for extract_command: hard to mock reliably.");
+    circular_buffer_t cb;
+    setup_buffer(&cb, "test\n");
+    
+    // Enable malloc failure
+    should_malloc_fail = 1;
+    
+    char *cmd = extract_command(&cb, 5);
+    cr_assert_null(cmd, "extract_command should return NULL when malloc fails");
+    
+    // Disable malloc failure for cleanup
+    should_malloc_fail = 0;
 }
