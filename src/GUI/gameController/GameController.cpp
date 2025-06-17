@@ -19,16 +19,13 @@ GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
 }
 
 bool GameController::unknownPlayerId(int playerID) {
-    if (_gameState->getPlayers().find(playerID)
-        == _gameState->getPlayers().end()) {
+    const auto &players = _gameState->getPlayers();
+    if (players.empty() || (!players.empty() && players.find(playerID) == players.end())) {
         std::string ppo = "ppo #" + std::to_string(playerID) + "\n";
         std::string plv = "plv #" + std::to_string(playerID) + "\n";
         std::string pin = "pin #" + std::to_string(playerID) + "\n";
-        std::cout << "PPO SENT!!!!!" << std::endl;
         _networkManager->sendCommand(ppo);
-        std::cout << "PLV SENT!!!!!" << std::endl;
         _networkManager->sendCommand(plv);
-        std::cout << "PIN SENT!!!!!" << std::endl;
         _networkManager->sendCommand(pin);
         return true;
     }
@@ -89,10 +86,6 @@ void GameController::processMessage(const Message& message) {
     MessageType messageType = message.getStructuredData()->getType();
 
     // la faire le check du map size
-    if (messageType != MessageType::MapSize && !_gameState->isMapInitialized()) {
-        auto mapSizeData = std::static_pointer_cast<MapSizeData>(message.getStructuredData());
-        _gameState->setMapSize(mapSizeData->getWidth(), mapSizeData->getHeight());
-    }
     auto it = _messageHandlers.find(messageType);
     if (it != _messageHandlers.end()) {
         it->second(message.getStructuredData());
@@ -109,9 +102,7 @@ void GameController::handleMapSize(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleTileContent(std::shared_ptr<IMessageData> data) {
     if (!_gameState->isMapInitialized()) {
-        std::cout << "MSZ SENT!!!!!" << std::endl;
         _networkManager->sendCommand("msz\n");
-        std::cout << "MCT SENT!!!!!" << std::endl;
         _networkManager->sendCommand("mct\n");
         return;
     }
