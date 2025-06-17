@@ -51,7 +51,6 @@ private:
     void handlePlayerBroadcast(std::shared_ptr<IMessageData> data);
     void handleResourceDrop(std::shared_ptr<IMessageData> data);
     void handleResourceCollect(std::shared_ptr<IMessageData> data);
-    void handlePlayerDeath(std::shared_ptr<IMessageData> data);
     void handleIncantationStart(std::shared_ptr<IMessageData> data);
     void handleIncantationEnd(std::shared_ptr<IMessageData> data);
     void handleEggLaying(std::shared_ptr<IMessageData> data);
