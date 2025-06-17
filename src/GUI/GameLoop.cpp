@@ -136,4 +136,3 @@ void GameLoop::updateCameraForMapSize() {
     m_camera->reset();
     m_camera->distance() = cameraDistance;
 }
-
