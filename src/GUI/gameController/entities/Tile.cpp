@@ -6,6 +6,9 @@
 */
 
 #include "Tile.hpp"
+#include <algorithm>
+#include <memory>
+#include <vector>
 
 Tile::Tile(int x, int y) : _x(x), _y(y), _resources{0}, _isIncantating(false) {}
 

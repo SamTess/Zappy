@@ -8,8 +8,9 @@
 #ifndef IPLAYER_HPP_
 #define IPLAYER_HPP_
 
-#include "IGameEntity.hpp"
 #include <string>
+#include <memory>
+#include "IGameEntity.hpp"
 
 class PlayerInfoData;
 

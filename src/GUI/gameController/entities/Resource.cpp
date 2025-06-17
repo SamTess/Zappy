@@ -7,6 +7,8 @@
 
 #include "Resource.hpp"
 #include <algorithm>
+#include <memory>
+#include <string>
 
 Resource::Resource(ResourceType type, int quantity)
     : _type(type), _quantity(quantity) {

@@ -8,8 +8,9 @@
 #ifndef IRESSOURCES_HPP_
 #define IRESSOURCES_HPP_
 
-#include "IGameEntity.hpp"
 #include <string>
+#include <memory>
+#include "IGameEntity.hpp"
 
 class IResource : public IRenderable {
 public:

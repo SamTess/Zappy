@@ -8,6 +8,7 @@
 #include "GameController.hpp"
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 GameController::GameController() {
     auto entityFactory = std::make_shared<EntityFactoryManager>();

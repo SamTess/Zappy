@@ -6,12 +6,12 @@
 */
 
 #include "DetailedTileRenderStrategy.hpp"
-#include "../../gameController/entities/Resource.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <memory>
 #include <string>
+#include "../../gameController/entities/Resource.hpp"
 
 namespace Zappy {
 
@@ -33,17 +33,17 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
     ZappyTypes::Color borderColor = {100, 100, 100, 255};
     float offset = tileSize/2;
     graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z - offset},
-                           {position.x + offset, position.y + 0.05f, position.z - offset},
-                           borderColor);
+        {position.x + offset, position.y + 0.05f, position.z - offset},
+        borderColor);
     graphicsLib->DrawLine3D({position.x + offset, position.y + 0.05f, position.z - offset},
-                           {position.x + offset, position.y + 0.05f, position.z + offset},
-                           borderColor);
+        {position.x + offset, position.y + 0.05f, position.z + offset},
+        borderColor);
     graphicsLib->DrawLine3D({position.x + offset, position.y + 0.05f, position.z + offset},
-                           {position.x - offset, position.y + 0.05f, position.z + offset},
-                           borderColor);
+        {position.x - offset, position.y + 0.05f, position.z + offset},
+        borderColor);
     graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z + offset},
-                           {position.x - offset, position.y + 0.05f, position.z - offset},
-                           borderColor);
+        {position.x - offset, position.y + 0.05f, position.z - offset},
+        borderColor);
 
     auto tile = gameState->getTile(x, y);
 
@@ -75,21 +75,15 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
             }
         }
     } else {
-        // Fallback vers l'ancienne méthode si pas de tile polymorphe
-    // Utilisation des nouvelles méthodes polymorphes
     auto tile = gameState->getTile(x, y);
     if (tile) {
-        // Rendu des ressources via les entités polymorphes
         for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
             int quantity = tile->getResourceQuantity(static_cast<ResourceType>(i));
             if (quantity > 0) {
-                // Créer temporairement une ressource pour le rendu
                 Resource tempResource(static_cast<ResourceType>(i), quantity);
                 tempResource.renderResource(graphicsLib, position, tileSize);
             }
         }
-        
-        // Rendu des joueurs via les entités polymorphes
         const auto& playerIds = tile->getPlayerIds();
         for (int i = 0; i < static_cast<int>(playerIds.size()); ++i) {
             int playerId = playerIds[i];
@@ -98,8 +92,6 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
                 player->renderPlayer(graphicsLib, position, tileSize, i, playerIds.size());
             }
         }
-        
-        // Rendu des œufs via les entités polymorphes
         const auto& eggIds = tile->getEggIds();
         for (int eggId : eggIds) {
             auto egg = gameState->getEggInfo(eggId);
@@ -138,32 +130,32 @@ void DetailedTileRenderStrategy::renderResourceIndicator(const std::shared_ptr<I
     graphicsLib->DrawCube(indicatorPos, indicatorSize, indicatorSize, indicatorSize, resourceColors[resourceIndex]);
     float halfSize = indicatorSize / 2;
     graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          borderColor);
+        {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+        borderColor);
     graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          borderColor);
+        {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+        borderColor);
     graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          borderColor);
+        {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+        borderColor);
     graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          borderColor);
+        {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+        borderColor);
     for (int i = 1; i < std::min(quantity, 5); ++i) {
         indicatorPos.y += indicatorSize * 0.8f;
         graphicsLib->DrawCube(indicatorPos, indicatorSize, indicatorSize, indicatorSize, resourceColors[resourceIndex]);
         graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              borderColor);
+            {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+            borderColor);
         graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              borderColor);
+            {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+            borderColor);
         graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              borderColor);
+            {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+            borderColor);
         graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              borderColor);
+            {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+            borderColor);
     }
 }
 

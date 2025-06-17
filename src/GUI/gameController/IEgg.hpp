@@ -8,8 +8,9 @@
 #ifndef IEGG_HPP_
 #define IEGG_HPP_
 
-#include "IGameEntity.hpp"
 #include <string>
+#include <memory>
+#include "IGameEntity.hpp"
 
 class EggData;
 

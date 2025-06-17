@@ -8,6 +8,7 @@
 #ifndef EGG_HPP_
 #define EGG_HPP_
 
+#include <memory>
 #include "../IGameEntity.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
 #include "../../../Shared/IGraphicsLib.hpp"
@@ -27,8 +28,8 @@ public:
                 const ZappyTypes::Vector3& position,
                 float tileSize) const override;
     void renderEgg(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-                   const ZappyTypes::Vector3& position,
-                   float tileSize) const override;
+        const ZappyTypes::Vector3& position,
+        float tileSize) const override;
 
 private:
     int _eggId;

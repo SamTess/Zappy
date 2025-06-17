@@ -8,15 +8,15 @@
 #ifndef RESOURCE_HPP_
 #define RESOURCE_HPP_
 
+#include <string>
+#include <memory>
 #include "../IGameEntity.hpp"
 #include "../../../Shared/IGraphicsLib.hpp"
 #include "../IResource.hpp"
-#include <string>
 
-// Implémentation concrète d'une ressource
 class Resource : public IResource {
 public:
-    Resource(ResourceType type, int quantity = 0);
+    explicit Resource(ResourceType type, int quantity = 0);
 
     ResourceType getType() const override;
     int getQuantity() const override;

@@ -8,9 +8,9 @@
 #ifndef PLAYER_INVENTORY_HPP_
 #define PLAYER_INVENTORY_HPP_
 
+#include <array>
 #include "../IGameEntity.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
-#include <array>
 #include "../IPlayerInventory.hpp"
 
 class PlayerInventory : public IPlayerInventory {

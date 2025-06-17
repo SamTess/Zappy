@@ -8,10 +8,11 @@
 #ifndef PLAYER_HPP_
 #define PLAYER_HPP_
 
+#include <string>
+#include <memory>
 #include "../IGameEntity.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
 #include "../../../Shared/IGraphicsLib.hpp"
-#include <string>
 #include "../IPlayer.hpp"
 
 class Player : public IPlayer {

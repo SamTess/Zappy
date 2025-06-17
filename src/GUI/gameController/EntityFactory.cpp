@@ -5,13 +5,14 @@
 ** EntityFactory - Implémentation du factory pour créer les entités
 */
 
+#include <memory>
+#include <utility>
 #include "EntityFactory.hpp"
 #include "entities/Player.hpp"
 #include "entities/Egg.hpp"
 #include "entities/Resource.hpp"
 #include "entities/Tile.hpp"
 #include "entities/PlayerInventory.hpp"
-
 
 std::shared_ptr<IPlayer> GameEntityFactory::createPlayer(const PlayerInfoData& data) {
     return std::make_shared<Player>(data);
@@ -41,7 +42,7 @@ EntityFactoryManager::EntityFactoryManager() {
     _factory = std::make_unique<GameEntityFactory>();
 }
 
-EntityFactoryManager::EntityFactoryManager(std::unique_ptr<IEntityFactory> factory) 
+EntityFactoryManager::EntityFactoryManager(std::unique_ptr<IEntityFactory> factory)
     : _factory(std::move(factory)) {
 }
 

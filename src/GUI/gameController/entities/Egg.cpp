@@ -7,6 +7,7 @@
 
 #include "Egg.hpp"
 #include <cmath>
+#include <memory>
 
 Egg::Egg() : _eggId(0), _x(0), _y(0) {}
 

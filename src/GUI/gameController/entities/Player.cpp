@@ -8,6 +8,8 @@
 #include "Player.hpp"
 #include <iostream>
 #include <cmath>
+#include <memory>
+#include <string>
 
 Player::Player() : _id(0), _x(0), _y(0), _orientation(0), _level(1), _teamName(""), _isAlive(true) {}
 

@@ -99,12 +99,10 @@ void MapRenderer::renderTile(int x, int y, int /*resourceType*/) {
 ZappyTypes::Color MapRenderer::calculateTileColor(int x, int y) {
     if (resourceColors.find(-1) == resourceColors.end())
         return {150, 150, 150, 255};
-    
     auto tile = gameState->getTile(x, y);
     if (tile && tile->isIncantating()) {
         return {50, 50, 255, 200};
     }
-    
     ResourceType dominantType = gameState->getDominantResourceType(x, y);
     int resourceIndex = static_cast<int>(dominantType);
     if (dominantType == ResourceType::COUNT || resourceColors.find(resourceIndex) == resourceColors.end()) {

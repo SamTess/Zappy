@@ -8,17 +8,18 @@
 #ifndef TILE_HPP_
 #define TILE_HPP_
 
+#include <array>
+#include <vector>
+#include <algorithm>
+#include <memory>
 #include "../IGameEntity.hpp"
 #include "../ITile.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
 #include "../../../Shared/IGraphicsLib.hpp"
-#include <array>
-#include <vector>
-#include <algorithm>
 
 class Tile : public ITile {
 public:
-    Tile(int x = 0, int y = 0);
+    explicit Tile(int x = 0, int y = 0);
     explicit Tile(const TileContentData& data);
 
     int getX() const override;

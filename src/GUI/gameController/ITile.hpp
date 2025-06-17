@@ -8,8 +8,9 @@
 #ifndef ITILE_HPP_
 #define ITILE_HPP_
 
-#include "IGameEntity.hpp"
 #include <string>
+#include <vector>
+#include "IGameEntity.hpp"
 
 class TileContentData;
 

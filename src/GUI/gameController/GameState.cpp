@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-
+#include <utility>
 GameState::GameState() {
     _entityFactory = std::make_shared<EntityFactoryManager>();
 }
@@ -216,7 +216,6 @@ void GameState::removePlayer(int playerId) {
 void GameState::updatePlayerInventory(const PlayerInventoryData& inventoryData) {
     std::lock_guard<std::mutex> lock(_mutex);
     int playerId = inventoryData.getId();
-    
     auto it = _inventories.find(playerId);
     if (it != _inventories.end()) {
         it->second->updateFromProtocol(inventoryData);
