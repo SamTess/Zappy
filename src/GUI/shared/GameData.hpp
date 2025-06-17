@@ -60,12 +60,10 @@ struct GameData {
     // Informations sur la map
     int mapWidth = 10;
     int mapHeight = 10;
-    
     // Informations temporelles
     float time = 0.0f;
     int frequency = 100;
     int tick = 0;
-    
     // Données du jeu
     std::vector<Player> players;
     std::vector<Tile> tiles;
