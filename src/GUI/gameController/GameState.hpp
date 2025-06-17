@@ -62,6 +62,7 @@ private:
     void removePlayerFromTile(int playerId, int x, int y);
     void addEggToTile(int eggId, int x, int y);
     void removeEggFromTile(int eggId, int x, int y);
+
     mutable std::mutex _mutex;
     int _mapWidth = 0;
     int _mapHeight = 0;

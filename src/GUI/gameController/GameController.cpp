@@ -10,13 +10,8 @@
 #include <algorithm>
 #include <memory>
 
-GameController::GameController() {
-    auto entityFactory = std::make_shared<EntityFactoryManager>();
-    _gameState = std::make_shared<GameState>(entityFactory);
-    initializeMessageHandlers();
-}
-
-GameController::GameController(std::shared_ptr<EntityFactoryManager> entityFactory) {
+GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
+    std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
     _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
 }
@@ -74,6 +69,11 @@ void GameController::processMessage(const Message& message) {
         return;
     MessageType messageType = message.getStructuredData()->getType();
 
+    // la faire le check du map size
+    if (messageType != MessageType::MapSize && !_gameState->isMapInitialized()) {
+        auto mapSizeData = std::static_pointer_cast<MapSizeData>(message.getStructuredData());
+        _gameState->setMapSize(mapSizeData->getWidth(), mapSizeData->getHeight());
+    }
     auto it = _messageHandlers.find(messageType);
     if (it != _messageHandlers.end()) {
         it->second(message.getStructuredData());
@@ -89,6 +89,11 @@ void GameController::handleMapSize(std::shared_ptr<IMessageData> data) {
 }
 
 void GameController::handleTileContent(std::shared_ptr<IMessageData> data) {
+    if (!_gameState->isMapInitialized()) {
+        _networkManager->sendCommand("msz\n");
+        _networkManager->sendCommand("mct\n");
+        return;
+    }
     auto tileData = std::static_pointer_cast<TileContentData>(data);
     int x = tileData->getX();
     int y = tileData->getY();
@@ -108,7 +113,7 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     int playerId = playerData->getId();
     auto existingPlayer = _gameState->getPlayerInfo(playerId);
 
-    if (existingPlayer) {
+    if (existingPlayer && playerData->getOrientation() != -1) {
         if (!playerData->isAlive()) {
             _gameState->removePlayer(playerId);
             return;
@@ -121,6 +126,12 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
             _gameState->addOrUpdatePlayer(*playerData);
             return;
         }
+    }
+    if (playerData->getOrientation() == -1) {
+        playerData->setTeamName(existingPlayer->getTeamName());
+        playerData->setX(existingPlayer->getX());
+        playerData->setY(existingPlayer->getY());
+        playerData->setOrientation(existingPlayer->getOrientation());
     }
     _gameState->addOrUpdatePlayer(*playerData);
 }

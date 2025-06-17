@@ -15,9 +15,8 @@
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
-
-GameLoop::GameLoop()
-    : m_host("localhost"), m_port(4242) {
+GameLoop::GameLoop(std::shared_ptr<NetworkManager> networkManager)
+    : m_host("localhost"), m_port(4242), m_networkManager(networkManager) {
 }
 
 bool GameLoop::init() {

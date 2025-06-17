@@ -15,6 +15,7 @@
 #include <memory>
 #include "NetworkManager.hpp"
 #include "NetworkLogger.hpp"
+#include "../../gameController/GameController.hpp"
 
 NetworkManager::NetworkManager()
     : _connection(std::make_unique<TcpConnection>()),
@@ -23,7 +24,7 @@ NetworkManager::NetworkManager()
       _incomingQueue(std::make_unique<MessageQueue>()),
       _outgoingQueue(std::make_unique<MessageQueue>()),
       _receiveBuffer(""),
-      _gameController(std::make_shared<GameController>()),
+      _gameController(nullptr),
       _isConnected(false) {
     // Activer le logging pour debug
     NetworkLogger::get().setEnabled(true);

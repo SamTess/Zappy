@@ -11,6 +11,7 @@
 #include "parsing/ParsingCLI.hpp"
 #include "GameLoop.hpp"
 #include "network/networkManager/NetworkManager.hpp"
+#include "gameController/EntityFactory.hpp"
 
 void displayHelp() {
     std::cout << "USAGE: ./zappy_gui -p port -h machine" << std::endl;
@@ -27,22 +28,26 @@ int main(int argc, char** argv) {
         ParsingCLI parser(argc, argv);
         std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
 
-        NetworkManager networkManager;
+        auto networkManager = std::make_shared<NetworkManager>();
 
-        if (!networkManager.connect(parser.getMachine(), parser.getPort())) {
+        if (!networkManager->connect(parser.getMachine(), parser.getPort())) {
             std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
         }
 
-        auto gameLoop = std::make_shared<GameLoop>();
+        auto entityFactory = std::make_shared<EntityFactoryManager>();
+        auto gameController = std::make_shared<GameController>(networkManager, entityFactory);
+        networkManager->setGameController(gameController);
+
+        auto gameLoop = std::make_shared<GameLoop>(networkManager);
         gameLoop->setServerInfo(parser.getMachine(), parser.getPort());
-        gameLoop->setGameController(networkManager.getGameController());
+        gameLoop->setGameController(gameController);
         if (!gameLoop->init()) {
             std::cerr << "Failed to initialize game components" << std::endl;
             return 84;
         }
         gameLoop->run();
-        networkManager.disconnect();
+        networkManager->disconnect();
         return 0;
     } catch (const AException &e) {
         std::cerr << e.getFormattedMessage() << std::endl;
