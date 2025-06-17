@@ -10,6 +10,7 @@
 #include "RayGui.hpp"
 #include "../TypeAdapter.hpp"
 #include "include/RayGuiEncap.hpp"
+#include <iostream>
 
 RayGui::RayGui() {}
 RayGui::~RayGui() {}
@@ -99,6 +100,27 @@ void RayGui::SetStyle(int control, int property, int value) {
 }
 int RayGui::GetStyle(int control, int property) {
     return RayGUICPP::RayGui::GetStyle(control, property);
+}
+
+ZappyTypes::Vector2 RayGui::GetMousePosition() {
+    Vector2 mousePos = ::GetMousePosition();
+    return TypeAdapter::FromRaylib(mousePos);
+}
+
+bool RayGui::IsMouseButtonDown(int button) {
+    return ::IsMouseButtonDown(button);
+}
+
+bool RayGui::IsMouseButtonPressed(int button) {
+    return ::IsMouseButtonPressed(button);
+}
+
+bool RayGui::IsMouseButtonReleased(int button) {
+    return ::IsMouseButtonReleased(button);
+}
+
+bool RayGui::CheckCollisionPointRec(ZappyTypes::Vector2 point, ZappyTypes::Rectangle rect) {
+    return ::CheckCollisionPointRec(TypeAdapter::ToRaylib(point), TypeAdapter::ToRaylib(rect));
 }
 
 extern "C" {
