@@ -20,11 +20,9 @@
 static bool remove_head_client(server_t *server, int fd)
 {
     client_t *current = server->client;
-    int client_id;
 
     if (current->client_fd != fd)
         return false;
-    client_id = current->client_id;
     if (current->client_fd == server->s_fd)
         return true;
     server->client = current->next;
@@ -37,7 +35,6 @@ static bool remove_other_client(server_t *server, int fd)
 {
     client_t *current = server->client;
     client_t *prev = NULL;
-    int client_id;
 
     while (current != NULL && current->client_fd != fd) {
         prev = current;
@@ -45,7 +42,6 @@ static bool remove_other_client(server_t *server, int fd)
     }
     if (current == NULL)
         return false;
-    client_id = current->client_id;
     prev->next = current->next;
     free_node(current, server);
     server->nfds -= 1;
