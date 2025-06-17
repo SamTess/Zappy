@@ -1,0 +1,119 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400
+** File description:
+** UIWindowFactory - Factory pour créer les différentes fenêtres UI
+*/
+
+#pragma once
+
+#include <memory>
+#include <string>
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include "windows/IUIWindow.hpp"
+#include "../shared/GameData.hpp"
+#include "../../Shared/IGuiLib.hpp"
+
+namespace GUI {
+
+/**
+ * @brief Factory pour créer et gérer les fenêtres de l'interface utilisateur
+ */
+class UIWindowFactory {
+public:
+    /**
+     * @brief Constructeur
+     * @param guiLib Pointeur vers la bibliothèque GUI
+     */
+    explicit UIWindowFactory(std::shared_ptr<IGuiLib> guiLib);
+    ~UIWindowFactory() = default;
+
+    /**
+     * @brief Crée toutes les fenêtres nécessaires pour l'interface utilisateur
+     * @param screenWidth Largeur de l'écran
+     * @param screenHeight Hauteur de l'écran
+     */
+    void createAllWindows(int screenWidth, int screenHeight);
+
+    /**
+     * @brief Obtient une fenêtre par son identifiant
+     * @param windowId Identifiant de la fenêtre
+     * @return Pointeur partagé vers la fenêtre
+     */
+    std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
+
+    /**
+     * @brief Rend toutes les fenêtres visibles
+     */
+    void renderAllWindows();
+
+    /**
+     * @brief Mise à jour des données pour toutes les fenêtres
+     * @param gameData Données du jeu
+     */
+    void updateAllWindows(const GameData& gameData);
+
+    /**
+     * @brief Ajoute un message au journal
+     * @param message Le message à ajouter
+     */
+    void addLogMessage(const std::string& message);
+
+    /**
+     * @brief Définit la case sélectionnée
+     * @param x Coordonnée X
+     * @param y Coordonnée Y
+     */
+    void setSelectedTile(int x, int y);
+
+    /**
+     * @brief Ajoute un message de diffusion
+     * @param team Équipe émettrice
+     * @param message Message diffusé
+     */
+    void addBroadcast(const std::string& team, const std::string& message);
+
+    /**
+     * @brief Définit le mode de vue
+     * @param mode Indice du mode de vue
+     */
+    void setViewMode(int mode);
+
+    /**
+     * @brief Gère le début du glissement d'une fenêtre
+     * @param mousePosition Position de la souris
+     */
+    void handleWindowDragging(const ZappyTypes::Vector2& mousePosition);
+
+    /**
+     * @brief Met à jour la position des fenêtres en cours de glissement
+     * @param mousePosition Position actuelle de la souris
+     */
+    void updateWindowDragging(const ZappyTypes::Vector2& mousePosition);
+
+    /**
+     * @brief Arrête le glissement des fenêtres
+     */
+    void stopWindowDragging();
+
+private:
+    // Bibliothèque GUI
+    std::shared_ptr<IGuiLib> m_guiLib;
+
+    // Map des fenêtres avec leurs identifiants
+    std::unordered_map<std::string, std::shared_ptr<IUIWindow>> m_windows;
+
+    // Données partagées
+    struct {
+        int x;
+        int y;
+        bool selected;
+    } m_selectedTile;
+
+    int m_currentViewMode;
+    std::vector<std::string> m_viewModes;
+};
+
+} // namespace GUI
