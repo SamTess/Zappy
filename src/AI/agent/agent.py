@@ -41,7 +41,7 @@ class Agent:
 
       # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
       self.current_role = "miner"           #? "fighter", "miner"
-      self.current_phase = "collecting"     #? "collecting", "rallying", "upgrading", "reproducing"
+      self.current_phase = "collecting"     #? "collecting", "rallying", "setting", "upgrading", "reproducing"
 
       # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
       self.last_known_inventory = {}
@@ -173,7 +173,21 @@ class Agent:
       print(self.last_known_surroundings)
       if amount_of_players >= 6:
         print("Enough players gathered for upgrade.")
-        self.current_phase = "upgrading"
+        self.current_phase = "setting"
+
+    elif self.current_phase == "setting":
+      last_surroundings = self.last_known_surroundings
+      if last_surroundings is None or "ko" in last_surroundings:
+        print("Failed to retrieve surroundings for setting phase.")
+        return
+      required_total_amount_of_resources = get_total_upgrade_resources()
+      for key, value in required_total_amount_of_resources.items():
+          distance_to_item, amount_found = zappy.get_closest_of_item(last_surroundings, key)
+          if distance_to_item == -1 or amount_found < value:
+              print(f"Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
+              return
+      print("All required resources for upgrading are available.")
+      self.current_phase = "upgrading"
 
 
   def send_command(self, command, timeout=2.0):
