@@ -46,10 +46,6 @@ int main(int argc, char** argv) {
             std::cerr << "Failed to initialize game components" << std::endl;
             return 84;
         }
-        
-        // The skybox will automatically load assets/models/sky.jpg
-        std::cout << "Skybox configured with sky.jpg texture..." << std::endl;
-        
         gameLoop->run();
         networkManager->disconnect();
         return 0;

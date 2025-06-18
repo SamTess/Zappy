@@ -114,5 +114,4 @@ void Tile::render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         return;
     (void)tileSize;
     ModelManager::getInstance().drawModel(ISLAND, position, 1);
-
 }

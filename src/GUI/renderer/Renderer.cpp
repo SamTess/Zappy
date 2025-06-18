@@ -22,8 +22,6 @@ Renderer::Renderer()
 void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->InitWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE);
     m_graphicsLib = graphics;
-    
-    // Initialize skybox with default sky.jpg texture
     if (m_skybox) {
         m_skybox->init(graphics);
     }

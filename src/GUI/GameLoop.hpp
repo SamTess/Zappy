@@ -32,8 +32,6 @@ public:
     bool init();
     int run();    void setServerInfo(const std::string& host, int port);
     void setGameController(std::shared_ptr<GameController> controller);
-    
-    // Skybox configuration methods
     void setSkyboxTexture(const std::string& texturePath);
     bool isSkyboxLoaded() const;
 

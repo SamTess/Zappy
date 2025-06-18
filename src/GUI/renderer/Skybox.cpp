@@ -7,9 +7,10 @@
 
 #include "Skybox.hpp"
 #include <iostream>
+#include <memory>
+#include <string>
 
 Skybox::Skybox() {
-    // Initialize with default values
 }
 
 bool Skybox::init(std::shared_ptr<IGraphicsLib> graphics) {
