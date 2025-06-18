@@ -56,8 +56,10 @@ void Player::updateFromProtocol(const PlayerInfoData& data) {
     _x = data.getX();
     _y = data.getY();
     _orientation = data.getOrientation();
-    _level = data.getLevel();
-    _teamName = data.getTeamName();
+    if (data.getLevel() >= _level)
+        _level = data.getLevel();
+    if (!data.getTeamName().empty())
+        _teamName = data.getTeamName();
     _isAlive = data.isAlive();
 }
 

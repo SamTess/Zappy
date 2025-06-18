@@ -29,9 +29,8 @@ void Text3D::DrawTextCodepoint3D(::Font font, int codepoint, Vector3 position,
 void Text3D::DrawText3D(::Font font, const std::string& text, Vector3 position,
     float fontSize, float fontSpacing, float lineSpacing,
     bool backface, Color tint) {
-    std::cout << "DrawText3D: " << text << std::endl;
     Text3DRenderer::renderBasicText(font, text, position, fontSize,
-                                   fontSpacing, lineSpacing, backface, tint);
+        fontSpacing, lineSpacing, backface, tint);
 }
 
 void Text3D::DrawTextWave3D(::Font font, const std::string& text, Vector3 position,

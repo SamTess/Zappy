@@ -13,7 +13,6 @@
 
 GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
     std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
-    std::cout << "  GAME CONTROLLER CREATED" << std::endl;
     _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
 }
@@ -24,11 +23,8 @@ bool GameController::unknownPlayerId(int playerID) {
         std::string ppo = "ppo #" + std::to_string(playerID) + "\n";
         std::string plv = "plv #" + std::to_string(playerID) + "\n";
         std::string pin = "pin #" + std::to_string(playerID) + "\n";
-        std::cout << "PPO SENT!!!!!" << std::endl;
         _networkManager->sendCommand(ppo);
-        std::cout << "PLV SENT!!!!!" << std::endl;
         _networkManager->sendCommand(plv);
-        std::cout << "PIN SENT!!!!!" << std::endl;
         _networkManager->sendCommand(pin);
         return true;
     }
@@ -109,9 +105,7 @@ void GameController::handleMapSize(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleTileContent(std::shared_ptr<IMessageData> data) {
     if (!_gameState->isMapInitialized()) {
-        std::cout << "MSZ SENT!!!!!" << std::endl;
         _networkManager->sendCommand("msz\n");
-        std::cout << "MCT SENT!!!!!" << std::endl;
         _networkManager->sendCommand("mct\n");
         return;
     }
