@@ -3,11 +3,12 @@ from agent.socketManager import SocketManager
 from agent.decisionManager import DecisionManager
 from agent.broadcastManager import BroadcastManager
 from logger.logger import Logger
-from constants.upgrades import get_total_upgrade_resources
+from constants.upgrades import get_total_upgrade_resources, minimum_players_for_upgrade
 import utils.encryption as encryption
 import utils.zappy as zappy
 import socket
 import sys
+
 
 class Agent:
   def __init__(self, ip, port, team, agent_id=0, performance_mode=False):
@@ -21,6 +22,7 @@ class Agent:
       self.map_size_x = None
       self.map_size_y = None
       self.current_behaviour = "BigDyson"
+      self.tick = 0
       encryption.secret_key = encryption.secret_key + self.team
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,7 +43,7 @@ class Agent:
 
       # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
       self.current_role = "miner"           #? "fighter", "miner"
-      self.current_phase = "collecting"     #? "collecting", "rallying", "upgrading", "reproducing"
+      self.current_phase = "collecting"     #? "collecting", "rallying", "setting", "upgrading", "reproducing"
 
       # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
       self.last_known_inventory = {}
@@ -65,28 +67,23 @@ class Agent:
     team_slots = self.send_command(self.team)
     map_size = self.get_message(timeout=4)
 
-    if map_size is None:
-      print("Failed to retrieve map size from server.")
+    if welcome_msg is None or team_slots is None or map_size is None \
+    or welcome_msg == "ko" or team_slots == "ko" or map_size == "ko":
+      print("Failed to retrieve necessary information from server.")
       sys.exit(1)
+
+    self.id = int(team_slots)
     self.map_size_x = int(map_size.split()[0])
     self.map_size_y = int(map_size.split()[1])
 
-    if welcome_msg == "WELCOME":
-      print(f"Welcome message {welcome_msg}")
-    else:
-      print(f"Unexpected welcome message: {welcome_msg}")
-      sys.exit(1)
-
-    if (team_slots == "ko"):
-        print("Failed to join team. Either the team is full, or its name is incorrect.")
-        sys.exit(1)
-    else:
-      print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
-
+    print(f"Welcome message {welcome_msg}")
+    print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
     print(f"Map size: {map_size}")
+
     self.running = True
     self._run()
-    self._stop()
+    self.stop()
+
 
   def stop(self):
     if self.running:
@@ -102,10 +99,14 @@ class Agent:
       try:
         self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")  #? Envoyer ses infos aux autres
         self._process_server_message()
-        self._update_self_state()           # TODO(ms-tristan): update l'état de l'agent actuel en fonction des informations reçues
-        self.decisionManager.take_action()  # TODO(ms-tristan): recréer l'arbre de décision pour prendre en compte les nouvelles actions
+        self.decisionManager.take_action()
+        # on laisse l'update en dessous de la prise de décision
+        # pour que les agents ne rebougent pas après avoir reçu un broadcast sur la même case
+        self._update_self_state()
         sleep(0.1)
-
+        self.tick += 1
+        if self.tick > 10:
+          self.tick = 0
       except BrokenPipeError:
         print(f"Agent {self.id}: Connection closed by server.")
       except Exception as e:
@@ -131,15 +132,23 @@ class Agent:
 
 
   def _update_self_state(self):
-
     #? On détermine le rôle de l'agent en fonction de son id
     agent_ids = list(self.other_agents.keys())
     agent_ids.append(self.id)
     agent_ids.sort()
-    if agent_ids.index(self.id) < 8:
+    if agent_ids.index(self.id) <= minimum_players_for_upgrade:
       self.current_role = "miner"
     else:
       self.current_role = "fighter"
+
+    agents_to_remove = []
+    for agent_id, items in self.other_agents.items():
+      if items['last_ping'] > self.tick:
+        agents_to_remove.append(agent_id)
+
+    for agent_id in agents_to_remove:
+      print(f"Removing agent {agent_id} from other_agents due to inactivity.")
+      del self.other_agents[agent_id]
 
     #? On check si l'inventaire de tout le monde permet d'upgrade de 0 à 8
     if self.current_phase == "collecting":
@@ -168,12 +177,27 @@ class Agent:
         print("Not all required resources for upgrade are available.")
 
     elif self.current_phase == "rallying":
-      distance_to_player, amount_of_players = zappy.get_closest_of_item(self.last_known_surroundings, "player")
-      print("amount_of_players", amount_of_players)
-      print(self.last_known_surroundings)
-      if amount_of_players >= 6:
-        print("Enough players gathered for upgrade.")
-        self.current_phase = "upgrading"
+      for agent_info in self.other_agents.items():
+        if agent_info[1]['direction'] is None or agent_info[1]['direction'] != 0:
+          print(f"Agent {agent_info[0]} direction: {agent_info[1]['direction']}")
+          print("Waiting for all agents to be ready for setting.")
+          return
+      print("All agents are ready for setting.")
+      self.current_phase = "setting"
+
+    elif self.current_phase == "setting":
+      last_surroundings = self.last_known_surroundings
+      if last_surroundings is None or "ko" in last_surroundings:
+        print("Failed to retrieve surroundings for setting phase.")
+        return
+      required_total_amount_of_resources = get_total_upgrade_resources()
+      for key, value in required_total_amount_of_resources.items():
+          distance_to_item, amount_found = zappy.get_closest_of_item(last_surroundings, key)
+          if distance_to_item == -1 or amount_found < value:
+              print(f"Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
+              return
+      print("All required resources for upgrading are available.")
+      self.current_phase = "upgrading"
 
 
   def send_command(self, command, timeout=2.0):
@@ -188,9 +212,17 @@ class Agent:
     return self.socketManager.has_messages()
 
   def update_agent_info(self, agent_id, direction, inventory):
+    if direction is None or inventory is None:
+      if agent_id is None:
+        return
+      if agent_id in self.other_agents:
+        del self.other_agents[agent_id]
+      return
+
     self.other_agents[agent_id] = {
         "direction": direction,
-        "inventory": inventory
+        "inventory": inventory,
+        "last_ping": self.tick
     }
 
   def update_last_known_enemy_direction(self, direction):

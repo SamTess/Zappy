@@ -30,26 +30,6 @@ class UpgradeBehavior(Behavior):
       print("UpgradeBehavior: Surroundings or inventory is None.")
       return
 
-    inventory_dict = zappy.inventory_to_dict(inventory)
-    upgrade_info = upgrades.upgrades.get(self.agent.level, {})
-
-    if not upgrade_info:
-      print(f"UpgradeBehavior: No upgrade defined for level {self.agent.level}.")
-      return
-    if not inventory_dict:
-      print("UpgradeBehavior: Inventory is empty or not properly parsed.")
-      return
-
-    upgrade_cost = upgrade_info.get("cost", {})
-
-    for resource, amount in upgrade_cost.items():
-      if resource == "players":
-        if zappy.how_much_of_item_here(surroundings, "player") < amount:
-          return
-        continue
-      elif inventory_dict.get(resource, 0) < amount:
-        return
-
     self.agent.send_command("Incantation")
 
 
@@ -111,6 +91,17 @@ class BigDysonBehavior(Behavior):
     self.agent.send_command("Forward")
     self.agent.send_command("Left")
 
+
+class FoodBigDysonBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    for _ in range(self.agent.map_size_x):
+      self.agent.send_command("Forward")
+      AgentActionManager(self.agent).take_all_of_item_here("food")
+    self.agent.send_command("Right")
+    self.agent.send_command("Forward")
+    self.agent.send_command("Left")
+
+
 class GetFoodAndMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if not surroundings or not inventory:
@@ -156,3 +147,36 @@ class TakeAllFoodHereBehavior(Behavior):
       return
 
     AgentActionManager(self.agent).take_all_of_item_here("food")
+
+
+class TakeOneFoodHereBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    self.agent.send_command("Take food")
+
+
+class DropEveryMineralsBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not inventory:
+      print("DropEveryMineralsBehavior: Inventory is None.")
+      return
+
+    inventory_dict = zappy.inventory_to_dict(inventory)
+    minerals = [item for item in inventory_dict if item != "food"]
+
+    for mineral in minerals:
+      amount = inventory_dict[mineral]
+      for _ in range(amount):
+        self.agent.send_command(f"Set {mineral}")
+
+
+class DropAllFoodBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not inventory:
+      print("DropAllFoodBehavior: Inventory is None.")
+      return
+
+    inventory_dict = zappy.inventory_to_dict(inventory)
+    if "food" in inventory_dict:
+      amount = inventory_dict["food"]
+      for _ in range(amount):
+        self.agent.send_command("Set food")
