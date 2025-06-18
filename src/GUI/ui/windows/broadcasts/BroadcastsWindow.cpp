@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <memory>
+#include <algorithm> // Pour std::min, std::max
 #include "BroadcastsWindow.hpp"
 
 namespace GUI {
@@ -18,29 +19,31 @@ BroadcastsWindow::BroadcastsWindow(std::shared_ptr<IGuiLib> guiLib)
 }
 
 void BroadcastsWindow::renderContent() {
-    std::stringstream broadcastsContent;
-    for (const auto& broadcast : m_broadcasts) {
-        broadcastsContent << broadcast.team << ": " << broadcast.message << " ("
-                         << static_cast<int>(broadcast.timeLeft) << "s)\n";
-    }
-    ZappyTypes::Vector2 contentSize = {
-        m_dimensions.x - 20,
-        static_cast<float>(m_broadcasts.size() * 20)
-    };
-    ZappyTypes::Rectangle contentRect = {0, 0, contentSize.x, contentSize.y};
-    ZappyTypes::Rectangle view = m_guiLib->DrawScrollPanel(
+    const float lineHeight = 20.0f;
+    const float panelWidth = m_dimensions.x - 20;
+    const float panelHeight = m_dimensions.y - 40;
+    const float contentWidth = panelWidth - 20;
+    ZappyTypes::Rectangle view = {
         m_position.x + 10,
         m_position.y + 30,
-        m_dimensions.x - 20,
-        m_dimensions.y - 40,
-        broadcastsContent.str(),
-        contentRect,
-        std::make_shared<ZappyTypes::Vector2>(m_scrollPosition)
-    );
-    (void)view;
+        panelWidth,
+        panelHeight
+    };
+    int maxVisibleItems = static_cast<int>(panelHeight / lineHeight);
+    int startIndex = 0;
+    if (m_broadcasts.size() > static_cast<size_t>(maxVisibleItems)) {
+        startIndex = m_broadcasts.size() - maxVisibleItems;
+    }
+    for (size_t i = startIndex; i < m_broadcasts.size(); i++) {
+        float textY = view.y + ((i - startIndex) * lineHeight);
+        std::string message = m_broadcasts[i].team + ": " + m_broadcasts[i].message + " (" +
+                             std::to_string(static_cast<int>(m_broadcasts[i].timeLeft)) + "s)";
+        m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+    }
 }
 
-void BroadcastsWindow::updateSpecificData(const GameData& /*gameData*/) {
+void BroadcastsWindow::updateSpecificData(const GameData& gameData) {
+    (void)gameData;
     for (auto it = m_broadcasts.begin(); it != m_broadcasts.end();) {
         it->timeLeft -= 0.016f;
         if (it->timeLeft <= 0.0f) {
@@ -56,9 +59,9 @@ void BroadcastsWindow::addBroadcast(const std::string& team, const std::string& 
     newBroadcast.team = team;
     newBroadcast.message = message;
     newBroadcast.timeLeft = 15.0f;
-    m_broadcasts.push_front(newBroadcast);
+    m_broadcasts.push_back(newBroadcast);
     while (m_broadcasts.size() > m_maxBroadcasts)
-        m_broadcasts.pop_back();
+        m_broadcasts.pop_front();
     setVisible(true);
 }
 

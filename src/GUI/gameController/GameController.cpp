@@ -7,6 +7,7 @@
 
 #include "GameController.hpp"
 #include <iostream>
+#include <string>
 #include <algorithm>
 #include <memory>
 #include <string>

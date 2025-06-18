@@ -75,16 +75,37 @@ public:
     void setViewMode(int mode);
 
     /**
-     * @brief Gère les événements de la souris
+     * @brief Affiche ou masque une fenêtre
+     * @param windowId Identifiant de la fenêtre
+     * @param visible true pour afficher, false pour masquer
+     * @return true si l'opération a réussi
      */
-    void handleMouseEvents();
+    bool toggleWindowVisibility(const std::string& windowId, bool visible);
+
+    /**
+     * @brief Gère les événements de la souris
+     * @return true si l'UI a capturé l'événement de souris
+     */
+    bool handleMouseEvents();
+
+    /**
+     * @brief Vérifie si la souris est sur une fenêtre de l'interface
+     * @return true si la souris est sur une fenêtre
+     */
+    bool isMouseOverUI() const;
+
+    /**
+     * @brief Vérifie si l'UI a traité le dernier événement de souris
+     * @return true si l'UI a capturé l'événement
+     */
+    bool hasHandledMouseEvent() const;
 
 private:
     // Référence à la bibliothèque graphique
     std::shared_ptr<IGuiLib> m_guiLib;
 
     // Factory pour la création et gestion des fenêtres
-    std::unique_ptr<UIWindowFactory> m_windowFactory;
+    std::shared_ptr<UIWindowFactory> m_windowFactory;
 
     // Dimensions de l'écran
     int m_screenWidth;
@@ -92,6 +113,9 @@ private:
 
     // État du glissement des fenêtres
     bool m_isDragging;
+
+    // Indique si l'UI a capturé le dernier clic de souris
+    bool m_mouseCapture;
 };
 
 } // namespace GUI

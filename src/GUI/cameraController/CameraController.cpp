@@ -37,6 +37,22 @@ void CameraController::update(std::shared_ptr<IGraphicsLib> graphics) {
     updateCameraPosition(graphics);
 }
 
+void CameraController::update(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse) {
+    if (!uiHandledMouse) {
+        handleMouseInput(graphics);
+    }
+    handleKeyboardInput(graphics);
+    updateCameraPosition(graphics);
+}
+
+void CameraController::update(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse, bool mouseOverUI) {
+    if (!uiHandledMouse && !mouseOverUI) {
+        handleMouseInput(graphics, false, false);
+    }
+    handleKeyboardInput(graphics);
+    updateCameraPosition(graphics);
+}
+
 void CameraController::reset() {
     m_cameraDistance = 25.0f;
     m_cameraAngleY = 0.8f;
@@ -50,7 +66,18 @@ void CameraController::setMousePosition(int x, int y) {
 }
 
 void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics) {
+    handleMouseInput(graphics, false);
+}
+
+void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse) {
+    handleMouseInput(graphics, uiHandledMouse, false);
+}
+
+void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse, bool mouseOverUI) {
     if (!graphics) {
+        return;
+    }
+    if (uiHandledMouse || mouseOverUI) {
         return;
     }
     if (graphics->IsMouseButtonPressed(0)) {

@@ -1,6 +1,11 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-YEP-400
+*    m_visible = true;
+    m_defaultPositions[0] = {10, 810};   // TileInfo
+    m_defaultPositions[1] = {10, 500};   // PlayerInfo
+    m_defaultPositions[2] = {1520, 540};  // Broadcasts
+    m_defaultPositions[3] = {1520, 860};  // Controls
+    m_defaultPositions[4] = {1450, 10};   // TimeInfo-400
 ** File description:
 ** MenuWindow implementation
 */
@@ -8,12 +13,13 @@
 #include <iomanip>
 #include <memory>
 #include <iostream>
+#include <string>
 #include <sstream>
 #include "MenuWindow.hpp"
 
 namespace GUI {
 
-MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
+GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Menu"),
       m_showMenu(false),
       m_showGraphicsSubmenu(false),
@@ -24,17 +30,17 @@ MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
       m_musicVolume(0.8f),
       m_sfxVolume(0.7f),
       m_gameSpeed(1.0f),
-      m_uiTransparency(0.9f) {
+      m_uiTransparency(0.9f),
+      m_windowFactory(nullptr) {
     m_visible = true;
-    m_defaultPositions[0] = {20, 40};   // Logs
-    m_defaultPositions[1] = {50, 50};   // TileInfo
-    m_defaultPositions[2] = {80, 60};   // PlayerInfo
-    m_defaultPositions[3] = {110, 70};  // Broadcasts
-    m_defaultPositions[4] = {140, 80};  // Controls
-    m_defaultPositions[5] = {170, 90};  // TimeInfo
+    m_defaultPositions[0] = {10, 810};   // TileInfo
+    m_defaultPositions[1] = {10, 500};   // PlayerInfo
+    m_defaultPositions[2] = {1520, 540};  // Broadcasts
+    m_defaultPositions[3] = {1520, 860};  // Controls
+    m_defaultPositions[4] = {1450, 10};  // TimeInfo
 }
 
-void MenuWindow::renderContent() {
+void GUI::MenuWindow::renderContent() {
     m_guiLib->DrawPanel(m_position.x, m_position.y, m_dimensions.x, m_dimensions.y);
     m_guiLib->DrawButton(
         m_position.x, m_position.y,
@@ -68,6 +74,31 @@ void MenuWindow::renderContent() {
             menuItemWidth,
             menuItemHeight * 4
         );
+        if (mousePressed) {
+            ZappyTypes::Rectangle menuMainRect = {
+                m_position.x, startY,
+                menuItemWidth, menuItemHeight * 4
+            };
+            float submenuWidth = 300;
+            float submenuHeight = m_showGraphicsSubmenu ? 150 :
+                                (m_showAudioSubmenu ? 150 :
+                                (m_showGameplaySubmenu ? 150 :
+                                (m_showWindowsSubmenu ? 300 : 0)));
+            float startX = m_position.x + menuItemWidth;
+            ZappyTypes::Rectangle submenuRect = {
+                startX, startY,
+                submenuWidth, submenuHeight
+            };
+            bool clickOnMainMenu = m_guiLib->CheckCollisionPointRec(mousePosition, menuMainRect);
+            bool clickOnSubmenu = submenuHeight > 0 && m_guiLib->CheckCollisionPointRec(mousePosition, submenuRect);
+            if (!clickOnMainMenu && !clickOnSubmenu && !mouseOnButton) {
+                m_showMenu = false;
+                m_showGraphicsSubmenu = false;
+                m_showAudioSubmenu = false;
+                m_showGameplaySubmenu = false;
+                m_showWindowsSubmenu = false;
+            }
+        }
         if (m_guiLib->ButtonPressed(
             m_position.x, startY,
             menuItemWidth, menuItemHeight,
@@ -120,7 +151,7 @@ void MenuWindow::renderContent() {
     }
 }
 
-void MenuWindow::renderGraphicsSubmenu() {
+void GUI::MenuWindow::renderGraphicsSubmenu() {
     float submenuWidth = 300;
     float submenuHeight = 150;
     float sliderHeight = 30;
@@ -159,7 +190,7 @@ void MenuWindow::renderGraphicsSubmenu() {
     );
 }
 
-void MenuWindow::renderAudioSubmenu() {
+void GUI::MenuWindow::renderAudioSubmenu() {
     float submenuWidth = 300;
     float submenuHeight = 150;
     float sliderHeight = 30;
@@ -249,89 +280,100 @@ void MenuWindow::renderWindowsSubmenu() {
         submenuWidth - 60, 20,
         "Gestion des fenêtres"
     );
-    // Référence vers les fenêtres externes via les onglets de l'UI
-    // Cette implémentation serait à adapter pour être liée à la factory
     float yPos = startY + 30;
-    // TODO(Sam): Adapter cette partie pour utiliser la factory
-    // Ci-dessous, le code est une simplification qui devrait être remplacée
-    // par des appels à la factory pour récupérer et modifier les fenêtres
+    if (!m_windowFactory) {
+        m_guiLib->DrawLabel(
+            startX + 10, yPos,
+            submenuWidth - 20, buttonHeight * 2,
+            "La factory de fenêtres n'est pas disponible.\nVeuillez l'initialiser d'abord."
+        );
+        return;
+    }
+    struct WindowInfo {
+        std::string id;
+        std::string name;
+        int positionIndex;
+    };
 
-    // Exemple pour les logs
-    bool showLogs = true;
-    showLogs = m_guiLib->DrawToggle(
-        startX + 10, yPos,
-        submenuWidth - 20, buttonHeight,
-        "Journal d'événements",
-        showLogs
-    );
-    if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
-        // Réinitialiser la position
-    }
-    yPos += buttonHeight + 5;
-    bool showTileInfo = true;
-    showTileInfo = m_guiLib->DrawToggle(
-        startX + 10, yPos,
-        submenuWidth - 20, buttonHeight,
-        "Informations sur la case",
-        showTileInfo
-    );
-    if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
-        // Réinitialiser la position
-    }
-    yPos += buttonHeight + 5;
-    bool showPlayerInfo = true;
-    showPlayerInfo = m_guiLib->DrawToggle(
-        startX + 10, yPos,
-        submenuWidth - 20, buttonHeight,
-        "Informations joueurs",
-        showPlayerInfo
-    );
-    if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
-        // Réinitialiser la position
-    }
-    yPos += buttonHeight + 5;
-    // Broadcasts
-    bool showBroadcasts = true;
-    showBroadcasts = m_guiLib->DrawToggle(
-        startX + 10, yPos,
-        submenuWidth - 20, buttonHeight,
-        "Broadcasts récents",
-        showBroadcasts
-    );
-    if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
-        // Réinitialiser la position
-    }
-    yPos += buttonHeight + 5;
+    WindowInfo windows[] = {
+        {"tileInfo", "Informations sur la case", 0},
+        {"playerInfo", "Informations joueurs", 1},
+        {"broadcasts", "Broadcasts récents", 2},
+        {"controls", "Contrôles", 3},
+        {"timeInfo", "Informations temporelles", 4}
+    };
 
-    // Controls
-    bool showControls = true;
-    showControls = m_guiLib->DrawToggle(
-        startX + 10, yPos,
-        submenuWidth - 20, buttonHeight,
-        "Contrôles",
-        showControls
-    );
-    if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
-        // Réinitialiser la position
+    for (const auto& window : windows) {
+        auto windowPtr = m_windowFactory->getWindow(window.id);
+        if (windowPtr) {
+            bool isVisible = windowPtr->isVisible();
+            bool newVisible = m_guiLib->DrawToggle(
+                startX + 10, yPos,
+                submenuWidth - 70, buttonHeight,
+                window.name,
+                isVisible
+            );
+            if (newVisible != isVisible) {
+                windowPtr->setVisible(newVisible);
+                std::stringstream ss;
+                ss << (newVisible ? "Ouverture" : "Fermeture") << " de la fenêtre: " << window.id;
+                if (m_windowFactory) {
+                    m_windowFactory->addLogMessage(ss.str());
+                }
+            }
+            if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
+                if (window.positionIndex < 6) {
+                    windowPtr->setPosition(m_defaultPositions[window.positionIndex]);
+                    if (m_windowFactory) {
+                        std::stringstream ss;
+                        ss << "Position de la fenêtre " << window.id << " réinitialisée";
+                        m_windowFactory->addLogMessage(ss.str());
+                    }
+                }
+            }
+            yPos += buttonHeight + 5;
+        }
+    }
+    if (m_guiLib->ButtonPressed(startX + 10, yPos, submenuWidth - 20, buttonHeight, "Afficher toutes les fenêtres")) {
+        for (const auto& window : windows) {
+            auto windowPtr = m_windowFactory->getWindow(window.id);
+            if (windowPtr) {
+                windowPtr->setVisible(true);
+            }
+        }
+        if (m_windowFactory) {
+            m_windowFactory->addLogMessage("Toutes les fenêtres ont été affichées");
+        }
     }
     yPos += buttonHeight + 5;
-
-    // Time Info
-    bool showTimeInfo = true;
-    showTimeInfo = m_guiLib->DrawToggle(
-        startX + 10, yPos,
-        submenuWidth - 20, buttonHeight,
-        "Informations temporelles",
-        showTimeInfo
-    );
-    if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
-        // Réinitialiser la position
+    if (m_guiLib->ButtonPressed(startX + 10, yPos, submenuWidth - 20, buttonHeight, "Masquer toutes les fenêtres (sauf menu)")) {
+        for (const auto& window : windows) {
+            auto windowPtr = m_windowFactory->getWindow(window.id);
+            if (windowPtr && window.id != "menu") {
+                windowPtr->setVisible(false);
+            }
+        }
+        if (m_windowFactory) {
+            m_windowFactory->addLogMessage("Toutes les fenêtres ont été masquées");
+        }
     }
 }
 
-void MenuWindow::updateSpecificData(const GameData& gameData) {
-    // Rien à mettre à jour pour le menu à partir des données de jeu
+void GUI::MenuWindow::updateSpecificData(const GameData& gameData) {
     (void)gameData;
+}
+
+void MenuWindow::setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory) {
+    m_windowFactory = factory;
+    if (m_windowFactory) {
+        for (int i = 0; i < 6; ++i) {
+            m_windowFactory->getWindow("tileInfo")->setPosition(m_defaultPositions[0]);
+            m_windowFactory->getWindow("playerInfo")->setPosition(m_defaultPositions[1]);
+            m_windowFactory->getWindow("broadcasts")->setPosition(m_defaultPositions[2]);
+            m_windowFactory->getWindow("controls")->setPosition(m_defaultPositions[3]);
+            m_windowFactory->getWindow("timeInfo")->setPosition(m_defaultPositions[4]);
+        }
+    }
 }
 
 } // namespace GUI

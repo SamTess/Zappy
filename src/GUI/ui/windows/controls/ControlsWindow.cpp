@@ -12,62 +12,12 @@ namespace GUI {
 
 ControlsWindow::ControlsWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Contrôles"),
-      m_showLogs(true),
-      m_showTileInfo(true),
-      m_showPlayerInfo(true),
-      m_showBroadcasts(true),
-      m_showTimeInfo(true),
       m_currentViewMode(0) {
     m_viewModes = {"Vue standard", "Vue aérienne", "Vue wireframe", "Vue ressources"};
 }
 
 void ControlsWindow::renderContent() {
     float yOffset = m_position.y + 30;
-    m_showLogs = m_guiLib->DrawToggle(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        25,
-        "Afficher les logs",
-        m_showLogs
-    );
-    yOffset += 30;
-    m_showTileInfo = m_guiLib->DrawToggle(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        25,
-        "Informations de case",
-        m_showTileInfo
-    );
-    yOffset += 30;
-    m_showPlayerInfo = m_guiLib->DrawToggle(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        25,
-        "Informations joueurs",
-        m_showPlayerInfo
-    );
-    yOffset += 30;
-    m_showBroadcasts = m_guiLib->DrawToggle(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        25,
-        "Broadcasts récents",
-        m_showBroadcasts
-    );
-    yOffset += 30;
-    m_showTimeInfo = m_guiLib->DrawToggle(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        25,
-        "Informations temporelles",
-        m_showTimeInfo
-    );
-    yOffset += 30;
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,

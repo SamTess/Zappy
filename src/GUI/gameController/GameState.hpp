@@ -14,6 +14,7 @@
 #include <string>
 #include <array>
 #include <mutex>
+#include <deque>
 
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 #include "IGameEntity.hpp"
@@ -56,6 +57,11 @@ public:
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
     std::map<int, std::shared_ptr<IPlayer>> getPlayers();
+
+    // Méthodes pour gérer les broadcasts
+    void addBroadcast(int playerId, const std::string& team, const std::string& message);
+    void updateBroadcasts(float deltaTime);
+    const std::deque<Broadcast>& getBroadcasts() const;
 
 private:
     bool isValidCoordinates(int x, int y) const;

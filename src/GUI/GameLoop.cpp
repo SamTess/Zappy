@@ -85,7 +85,9 @@ int GameLoop::run() {
     if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer)
         return 84;
     while (!m_graphics->WindowShouldClose()) {
-        m_camera->update(m_graphics);
+        bool uiHandledMouse = m_userInterface->handleMouseEvents();
+        bool mouseOverUI = m_userInterface->isMouseOverUI();
+        m_camera->update(m_graphics, uiHandledMouse, mouseOverUI);
         m_graphics->BeginDrawing();
         if (m_renderer) {
             m_renderer->renderSkybox(m_graphics);

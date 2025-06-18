@@ -21,7 +21,7 @@ namespace GUI {
 /**
  * @brief Factory pour créer et gérer les fenêtres de l'interface utilisateur
  */
-class UIWindowFactory {
+class UIWindowFactory : public std::enable_shared_from_this<UIWindowFactory> {
 public:
     /**
      * @brief Constructeur
@@ -56,12 +56,6 @@ public:
     void updateAllWindows(const GameData& gameData);
 
     /**
-     * @brief Ajoute un message au journal
-     * @param message Le message à ajouter
-     */
-    void addLogMessage(const std::string& message);
-
-    /**
      * @brief Définit la case sélectionnée
      * @param x Coordonnée X
      * @param y Coordonnée Y
@@ -84,8 +78,9 @@ public:
     /**
      * @brief Gère le début du glissement d'une fenêtre
      * @param mousePosition Position de la souris
+     * @return true si une fenêtre a commencé à être déplacée, false sinon
      */
-    void handleWindowDragging(const ZappyTypes::Vector2& mousePosition);
+    bool handleWindowDragging(const ZappyTypes::Vector2& mousePosition);
 
     /**
      * @brief Met à jour la position des fenêtres en cours de glissement
@@ -97,6 +92,13 @@ public:
      * @brief Arrête le glissement des fenêtres
      */
     void stopWindowDragging();
+
+    /**
+     * @brief Vérifie si la souris est sur une fenêtre
+     * @param mousePosition Position de la souris
+     * @return true si la souris est sur une fenêtre
+     */
+    bool isMouseOverWindow(const ZappyTypes::Vector2& mousePosition) const;
 
 private:
     // Bibliothèque GUI

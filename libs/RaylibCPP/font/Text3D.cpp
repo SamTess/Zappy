@@ -36,7 +36,6 @@ void Text3D::DrawText3D(::Font font, const std::string& text, Vector3 position,
 void Text3D::DrawTextWave3D(::Font font, const std::string& text, Vector3 position,
     float fontSize, float fontSpacing, float lineSpacing,
     bool backface, const WaveTextConfigPtr& config, float time, Color tint) {
-    std::cout << "DrawTextWave3D (smart pointer): " << text << std::endl;
     Text3DParser::renderWaveText(font, text, position, fontSize, fontSpacing,
                                 lineSpacing, backface, config, time, tint);
 }

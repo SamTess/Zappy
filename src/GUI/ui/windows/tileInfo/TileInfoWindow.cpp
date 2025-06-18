@@ -85,7 +85,6 @@ void TileInfoWindow::renderContent() {
 }
 
 void TileInfoWindow::updateSpecificData(const GameData&) {
-    // Les données sont déjà mises à jour par la classe parente
 }
 
 void TileInfoWindow::setSelectedTile(int x, int y) {

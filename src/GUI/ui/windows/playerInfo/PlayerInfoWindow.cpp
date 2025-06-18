@@ -31,8 +31,6 @@ void PlayerInfoWindow::renderContent() {
         );
         return;
     }
-
-    // Recherche le joueur dans les données de jeu
     const Player* selectedPlayer = nullptr;
     for (const auto& player : m_gameData.players) {
         if (player.id == m_selectedPlayerId) {
@@ -51,11 +49,7 @@ void PlayerInfoWindow::renderContent() {
         );
         return;
     }
-
-    // Affiche les informations du joueur
     float yOffset = m_position.y + 30;
-
-    // ID et équipe
     std::stringstream idTeam;
     idTeam << "ID: " << selectedPlayer->id << " | Équipe: " << selectedPlayer->team;
     m_guiLib->DrawLabel(
@@ -66,8 +60,6 @@ void PlayerInfoWindow::renderContent() {
         idTeam.str()
     );
     yOffset += 20;
-
-    // Position et orientation
     std::stringstream posInfo;
     std::string orientationStr;
     switch (selectedPlayer->orientation) {
@@ -87,8 +79,6 @@ void PlayerInfoWindow::renderContent() {
         posInfo.str()
     );
     yOffset += 20;
-
-    // Niveau
     std::stringstream levelInfo;
     levelInfo << "Niveau: " << selectedPlayer->level;
     m_guiLib->DrawLabel(
@@ -99,8 +89,6 @@ void PlayerInfoWindow::renderContent() {
         levelInfo.str()
     );
     yOffset += 30;
-
-    // Inventaire
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -109,8 +97,6 @@ void PlayerInfoWindow::renderContent() {
         "Inventaire:"
     );
     yOffset += 20;
-
-    // Liste des ressources dans l'inventaire
     const std::pair<std::string, int> resources[] = {
         {"Nourriture", selectedPlayer->inventory.food},
         {"Linemate", selectedPlayer->inventory.linemate},
@@ -136,9 +122,6 @@ void PlayerInfoWindow::renderContent() {
 }
 
 void PlayerInfoWindow::updateSpecificData(const GameData& gameData) {
-    // Les données sont déjà mises à jour par la classe parente
-
-    // Vérifie si le joueur sélectionné existe toujours
     if (m_hasSelectedPlayer) {
         bool playerExists = false;
         for (const auto& player : gameData.players) {

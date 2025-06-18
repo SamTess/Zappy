@@ -96,6 +96,13 @@ public:
      * @return true si la fenêtre est en cours de glissement, false sinon
      */
     virtual bool isDragging() const = 0;
+
+    /**
+     * @brief Vérifie si une position est à l'intérieur de la fenêtre
+     * @param position Position à vérifier
+     * @return true si la position est à l'intérieur de la fenêtre, false sinon
+     */
+    virtual bool isPositionInWindow(const ZappyTypes::Vector2& position) const = 0;
 };
 
 } // namespace GUI
