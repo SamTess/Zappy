@@ -94,7 +94,7 @@ public:
     // Modèles 3D
     int LoadModel3D(const std::string& path) override;
     void DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override;
-    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override;
+    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE) override;
     void UnloadModel3D(int modelId) override;
     int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override;
 

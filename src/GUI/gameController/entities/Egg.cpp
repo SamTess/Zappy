@@ -8,6 +8,7 @@
 #include "Egg.hpp"
 #include <cmath>
 #include <memory>
+#include "../../textureManager/ModelManager.hpp"
 
 Egg::Egg() : _eggId(0), _x(0), _y(0) {}
 
@@ -45,35 +46,15 @@ void Egg::render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
 
 void Egg::renderEgg(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     const ZappyTypes::Vector3& position,
-    float tileSize) const {
+    float tileSize,
+    int stackIndex) const {
     if (!graphicsLib)
         return;
-    ZappyTypes::Color borderColor = {80, 80, 80, 255};
-    ZappyTypes::Color eggColor = {255, 255, 255, 255};
-    float eggSize = tileSize * 0.15f;
     ZappyTypes::Vector3 eggPos = position;
-    eggPos.y = position.y + 0.2f;
-    eggPos.x -= tileSize * 0.25f;
-    eggPos.z -= tileSize * 0.25f;
+    float eggHeight = 0.3f;
+    eggPos.y = position.y + 0.5f + (stackIndex * eggHeight * 0.8f);
+    eggPos.x -= tileSize * 0.18f;
+    eggPos.z -= tileSize * -0.8f;
 
-    graphicsLib->DrawSphere(eggPos, eggSize, eggColor);
-
-    float offset = eggSize * 0.7f;
-    graphicsLib->DrawLine3D({eggPos.x - offset, eggPos.y, eggPos.z},
-        {eggPos.x + offset, eggPos.y, eggPos.z}, borderColor);
-    graphicsLib->DrawLine3D({eggPos.x, eggPos.y - offset, eggPos.z},
-        {eggPos.x, eggPos.y + offset, eggPos.z}, borderColor);
-    graphicsLib->DrawLine3D({eggPos.x, eggPos.y, eggPos.z - offset},
-        {eggPos.x, eggPos.y, eggPos.z + offset}, borderColor);
-
-    const int numSegments = 8;
-    for (int i = 0; i < numSegments; ++i) {
-        float angle1 = 2 * M_PI * i / numSegments;
-        float angle2 = 2 * M_PI * ((i + 1) % numSegments) / numSegments;
-        float x1 = eggPos.x + offset * std::cos(angle1);
-        float z1 = eggPos.z + offset * std::sin(angle1);
-        float x2 = eggPos.x + offset * std::cos(angle2);
-        float z2 = eggPos.z + offset * std::sin(angle2);
-        graphicsLib->DrawLine3D({x1, eggPos.y, z1}, {x2, eggPos.y, z2}, borderColor);
-    }
+    ModelManager::getInstance().drawModel(TRIPY_TROPHY, eggPos, 0.25f);
 }

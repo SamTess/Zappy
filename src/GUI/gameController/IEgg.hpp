@@ -19,7 +19,8 @@ public:
     virtual void updateFromProtocol(const EggData& data) = 0;
     virtual void renderEgg(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         const ZappyTypes::Vector3& position,
-        float tileSize) const = 0;
+        float tileSize,
+        int stackIndex = 0) const = 0;
 };
 
 #endif /* !IEGG_HPP_ */

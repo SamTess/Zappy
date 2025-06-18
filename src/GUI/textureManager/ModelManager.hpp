@@ -29,6 +29,19 @@ struct Model3D {
     ZappyTypes::Vector3 boundingBoxMax;// Point maximum de la boîte englobante
 };
 
+typedef enum {
+    TRIPY_TROPHY = 1,
+    ESPRESSONA_SIGNORA = 2,
+    FRIGO_CAMELO = 3,
+    GARAMARAN = 4,
+    LA_VACA_SATURNO = 5,
+    TRALALERO_TRALALA = 6,
+    TRULIMERO_TRULICINA = 7,
+    TUNG_TUNG_TUNG_SAHUR = 8,
+    ISLAND = 9,
+    LIRILI_LARILA = 10
+} ModelType;
+
 /**
  * @brief Gestionnaire de modèles 3D singleton qui implémente un pattern de pool de ressources
  * pour éviter de charger plusieurs fois les mêmes modèles.
@@ -85,6 +98,16 @@ public:
     void drawModel(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE);
 
     /**
+     * @brief Dessine un modèle 3D à une position donnée avec une échelle personnalisée
+     *
+     * @param modelId ID du modèle à dessiner
+     * @param position Position du modèle dans l'espace 3D
+     * @param scale Échelle du modèle
+     * @param color Couleur de teinte (blanc par défaut)
+     */
+    void drawModel(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE);
+
+    /**
      * @brief Dessine un modèle 3D avec rotation
      *
      * @param modelId ID du modèle à dessiner
@@ -94,7 +117,7 @@ public:
      * @param scale Échelle du modèle (1.0f par défaut)
      */
     void drawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis,
-                    float rotationAngle, float scale = 1.0f);
+                    float rotationAngle, float scale = 1.0f, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE);
 
     /**
      * @brief Libère un modèle 3D spécifique et ses textures associées

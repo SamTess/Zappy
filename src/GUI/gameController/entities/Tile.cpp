@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include "../../textureManager/ModelManager.hpp"
 
 Tile::Tile(int x, int y) : _x(x), _y(y), _resources{0}, _isIncantating(false) {}
 
@@ -106,12 +107,12 @@ void Tile::updateFromProtocol(const TileContentData& data) {
     _resources[6] = data.getThystame();
 }
 
-// modifier render et pourquoi pas faire un prendre de tout ce qu'il a à l'intérieur de lui
 void Tile::render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     const ZappyTypes::Vector3& position,
     float tileSize) const {
     if (!graphicsLib)
         return;
-    ZappyTypes::Color tileColor = {100, 100, 100, 255};
-    graphicsLib->DrawCube(position, tileSize, 0.1f, tileSize, tileColor);
+    (void)tileSize;
+    ModelManager::getInstance().drawModel(ISLAND, position, 1);
+
 }

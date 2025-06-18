@@ -23,8 +23,8 @@ bool GameLoop::init() {
     if (!loadLibraries())
         return false;
     initializeManagers();
-    // if (!loadModels())
-    //     return false;
+    if (!loadModels())
+        return false;
     setupComponents();
     return true;
 }
@@ -56,8 +56,19 @@ void GameLoop::initializeManagers() {
 }
 
 bool GameLoop::loadModels() {
-    // auto& modelManager = ModelManager::getInstance();
-    // m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
+    auto& modelManager = ModelManager::getInstance();
+
+    modelManager.loadModel("assets/models/baby_Tripy_Trophy.glb");
+    modelManager.loadModel("assets/models/baby_Espressona_Signora.glb");
+    modelManager.loadModel("assets/models/baby_Frigo_Camelo.glb");
+    modelManager.loadModel("assets/models/baby_Garamaran.glb");
+    modelManager.loadModel("assets/models/baby_La_Vaca_Saturno_Saturnita.glb");
+    modelManager.loadModel("assets/models/baby_TRALALERO_TRALALA.glb");
+    modelManager.loadModel("assets/models/Baby_Trulimero_Trulicina.glb");
+    modelManager.loadModel("assets/models/baby_tung_tung_tung_sahur.glb");
+    modelManager.loadModel("assets/models/island.glb");
+    modelManager.loadModel("assets/models/labubu.glb");
+
     return true;
 }
 

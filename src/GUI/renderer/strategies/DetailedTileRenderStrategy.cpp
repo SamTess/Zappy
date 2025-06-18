@@ -23,30 +23,15 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
     const ZappyTypes::Color& color,
     float tileSize,
     float spacing) {
-    float mapOffset = gameState->getMapWidth() / 2.0f;
     ZappyTypes::Vector3 position = {
-        (x - mapOffset + 0.5f) * (tileSize + spacing),
+        (x - gameState->getMapWidth() / 2.0f + 0.5f) * (tileSize + spacing),
         0.0f,
         (y - gameState->getMapHeight() / 2.0f + 0.5f) * (tileSize + spacing)
     };
-    graphicsLib->DrawCube(position, tileSize, 0.1f, tileSize, color);
-    ZappyTypes::Color borderColor = {100, 100, 100, 255};
-    float offset = tileSize/2;
-    graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z - offset},
-        {position.x + offset, position.y + 0.05f, position.z - offset},
-        borderColor);
-    graphicsLib->DrawLine3D({position.x + offset, position.y + 0.05f, position.z - offset},
-        {position.x + offset, position.y + 0.05f, position.z + offset},
-        borderColor);
-    graphicsLib->DrawLine3D({position.x + offset, position.y + 0.05f, position.z + offset},
-        {position.x - offset, position.y + 0.05f, position.z + offset},
-        borderColor);
-    graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z + offset},
-        {position.x - offset, position.y + 0.05f, position.z - offset},
-        borderColor);
 
     auto tile = gameState->getTile(x, y);
-
+    (void)color;
+    tile->render(graphicsLib, position, tileSize);
     if (tile) {
         const auto& resources = tile->getResources();
         for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
@@ -68,38 +53,13 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
             }
         }
         const auto& eggIds = tile->getEggIds();
-        for (int eggId : eggIds) {
+        for (size_t i = 0; i < eggIds.size(); ++i) {
+            int eggId = eggIds[i];
             auto eggInfo = gameState->getEggInfo(eggId);
             if (eggInfo) {
-                eggInfo->renderEgg(graphicsLib, position, tileSize);
+                eggInfo->renderEgg(graphicsLib, position, tileSize, i);
             }
         }
-    } else {
-    auto tile = gameState->getTile(x, y);
-    if (tile) {
-        for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
-            int quantity = tile->getResourceQuantity(static_cast<ResourceType>(i));
-            if (quantity > 0) {
-                Resource tempResource(static_cast<ResourceType>(i), quantity);
-                tempResource.renderResource(graphicsLib, position, tileSize);
-            }
-        }
-        const auto& playerIds = tile->getPlayerIds();
-        for (int i = 0; i < static_cast<int>(playerIds.size()); ++i) {
-            int playerId = playerIds[i];
-            auto player = gameState->getPlayerInfo(playerId);
-            if (player) {
-                player->renderPlayer(graphicsLib, position, tileSize, i, playerIds.size());
-            }
-        }
-        const auto& eggIds = tile->getEggIds();
-        for (int eggId : eggIds) {
-            auto egg = gameState->getEggInfo(eggId);
-            if (egg) {
-                egg->renderEgg(graphicsLib, position, tileSize);
-            }
-        }
-    }
     }
 }
 

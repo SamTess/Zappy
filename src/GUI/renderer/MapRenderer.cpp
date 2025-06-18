@@ -22,7 +22,7 @@ MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
       gameState(state),
       strategyFactory(modelManagerAdapter),
       tileSize(1.0f),
-      tileSpacing(0.1f),
+      tileSpacing(2.0f),
       zoomLevel(1.0f),
       detailThreshold(2.0f) {
     tileRenderStrategy = strategyFactory.createSimpleTileStrategy(gameState);

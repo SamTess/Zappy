@@ -36,6 +36,9 @@ public:
     void setTeamName(const std::string& teamName) override;
     void setIsAlive(bool alive) override;
 
+    float getCurrentRotation() const override;
+    float getLastRotation() const override;
+
     // Implémentation IRenderable
     void render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
                 const ZappyTypes::Vector3& position,
@@ -48,14 +51,8 @@ public:
         int totalPlayers = 1) const override;
 
 private:
-    void renderDirectionArrow(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        const ZappyTypes::Vector3& playerPos,
-        float tileSize) const;
-    void renderText3D(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        const std::string& text,
-        ZappyTypes::Vector3 position,
-        float fontSize,
-        ZappyTypes::Color color) const;
+    ZappyTypes::Color generateTeamColor() const;
+    float orientationToRotationDegrees(int orientation) const;
 
     int _id;
     int _x;
@@ -64,6 +61,8 @@ private:
     int _level;
     std::string _teamName;
     bool _isAlive;
+    float _lastRotation;
+    float _currentRotation;
 };
 
 #endif /* !PLAYER_HPP_ */
