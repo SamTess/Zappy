@@ -55,6 +55,14 @@ struct Team {
     int remainingSlots = 0;
 };
 
+// Structure pour représenter un broadcast
+struct Broadcast {
+    std::string team;
+    std::string message;
+    float timeLeft = 15.0f; // Temps en secondes avant disparition
+    int playerId;
+};
+
 // Structure principale contenant toutes les données du jeu
 struct GameData {
     // Informations sur la map
@@ -68,6 +76,7 @@ struct GameData {
     std::vector<Player> players;
     std::vector<Tile> tiles;
     std::vector<Team> teams;
+    std::vector<Broadcast> broadcasts;
 };
 
 } // namespace GUI

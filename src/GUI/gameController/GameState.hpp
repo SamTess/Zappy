@@ -14,8 +14,16 @@
 #include <string>
 #include <array>
 #include <mutex>
+#include <deque>
 
 #include "../network/protocol/messageData/MessageDataAll.hpp"
+
+struct Broadcast {
+    int playerId;
+    std::string team;
+    std::string message;
+    float timeLeft;
+};
 
 
 struct TileData {
@@ -71,6 +79,11 @@ public:
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
 
+    // Méthodes pour gérer les broadcasts
+    void addBroadcast(int playerId, const std::string& team, const std::string& message);
+    void updateBroadcasts(float deltaTime);
+    const std::deque<Broadcast>& getBroadcasts() const;
+
 private:
     bool isValidCoordinates(int x, int y) const;
     void addPlayerToTile(int playerId, int x, int y);
@@ -89,6 +102,8 @@ private:
     int _timeUnit = 100;
     bool _gameEnded = false;
     std::string _winningTeam;
+    std::deque<Broadcast> _broadcasts;
+    const size_t _maxBroadcasts = 20;
 };
 
 #endif /* !GAME_STATE_HPP_ */

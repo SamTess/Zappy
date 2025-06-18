@@ -37,7 +37,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/UserInterface.cpp \
 	  ui/UIWindowFactory.cpp \
 	  ui/windows/AUIWindow.cpp \
-	  ui/windows/logs/LogsWindow.cpp \
 	  ui/windows/tileInfo/TileInfoWindow.cpp \
 	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
 	  ui/windows/broadcasts/BroadcastsWindow.cpp \

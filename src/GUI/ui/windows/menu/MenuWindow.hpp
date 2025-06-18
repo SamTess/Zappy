@@ -9,6 +9,7 @@
 
 #include <memory>
 #include "../AUIWindow.hpp"
+#include "../../UIWindowFactory.hpp"
 
 namespace GUI {
 
@@ -16,6 +17,12 @@ class MenuWindow : public AUIWindow {
 public:
     explicit MenuWindow(std::shared_ptr<IGuiLib> guiLib);
     ~MenuWindow() = default;
+
+    /**
+     * @brief Définit la référence vers la factory des fenêtres
+     * @param factory Pointeur vers la factory
+     */
+    void setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory);
 
 protected:
     void renderContent() override;
@@ -36,10 +43,9 @@ private:
     float m_gameSpeed;
     float m_uiTransparency;
 
-    // Position initiale des fenêtres pour la réinitialisation
+    // Factory pour les fenêtres
+    std::shared_ptr<GUI::UIWindowFactory> m_windowFactory;
     ZappyTypes::Vector2 m_defaultPositions[6];
-
-    // Méthodes de rendu pour les sous-menus
     void renderGraphicsSubmenu();
     void renderAudioSubmenu();
     void renderGameplaySubmenu();

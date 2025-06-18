@@ -40,6 +40,7 @@ public:
     void updateDragging(const ZappyTypes::Vector2& mousePosition) override;
     void stopDragging() override;
     bool isDragging() const override;
+    bool isPositionInWindow(const ZappyTypes::Vector2& position) const override;
 
 protected:
     /**

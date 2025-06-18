@@ -7,6 +7,7 @@
 
 #include "GameController.hpp"
 #include <iostream>
+#include <string>
 #include <algorithm>
 
 GameController::GameController() : _gameState(std::make_shared<GameState>()) {
@@ -131,6 +132,14 @@ void GameController::handlePlayerExpulsion(std::shared_ptr<IMessageData> data) {
 
 void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     auto broadcastData = std::static_pointer_cast<BroadcastData>(data);
+    int playerId = broadcastData->getPlayerId();
+    const std::string& message = broadcastData->getMessage();
+    std::string teamName = "Inconnu";
+    auto playerInfo = _gameState->getPlayerInfo(playerId);
+    if (playerInfo) {
+        teamName = playerInfo->getTeamName();
+    }
+    _gameState->addBroadcast(playerId, teamName, message);
 }
 
 void GameController::handleResourceDrop(std::shared_ptr<IMessageData> data) {
@@ -213,4 +222,9 @@ void GameController::handleEndGame(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
     auto serverData = std::static_pointer_cast<ServerMessageData>(data);
+}
+
+void GameController::updateBroadcasts(float deltaTime) {
+    // Accès non-const au GameState pour mettre à jour les broadcasts
+    _gameState->updateBroadcasts(deltaTime);
 }

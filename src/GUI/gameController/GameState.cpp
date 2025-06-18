@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <deque>
 #include <vector>
 #include <string>
 
@@ -260,6 +261,36 @@ void GameState::setGameEnded(bool ended, const std::string& winningTeam) {
     std::lock_guard<std::mutex> lock(_mutex);
     _gameEnded = ended;
     _winningTeam = winningTeam;
+}
+
+void GameState::addBroadcast(int playerId, const std::string& team, const std::string& message) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    Broadcast newBroadcast;
+    newBroadcast.playerId = playerId;
+    newBroadcast.team = team;
+    newBroadcast.message = message;
+    newBroadcast.timeLeft = 15.0f;
+    _broadcasts.push_back(newBroadcast);
+    while (_broadcasts.size() > _maxBroadcasts) {
+        _broadcasts.pop_front();
+    }
+}
+
+void GameState::updateBroadcasts(float deltaTime) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    for (auto it = _broadcasts.begin(); it != _broadcasts.end();) {
+        it->timeLeft -= deltaTime;
+        if (it->timeLeft <= 0.0f) {
+            it = _broadcasts.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+const std::deque<Broadcast>& GameState::getBroadcasts() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _broadcasts;
 }
 
 bool GameState::isValidCoordinates(int x, int y) const {

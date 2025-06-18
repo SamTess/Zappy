@@ -28,29 +28,24 @@ void AUIWindow::initialize(const ZappyTypes::Vector2& position,
 }
 
 bool AUIWindow::render() {
-    std::cout << "AUIWindow::render() - m_title=" << m_title << ", visible=" << (m_visible ? "true" : "false") << std::endl;
     if (!m_visible)
         return true;
-    bool result = true;
     ZappyTypes::Rectangle windowRect = {
         m_position.x, m_position.y,
         m_dimensions.x, m_dimensions.y
     };
-    m_guiLib->DrawWindowBox(
+    bool closeButtonClicked = m_guiLib->DrawWindowBox(
         windowRect.x, windowRect.y,
         windowRect.width, windowRect.height,
         m_title
     );
-    bool windowOpen = true;
-    if (!windowOpen) {
-        std::cout << "  La fenêtre a été fermée par une action explicite" << std::endl;
+    if (closeButtonClicked) {
         m_visible = false;
-        result = false;
+        return false;
     } else {
-        std::cout << "  Appel de renderContent()" << std::endl;
         renderContent();
+        return true;
     }
-    return result;
 }
 
 void AUIWindow::updateData(const GameData& gameData) {
@@ -109,6 +104,14 @@ void AUIWindow::stopDragging() {
 
 bool AUIWindow::isDragging() const {
     return m_dragging;
+}
+
+bool AUIWindow::isPositionInWindow(const ZappyTypes::Vector2& position) const {
+    ZappyTypes::Rectangle windowRect = {
+        m_position.x, m_position.y,
+        m_dimensions.x, m_dimensions.y
+    };
+    return m_guiLib->CheckCollisionPointRec(position, windowRect);
 }
 
 } // namespace GUI

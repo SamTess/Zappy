@@ -18,6 +18,7 @@
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "gameController/GameController.hpp"
+#include "gameController/GameState.hpp"
 #include "ui/UserInterface.hpp"
 #include "shared/GameData.hpp"
 
@@ -46,6 +47,10 @@ private:
     void handleViewModeChange(int mode);
     void onMapSizeChanged(int width, int height);
     void onTileChanged(int x, int y, const TileData& tileData);
+    void updateTilesFromGameState(std::shared_ptr<const GameState> gameState);
+    void updatePlayersFromGameState(std::shared_ptr<const GameState> gameState);
+    void updateTeamsFromGameState(std::shared_ptr<const GameState> gameState);
+    void updateBroadcastsFromGameState(std::shared_ptr<const GameState> gameState);
     std::string m_host;
     int m_port;
 

@@ -57,8 +57,6 @@ void GameLoop::initializeManagers() {
 }
 
 bool GameLoop::loadModels() {
-    // auto& modelManager = ModelManager::getInstance();
-    // m_cubeModelId = modelManager.loadModel("assets/models/Cube/cube.obj", "assets/models/Cube/cube_diffuse.png");
     return true;
 }
 
@@ -78,7 +76,9 @@ int GameLoop::run() {
     if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer)
         return 84;
     while (!m_graphics->WindowShouldClose()) {
-        m_camera->update(m_graphics);
+        bool uiHandledMouse = m_userInterface->handleMouseEvents();
+        bool mouseOverUI = m_userInterface->isMouseOverUI();
+        m_camera->update(m_graphics, uiHandledMouse, mouseOverUI);
         m_graphics->BeginDrawing();
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();

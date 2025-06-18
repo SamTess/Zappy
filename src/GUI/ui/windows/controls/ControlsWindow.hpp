@@ -36,11 +36,6 @@ protected:
     void updateSpecificData(const GameData& gameData) override;
 
 private:
-    bool m_showLogs;
-    bool m_showTileInfo;
-    bool m_showPlayerInfo;
-    bool m_showBroadcasts;
-    bool m_showTimeInfo;
     int m_currentViewMode;
     std::vector<std::string> m_viewModes;
 };
