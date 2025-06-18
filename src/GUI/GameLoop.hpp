@@ -30,9 +30,12 @@ public:
     explicit GameLoop(std::shared_ptr<NetworkManager> networkManager);
     ~GameLoop() = default;
     bool init();
-    int run();
-    void setServerInfo(const std::string& host, int port);
+    int run();    void setServerInfo(const std::string& host, int port);
     void setGameController(std::shared_ptr<GameController> controller);
+    
+    // Skybox configuration methods
+    void setSkyboxTexture(const std::string& texturePath);
+    bool isSkyboxLoaded() const;
 
 private:
     bool loadLibraries();

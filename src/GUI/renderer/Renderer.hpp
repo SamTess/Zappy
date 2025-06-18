@@ -16,6 +16,7 @@
 #include "UIRenderer.hpp"
 #include "../textureManager/TextureManager.hpp"
 #include "../textureManager/ModelManager.hpp"
+#include "Skybox.hpp"
 
 class Renderer {
 public:
@@ -28,6 +29,7 @@ public:
                 std::shared_ptr<UIRenderer> uiRenderer);
 
     void renderBackground(std::shared_ptr<IGraphicsLib> graphics);
+    void renderSkybox(std::shared_ptr<IGraphicsLib> graphics);
     void renderGrid(std::shared_ptr<IGraphicsLib> graphics);
     void renderScene(std::shared_ptr<IGraphicsLib> graphics);
     void renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
@@ -37,14 +39,17 @@ public:
 
 
     int loadResourceTexture(const std::string& resourceName, const std::string& texturePath);
-    int getResourceTextureId(const std::string& resourceName) const;
-
-    int getMapWidth() const { return m_mapWidth; }
+    int getResourceTextureId(const std::string& resourceName) const;    int getMapWidth() const { return m_mapWidth; }
     int getMapHeight() const { return m_mapHeight; }
+    
+    // Skybox methods
+    void setSkyboxTexture(const std::string& texturePath);
+    bool isSkyboxLoaded() const;
 
 private:
     int m_mapWidth;
     int m_mapHeight;
     std::map<std::string, int> m_resourceTextures;
     std::weak_ptr<IGraphicsLib> m_graphicsLib;
+    std::unique_ptr<Skybox> m_skybox;
 };

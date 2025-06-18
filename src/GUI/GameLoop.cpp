@@ -88,6 +88,9 @@ int GameLoop::run() {
     while (!m_graphics->WindowShouldClose()) {
         m_camera->update(m_graphics);
         m_graphics->BeginDrawing();
+        if (m_renderer) {
+            m_renderer->renderSkybox(m_graphics);
+        }
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();
         m_mapRenderer->render();
@@ -141,5 +144,15 @@ void GameLoop::updateCameraForMapSize() {
         cameraDistance = 50.0f;
     m_camera->reset();
     m_camera->distance() = cameraDistance;
+}
+
+void GameLoop::setSkyboxTexture(const std::string& texturePath) {
+    if (m_renderer) {
+        m_renderer->setSkyboxTexture(texturePath);
+    }
+}
+
+bool GameLoop::isSkyboxLoaded() const {
+    return m_renderer && m_renderer->isSkyboxLoaded();
 }
 
