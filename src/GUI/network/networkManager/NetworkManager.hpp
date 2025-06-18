@@ -20,7 +20,8 @@
 #include "../protocol/HeaderMessage.hpp"
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
-#include "../../gameController/GameController.hpp"
+
+class GameController;
 
 class NetworkManager {
     public:

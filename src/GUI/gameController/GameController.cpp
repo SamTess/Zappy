@@ -8,9 +8,27 @@
 #include "GameController.hpp"
 #include <iostream>
 #include <algorithm>
+#include <memory>
+#include <string>
 
-GameController::GameController() : _gameState(std::make_shared<GameState>()) {
+GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
+    std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
+    _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
+}
+
+bool GameController::unknownPlayerId(int playerID) {
+    const auto &players = _gameState->getPlayers();
+    if (players.empty() || (!players.empty() && players.find(playerID) == players.end())) {
+        std::string ppo = "ppo #" + std::to_string(playerID) + "\n";
+        std::string plv = "plv #" + std::to_string(playerID) + "\n";
+        std::string pin = "pin #" + std::to_string(playerID) + "\n";
+        _networkManager->sendCommand(ppo);
+        _networkManager->sendCommand(plv);
+        _networkManager->sendCommand(pin);
+        return true;
+    }
+    return false;
 }
 
 // pas beau mais efficace
@@ -66,6 +84,7 @@ void GameController::processMessage(const Message& message) {
         return;
     MessageType messageType = message.getStructuredData()->getType();
 
+    // la faire le check du map size
     auto it = _messageHandlers.find(messageType);
     if (it != _messageHandlers.end()) {
         it->second(message.getStructuredData());
@@ -81,6 +100,11 @@ void GameController::handleMapSize(std::shared_ptr<IMessageData> data) {
 }
 
 void GameController::handleTileContent(std::shared_ptr<IMessageData> data) {
+    if (!_gameState->isMapInitialized()) {
+        _networkManager->sendCommand("msz\n");
+        _networkManager->sendCommand("mct\n");
+        return;
+    }
     auto tileData = std::static_pointer_cast<TileContentData>(data);
     int x = tileData->getX();
     int y = tileData->getY();
@@ -97,10 +121,12 @@ void GameController::handleTeamName(std::shared_ptr<IMessageData> data) {
 
 void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     auto playerData = std::static_pointer_cast<PlayerInfoData>(data);
+    if (playerData->getTeamName() != "" && unknownPlayerId(playerData->getId()))
+        return;
     int playerId = playerData->getId();
     auto existingPlayer = _gameState->getPlayerInfo(playerId);
 
-    if (existingPlayer) {
+    if (existingPlayer && playerData->getOrientation() != -1) {
         if (!playerData->isAlive()) {
             _gameState->removePlayer(playerId);
             return;
@@ -114,31 +140,46 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
             return;
         }
     }
+    if (playerData->getOrientation() == -1) {
+        playerData->setTeamName(existingPlayer->getTeamName());
+        playerData->setX(existingPlayer->getX());
+        playerData->setY(existingPlayer->getY());
+        playerData->setOrientation(existingPlayer->getOrientation());
+    }
     _gameState->addOrUpdatePlayer(*playerData);
 }
 
 void GameController::handlePlayerInventory(std::shared_ptr<IMessageData> data) {
     auto inventoryData = std::static_pointer_cast<PlayerInventoryData>(data);
+    if (unknownPlayerId(inventoryData->getId()))
+        return;
 
     _gameState->updatePlayerInventory(*inventoryData);
 }
 
 void GameController::handlePlayerExpulsion(std::shared_ptr<IMessageData> data) {
     auto expulsionData = std::static_pointer_cast<PlayerExpulsionData>(data);
-
+    if (unknownPlayerId(expulsionData->getPlayerId()))
+        return;
     // faire une animation ici
 }
 
 void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     auto broadcastData = std::static_pointer_cast<BroadcastData>(data);
+    if (unknownPlayerId(broadcastData->getPlayerId()))
+        return;
 }
 
 void GameController::handleResourceDrop(std::shared_ptr<IMessageData> data) {
     auto resourceData = std::static_pointer_cast<ResourceData>(data);
+    if (unknownPlayerId(resourceData->getPlayerId()))
+        return;
 }
 
 void GameController::handleResourceCollect(std::shared_ptr<IMessageData> data) {
     auto resourceData = std::static_pointer_cast<ResourceData>(data);
+    if (unknownPlayerId(resourceData->getPlayerId()))
+        return;
 }
 
 void GameController::handleIncantationStart(std::shared_ptr<IMessageData> data) {
@@ -146,6 +187,9 @@ void GameController::handleIncantationStart(std::shared_ptr<IMessageData> data) 
     int x = incantationData->getX();
     int y = incantationData->getY();
     // int level = incantationData->getLevel();
+    for (int playerId : incantationData->getPlayerIds()) {
+        unknownPlayerId(playerId);
+    }
 
     _gameState->setTileIncantationState(x, y, true);
 }
@@ -161,10 +205,15 @@ void GameController::handleIncantationEnd(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleEggLaying(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
+    if (unknownPlayerId(eggData->getPlayerId()))
+        return;
 }
 
 void GameController::handleEggDrop(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
+    // server au debut c'est -1 donc il affiche pas les oeuf de depart
+    // if (unknownPlayerId(eggData->getPlayerId()))
+    //     return;
 
     switch (eggData->getAction()) {
         case EggData::EggAction::Drop: {
@@ -213,4 +262,9 @@ void GameController::handleEndGame(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
     auto serverData = std::static_pointer_cast<ServerMessageData>(data);
+}
+
+void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {
+    _gameState = std::make_shared<GameState>(factory);
+    initializeMessageHandlers();
 }

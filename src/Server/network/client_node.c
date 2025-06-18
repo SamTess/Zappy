@@ -8,15 +8,31 @@
 #include "../include/command.h"
 #include <stdlib.h>
 
+static void free_player_queue(player_t *player)
+{
+    for (int i = 0; i < 10; i++){
+        if (player->command_queue[i]){
+            free(player->command_queue[i]);
+            player->command_queue[i] = NULL;
+        }
+    }
+    free(player->command_queue);
+    player->command_queue = NULL;
+}
+
 static void cleanup_player_client(client_t *current_client)
 {
-    player_t *player = current_client->player;
+    player_t *player;
 
-    free(player->team_name);
-    player->team_name = NULL;
-    free_inventory(player);
+    if (!current_client || !current_client->player)
+        return;
+    player = current_client->player;
+    if (player->team_name){
+        free(player->team_name);
+        player->team_name = NULL;
+    }
     if (player->command_queue)
-        cleanup_player_queue(player);
+        free_player_queue(current_client->player);
     if (player->pending_cmd){
         if (player->pending_cmd->args){
             free(player->pending_cmd->args);
@@ -25,22 +41,22 @@ static void cleanup_player_client(client_t *current_client)
         free(player->pending_cmd);
         player->pending_cmd = NULL;
     }
-    free(player);
-    current_client->player = NULL;
 }
 
 void free_node(client_t *node, server_t *server)
 {
+    if (!node)
+        return;
     if (node->type == GRAPHICAL)
         remove_graphic_client(server, node);
-    if (node->client_poll)
+    if (node->client_poll) {
         free(node->client_poll);
-    if (node->client_add)
-        free(node->client_add);
+        node->client_poll = NULL;
+    }
     if (node->player) {
         cleanup_player_client(node);
-        cleanup_pending(node->player);
         free(node->player);
+        node->player = NULL;
     }
     free(node);
 }

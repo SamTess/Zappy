@@ -18,6 +18,8 @@
 #include "../network/protocol/HeaderMessage.hpp"
 #include "../network/protocol/ProtocolParser.hpp"
 #include "GameState.hpp"
+#include "EntityFactory.hpp"
+#include "../network/networkManager/NetworkManager.hpp"
 
 /**
  * @brief Interface pour recevoir les messages du réseau
@@ -31,14 +33,14 @@ public:
 /**
  * @brief Contrôleur principal du jeu - gère la logique métier et orchestre les mises à jour
  */
-class GameController : public INetworkObserver {
+class GameController {
 public:
     GameController();
+    GameController(std::shared_ptr<NetworkManager> networkManager, std::shared_ptr<EntityFactoryManager> entityFactory);
     ~GameController() = default;
-
-    void onMessageReceived(const Message& message) override;
-
+    void onMessageReceived(const Message& message);
     std::shared_ptr<const GameState> getGameState() const { return _gameState; }
+    void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory);
 
 private:
     void processMessage(const Message& message);
@@ -60,8 +62,10 @@ private:
     void handleTimeUnit(std::shared_ptr<IMessageData> data);
     void handleEndGame(std::shared_ptr<IMessageData> data);
     void handleServerMessage(std::shared_ptr<IMessageData> data);
+    bool unknownPlayerId(int playerID);
 
     std::shared_ptr<GameState> _gameState;
+    std::shared_ptr<NetworkManager> _networkManager;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
     void initializeMessageHandlers();
 };
