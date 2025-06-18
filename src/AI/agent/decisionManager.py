@@ -1,7 +1,4 @@
-import utils.encryption as encryption
 import agent.behaviors as behaviors
-import utils.zappy as zappy
-from random import choices
 
 class DecisionManager:
   def __init__(self, agent):
@@ -13,11 +10,14 @@ class DecisionManager:
       "Upgrade": behaviors.UpgradeBehavior(agent),
       "Dyson": behaviors.DysonBehavior(agent),
       "BigDyson": behaviors.BigDysonBehavior(agent),
-      "JoinTeamMates": behaviors.JoinTeamMatesBehavior(agent),
+      "FoodBigDyson": behaviors.FoodBigDysonBehavior(agent),
       "FoodDyson": behaviors.FoodDysonBehavior(agent),
+      "JoinTeamMates": behaviors.JoinTeamMatesBehavior(agent),
       "TakeEverythingHere": behaviors.TakeEverythingHereBehavior(agent),
       "TakeAllFoodHere": behaviors.TakeAllFoodHereBehavior(agent),
+      "TakeOneFoodHere": behaviors.TakeOneFoodHereBehavior(agent),
       "DropEveryMinerals": behaviors.DropEveryMineralsBehavior(agent),
+      "DropAllFood": behaviors.DropAllFoodBehavior(agent),
       "None": behaviors.NoActionBehavior(agent),
       "": behaviors.NoActionBehavior(agent),
     }
@@ -25,9 +25,9 @@ class DecisionManager:
 
     self.decisions = {
       "collecting": {"miner": ["BigDyson"], "fighter": ["FoodDyson"]},
-      "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["FoodDyson"]},
-      "setting": {"miner": ["DropEveryMinerals"], "fighter": ["FoodDyson"]},
-      "upgrading": {"miner": ["Upgrade"], "fighter": ["FoodDyson"]}
+      "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["JoinTeamMates"]},
+      "setting": {"miner": ["DropEveryMinerals"], "fighter": ["DropAllFood"]},
+      "upgrading": {"miner": ["Upgrade", "TakeOneFoodHere", "TakeOneFoodHere"], "fighter": ["FoodBigDyson"]}
     }
 
 
@@ -44,5 +44,4 @@ class DecisionManager:
 
     for action in self.decisions[self.agent.current_phase][self.agent.current_role]:
       self.behaviors[action].execute(surroundings, inventory)
-      print(f"Executed action: {action}")
     # print(inventory)
