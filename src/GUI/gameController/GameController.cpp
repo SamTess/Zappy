@@ -13,7 +13,6 @@
 
 GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
     std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
-    std::cout << "  GAME CONTROLLER CREATED" << std::endl;
     _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
 }
@@ -212,8 +211,9 @@ void GameController::handleEggLaying(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleEggDrop(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
-    if (unknownPlayerId(eggData->getPlayerId()))
-        return;
+    // server au debut c'est -1 donc il affiche pas les oeuf de depart
+    // if (unknownPlayerId(eggData->getPlayerId()))
+    //     return;
 
     switch (eggData->getAction()) {
         case EggData::EggAction::Drop: {

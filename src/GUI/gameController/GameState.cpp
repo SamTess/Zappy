@@ -194,9 +194,11 @@ void GameState::addOrUpdatePlayer(const PlayerInfoData& playerData) {
 
     if (_players.find(playerId) != _players.end()) {
         const auto& oldPlayer = _players[playerId];
+        int oldX = oldPlayer->getX();
+        int oldY = oldPlayer->getY();
         _players[playerId]->updateFromProtocol(playerData);
-        if (oldPlayer->getX() != playerData.getX() || oldPlayer->getY() != playerData.getY()) {
-            removePlayerFromTile(playerId, oldPlayer->getX(), oldPlayer->getY());
+        if (oldX != playerData.getX() || oldY != playerData.getY()) {
+            removePlayerFromTile(playerId, oldX, oldY);
             addPlayerToTile(playerId, playerData.getX(), playerData.getY());
         }
     } else {
