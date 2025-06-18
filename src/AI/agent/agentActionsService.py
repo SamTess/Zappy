@@ -1,6 +1,5 @@
 import utils.zappy as zappy
 
-
 class AgentActionManager:
   def __init__(self, agent):
     self.agent = agent

@@ -177,11 +177,14 @@ class Agent:
         print("Not all required resources for upgrade are available.")
 
     elif self.current_phase == "rallying":
+      i = 0
       for agent_info in self.other_agents.items():
         if agent_info[1]['direction'] is None or agent_info[1]['direction'] != 0:
           print(f"Agent {agent_info[0]} direction: {agent_info[1]['direction']}")
           print("Waiting for all agents to be ready for setting.")
           return
+        if i > 20:
+          break
       print("All agents are ready for setting.")
       self.current_phase = "setting"
 

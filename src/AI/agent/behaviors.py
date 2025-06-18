@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 from time import sleep
-import utils.zappy as zappy
-import utils.encryption as encryption
 from agent.agentActionsService import AgentActionManager
-import constants.upgrades as upgrades
+import utils.zappy as zappy
 
 class Behavior(ABC):
   def __init__(self, agent):
@@ -180,3 +178,22 @@ class DropAllFoodBehavior(Behavior):
       amount = inventory_dict["food"]
       for _ in range(amount):
         self.agent.send_command("Set food")
+
+
+class ForkBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    while True:
+      slots_available = self.agent.send_command("Connect_nbr")
+      if slots_available is None or "ko" in slots_available:
+        print(f"ForkAgentBehavior: Failed to get available slots. Response: {slots_available}")
+        return
+      try:
+        slots_available = int(slots_available)
+      except ValueError:
+        print(f"ForkAgentBehavior: Invalid slots_available value: {slots_available}")
+        return
+      if slots_available > 0:
+        from utils.mutliprocessing import fork_agent
+        fork_agent(self.agent.ip, self.agent.port, self.agent.team, 0, self.agent.performance_mode)
+      else:
+        return
