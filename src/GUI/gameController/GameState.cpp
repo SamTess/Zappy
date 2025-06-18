@@ -10,15 +10,18 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <map>
 #include <string>
 #include <utility>
 
 GameState::GameState() {
+    _isMapInitialized = false;
     _entityFactory = std::make_shared<EntityFactoryManager>();
 }
 
 GameState::GameState(std::shared_ptr<EntityFactoryManager> factory)
     : _entityFactory(std::move(factory)) {
+    _isMapInitialized = false;
 }
 
 int GameState::getMapWidth() const {
@@ -312,4 +315,8 @@ void GameState::removeEggFromTile(int eggId, int x, int y) {
     if (tile) {
         tile->removeEgg(eggId);
     }
+}
+
+std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
+    return _players;
 }
