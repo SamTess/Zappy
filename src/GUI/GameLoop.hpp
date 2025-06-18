@@ -18,6 +18,7 @@
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "gameController/GameController.hpp"
+#include "./network/networkManager/NetworkManager.hpp"
 
 namespace Zappy {
     class MapRenderer;
@@ -26,7 +27,7 @@ namespace Zappy {
 
 class GameLoop {
 public:
-    GameLoop();
+    explicit GameLoop(std::shared_ptr<NetworkManager> networkManager);
     ~GameLoop() = default;
     bool init();
     int run();
@@ -54,6 +55,7 @@ private:
     std::shared_ptr<GameController> m_gameController;
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
+    std::shared_ptr<NetworkManager> m_networkManager;
 
     int m_cubeModelId = -1;
 };

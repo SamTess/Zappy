@@ -11,6 +11,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include "../../gameController/entities/Resource.hpp"
 
 namespace Zappy {
 
@@ -32,30 +33,73 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
     ZappyTypes::Color borderColor = {100, 100, 100, 255};
     float offset = tileSize/2;
     graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z - offset},
-                           {position.x + offset, position.y + 0.05f, position.z - offset},
-                           borderColor);
+        {position.x + offset, position.y + 0.05f, position.z - offset},
+        borderColor);
     graphicsLib->DrawLine3D({position.x + offset, position.y + 0.05f, position.z - offset},
-                           {position.x + offset, position.y + 0.05f, position.z + offset},
-                           borderColor);
+        {position.x + offset, position.y + 0.05f, position.z + offset},
+        borderColor);
     graphicsLib->DrawLine3D({position.x + offset, position.y + 0.05f, position.z + offset},
-                           {position.x - offset, position.y + 0.05f, position.z + offset},
-                           borderColor);
+        {position.x - offset, position.y + 0.05f, position.z + offset},
+        borderColor);
     graphicsLib->DrawLine3D({position.x - offset, position.y + 0.05f, position.z + offset},
-                           {position.x - offset, position.y + 0.05f, position.z - offset},
-                           borderColor);
-    const TileData& tileData = gameState->getTileData(x, y);
-    for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
-        int quantity = tileData.resources[i];
-        if (quantity > 0) {
-            renderResourceIndicator(graphicsLib, position, static_cast<ResourceType>(i), quantity, tileSize);
+        {position.x - offset, position.y + 0.05f, position.z - offset},
+        borderColor);
+
+    auto tile = gameState->getTile(x, y);
+
+    if (tile) {
+        const auto& resources = tile->getResources();
+        for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
+            int quantity = resources[i];
+            if (quantity > 0) {
+                Resource resource(static_cast<ResourceType>(i), quantity);
+                resource.renderResource(graphicsLib, position, tileSize);
+            }
+        }
+
+        const auto& playerIds = tile->getPlayerIds();
+        for (size_t i = 0; i < playerIds.size(); ++i) {
+            int playerId = playerIds[i];
+            auto playerInfo = gameState->getPlayerInfo(playerId);
+            if (playerInfo) {
+                playerInfo->renderPlayer(graphicsLib, position, tileSize, i, playerIds.size());
+            } else {
+                std::cout << "WARNING: Player " << playerId << " not found in gameState during rendering!" << std::endl;
+            }
+        }
+        const auto& eggIds = tile->getEggIds();
+        for (int eggId : eggIds) {
+            auto eggInfo = gameState->getEggInfo(eggId);
+            if (eggInfo) {
+                eggInfo->renderEgg(graphicsLib, position, tileSize);
+            }
+        }
+    } else {
+    auto tile = gameState->getTile(x, y);
+    if (tile) {
+        for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
+            int quantity = tile->getResourceQuantity(static_cast<ResourceType>(i));
+            if (quantity > 0) {
+                Resource tempResource(static_cast<ResourceType>(i), quantity);
+                tempResource.renderResource(graphicsLib, position, tileSize);
+            }
+        }
+        const auto& playerIds = tile->getPlayerIds();
+        for (int i = 0; i < static_cast<int>(playerIds.size()); ++i) {
+            int playerId = playerIds[i];
+            auto player = gameState->getPlayerInfo(playerId);
+            if (player) {
+                player->renderPlayer(graphicsLib, position, tileSize, i, playerIds.size());
+            }
+        }
+        const auto& eggIds = tile->getEggIds();
+        for (int eggId : eggIds) {
+            auto egg = gameState->getEggInfo(eggId);
+            if (egg) {
+                egg->renderEgg(graphicsLib, position, tileSize);
+            }
         }
     }
-    for (int i = 0; i < static_cast<int>(tileData.playerIds.size()); ++i) {
-        int playerId = tileData.playerIds[i];
-        renderPlayerIndicator(graphicsLib, position, playerId, tileSize, i, tileData.playerIds.size());
-    }
-    for (int eggId : tileData.eggIds) {
-        renderEggIndicator(graphicsLib, position, eggId, tileSize);
     }
 }
 
@@ -86,32 +130,32 @@ void DetailedTileRenderStrategy::renderResourceIndicator(const std::shared_ptr<I
     graphicsLib->DrawCube(indicatorPos, indicatorSize, indicatorSize, indicatorSize, resourceColors[resourceIndex]);
     float halfSize = indicatorSize / 2;
     graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          borderColor);
+        {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+        borderColor);
     graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          borderColor);
+        {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+        borderColor);
     graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          borderColor);
+        {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+        borderColor);
     graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                          {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                          borderColor);
+        {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+        borderColor);
     for (int i = 1; i < std::min(quantity, 5); ++i) {
         indicatorPos.y += indicatorSize * 0.8f;
         graphicsLib->DrawCube(indicatorPos, indicatorSize, indicatorSize, indicatorSize, resourceColors[resourceIndex]);
         graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              borderColor);
+            {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+            borderColor);
         graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              borderColor);
+            {indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+            borderColor);
         graphicsLib->DrawLine3D({indicatorPos.x + halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              borderColor);
+            {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
+            borderColor);
         graphicsLib->DrawLine3D({indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z + halfSize},
-                              {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
-                              borderColor);
+            {indicatorPos.x - halfSize, indicatorPos.y + halfSize + 0.001f, indicatorPos.z - halfSize},
+            borderColor);
     }
 }
 

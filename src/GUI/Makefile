@@ -32,7 +32,13 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/strategies/SimpleTileRenderStrategy.cpp \
 	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
-	  GameLoop.cpp
+	  GameLoop.cpp \
+	  gameController/EntityFactory.cpp \
+	  gameController/entities/Player.cpp \
+	  gameController/entities/Egg.cpp \
+	  gameController/entities/Resource.cpp \
+	  gameController/entities/Tile.cpp \
+	  gameController/entities/PlayerInventory.cpp \
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
