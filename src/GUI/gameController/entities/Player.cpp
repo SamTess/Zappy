@@ -118,15 +118,14 @@ void Player::renderPlayer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         return;
     ZappyTypes::Color teamColor = generateTeamColor();
 
+    (void)tileSize;
     ZappyTypes::Vector3 playerPos = position;
     if (totalPlayers > 1) {
-        float offsetRadius = tileSize * 0.3f;
-        float angle = (2.0f * M_PI * playerIndex) / totalPlayers;
-        playerPos.x += offsetRadius * std::cos(angle);
-        playerPos.z += offsetRadius * std::sin(angle);
+        float stackHeight = 1.1f;
+        playerPos.y += playerIndex * stackHeight;
     }
 
-    playerPos.y = position.y + 0.55f;
+    playerPos.y += 0.55f;
     float rotationAngle = _currentRotation;
     ZappyTypes::Vector3 rotationAxis = {0.0f, 1.0f, 0.0f};
     ModelManager::getInstance().drawModelEx(LIRILI_LARILA, playerPos, rotationAxis, rotationAngle, 0.4f, teamColor);

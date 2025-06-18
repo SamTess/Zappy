@@ -26,12 +26,7 @@ private:
         ResourceType resourceType,
         int quantity,
         float tileSize);
-    void renderPlayerIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        ZappyTypes::Vector3 position,
-        int playerId,
-        float tileSize,
-        int playerIndex = 0,
-        int totalPlayers = 1);
+
     void renderEggIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         ZappyTypes::Vector3 position,
         int eggId,
