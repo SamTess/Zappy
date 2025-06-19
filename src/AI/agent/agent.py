@@ -23,7 +23,7 @@ class Agent:
       self.map_size_y = None
       self.current_behaviour = "BigDyson"
       self.tick = 0
-      encryption.secret_key = encryption.secret_key + self.team
+      encryption.secret_key = encryption.base_key + self.team
 
       self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.connect((self.ip, self.port))

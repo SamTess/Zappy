@@ -6,15 +6,19 @@ from cryptography.fernet import Fernet
 try:
   from dotenv import load_dotenv
   load_dotenv()
-except (ImportError, AssertionError):
-  pass
+except ImportError:
+  print("Warning: 'python-dotenv' module not found. Environment variables may not be loaded from .env file.")
+except Exception as e:
+  print(f"Warning: Could not load environment variables: {e}")
 
-secret_key = os.getenv("SECRET_KEY", "default_secret_key")
+base_key = os.getenv("BASE_KEY", "default_base_key")
+secret_key = base_key
 
 # generates a key using fernet algo (based on the secret key)
 def _get_encryption_key():
   key_hash = hashlib.sha256(secret_key.encode()).digest()
   return base64.urlsafe_b64encode(key_hash)
+
 
 def encrypt_message(message):
   try:
@@ -26,6 +30,7 @@ def encrypt_message(message):
     print(f"Encryption error: {e}")
     return message
 
+
 def decrypt_message(encrypted_message):
   try:
     fernet = Fernet(_get_encryption_key())
@@ -34,4 +39,5 @@ def decrypt_message(encrypted_message):
     return decrypted_data.decode()
 
   except Exception as e:
+    print(f"Decryption error: {e}")
     return None
