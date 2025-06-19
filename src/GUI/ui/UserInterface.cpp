@@ -40,14 +40,6 @@ void UserInterface::updateData(const GameData& gameData) {
     m_windowFactory->updateAllWindows(gameData);
 }
 
-void UserInterface::addLogMessage(const std::string& message) {
-    m_windowFactory->addLogMessage(message);
-}
-
-void UserInterface::clearLogs() {
-    // Logs functionality has been removed
-}
-
 void UserInterface::setSelectedTile(int x, int y) {
     m_windowFactory->setSelectedTile(x, y);
 }
@@ -60,11 +52,6 @@ bool UserInterface::toggleWindowVisibility(const std::string& windowId, bool vis
     auto window = m_windowFactory->getWindow(windowId);
     if (window) {
         window->setVisible(visible);
-        if (visible) {
-            addLogMessage("Fenêtre " + windowId + " ouverte");
-        } else {
-            addLogMessage("Fenêtre " + windowId + " fermée");
-        }
         return true;
     }
     return false;
