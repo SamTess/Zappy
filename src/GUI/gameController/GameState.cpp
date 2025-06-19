@@ -288,7 +288,7 @@ void GameState::updateBroadcasts(float deltaTime) {
     }
 }
 
-const std::deque<Broadcast>& GameState::getBroadcasts() const {
+std::deque<Broadcast> GameState::getBroadcasts() const {
     std::lock_guard<std::mutex> lock(_mutex);
     return _broadcasts;
 }

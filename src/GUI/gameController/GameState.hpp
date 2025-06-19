@@ -82,7 +82,7 @@ public:
     // Méthodes pour gérer les broadcasts
     void addBroadcast(int playerId, const std::string& team, const std::string& message);
     void updateBroadcasts(float deltaTime);
-    const std::deque<Broadcast>& getBroadcasts() const;
+    std::deque<Broadcast> getBroadcasts() const;
 
 private:
     bool isValidCoordinates(int x, int y) const;
