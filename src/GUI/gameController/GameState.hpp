@@ -35,19 +35,6 @@ struct TileData {
     std::vector<int> eggIds;
     bool isIncantating{false};
 };
-
-
-enum class ResourceType {
-    FOOD = 0,
-    LINEMATE,
-    DERAUMERE,
-    SIBUR,
-    MENDIANE,
-    PHIRAS,
-    THYSTAME,
-    COUNT
-};
-
 class GameState {
 public:
     GameState();

@@ -43,7 +43,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/broadcasts/BroadcastsWindow.cpp \
 	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
-	  ui/windows/menu/MenuWindow.cpp
+	  ui/windows/menu/MenuWindow.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
 	  gameController/entities/Egg.cpp \

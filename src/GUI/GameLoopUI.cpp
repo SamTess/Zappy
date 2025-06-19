@@ -156,7 +156,7 @@ void GameLoop::updateTilesFromGameState(std::shared_ptr<const GameState> gameSta
     int mapHeight = gameState->getMapHeight();
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {
-            const TileData& tileData = gameState->getTileData(x, y);
+            auto tile = gameState->getTile(x, y);
             auto tileIt = std::find_if(m_gameData.tiles.begin(), m_gameData.tiles.end(),
                 [x, y](const GUI::Tile& tile) {
                     return tile.x == x && tile.y == y;
@@ -171,13 +171,13 @@ void GameLoop::updateTilesFromGameState(std::shared_ptr<const GameState> gameSta
             } else {
                 targetTile = &(*tileIt);
             }
-            targetTile->food = tileData.resources[static_cast<int>(ResourceType::FOOD)];
-            targetTile->linemate = tileData.resources[static_cast<int>(ResourceType::LINEMATE)];
-            targetTile->deraumere = tileData.resources[static_cast<int>(ResourceType::DERAUMERE)];
-            targetTile->sibur = tileData.resources[static_cast<int>(ResourceType::SIBUR)];
-            targetTile->mendiane = tileData.resources[static_cast<int>(ResourceType::MENDIANE)];
-            targetTile->phiras = tileData.resources[static_cast<int>(ResourceType::PHIRAS)];
-            targetTile->thystame = tileData.resources[static_cast<int>(ResourceType::THYSTAME)];
+            targetTile->food = tile->getResourceQuantity(ResourceType::FOOD);
+            targetTile->linemate = tile->getResourceQuantity(ResourceType::LINEMATE);
+            targetTile->deraumere = tile->getResourceQuantity(ResourceType::DERAUMERE);
+            targetTile->sibur = tile->getResourceQuantity(ResourceType::SIBUR);
+            targetTile->mendiane = tile->getResourceQuantity(ResourceType::MENDIANE);
+            targetTile->phiras = tile->getResourceQuantity(ResourceType::PHIRAS);
+            targetTile->thystame = tile->getResourceQuantity(ResourceType::THYSTAME);
         }
     }
 }
@@ -191,8 +191,9 @@ void GameLoop::updatePlayersFromGameState(std::shared_ptr<const GameState> gameS
     std::vector<int> updatedPlayerIds;
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {
-            const TileData& tileData = gameState->getTileData(x, y);
-            for (int playerId : tileData.playerIds) {
+            auto tile = gameState->getTile(x, y);
+            std::vector<int> playerIds = gameState->getPlayersOnTile(x, y);
+            for (int playerId : playerIds) {
                 updatedPlayerIds.push_back(playerId);
                 auto playerInfo = gameState->getPlayerInfo(playerId);
                 auto playerInventory = gameState->getPlayerInventory(playerId);
