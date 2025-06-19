@@ -50,7 +50,13 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/broadcasts/BroadcastsWindow.cpp \
 	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
-	  ui/windows/menu/MenuWindow.cpp
+	  ui/windows/menu/MenuWindow.cpp \
+	  gameController/EntityFactory.cpp \
+	  gameController/entities/Player.cpp \
+	  gameController/entities/Egg.cpp \
+	  gameController/entities/Resource.cpp \
+	  gameController/entities/Tile.cpp \
+	  gameController/entities/PlayerInventory.cpp \
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))

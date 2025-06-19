@@ -22,7 +22,10 @@ Texture::Texture(const std::string& path) {
 }
 
 Texture::~Texture() {
-    UnloadTexture(texture);
+    if (texture.id > 0 && IsWindowReady()) {
+        UnloadTexture(texture);
+        texture.id = 0;
+    }
 }
 
 void Texture::draw(int x, int y) const {
@@ -48,7 +51,10 @@ Texture3DWrap::Texture3DWrap(const std::string& path) {
 }
 
 Texture3DWrap::~Texture3DWrap() {
-    UnloadTexture(texture);
+    if (texture.id > 0 && IsWindowReady()) {
+        UnloadTexture(texture);
+        texture.id = 0;
+    }
 }
 
 void Texture3DWrap::bind(int unit) const {
@@ -78,7 +84,13 @@ ModelWrap::ModelWrap(const std::string& objPath) {
 }
 
 ModelWrap::~ModelWrap() {
-    UnloadModel(model);
+    // Vérification pour éviter les libérations invalides
+    if (model.meshes != nullptr && model.meshCount > 0) {
+        UnloadModel(model);
+        // Invalidation pour éviter les doubles libérations
+        model.meshes = nullptr;
+        model.meshCount = 0;
+    }
 }
 
 void ModelWrap::draw(Vector3 position, float scale, Color tint) const {

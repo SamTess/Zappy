@@ -10,7 +10,6 @@
 #include <string>
 #include <algorithm>
 #include <memory>
-#include <string>
 
 GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
     std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
