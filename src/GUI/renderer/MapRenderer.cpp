@@ -22,7 +22,7 @@ MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
       gameState(state),
       strategyFactory(modelManagerAdapter),
       tileSize(1.0f),
-      tileSpacing(0.1f),
+      tileSpacing(1.5f),
       zoomLevel(1.0f),
       detailThreshold(2.0f) {
     tileRenderStrategy = strategyFactory.createSimpleTileStrategy(gameState);
@@ -58,7 +58,6 @@ void MapRenderer::render() {
             renderTile(x, y, resourceIndex);
         }
     }
-    graphicsLib->DrawGrid(std::max(mapWidth, mapHeight), tileSize + tileSpacing);
 }
 
 void MapRenderer::setTileRenderStrategy(std::shared_ptr<ITileRenderStrategy> strategy) {
@@ -99,8 +98,8 @@ void MapRenderer::renderTile(int x, int y, int /*resourceType*/) {
 ZappyTypes::Color MapRenderer::calculateTileColor(int x, int y) {
     if (resourceColors.find(-1) == resourceColors.end())
         return {150, 150, 150, 255};
-    const TileData& tileData = gameState->getTileData(x, y);
-    if (tileData.isIncantating) {
+    auto tile = gameState->getTile(x, y);
+    if (tile && tile->isIncantating()) {
         return {50, 50, 255, 200};
     }
     ResourceType dominantType = gameState->getDominantResourceType(x, y);

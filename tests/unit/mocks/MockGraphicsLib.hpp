@@ -31,6 +31,7 @@ public:
     ZappyTypes::Vector3 lastDrawModelExRotationAxis = {0, 0, 0};
     float lastDrawModelExAngle = 0.0f;
     float lastDrawModelExScale = 0.0f;
+    ZappyTypes::Color lastDrawModelExColor = {255, 255, 255, 255};
 
     std::vector<std::string> lastTexturePathsLoaded;
     bool textureReadyResponse = true;
@@ -130,13 +131,14 @@ public:
         lastDrawModelColor = color;
     }
     
-    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override {
+    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE) override {
         wasDrawModelExCalled = true;
         lastDrawTextureId = modelId;
         lastDrawModelExPosition = position;
         lastDrawModelExRotationAxis = rotationAxis;
         lastDrawModelExAngle = rotationAngle;
         lastDrawModelExScale = scale;
+        lastDrawModelExColor = color;
     }
     
     void UnloadModel3D(int modelId) override {}

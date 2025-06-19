@@ -21,6 +21,7 @@
 #include "gameController/GameState.hpp"
 #include "ui/UserInterface.hpp"
 #include "shared/GameData.hpp"
+#include "./network/networkManager/NetworkManager.hpp"
 
 namespace Zappy {
     class MapRenderer;
@@ -29,12 +30,14 @@ namespace Zappy {
 
 class GameLoop {
 public:
-    GameLoop();
+    explicit GameLoop(std::shared_ptr<NetworkManager> networkManager);
     ~GameLoop() = default;
     bool init();
     int run();
     void setServerInfo(const std::string& host, int port);
     void setGameController(std::shared_ptr<GameController> controller);
+    void setSkyboxTexture(const std::string& texturePath);
+    bool isSkyboxLoaded() const;
 
 private:
     bool loadLibraries();
@@ -67,6 +70,7 @@ private:
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
     GUI::GameData m_gameData;
+    std::shared_ptr<NetworkManager> m_networkManager;
 
     int m_cubeModelId = -1;
     struct {

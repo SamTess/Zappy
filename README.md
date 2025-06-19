@@ -235,7 +235,6 @@ Autonomous bots developed in Python with a modular and scalable architecture.
 - Evolution and cooperation strategies
 - Advanced logging for debugging and analysis
 ./zappy_ai -p 4242 -n team1
-```
 
 ## 📦 Components
 

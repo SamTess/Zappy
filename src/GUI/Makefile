@@ -25,6 +25,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
+	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
 	  renderer/UIRenderer.cpp \
 	  renderer/strategies/DetailedTileRenderStrategy.cpp \
@@ -43,6 +44,12 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp
+	  gameController/EntityFactory.cpp \
+	  gameController/entities/Player.cpp \
+	  gameController/entities/Egg.cpp \
+	  gameController/entities/Resource.cpp \
+	  gameController/entities/Tile.cpp \
+	  gameController/entities/PlayerInventory.cpp \
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))

@@ -11,9 +11,18 @@
 #include <memory>
 #include <deque>
 #include <vector>
+#include <map>
 #include <string>
+#include <utility>
 
 GameState::GameState() {
+    _isMapInitialized = false;
+    _entityFactory = std::make_shared<EntityFactoryManager>();
+}
+
+GameState::GameState(std::shared_ptr<EntityFactoryManager> factory)
+    : _entityFactory(std::move(factory)) {
+    _isMapInitialized = false;
 }
 
 int GameState::getMapWidth() const {
@@ -34,22 +43,29 @@ bool GameState::isMapInitialized() const {
     return _isMapInitialized;
 }
 
-const TileData& GameState::getTileData(int x, int y) const {
+std::shared_ptr<const ITile> GameState::getTile(int x, int y) const {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    if (!isValidCoordinates(x, y)) {
-        static TileData emptyTile;
-        return emptyTile;
-    }
-    return _mapTiles[y][x];
+    if (!isValidCoordinates(x, y))
+        return nullptr;
+    return _tiles[y][x];
+}
+
+std::shared_ptr<ITile> GameState::getTileMutable(int x, int y) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    if (!isValidCoordinates(x, y))
+        return nullptr;
+    return _tiles[y][x];
 }
 
 int GameState::getResourceQuantity(int x, int y, ResourceType resourceType) const {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    if (!isValidCoordinates(x, y) || static_cast<int>(resourceType) >= static_cast<int>(ResourceType::COUNT))
+    if (!isValidCoordinates(x, y))
         return 0;
-    return _mapTiles[y][x].resources[static_cast<int>(resourceType)];
+    auto tile = _tiles[y][x];
+    return tile ? tile->getResourceQuantity(resourceType) : 0;
 }
 
 ResourceType GameState::getDominantResourceType(int x, int y) const {
@@ -58,30 +74,22 @@ ResourceType GameState::getDominantResourceType(int x, int y) const {
     if (!isValidCoordinates(x, y))
         return ResourceType::FOOD;
 
-    const auto& resources = _mapTiles[y][x].resources;
-    int maxQuantity = 0;
-    ResourceType dominantType = ResourceType::FOOD;
-    for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
-        if (resources[i] > maxQuantity) {
-            maxQuantity = resources[i];
-            dominantType = static_cast<ResourceType>(i);
-        }
-    }
-    return dominantType;
+    auto tile = _tiles[y][x];
+    return tile ? tile->getDominantResourceType() : ResourceType::FOOD;
 }
 
-std::shared_ptr<const PlayerInfoData> GameState::getPlayerInfo(int playerId) const {
+std::shared_ptr<const IPlayer> GameState::getPlayerInfo(int playerId) const {
     std::lock_guard<std::mutex> lock(_mutex);
     auto it = _players.find(playerId);
 
-    return (it != _players.end()) ? std::make_shared<PlayerInfoData>(it->second) : nullptr;
+    return (it != _players.end()) ? it->second : nullptr;
 }
 
-std::shared_ptr<const PlayerInventoryData> GameState::getPlayerInventory(int playerId) const {
+std::shared_ptr<const IPlayerInventory> GameState::getPlayerInventory(int playerId) const {
     std::lock_guard<std::mutex> lock(_mutex);
 
     auto it = _inventories.find(playerId);
-    return (it != _inventories.end()) ? std::make_shared<PlayerInventoryData>(it->second) : nullptr;
+    return (it != _inventories.end()) ? it->second : nullptr;
 }
 
 bool GameState::isPlayerOnTile(int x, int y, int playerId) const {
@@ -89,7 +97,10 @@ bool GameState::isPlayerOnTile(int x, int y, int playerId) const {
 
     if (!isValidCoordinates(x, y))
         return false;
-    const auto& playerIds = _mapTiles[y][x].playerIds;
+    auto tile = _tiles[y][x];
+    if (!tile)
+        return false;
+    const auto& playerIds = tile->getPlayerIds();
     return std::find(playerIds.begin(), playerIds.end(), playerId) != playerIds.end();
 }
 
@@ -97,14 +108,15 @@ std::vector<int> GameState::getPlayersOnTile(int x, int y) const {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!isValidCoordinates(x, y))
         return {};
-    return _mapTiles[y][x].playerIds;
+    auto tile = _tiles[y][x];
+    return tile ? tile->getPlayerIds() : std::vector<int>{};
 }
 
-std::shared_ptr<const EggData> GameState::getEggInfo(int eggId) const {
+std::shared_ptr<const IEgg> GameState::getEggInfo(int eggId) const {
     std::lock_guard<std::mutex> lock(_mutex);
     auto it = _eggs.find(eggId);
 
-    return (it != _eggs.end()) ? std::make_shared<EggData>(it->second) : nullptr;
+    return (it != _eggs.end()) ? it->second : nullptr;
 }
 
 std::vector<int> GameState::getEggsOnTile(int x, int y) const {
@@ -112,7 +124,8 @@ std::vector<int> GameState::getEggsOnTile(int x, int y) const {
 
     if (!isValidCoordinates(x, y))
         return {};
-    return _mapTiles[y][x].eggIds;
+    auto tile = _tiles[y][x];
+    return tile ? tile->getEggIds() : std::vector<int>{};
 }
 
 const std::vector<std::string>& GameState::getTeamNames() const {
@@ -143,10 +156,10 @@ void GameState::setMapSize(int width, int height) {
         return;
     _mapWidth = width;
     _mapHeight = height;
-    _mapTiles.resize(_mapHeight, std::vector<TileData>(_mapWidth));
+    _tiles.resize(_mapHeight, std::vector<std::shared_ptr<ITile>>(_mapWidth));
     for (int y = 0; y < _mapHeight; ++y) {
         for (int x = 0; x < _mapWidth; ++x) {
-            _mapTiles[y][x] = TileData{};
+            _tiles[y][x] = _entityFactory->getFactory().createTile(x, y);
         }
     }
     _isMapInitialized = true;
@@ -158,14 +171,11 @@ void GameState::updateTileResources(int x, int y, int food, int linemate, int de
 
     if (!isValidCoordinates(x, y))
         return;
-    auto& tile = _mapTiles[y][x];
-    tile.resources[static_cast<int>(ResourceType::FOOD)] = food;
-    tile.resources[static_cast<int>(ResourceType::LINEMATE)] = linemate;
-    tile.resources[static_cast<int>(ResourceType::DERAUMERE)] = deraumere;
-    tile.resources[static_cast<int>(ResourceType::SIBUR)] = sibur;
-    tile.resources[static_cast<int>(ResourceType::MENDIANE)] = mendiane;
-    tile.resources[static_cast<int>(ResourceType::PHIRAS)] = phiras;
-    tile.resources[static_cast<int>(ResourceType::THYSTAME)] = thystame;
+    auto& tile = _tiles[y][x];
+    if (tile) {
+        TileContentData tileData(x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame);
+        tile->updateFromProtocol(tileData);
+    }
 }
 
 void GameState::setTileIncantationState(int x, int y, bool isIncantating) {
@@ -173,7 +183,10 @@ void GameState::setTileIncantationState(int x, int y, bool isIncantating) {
 
     if (!isValidCoordinates(x, y))
         return;
-    _mapTiles[y][x].isIncantating = isIncantating;
+    auto& tile = _tiles[y][x];
+    if (tile) {
+        tile->setIncantating(isIncantating);
+    }
 }
 
 void GameState::addOrUpdatePlayer(const PlayerInfoData& playerData) {
@@ -182,20 +195,15 @@ void GameState::addOrUpdatePlayer(const PlayerInfoData& playerData) {
 
     if (_players.find(playerId) != _players.end()) {
         const auto& oldPlayer = _players[playerId];
-        PlayerInfoData updatedPlayer = playerData;
-        if (updatedPlayer.getTeamName().empty() && !oldPlayer.getTeamName().empty())
-            updatedPlayer.setTeamName(oldPlayer.getTeamName());
-        if (updatedPlayer.getLevel() == 0 && oldPlayer.getLevel() > 0)
-            updatedPlayer.setLevel(oldPlayer.getLevel());
-        if (oldPlayer.getX() != updatedPlayer.getX() || oldPlayer.getY() != updatedPlayer.getY()) {
-            removePlayerFromTile(playerId, oldPlayer.getX(), oldPlayer.getY());
-            _players[playerId] = updatedPlayer;
-            addPlayerToTile(playerId, updatedPlayer.getX(), updatedPlayer.getY());
-        } else {
-            _players[playerId] = updatedPlayer;
+        int oldX = oldPlayer->getX();
+        int oldY = oldPlayer->getY();
+        _players[playerId]->updateFromProtocol(playerData);
+        if (oldX != playerData.getX() || oldY != playerData.getY()) {
+            removePlayerFromTile(playerId, oldX, oldY);
+            addPlayerToTile(playerId, playerData.getX(), playerData.getY());
         }
     } else {
-        _players[playerId] = playerData;
+        _players[playerId] = _entityFactory->getFactory().createPlayer(playerData);
         addPlayerToTile(playerId, playerData.getX(), playerData.getY());
     }
 }
@@ -206,7 +214,7 @@ void GameState::removePlayer(int playerId) {
 
     if (it != _players.end()) {
         const auto& player = it->second;
-        removePlayerFromTile(playerId, player.getX(), player.getY());
+        removePlayerFromTile(playerId, player->getX(), player->getY());
         _players.erase(it);
         _inventories.erase(playerId);
     }
@@ -214,7 +222,13 @@ void GameState::removePlayer(int playerId) {
 
 void GameState::updatePlayerInventory(const PlayerInventoryData& inventoryData) {
     std::lock_guard<std::mutex> lock(_mutex);
-    _inventories[inventoryData.getId()] = inventoryData;
+    int playerId = inventoryData.getId();
+    auto it = _inventories.find(playerId);
+    if (it != _inventories.end()) {
+        it->second->updateFromProtocol(inventoryData);
+    } else {
+        _inventories[playerId] = _entityFactory->getFactory().createPlayerInventory(inventoryData);
+    }
 }
 
 void GameState::movePlayer(int playerId, int newX, int newY) {
@@ -223,7 +237,8 @@ void GameState::movePlayer(int playerId, int newX, int newY) {
 
     if (it != _players.end()) {
         auto& player = it->second;
-        removePlayerFromTile(playerId, player.getX(), player.getY());
+        removePlayerFromTile(playerId, player->getX(), player->getY());
+        player->setPosition(newX, newY);
         addPlayerToTile(playerId, newX, newY);
     }
 }
@@ -232,7 +247,7 @@ void GameState::addEgg(const EggData& eggData) {
     std::lock_guard<std::mutex> lock(_mutex);
     int eggId = eggData.getEggId();
 
-    _eggs[eggId] = eggData;
+    _eggs[eggId] = _entityFactory->getFactory().createEgg(eggData);
     addEggToTile(eggId, eggData.getX(), eggData.getY());
 }
 
@@ -242,7 +257,7 @@ void GameState::removeEgg(int eggId) {
 
     if (it != _eggs.end()) {
         const auto& egg = it->second;
-        removeEggFromTile(eggId, egg.getX(), egg.getY());
+        removeEggFromTile(eggId, egg->getX(), egg->getY());
         _eggs.erase(it);
     }
 }
@@ -300,31 +315,39 @@ bool GameState::isValidCoordinates(int x, int y) const {
 void GameState::addPlayerToTile(int playerId, int x, int y) {
     if (!isValidCoordinates(x, y))
         return;
-    auto& playerIds = _mapTiles[y][x].playerIds;
-    if (std::find(playerIds.begin(), playerIds.end(), playerId) == playerIds.end()) {
-        playerIds.push_back(playerId);
+    auto& tile = _tiles[y][x];
+    if (tile) {
+        tile->addPlayer(playerId);
     }
 }
 
 void GameState::removePlayerFromTile(int playerId, int x, int y) {
     if (!isValidCoordinates(x, y))
         return;
-    auto& playerIds = _mapTiles[y][x].playerIds;
-    playerIds.erase(std::remove(playerIds.begin(), playerIds.end(), playerId), playerIds.end());
+    auto& tile = _tiles[y][x];
+    if (tile) {
+        tile->removePlayer(playerId);
+    }
 }
 
 void GameState::addEggToTile(int eggId, int x, int y) {
     if (!isValidCoordinates(x, y))
         return;
-    auto& eggIds = _mapTiles[y][x].eggIds;
-    if (std::find(eggIds.begin(), eggIds.end(), eggId) == eggIds.end()) {
-        eggIds.push_back(eggId);
+    auto& tile = _tiles[y][x];
+    if (tile) {
+        tile->addEgg(eggId);
     }
 }
 
 void GameState::removeEggFromTile(int eggId, int x, int y) {
     if (!isValidCoordinates(x, y))
         return;
-    auto& eggIds = _mapTiles[y][x].eggIds;
-    eggIds.erase(std::remove(eggIds.begin(), eggIds.end(), eggId), eggIds.end());
+    auto& tile = _tiles[y][x];
+    if (tile) {
+        tile->removeEgg(eggId);
+    }
+}
+
+std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
+    return _players;
 }

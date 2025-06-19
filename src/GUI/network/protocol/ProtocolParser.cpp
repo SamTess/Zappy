@@ -177,7 +177,6 @@ Message ProtocolParser::parseTeamNames(const std::string &message) {
 }
 
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
-    printf("Parsing player connection message: %s\n", message.c_str());
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 6)
         throw ProtocolParserException("Invalid player connection parameters: " + message);
@@ -212,7 +211,7 @@ Message ProtocolParser::parsePlayerLevel(const std::string &message) {
     int id = parseIntParameter(params[0]);
     int level = parseIntParameter(params[1]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, level);
+    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, -1, level);
     return Message(PLV_HEADER, extractCommandParameter(message), playerInfoData);
 }
 

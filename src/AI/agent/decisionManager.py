@@ -1,7 +1,4 @@
-import utils.encryption as encryption
 import agent.behaviors as behaviors
-import utils.zappy as zappy
-from random import choices
 
 class DecisionManager:
   def __init__(self, agent):
@@ -13,35 +10,26 @@ class DecisionManager:
       "Upgrade": behaviors.UpgradeBehavior(agent),
       "Dyson": behaviors.DysonBehavior(agent),
       "BigDyson": behaviors.BigDysonBehavior(agent),
-      "JoinTeamMates": behaviors.JoinTeamMatesBehavior(agent),
+      "FoodBigDyson": behaviors.FoodBigDysonBehavior(agent),
       "FoodDyson": behaviors.FoodDysonBehavior(agent),
+      "JoinTeamMates": behaviors.JoinTeamMatesBehavior(agent),
       "TakeEverythingHere": behaviors.TakeEverythingHereBehavior(agent),
       "TakeAllFoodHere": behaviors.TakeAllFoodHereBehavior(agent),
+      "TakeOneFoodHere": behaviors.TakeOneFoodHereBehavior(agent),
+      "DropEveryMinerals": behaviors.DropEveryMineralsBehavior(agent),
+      "DropAllFood": behaviors.DropAllFoodBehavior(agent),
+      "Fork": behaviors.ForkBehavior(agent),
       "None": behaviors.NoActionBehavior(agent),
       "": behaviors.NoActionBehavior(agent),
     }
 
 
-  def upgradePhase(self, surroundings, inventory): # TODO(ms-tristan): implement
-    if self.agent.current_role == "miner":
-      print("Upgrading with da bros")
-    elif self.agent.current_role == "fighter":
-      print("Feeding da bros")
-
-
-  def rallyPhase(self, surroundings, inventory):
-    if (self.agent.current_role == "miner"): # TODO(ms-tristan): implement
-      self.behaviors["JoinTeamMates"].execute(surroundings, inventory)
-      self.behaviors["TakeAllFoodHere"].execute(surroundings, inventory)
-    elif (self.agent.current_role == "fighter"):
-      self.behaviors["FoodDyson"].execute(surroundings, inventory)
-
-
-  def collectPhase(self, surroundings, inventory):
-    if (self.agent.current_role == "miner"):
-      self.behaviors["BigDyson"].execute(surroundings, inventory)
-    elif (self.agent.current_role == "fighter"):
-      self.behaviors["FoodDyson"].execute(surroundings, inventory)
+    self.decisions = {
+      "collecting": {"miner": ["Fork", "BigDyson"], "fighter": ["FoodDyson"]},
+      "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["JoinTeamMates"]},
+      "setting": {"miner": ["DropEveryMinerals"], "fighter": ["DropAllFood"]},
+      "upgrading": {"miner": ["Upgrade", "TakeOneFoodHere", "TakeOneFoodHere"], "fighter": ["FoodBigDyson"]}
+    }
 
 
   def take_action(self):
@@ -55,11 +43,6 @@ class DecisionManager:
       print("Failed to retrieve inventory or surroundings.")
       return
 
-    if self.agent.current_phase == "collecting":
-      self.collectPhase(surroundings, inventory)
-    elif self.agent.current_phase == "rallying":
-      self.rallyPhase(surroundings, inventory)
-    elif self.agent.current_phase == "upgrading":
-      self.upgradePhase(surroundings, inventory)
-
+    for action in self.decisions[self.agent.current_phase][self.agent.current_role]:
+      self.behaviors[action].execute(surroundings, inventory)
     # print(inventory)

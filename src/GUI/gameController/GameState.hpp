@@ -15,6 +15,9 @@
 #include <array>
 #include <mutex>
 #include <deque>
+#include "IGameEntity.hpp"
+#include "GameEntitiesAll.hpp"
+#include "EntityFactory.hpp"
 
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 
@@ -48,18 +51,20 @@ enum class ResourceType {
 class GameState {
 public:
     GameState();
+    explicit GameState(std::shared_ptr<EntityFactoryManager> factory);
     ~GameState() = default;
     int getMapWidth() const;
     int getMapHeight() const;
     bool isMapInitialized() const;
-    const TileData& getTileData(int x, int y) const;
+    std::shared_ptr<const ITile> getTile(int x, int y) const;
+    std::shared_ptr<ITile> getTileMutable(int x, int y);
     int getResourceQuantity(int x, int y, ResourceType resourceType) const;
     ResourceType getDominantResourceType(int x, int y) const;
-    std::shared_ptr<const PlayerInfoData> getPlayerInfo(int playerId) const;
-    std::shared_ptr<const PlayerInventoryData> getPlayerInventory(int playerId) const;
+    std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const;
+    std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const;
     bool isPlayerOnTile(int x, int y, int playerId) const;
     std::vector<int> getPlayersOnTile(int x, int y) const;
-    std::shared_ptr<const EggData> getEggInfo(int eggId) const;
+    std::shared_ptr<const IEgg> getEggInfo(int eggId) const;
     std::vector<int> getEggsOnTile(int x, int y) const;
     const std::vector<std::string>& getTeamNames() const;
     int getTimeUnit() const;
@@ -78,6 +83,7 @@ public:
     void setTeamNames(const std::vector<std::string>& teamNames);
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
+    std::map<int, std::shared_ptr<IPlayer>> getPlayers();
 
     // Méthodes pour gérer les broadcasts
     void addBroadcast(int playerId, const std::string& team, const std::string& message);
@@ -90,20 +96,22 @@ private:
     void removePlayerFromTile(int playerId, int x, int y);
     void addEggToTile(int eggId, int x, int y);
     void removeEggFromTile(int eggId, int x, int y);
+
     mutable std::mutex _mutex;
     int _mapWidth = 0;
     int _mapHeight = 0;
     bool _isMapInitialized = false;
-    std::vector<std::vector<TileData>> _mapTiles;
-    std::map<int, PlayerInfoData> _players;
-    std::map<int, PlayerInventoryData> _inventories;
-    std::map<int, EggData> _eggs;
+    std::vector<std::vector<std::shared_ptr<ITile>>> _tiles;
+    std::map<int, std::shared_ptr<IPlayer>> _players;
+    std::map<int, std::shared_ptr<IPlayerInventory>> _inventories;
+    std::map<int, std::shared_ptr<IEgg>> _eggs;
     std::vector<std::string> _teamNames;
     int _timeUnit = 100;
     bool _gameEnded = false;
     std::string _winningTeam;
     std::deque<Broadcast> _broadcasts;
     const size_t _maxBroadcasts = 20;
+    std::shared_ptr<EntityFactoryManager> _entityFactory;
 };
 
 #endif /* !GAME_STATE_HPP_ */

@@ -86,14 +86,21 @@ void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, ZappyTyp
     m_graphicsLib->DrawModel3D(modelId, position, 1.0f, color);
 }
 
+void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (!validateModelForDrawing(modelId))
+        return;
+    m_graphicsLib->DrawModel3D(modelId, position, scale, color);
+}
+
 void ModelManager::drawModelEx(int modelId, ZappyTypes::Vector3 position,
     ZappyTypes::Vector3 rotationAxis,
-    float rotationAngle, float scale) {
+    float rotationAngle, float scale, ZappyTypes::Color color) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (!validateModelForDrawing(modelId))
         return;
-    m_graphicsLib->DrawModelEx(modelId, position, rotationAxis, rotationAngle, scale);
+    m_graphicsLib->DrawModelEx(modelId, position, rotationAxis, rotationAngle, scale, color);
 }
 
 void ModelManager::unloadModel(int modelId) {

@@ -37,6 +37,12 @@ static void create_server_egg(server_t *n_server, int egg_id, int i)
     add_egg(n_server, n_egg);
 }
 
+void init_struct(client_t *new_c)
+{
+    init_player(new_c->player, NULL);
+    init_circular_buffer(&new_c->read_buffer);
+}
+
 void init_server_eggs(server_t *n_server)
 {
     int team_count = count_team(n_server);
