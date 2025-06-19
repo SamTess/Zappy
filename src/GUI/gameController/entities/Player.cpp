@@ -14,7 +14,7 @@
 #include "../../textureManager/ModelManager.hpp"
 
 Player::Player() : _id(0), _x(0), _y(0), _orientation(0), _level(1), _teamName(""), _isAlive(true),
-    _lastRotation(0.0f), _currentRotation(180.0f) {}
+    _lastRotation(180.0f), _currentRotation(180.0f) {}
 
 Player::Player(const PlayerInfoData& data)
     : _id(data.getId()), _x(data.getX()), _y(data.getY()),
@@ -128,18 +128,18 @@ void Player::renderPlayer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     playerPos.y += 0.55f;
     float rotationAngle = _currentRotation;
     ZappyTypes::Vector3 rotationAxis = {0.0f, 1.0f, 0.0f};
-    ModelManager::getInstance().drawModelEx(LIRILI_LARILA, playerPos, rotationAxis, rotationAngle, 0.4f, teamColor);
+    ModelManager::getInstance().drawModelEx(LABUBU, playerPos, rotationAxis, rotationAngle, 0.4f, teamColor);
 }
 
 float Player::orientationToRotationDegrees(int orientation) const {
     switch (orientation) {
-        case 1:
+        case 1: // RIGHT
             return 0.0f;
-        case 2:
+        case 2: // DOWN
             return 90.0f;
-        case 3:
+        case 3: // LEFT
             return 180.0f;
-        case 4:
+        case 4: // UP
             return 270.0f;
         default:
             return 0.0f;
@@ -157,9 +157,6 @@ ZappyTypes::Color Player::generateTeamColor() const {
     int red = (asciiSum * 7) % 256;
     int green = (asciiSum * 13) % 256;
     int blue = (asciiSum * 17) % 256;
-    red = std::max(red, 80);
-    green = std::max(green, 80);
-    blue = std::max(blue, 80);
     return {static_cast<unsigned char>(red),
             static_cast<unsigned char>(green),
             static_cast<unsigned char>(blue),

@@ -22,7 +22,7 @@ MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
       gameState(state),
       strategyFactory(modelManagerAdapter),
       tileSize(1.0f),
-      tileSpacing(2.0f),
+      tileSpacing(1.5f),
       zoomLevel(1.0f),
       detailThreshold(2.0f) {
     tileRenderStrategy = strategyFactory.createSimpleTileStrategy(gameState);
@@ -58,7 +58,6 @@ void MapRenderer::render() {
             renderTile(x, y, resourceIndex);
         }
     }
-    graphicsLib->DrawGrid(std::max(mapWidth, mapHeight), tileSize + tileSpacing);
 }
 
 void MapRenderer::setTileRenderStrategy(std::shared_ptr<ITileRenderStrategy> strategy) {

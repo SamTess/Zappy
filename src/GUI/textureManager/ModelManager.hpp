@@ -39,7 +39,7 @@ typedef enum {
     TRULIMERO_TRULICINA = 7,
     TUNG_TUNG_TUNG_SAHUR = 8,
     ISLAND = 9,
-    LIRILI_LARILA = 10
+    LABUBU = 10
 } ModelType;
 
 /**
