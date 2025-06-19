@@ -23,7 +23,7 @@ NetworkManager::NetworkManager()
       _networkThread(std::make_unique<NetworkThread>()),
       _incomingQueue(std::make_unique<MessageQueue>()),
       _outgoingQueue(std::make_unique<MessageQueue>()),
-      _receiveBuffer(""),
+      _receiveBuffer(4096),
       _gameController(nullptr),
       _isConnected(false) {
     // Activer le logging pour debug
@@ -151,10 +151,9 @@ void NetworkManager::networkThreadLoop() {
 }
 
 bool NetworkManager::processInitialWelcomeData() {
-    size_t pos = 0;
-    while ((pos = _receiveBuffer.find('\n')) != std::string::npos) {
-        std::string message = _receiveBuffer.substr(0, pos + 1);
-        _receiveBuffer.erase(0, pos + 1);
+    while (_receiveBuffer.hasLine()) {
+        std::string message = _receiveBuffer.readLine();
+        message += "\n"; // Remettre le \n pour compatibilité
         NetworkLogger::get().log(std::string("Initial message extracted: ") + message);
         if (message.find("WELCOME") != std::string::npos) {
             NetworkLogger::get().log("WELCOME message received during initialization");
@@ -170,14 +169,14 @@ bool NetworkManager::processInitialWelcomeData() {
 bool NetworkManager::tryReceiveInitialWelcome() {
     try {
         for (int i = 0; i < 30 && _networkThread->isRunning(); ++i) {
-            std::string data = _connection->receive();
-            if (!data.empty()) {
-                _receiveBuffer += data;
-                if (processInitialWelcomeData()) {
-                    processPendingOutgoingMessages(0, 3);
-                    return true;
-                }
+        std::string data = _connection->receive();
+        if (!data.empty()) {
+            _receiveBuffer.write(data);
+            if (processInitialWelcomeData()) {
+                processPendingOutgoingMessages(0, 3);
+                return true;
             }
+        }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         NetworkLogger::get().log("[ERROR] Timeout waiting for WELCOME message");
@@ -194,7 +193,7 @@ int NetworkManager::receiveAndProcessData(int errorCount, int maxErrors) {
         if (!data.empty()) {
             NetworkLogger::get().log(std::string("Data received (") +
             std::to_string(data.size()) + " bytes): " + (data.size() > 20 ? data.substr(0, 20) + "..." : data));
-            _receiveBuffer += data;
+            _receiveBuffer.write(data);
             extractCompleteMessages();
             return 0;
         }
@@ -205,11 +204,10 @@ int NetworkManager::receiveAndProcessData(int errorCount, int maxErrors) {
 }
 
 void NetworkManager::extractCompleteMessages() {
-    size_t pos = 0;
-    while ((pos = _receiveBuffer.find('\n')) != std::string::npos) {
-        std::string message = _receiveBuffer.substr(0, pos + 1);
-        _receiveBuffer.erase(0, pos + 1);
+    while (_receiveBuffer.hasLine()) {
+        std::string message = _receiveBuffer.readLine();
         if (!message.empty()) {
+            message += "\n";
             NetworkLogger::get().log(std::string("Message extracted: ") + message);
             _incomingQueue->enqueue(message);
         }

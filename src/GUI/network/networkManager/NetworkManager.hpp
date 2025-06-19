@@ -20,6 +20,7 @@
 #include "../protocol/HeaderMessage.hpp"
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
+#include "../buffer/CircularBuffer.hpp"
 
 class GameController;
 
@@ -49,7 +50,7 @@ class NetworkManager {
         std::unique_ptr<NetworkThread> _networkThread;
         std::unique_ptr<MessageQueue> _incomingQueue;
         std::unique_ptr<MessageQueue> _outgoingQueue;
-        std::string _receiveBuffer;
+        CircularBuffer _receiveBuffer;
         std::shared_ptr<GameController> _gameController;
 
         bool _isConnected;
@@ -60,7 +61,6 @@ class NetworkManager {
         MessageCallback _messageCallback;
         ConnectionCallback _connectionCallback;
 
-        // Méthodes de gestion du thread réseau
         bool tryReceiveInitialWelcome();
         bool processInitialWelcomeData();
         int receiveAndProcessData(int errorCount, int maxErrors);
