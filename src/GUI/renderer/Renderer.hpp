@@ -39,7 +39,8 @@ public:
 
 
     int loadResourceTexture(const std::string& resourceName, const std::string& texturePath);
-    int getResourceTextureId(const std::string& resourceName) const;    int getMapWidth() const { return m_mapWidth; }
+    int getResourceTextureId(const std::string& resourceName) const;
+    int getMapWidth() const { return m_mapWidth; }
     int getMapHeight() const { return m_mapHeight; }
     void setSkyboxTexture(const std::string& texturePath);
     bool isSkyboxLoaded() const;

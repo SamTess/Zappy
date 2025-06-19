@@ -75,9 +75,9 @@ void Resource::renderResource(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         TUNG_TUNG_TUNG_SAHUR
     };
     const float refScale[] = {
-        0.70f, // GARAMARAN
+        0.70f, // LA_VACA_SATURNO
         0.30f, // TRULIMERO_TRULICINA
-        0.50f, // LA_VACA_SATURNO
+        0.50f, // GARAMARAN
         0.25f, // FRIGO_CAMELO
         0.25f, // ESPRESSONA_SIGNORA
         0.25f, // TRALALERO_TRALALA
