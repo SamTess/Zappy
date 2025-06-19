@@ -57,30 +57,34 @@ private:
     /**
      * @brief Affiche les informations d'identification du joueur (ID et équipe)
      * @param selectedPlayer Pointeur vers le joueur sélectionné
-     * @param yOffset Position Y pour l'affichage, mise à jour après l'opération
+     * @param yOffset Position Y pour l'affichage
+     * @return Nouvelle position Y après l'affichage
      */
-    void displayPlayerIdentity(const Player* selectedPlayer, float& yOffset);
+    float displayPlayerIdentity(const Player* selectedPlayer, float yOffset);
 
     /**
      * @brief Affiche les informations de position et d'orientation du joueur
      * @param selectedPlayer Pointeur vers le joueur sélectionné
-     * @param yOffset Position Y pour l'affichage, mise à jour après l'opération
+     * @param yOffset Position Y pour l'affichage
+     * @return Nouvelle position Y après l'affichage
      */
-    void displayPositionInfo(const Player* selectedPlayer, float& yOffset);
+    float displayPositionInfo(const Player* selectedPlayer, float yOffset);
 
     /**
      * @brief Affiche le niveau du joueur
      * @param selectedPlayer Pointeur vers le joueur sélectionné
-     * @param yOffset Position Y pour l'affichage, mise à jour après l'opération
+     * @param yOffset Position Y pour l'affichage
+     * @return Nouvelle position Y après l'affichage
      */
-    void displayLevelInfo(const Player* selectedPlayer, float& yOffset);
+    float displayLevelInfo(const Player* selectedPlayer, float yOffset);
 
     /**
      * @brief Affiche l'inventaire du joueur
      * @param selectedPlayer Pointeur vers le joueur sélectionné
      * @param yOffset Position Y pour l'affichage
+     * @return Nouvelle position Y après l'affichage
      */
-    void displayInventory(const Player* selectedPlayer, float& yOffset);
+    float displayInventory(const Player* selectedPlayer, float yOffset);
 
     /**
      * @brief Obtient la représentation textuelle de l'orientation du joueur

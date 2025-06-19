@@ -59,7 +59,7 @@ private:
     void drawMenuButton();
     void handleMenuButtonClick(bool mouseOnButton, bool mousePressed);
     void drawMainMenu(float menuItemWidth, float menuItemHeight, float startY);
-    void handleMenuClickOutside(ZappyTypes::Vector2& mousePosition, float menuItemWidth,
+    void handleMenuClickOutside(const ZappyTypes::Vector2& mousePosition, float menuItemWidth,
         float menuItemHeight, float startY, bool mousePressed);
     void handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY);
 
@@ -72,11 +72,11 @@ private:
     void drawGameplaySliders(float startX, float startY, float submenuWidth, float sliderHeight);
     void renderWindowsSubmenu();
     void drawWindowsList(float startX, float startY, float submenuWidth, float buttonHeight);
-    void drawWindowButtons(float startX, float startY, float submenuWidth, float buttonHeight, float& yPos);
+    float drawWindowButtons(float startX, float startY, float submenuWidth, float buttonHeight, float yPos);
 
     // Fonctions utilitaires
     void resetAllSubmenus();
-    void showSubmenu(bool& submenu);
+    float showSubmenu(bool submenu);
     float getSubmenuHeight() const;
 };
 

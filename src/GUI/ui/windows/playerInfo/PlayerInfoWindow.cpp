@@ -31,10 +31,10 @@ void GUI::PlayerInfoWindow::renderContent() {
         return;
     }
     float yOffset = m_position.y + 30;
-    displayPlayerIdentity(selectedPlayer, yOffset);
-    displayPositionInfo(selectedPlayer, yOffset);
-    displayLevelInfo(selectedPlayer, yOffset);
-    displayInventory(selectedPlayer, yOffset);
+    yOffset = displayPlayerIdentity(selectedPlayer, yOffset);
+    yOffset = displayPositionInfo(selectedPlayer, yOffset);
+    yOffset = displayLevelInfo(selectedPlayer, yOffset);
+    yOffset = displayInventory(selectedPlayer, yOffset);
 }
 
 void GUI::PlayerInfoWindow::displayNoPlayerSelected() {
@@ -66,7 +66,7 @@ void GUI::PlayerInfoWindow::displayPlayerNotFound() {
     );
 }
 
-void GUI::PlayerInfoWindow::displayPlayerIdentity(const Player* selectedPlayer, float& yOffset) {
+float GUI::PlayerInfoWindow::displayPlayerIdentity(const Player* selectedPlayer, float yOffset) {
     std::stringstream idTeam;
     idTeam << "ID: " << selectedPlayer->id << " | Équipe: " << selectedPlayer->team;
     m_guiLib->DrawLabel(
@@ -76,7 +76,7 @@ void GUI::PlayerInfoWindow::displayPlayerIdentity(const Player* selectedPlayer, 
         20,
         idTeam.str()
     );
-    yOffset += 20;
+    return yOffset + 20;
 }
 
 std::string GUI::PlayerInfoWindow::getOrientationString(int orientation) {
@@ -89,7 +89,7 @@ std::string GUI::PlayerInfoWindow::getOrientationString(int orientation) {
     }
 }
 
-void GUI::PlayerInfoWindow::displayPositionInfo(const Player* selectedPlayer, float& yOffset) {
+float GUI::PlayerInfoWindow::displayPositionInfo(const Player* selectedPlayer, float yOffset) {
     std::stringstream posInfo;
     std::string orientationStr = getOrientationString(selectedPlayer->orientation);
     posInfo << "Position: (" << selectedPlayer->x << ", " << selectedPlayer->y
@@ -101,10 +101,10 @@ void GUI::PlayerInfoWindow::displayPositionInfo(const Player* selectedPlayer, fl
         20,
         posInfo.str()
     );
-    yOffset += 20;
+    return yOffset + 20;
 }
 
-void GUI::PlayerInfoWindow::displayLevelInfo(const Player* selectedPlayer, float& yOffset) {
+float GUI::PlayerInfoWindow::displayLevelInfo(const Player* selectedPlayer, float yOffset) {
     std::stringstream levelInfo;
     levelInfo << "Niveau: " << selectedPlayer->level;
     m_guiLib->DrawLabel(
@@ -114,10 +114,10 @@ void GUI::PlayerInfoWindow::displayLevelInfo(const Player* selectedPlayer, float
         20,
         levelInfo.str()
     );
-    yOffset += 30;
+    return yOffset + 30;
 }
 
-void GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, float& yOffset) {
+float GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, float yOffset) {
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -125,7 +125,7 @@ void GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, float
         20,
         "Inventaire:"
     );
-    yOffset += 20;
+    float newYOffset = yOffset + 20;
     const std::pair<std::string, int> resources[] = {
         {"Nourriture", selectedPlayer->inventory.food},
         {"Linemate", selectedPlayer->inventory.linemate},
@@ -141,13 +141,14 @@ void GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, float
         ss << resource.first << ": " << resource.second;
         m_guiLib->DrawLabel(
             m_position.x + 10,
-            yOffset,
+            newYOffset,
             m_dimensions.x - 20,
             20,
             ss.str()
         );
-        yOffset += 20;
+        newYOffset += 20;
     }
+    return newYOffset;
 }
 
 void GUI::PlayerInfoWindow::updateSpecificData(const GUI::GameData& gameData) {

@@ -69,7 +69,7 @@ float GUI::MenuWindow::getSubmenuHeight() const {
     return 0;
 }
 
-void GUI::MenuWindow::handleMenuClickOutside(ZappyTypes::Vector2& mousePosition, float menuItemWidth, float menuItemHeight, float startY, bool mousePressed) {
+void GUI::MenuWindow::handleMenuClickOutside(const ZappyTypes::Vector2& mousePosition, float menuItemWidth, float menuItemHeight, float startY, bool mousePressed) {
     if (!mousePressed) return;
     ZappyTypes::Rectangle menuMainRect = {
         m_position.x, startY,
@@ -95,14 +95,19 @@ void GUI::MenuWindow::handleMenuClickOutside(ZappyTypes::Vector2& mousePosition,
     }
 }
 
-void GUI::MenuWindow::showSubmenu(bool& submenu) {
-    submenu = !submenu;
-    if (submenu) {
-        if (&submenu != &m_showGraphicsSubmenu) m_showGraphicsSubmenu = false;
-        if (&submenu != &m_showAudioSubmenu) m_showAudioSubmenu = false;
-        if (&submenu != &m_showGameplaySubmenu) m_showGameplaySubmenu = false;
-        if (&submenu != &m_showWindowsSubmenu) m_showWindowsSubmenu = false;
+float GUI::MenuWindow::showSubmenu(bool submenu) {
+    bool newValue = !submenu;
+    if (newValue) {
+        m_showGraphicsSubmenu = false;
+        m_showAudioSubmenu = false;
+        m_showGameplaySubmenu = false;
+        m_showWindowsSubmenu = false;
+        if (&submenu == &m_showGraphicsSubmenu) m_showGraphicsSubmenu = true;
+        else if (&submenu == &m_showAudioSubmenu) m_showAudioSubmenu = true;
+        else if (&submenu == &m_showGameplaySubmenu) m_showGameplaySubmenu = true;
+        else if (&submenu == &m_showWindowsSubmenu) m_showWindowsSubmenu = true;
     }
+    return newValue;
 }
 
 void GUI::MenuWindow::handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY) {
@@ -111,28 +116,28 @@ void GUI::MenuWindow::handleSubmenuButtons(float menuItemWidth, float menuItemHe
         menuItemWidth, menuItemHeight,
         "Graphiques"
     )) {
-        showSubmenu(m_showGraphicsSubmenu);
+        m_showGraphicsSubmenu = showSubmenu(m_showGraphicsSubmenu);
     }
     if (m_guiLib->ButtonPressed(
         m_position.x, startY + menuItemHeight,
         menuItemWidth, menuItemHeight,
         "Audio"
     )) {
-        showSubmenu(m_showAudioSubmenu);
+        m_showAudioSubmenu = showSubmenu(m_showAudioSubmenu);
     }
     if (m_guiLib->ButtonPressed(
         m_position.x, startY + menuItemHeight * 2,
         menuItemWidth, menuItemHeight,
         "Gameplay"
     )) {
-        showSubmenu(m_showGameplaySubmenu);
+        m_showGameplaySubmenu = showSubmenu(m_showGameplaySubmenu);
     }
     if (m_guiLib->ButtonPressed(
         m_position.x, startY + menuItemHeight * 3,
         menuItemWidth, menuItemHeight,
         "Fenêtres"
     )) {
-        showSubmenu(m_showWindowsSubmenu);
+        m_showWindowsSubmenu = showSubmenu(m_showWindowsSubmenu);
     }
 }
 
@@ -340,7 +345,8 @@ void MenuWindow::drawWindowsList(float startX, float startY, float submenuWidth,
     drawWindowButtons(startX, startY, submenuWidth, buttonHeight, yPos);
 }
 
-void MenuWindow::drawWindowButtons(float startX, float startY, float submenuWidth, float buttonHeight, float& yPos) {
+float MenuWindow::drawWindowButtons(float startX, float startY, float submenuWidth, float buttonHeight, float yPos) {
+    (void)startY;
     WindowInfo windows[] = {
         {"tileInfo", "Informations sur la case", 0},
         {"playerInfo", "Informations joueurs", 1},
@@ -365,6 +371,7 @@ void MenuWindow::drawWindowButtons(float startX, float startY, float submenuWidt
             }
         }
     }
+    return yPos;
 }
 
 void MenuWindow::renderWindowsSubmenu() {
