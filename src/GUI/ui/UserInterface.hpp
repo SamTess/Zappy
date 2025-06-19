@@ -44,17 +44,6 @@ public:
     void updateData(const GameData& gameData);
 
     /**
-     * @brief Ajoute un message dans le journal
-     * @param message Message à ajouter
-     */
-    void addLogMessage(const std::string& message);
-
-    /**
-     * @brief Efface tous les messages du journal
-     */
-    void clearLogs();
-
-    /**
      * @brief Définit la case sélectionnée
      * @param x Coordonnée X
      * @param y Coordonnée Y

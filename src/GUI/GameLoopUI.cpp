@@ -78,16 +78,7 @@ void GameLoop::handleTileSelection(int x, int y) {
         return;
 
     m_userInterface->setSelectedTile(x, y);
-    auto playerIt = std::find_if(m_gameData.players.begin(), m_gameData.players.end(),
-        [x, y](const auto& player) {
-            return player.x == x && player.y == y;
-        });
 
-    if (playerIt != m_gameData.players.end()) {
-        std::stringstream message;
-        message << "Joueur " << playerIt->id << " [Équipe: " << playerIt->team << ", Niveau: " << playerIt->level << "] sélectionné";
-        m_userInterface->addLogMessage(message.str());
-    }
     auto tileIt = std::find_if(m_gameData.tiles.begin(), m_gameData.tiles.end(),
         [x, y](const auto& tile) {
             return tile.x == x && tile.y == y;
@@ -128,9 +119,6 @@ void GameLoop::onMapSizeChanged(int width, int height) {
     m_camera->setMapDimensions(width, height);
     m_gameData.mapWidth = width;
     m_gameData.mapHeight = height;
-    std::stringstream message;
-    message << "Dimensions de la map modifiées : " << width << "x" << height;
-    m_userInterface->addLogMessage(message.str());
 }
 
 void GameLoop::onTileChanged(int x, int y, const TileData& tileData) {

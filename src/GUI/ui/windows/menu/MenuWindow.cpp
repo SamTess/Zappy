@@ -315,20 +315,10 @@ void MenuWindow::renderWindowsSubmenu() {
             );
             if (newVisible != isVisible) {
                 windowPtr->setVisible(newVisible);
-                std::stringstream ss;
-                ss << (newVisible ? "Ouverture" : "Fermeture") << " de la fenêtre: " << window.id;
-                if (m_windowFactory) {
-                    m_windowFactory->addLogMessage(ss.str());
-                }
             }
             if (m_guiLib->ButtonPressed(startX + submenuWidth - 60, yPos, 50, buttonHeight, "Reset")) {
                 if (window.positionIndex < 6) {
                     windowPtr->setPosition(m_defaultPositions[window.positionIndex]);
-                    if (m_windowFactory) {
-                        std::stringstream ss;
-                        ss << "Position de la fenêtre " << window.id << " réinitialisée";
-                        m_windowFactory->addLogMessage(ss.str());
-                    }
                 }
             }
             yPos += buttonHeight + 5;
@@ -341,9 +331,6 @@ void MenuWindow::renderWindowsSubmenu() {
                 windowPtr->setVisible(true);
             }
         }
-        if (m_windowFactory) {
-            m_windowFactory->addLogMessage("Toutes les fenêtres ont été affichées");
-        }
     }
     yPos += buttonHeight + 5;
     if (m_guiLib->ButtonPressed(startX + 10, yPos, submenuWidth - 20, buttonHeight, "Masquer toutes les fenêtres (sauf menu)")) {
@@ -352,9 +339,6 @@ void MenuWindow::renderWindowsSubmenu() {
             if (windowPtr && window.id != "menu") {
                 windowPtr->setVisible(false);
             }
-        }
-        if (m_windowFactory) {
-            m_windowFactory->addLogMessage("Toutes les fenêtres ont été masquées");
         }
     }
 }
