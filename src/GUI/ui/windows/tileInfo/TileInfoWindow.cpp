@@ -17,17 +17,27 @@ TileInfoWindow::TileInfoWindow(std::shared_ptr<IGuiLib> guiLib)
     m_selectedTile = {0, 0, false};
 }
 
-void TileInfoWindow::renderContent() {
+void GUI::TileInfoWindow::renderContent() {
     if (!m_selectedTile.selected) {
-        m_guiLib->DrawLabel(
-            m_position.x + 10,
-            m_position.y + 40,
-            m_dimensions.x - 20,
-            30,
-            "Aucune case sélectionnée"
-        );
+        renderNoTileSelected();
         return;
     }
+    renderTilePosition();
+    float yOffset = renderResourceInfo();
+    renderPlayerCount(yOffset);
+}
+
+void GUI::TileInfoWindow::renderNoTileSelected() {
+    m_guiLib->DrawLabel(
+        m_position.x + 10,
+        m_position.y + 40,
+        m_dimensions.x - 20,
+        30,
+        "Aucune case sélectionnée"
+    );
+}
+
+void GUI::TileInfoWindow::renderTilePosition() {
     std::stringstream tilePos;
     tilePos << "Position: (" << m_selectedTile.x << ", " << m_selectedTile.y << ")";
     m_guiLib->DrawLabel(
@@ -37,6 +47,9 @@ void TileInfoWindow::renderContent() {
         20,
         tilePos.str()
     );
+}
+
+float GUI::TileInfoWindow::renderResourceInfo() {
     int resources[7] = {0};
     for (const auto& tile : m_gameData.tiles) {
         if (tile.x == m_selectedTile.x && tile.y == m_selectedTile.y) {
@@ -67,13 +80,17 @@ void TileInfoWindow::renderContent() {
         );
         yOffset += 20;
     }
-    std::stringstream playersTitle;
+    return yOffset;
+}
+
+void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     int playerCount = 0;
     for (const auto& player : m_gameData.players) {
         if (player.x == m_selectedTile.x && player.y == m_selectedTile.y) {
             playerCount++;
         }
     }
+    std::stringstream playersTitle;
     playersTitle << "Joueurs sur cette case: " << playerCount;
     m_guiLib->DrawLabel(
         m_position.x + 10,
@@ -84,21 +101,21 @@ void TileInfoWindow::renderContent() {
     );
 }
 
-void TileInfoWindow::updateSpecificData(const GameData&) {
+void GUI::TileInfoWindow::updateSpecificData(const GUI::GameData&) {
 }
 
-void TileInfoWindow::setSelectedTile(int x, int y) {
+void GUI::TileInfoWindow::setSelectedTile(int x, int y) {
     m_selectedTile.x = x;
     m_selectedTile.y = y;
     m_selectedTile.selected = true;
     setVisible(true);
 }
 
-std::pair<int, int> TileInfoWindow::getSelectedTile() const {
+std::pair<int, int> GUI::TileInfoWindow::getSelectedTile() const {
     return {m_selectedTile.x, m_selectedTile.y};
 }
 
-bool TileInfoWindow::hasTileSelected() const {
+bool GUI::TileInfoWindow::hasTileSelected() const {
     return m_selectedTile.selected;
 }
 

@@ -63,25 +63,36 @@ bool UserInterface::handleMouseEvents() {
     bool mouseOverUI = isMouseOverUI();
     if (mouseOverUI) {
         m_mouseCapture = true;
-        if (m_guiLib->IsMouseButtonPressed(0) && !m_isDragging) {
-            bool startedDragging = m_windowFactory->handleWindowDragging(mousePosition);
-            if (startedDragging) {
-                m_isDragging = true;
-            }
-        } else if (m_guiLib->IsMouseButtonDown(0) && m_isDragging) {
-            m_windowFactory->updateWindowDragging(mousePosition);
-        }
-        if (m_guiLib->IsMouseButtonPressed(0) ||
-            m_guiLib->IsMouseButtonReleased(0) ||
-            m_guiLib->IsMouseButtonDown(0)) {
-            m_mouseCapture = true;
-        }
+        handleUIMouseInteraction(mousePosition);
     }
+    handleDragEndIfNeeded();
+    return m_mouseCapture;
+}
+
+void UserInterface::handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition) {
+    if (m_guiLib->IsMouseButtonPressed(0) && !m_isDragging)
+        startDraggingIfPossible(mousePosition);
+    else if (m_guiLib->IsMouseButtonDown(0) && m_isDragging)
+        m_windowFactory->updateWindowDragging(mousePosition);
+    if (m_guiLib->IsMouseButtonPressed(0) ||
+        m_guiLib->IsMouseButtonReleased(0) ||
+        m_guiLib->IsMouseButtonDown(0)) {
+        m_mouseCapture = true;
+    }
+}
+
+void UserInterface::startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition) {
+    bool startedDragging = m_windowFactory->handleWindowDragging(mousePosition);
+    if (startedDragging) {
+        m_isDragging = true;
+    }
+}
+
+void UserInterface::handleDragEndIfNeeded() {
     if (!m_guiLib->IsMouseButtonDown(0) && m_isDragging) {
         m_windowFactory->stopWindowDragging();
         m_isDragging = false;
     }
-    return m_mouseCapture;
 }
 
 bool UserInterface::isMouseOverUI() const {

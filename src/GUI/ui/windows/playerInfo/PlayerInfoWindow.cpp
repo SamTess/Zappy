@@ -20,36 +20,53 @@ PlayerInfoWindow::PlayerInfoWindow(std::shared_ptr<IGuiLib> guiLib)
       m_hasSelectedPlayer(false) {
 }
 
-void PlayerInfoWindow::renderContent() {
+void GUI::PlayerInfoWindow::renderContent() {
     if (!m_hasSelectedPlayer) {
-        m_guiLib->DrawLabel(
-            m_position.x + 10,
-            m_position.y + 40,
-            m_dimensions.x - 20,
-            30,
-            "Aucun joueur sélectionné"
-        );
+        displayNoPlayerSelected();
         return;
     }
-    const Player* selectedPlayer = nullptr;
-    for (const auto& player : m_gameData.players) {
-        if (player.id == m_selectedPlayerId) {
-            selectedPlayer = &player;
-            break;
-        }
-    }
-
+    const Player* selectedPlayer = findSelectedPlayer();
     if (!selectedPlayer) {
-        m_guiLib->DrawLabel(
-            m_position.x + 10,
-            m_position.y + 40,
-            m_dimensions.x - 20,
-            30,
-            "Joueur introuvable"
-        );
+        displayPlayerNotFound();
         return;
     }
     float yOffset = m_position.y + 30;
+    displayPlayerIdentity(selectedPlayer, yOffset);
+    displayPositionInfo(selectedPlayer, yOffset);
+    displayLevelInfo(selectedPlayer, yOffset);
+    displayInventory(selectedPlayer, yOffset);
+}
+
+void GUI::PlayerInfoWindow::displayNoPlayerSelected() {
+    m_guiLib->DrawLabel(
+        m_position.x + 10,
+        m_position.y + 40,
+        m_dimensions.x - 20,
+        30,
+        "Aucun joueur sélectionné"
+    );
+}
+
+const Player* GUI::PlayerInfoWindow::findSelectedPlayer() {
+    for (const auto& player : m_gameData.players) {
+        if (player.id == m_selectedPlayerId) {
+            return &player;
+        }
+    }
+    return nullptr;
+}
+
+void GUI::PlayerInfoWindow::displayPlayerNotFound() {
+    m_guiLib->DrawLabel(
+        m_position.x + 10,
+        m_position.y + 40,
+        m_dimensions.x - 20,
+        30,
+        "Joueur introuvable"
+    );
+}
+
+void GUI::PlayerInfoWindow::displayPlayerIdentity(const Player* selectedPlayer, float& yOffset) {
     std::stringstream idTeam;
     idTeam << "ID: " << selectedPlayer->id << " | Équipe: " << selectedPlayer->team;
     m_guiLib->DrawLabel(
@@ -60,15 +77,21 @@ void PlayerInfoWindow::renderContent() {
         idTeam.str()
     );
     yOffset += 20;
-    std::stringstream posInfo;
-    std::string orientationStr;
-    switch (selectedPlayer->orientation) {
-        case 1: orientationStr = "Nord"; break;
-        case 2: orientationStr = "Est"; break;
-        case 3: orientationStr = "Sud"; break;
-        case 4: orientationStr = "Ouest"; break;
-        default: orientationStr = "Inconnue";
+}
+
+std::string GUI::PlayerInfoWindow::getOrientationString(int orientation) {
+    switch (orientation) {
+        case 1: return "Nord";
+        case 2: return "Est";
+        case 3: return "Sud";
+        case 4: return "Ouest";
+        default: return "Inconnue";
     }
+}
+
+void GUI::PlayerInfoWindow::displayPositionInfo(const Player* selectedPlayer, float& yOffset) {
+    std::stringstream posInfo;
+    std::string orientationStr = getOrientationString(selectedPlayer->orientation);
     posInfo << "Position: (" << selectedPlayer->x << ", " << selectedPlayer->y
             << ") | Orientation: " << orientationStr;
     m_guiLib->DrawLabel(
@@ -79,6 +102,9 @@ void PlayerInfoWindow::renderContent() {
         posInfo.str()
     );
     yOffset += 20;
+}
+
+void GUI::PlayerInfoWindow::displayLevelInfo(const Player* selectedPlayer, float& yOffset) {
     std::stringstream levelInfo;
     levelInfo << "Niveau: " << selectedPlayer->level;
     m_guiLib->DrawLabel(
@@ -89,6 +115,9 @@ void PlayerInfoWindow::renderContent() {
         levelInfo.str()
     );
     yOffset += 30;
+}
+
+void GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, float& yOffset) {
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -121,31 +150,32 @@ void PlayerInfoWindow::renderContent() {
     }
 }
 
-void PlayerInfoWindow::updateSpecificData(const GameData& gameData) {
-    if (m_hasSelectedPlayer) {
-        bool playerExists = false;
-        for (const auto& player : gameData.players) {
-            if (player.id == m_selectedPlayerId) {
-                playerExists = true;
-                break;
-            }
-        }
-        if (!playerExists)
-            m_hasSelectedPlayer = false;
+void GUI::PlayerInfoWindow::updateSpecificData(const GUI::GameData& gameData) {
+    if (m_hasSelectedPlayer && !playerExistsInGameData(gameData)) {
+        m_hasSelectedPlayer = false;
     }
 }
 
-void PlayerInfoWindow::setSelectedPlayer(int playerId) {
+bool GUI::PlayerInfoWindow::playerExistsInGameData(const GUI::GameData& gameData) {
+    for (const auto& player : gameData.players) {
+        if (player.id == m_selectedPlayerId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void GUI::PlayerInfoWindow::setSelectedPlayer(int playerId) {
     m_selectedPlayerId = playerId;
     m_hasSelectedPlayer = true;
     setVisible(true);
 }
 
-int PlayerInfoWindow::getSelectedPlayer() const {
+int GUI::PlayerInfoWindow::getSelectedPlayer() const {
     return m_selectedPlayerId;
 }
 
-bool PlayerInfoWindow::hasPlayerSelected() const {
+bool GUI::PlayerInfoWindow::hasPlayerSelected() const {
     return m_hasSelectedPlayer;
 }
 

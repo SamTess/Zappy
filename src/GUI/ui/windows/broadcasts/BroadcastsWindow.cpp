@@ -29,23 +29,47 @@ void BroadcastsWindow::renderContent() {
         panelWidth,
         panelHeight
     };
-    int maxVisibleItems = static_cast<int>(panelHeight / lineHeight);
-    int startIndex = 0;
+    int maxVisibleItems = calculateVisibleItemCount(panelHeight, lineHeight);
+    int startIndex = calculateStartIndex(maxVisibleItems);
+
+    renderBroadcastMessages(view, startIndex, lineHeight, contentWidth);
+}
+
+int GUI::BroadcastsWindow::calculateVisibleItemCount(float panelHeight, float lineHeight) {
+    return static_cast<int>(panelHeight / lineHeight);
+}
+
+int GUI::BroadcastsWindow::calculateStartIndex(int maxVisibleItems) {
     if (m_broadcasts.size() > static_cast<size_t>(maxVisibleItems)) {
-        startIndex = m_broadcasts.size() - maxVisibleItems;
+        return m_broadcasts.size() - maxVisibleItems;
     }
+    return 0;
+}
+
+void GUI::BroadcastsWindow::renderBroadcastMessages(const ZappyTypes::Rectangle& view,
+    int startIndex, float lineHeight,
+    float contentWidth) {
     for (size_t i = startIndex; i < m_broadcasts.size(); i++) {
         float textY = view.y + ((i - startIndex) * lineHeight);
-        std::string message = m_broadcasts[i].team + ": " + m_broadcasts[i].message + " (" +
-                             std::to_string(static_cast<int>(m_broadcasts[i].timeLeft)) + "s)";
+        std::string message = formatBroadcastMessage(m_broadcasts[i]);
         m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
     }
 }
 
-void BroadcastsWindow::updateSpecificData(const GameData& gameData) {
+std::string GUI::BroadcastsWindow::formatBroadcastMessage(const Broadcast& broadcast) {
+    return broadcast.team + ": " + broadcast.message + " (" +
+           std::to_string(static_cast<int>(broadcast.timeLeft)) + "s)";
+}
+
+void GUI::BroadcastsWindow::updateSpecificData(const GUI::GameData& gameData) {
     (void)gameData;
+    updateBroadcastMessages();
+}
+
+void GUI::BroadcastsWindow::updateBroadcastMessages() {
+    const float frameDuration = 0.016f;
     for (auto it = m_broadcasts.begin(); it != m_broadcasts.end();) {
-        it->timeLeft -= 0.016f;
+        it->timeLeft -= frameDuration;
         if (it->timeLeft <= 0.0f) {
             it = m_broadcasts.erase(it);
         } else {
@@ -54,7 +78,7 @@ void BroadcastsWindow::updateSpecificData(const GameData& gameData) {
     }
 }
 
-void BroadcastsWindow::addBroadcast(const std::string& team, const std::string& message) {
+void GUI::BroadcastsWindow::addBroadcast(const std::string& team, const std::string& message) {
     Broadcast newBroadcast;
     newBroadcast.team = team;
     newBroadcast.message = message;
@@ -65,7 +89,7 @@ void BroadcastsWindow::addBroadcast(const std::string& team, const std::string& 
     setVisible(true);
 }
 
-void BroadcastsWindow::clearBroadcasts() {
+void GUI::BroadcastsWindow::clearBroadcasts() {
     m_broadcasts.clear();
 }
 
