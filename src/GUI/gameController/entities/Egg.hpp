@@ -29,7 +29,8 @@ public:
                 float tileSize) const override;
     void renderEgg(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         const ZappyTypes::Vector3& position,
-        float tileSize) const override;
+        float tileSize,
+        int stackIndex = 0) const override;
 
 private:
     int _eggId;

@@ -177,7 +177,6 @@ Message ProtocolParser::parseTeamNames(const std::string &message) {
 }
 
 Message ProtocolParser::parsePlayerConnection(const std::string &message) {
-    printf("Parsing player connection message: %s\n", message.c_str());
     std::vector<std::string> params = extractMessageParameters(message);
     if (params.size() < 6)
         throw ProtocolParserException("Invalid player connection parameters: " + message);

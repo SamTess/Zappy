@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include "../../textureManager/ModelManager.hpp"
 
 Resource::Resource(ResourceType type, int quantity)
     : _type(type), _quantity(quantity) {
@@ -64,43 +65,42 @@ void Resource::renderResource(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     if (!graphicsLib || _quantity <= 0)
         return;
 
-    const ZappyTypes::Color colorRessources[] = {
-        {255, 255, 150, 255},
-        {0, 255, 0, 255},
-        {0, 0, 255, 255},
-        {255, 0, 0, 255},
-        {255, 0, 255, 255},
-        {0, 255, 255, 255},
-        {255, 215, 0, 255}
+    const ModelType colorRessources[] = {
+        LA_VACA_SATURNO,
+        TRULIMERO_TRULICINA,
+        GARAMARAN,
+        FRIGO_CAMELO,
+        ESPRESSONA_SIGNORA,
+        TRALALERO_TRALALA,
+        TUNG_TUNG_TUNG_SAHUR
     };
-    const ZappyTypes::Color borderColor = {80, 80, 80, 255};
+    const float refScale[] = {
+        0.70f, // LA_VACA_SATURNO
+        0.30f, // TRULIMERO_TRULICINA
+        0.50f, // GARAMARAN
+        0.25f, // FRIGO_CAMELO
+        0.25f, // ESPRESSONA_SIGNORA
+        0.25f, // TRALALERO_TRALALA
+        0.30f  // TUNG_TUNG_TUNG_SAHUR
+    };
     int resourceIndex = static_cast<int>(_type);
     if (resourceIndex < 0 || resourceIndex >= static_cast<int>(ResourceType::COUNT))
         return;
-    ZappyTypes::Color resourceColor = colorRessources[resourceIndex];
+    ModelType resourceColor = colorRessources[resourceIndex];
     float indicatorSize = tileSize * 0.2f;
-    float spacing = tileSize * 0.4f;
+    // float spacing = tileSize * 0.4f;
     ZappyTypes::Vector3 indicatorPos = position;
-    indicatorPos.y = position.y + 0.15f;
+    indicatorPos.y = position.y + 0.5f;
 
-    int row = resourceIndex / 3;
-    int col = resourceIndex % 3;
-    indicatorPos.x += (col - 1) * spacing;
-    indicatorPos.z += (row - 1) * spacing;
+    float resourceSpacing = tileSize * 0.3f;
+    float totalWidth = 6 * resourceSpacing;
+    float startOffsetX = -totalWidth / 2.0f;
+    indicatorPos.x = position.x + startOffsetX + resourceIndex * resourceSpacing;
+    indicatorPos.z = position.z - 0.7f;
 
     for (int i = 0; i < _quantity; ++i) {
         ZappyTypes::Vector3 cubePos = indicatorPos;
-        cubePos.y += i * indicatorSize * 0.8f;
-        graphicsLib->DrawCube(cubePos, indicatorSize, indicatorSize, indicatorSize, resourceColor);
-        float halfSize = indicatorSize / 2;
-        float topY = cubePos.y + halfSize + 0.001f;
-        graphicsLib->DrawLine3D({cubePos.x - halfSize, topY, cubePos.z - halfSize},
-            {cubePos.x + halfSize, topY, cubePos.z - halfSize}, borderColor);
-        graphicsLib->DrawLine3D({cubePos.x + halfSize, topY, cubePos.z - halfSize},
-            {cubePos.x + halfSize, topY, cubePos.z + halfSize}, borderColor);
-        graphicsLib->DrawLine3D({cubePos.x + halfSize, topY, cubePos.z + halfSize},
-            {cubePos.x - halfSize, topY, cubePos.z + halfSize}, borderColor);
-        graphicsLib->DrawLine3D({cubePos.x - halfSize, topY, cubePos.z + halfSize},
-            {cubePos.x - halfSize, topY, cubePos.z - halfSize}, borderColor);
+        cubePos.y += i * indicatorSize * 1.2f;
+        ModelManager::getInstance().drawModel(resourceColor, cubePos, refScale[resourceIndex]);
     }
 }

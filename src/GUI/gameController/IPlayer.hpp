@@ -26,6 +26,9 @@ public:
     virtual void setTeamName(const std::string& teamName) = 0;
     virtual void setIsAlive(bool alive) = 0;
 
+    virtual float getCurrentRotation() const = 0;
+    virtual float getLastRotation() const = 0;
+
     virtual void renderPlayer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         const ZappyTypes::Vector3& position,
         float tileSize,

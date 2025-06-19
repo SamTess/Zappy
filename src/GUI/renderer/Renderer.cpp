@@ -10,16 +10,21 @@
 #include <string>
 #include <iostream>
 #include "Renderer.hpp"
+#include "Skybox.hpp"
 #include "../Constants.hpp"
 
 Renderer::Renderer()
     : m_mapWidth(20),
-      m_mapHeight(20) {
+      m_mapHeight(20),
+      m_skybox(std::make_unique<Skybox>()) {
 }
 
 void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->InitWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE);
     m_graphicsLib = graphics;
+    if (m_skybox) {
+        m_skybox->init(graphics);
+    }
 }
 
 void Renderer::render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
@@ -27,6 +32,7 @@ void Renderer::render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IG
     std::shared_ptr<UIRenderer> uiRenderer) {
 
     graphics->BeginDrawing();
+    renderSkybox(graphics);
     renderBackground(graphics);
     graphics->BeginCamera3D();
     renderGrid(graphics);
@@ -89,4 +95,22 @@ int Renderer::getResourceTextureId(const std::string& resourceName) const {
         return it->second;
     }
     return -1;
+}
+
+void Renderer::renderSkybox(std::shared_ptr<IGraphicsLib> graphics) {
+    if (m_skybox) {
+        m_skybox->render(graphics);
+    }
+}
+
+void Renderer::setSkyboxTexture(const std::string& texturePath) {
+    if (m_skybox) {
+        if (auto graphics = m_graphicsLib.lock()) {
+            m_skybox->setSkyboxTexture(texturePath, graphics);
+        }
+    }
+}
+
+bool Renderer::isSkyboxLoaded() const {
+    return m_skybox && m_skybox->isLoaded();
 }

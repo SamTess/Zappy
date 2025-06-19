@@ -83,7 +83,7 @@ public:
     // Modèles 3D
     virtual int LoadModel3D(const std::string& path) = 0;
     virtual void DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) = 0;
-    virtual void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) = 0;
+    virtual void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE) = 0;
     virtual void UnloadModel3D(int modelId) = 0;
 
     // Modèle avec texture

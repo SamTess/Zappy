@@ -33,6 +33,8 @@ public:
     int run();
     void setServerInfo(const std::string& host, int port);
     void setGameController(std::shared_ptr<GameController> controller);
+    void setSkyboxTexture(const std::string& texturePath);
+    bool isSkyboxLoaded() const;
 
 private:
     bool loadLibraries();

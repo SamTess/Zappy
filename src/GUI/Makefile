@@ -25,6 +25,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
+	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
 	  renderer/UIRenderer.cpp \
 	  renderer/strategies/DetailedTileRenderStrategy.cpp \

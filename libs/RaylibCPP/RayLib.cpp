@@ -309,7 +309,7 @@ void RayLib::DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale,
     }
 }
 
-void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) {
+void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color) {
     auto it = _models.find(modelId);
     if (it != _models.end() && it->second) {
         ::DrawModelEx(
@@ -318,7 +318,7 @@ void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::
             TypeAdapter::ToRaylib(rotationAxis),
             rotationAngle,
             Vector3{scale, scale, scale},
-            WHITE
+            TypeAdapter::ToRaylib(color)
         );
     } else {
         std::cerr << "Tentative de dessiner un modèle inexistant avec rotation (ID: " << modelId << ")" << std::endl;

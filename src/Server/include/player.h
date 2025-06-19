@@ -12,10 +12,10 @@
     #include "pending_cmd.h"
 
 enum rotation_e {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
+    RIGHT = 1,
+    DOWN = 2,
+    LEFT = 3,
+    UP = 4
 };
 
 typedef struct player_inventory_s {
