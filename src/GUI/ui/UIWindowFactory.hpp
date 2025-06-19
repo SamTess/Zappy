@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <iostream>
 #include <vector>
 #include <unordered_map>
@@ -101,6 +102,41 @@ public:
     bool isMouseOverWindow(const ZappyTypes::Vector2& mousePosition) const;
 
 private:
+    /**
+     * @brief Crée une fenêtre spécifique en fonction de son identifiant
+     * @param id Identifiant de la fenêtre à créer
+     * @param position Position de la fenêtre
+     * @param dimensions Dimensions de la fenêtre
+     * @param visible Visibilité initiale de la fenêtre
+     */
+    void createWindow(const std::string& id, const ZappyTypes::Vector2& position,
+        const ZappyTypes::Vector2& dimensions, bool visible);
+    /**
+     * @brief Rend toutes les fenêtres régulières (non menu)
+     */
+    void renderRegularWindows();
+
+    /**
+     * @brief Rend la fenêtre de menu, en la créant si nécessaire
+     */
+    void renderMenuWindow();
+
+    /**
+     * @brief Obtient les fenêtres dans l'ordre z (avant-plan vers arrière-plan)
+     * @return Vecteur des paires (identifiant, fenêtre)
+     */
+    std::vector<std::pair<std::string, std::shared_ptr<IUIWindow>>> getWindowsInZOrder();
+
+    /**
+     * @brief Essaie de démarrer le glissement de fenêtre dans l'ordre z
+     * @param windows Liste des fenêtres ordonnées par z-order
+     * @param mousePosition Position actuelle de la souris
+     * @return true si une fenêtre a commencé à être déplacée
+     */
+    bool tryStartDraggingWindowInZOrder(
+        const std::vector<std::pair<std::string, std::shared_ptr<IUIWindow>>>& windows,
+        const ZappyTypes::Vector2& mousePosition);
+
     // Bibliothèque GUI
     std::shared_ptr<IGuiLib> m_guiLib;
 

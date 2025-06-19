@@ -90,6 +90,23 @@ public:
     bool hasHandledMouseEvent() const;
 
 private:
+    /**
+     * @brief Gère les interactions de souris sur les éléments d'interface
+     * @param mousePosition Position actuelle de la souris
+     */
+    void handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition);
+
+    /**
+     * @brief Démarre le glissement d'une fenêtre si possible
+     * @param mousePosition Position actuelle de la souris
+     */
+    void startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition);
+
+    /**
+     * @brief Gère la fin du glissement si nécessaire
+     */
+    void handleDragEndIfNeeded();
+
     // Référence à la bibliothèque graphique
     std::shared_ptr<IGuiLib> m_guiLib;
 

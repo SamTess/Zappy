@@ -18,6 +18,13 @@ ControlsWindow::ControlsWindow(std::shared_ptr<IGuiLib> guiLib)
 
 void ControlsWindow::renderContent() {
     float yOffset = m_position.y + 30;
+    yOffset = drawViewModeTitle(yOffset);
+    int newSelectedMode = drawViewModeButtons(yOffset);
+    if (newSelectedMode != m_currentViewMode)
+        setViewMode(newSelectedMode);
+}
+
+float ControlsWindow::drawViewModeTitle(float yOffset) {
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -25,36 +32,46 @@ void ControlsWindow::renderContent() {
         20,
         "Mode de vue:"
     );
-    yOffset += 25;
+    return yOffset + 25;
+}
 
+int ControlsWindow::drawViewModeButtons(float yOffset) {
     float buttonHeight = 25;
     float spacing = 5;
     int newSelectedMode = m_currentViewMode;
 
     for (size_t i = 0; i < m_viewModes.size(); i++) {
         bool isSelected = (static_cast<int>(i) == m_currentViewMode);
-        if (isSelected) {
-            m_guiLib->DrawPanel(
-                m_position.x + 8,
-                yOffset + i * (buttonHeight + spacing) - 2,
-                m_dimensions.x - 16,
-                buttonHeight + 4
-            );
-        }
-        if (m_guiLib->ButtonPressed(
-                m_position.x + 10,
-                yOffset + i * (buttonHeight + spacing),
-                m_dimensions.x - 20,
-                buttonHeight,
-                m_viewModes[i])) {
+        if (isSelected)
+            drawSelectedButtonBackground(yOffset, i, buttonHeight, spacing);
+        if (drawViewModeButton(yOffset, i, buttonHeight, spacing))
             newSelectedMode = i;
-        }
     }
-    if (newSelectedMode != m_currentViewMode)
-        setViewMode(newSelectedMode);
+    return newSelectedMode;
 }
 
-void ControlsWindow::updateSpecificData(const GameData& gameData) {
+void ControlsWindow::drawSelectedButtonBackground(float yOffset, size_t index,
+    float buttonHeight, float spacing) {
+    m_guiLib->DrawPanel(
+        m_position.x + 8,
+        yOffset + index * (buttonHeight + spacing) - 2,
+        m_dimensions.x - 16,
+        buttonHeight + 4
+    );
+}
+
+bool ControlsWindow::drawViewModeButton(float yOffset, size_t index,
+    float buttonHeight, float spacing) {
+    return m_guiLib->ButtonPressed(
+        m_position.x + 10,
+        yOffset + index * (buttonHeight + spacing),
+        m_dimensions.x - 20,
+        buttonHeight,
+        m_viewModes[index]
+    );
+}
+
+void ControlsWindow::updateSpecificData(const GUI::GameData& gameData) {
     (void)gameData;
 }
 

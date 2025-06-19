@@ -40,6 +40,28 @@ protected:
     void updateSpecificData(const GameData& gameData) override;
 
 private:
+    /**
+     * @brief Affiche un message quand aucune tuile n'est sélectionnée
+     */
+    void renderNoTileSelected();
+
+    /**
+     * @brief Affiche les coordonnées de la tuile sélectionnée
+     */
+    void renderTilePosition();
+
+    /**
+     * @brief Affiche les informations sur les ressources de la tuile
+     * @return Position Y pour le prochain élément à afficher
+     */
+    float renderResourceInfo();
+
+    /**
+     * @brief Affiche le nombre de joueurs sur la tuile
+     * @param yOffset Position Y où commencer l'affichage
+     */
+    void renderPlayerCount(float yOffset);
+
     struct {
         int x;
         int y;

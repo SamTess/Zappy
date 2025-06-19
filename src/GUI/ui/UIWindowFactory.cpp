@@ -8,9 +8,11 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <functional>
 #include "UIWindowFactory.hpp"
 #include "windows/tileInfo/TileInfoWindow.hpp"
 #include "windows/playerInfo/PlayerInfoWindow.hpp"
@@ -28,50 +30,29 @@ UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
 }
 
 void UIWindowFactory::createAllWindows(int, int) {
-    ZappyTypes::Vector2 tileInfoPos = {10, 810};
-    ZappyTypes::Vector2 playerInfoPos = {10, 500};
-    ZappyTypes::Vector2 broadcastsPos = {1520, 540};
-    ZappyTypes::Vector2 controlsPos = {1520, 860};
-    ZappyTypes::Vector2 timeInfoPos = {1450, 10};
-    ZappyTypes::Vector2 menuPos = {10, 10};
-    ZappyTypes::Vector2 standardDimensions = {400, 300};
-    ZappyTypes::Vector2 timeInfoDimensions = {250, 150};
-    ZappyTypes::Vector2 controleDimensions = {400, 200};
-    ZappyTypes::Vector2 menuDimensionsLarger = {40, 40};
-
-    auto tileInfoWindow = std::make_shared<TileInfoWindow>(m_guiLib);
-    tileInfoWindow->initialize(tileInfoPos, standardDimensions);
-    tileInfoWindow->setVisible(false);
-    m_windows["tileInfo"] = tileInfoWindow;
-
-    auto playerInfoWindow = std::make_shared<PlayerInfoWindow>(m_guiLib);
-    playerInfoWindow->initialize(playerInfoPos, standardDimensions);
-    playerInfoWindow->setVisible(false);
-    m_windows["playerInfo"] = playerInfoWindow;
-
-    auto broadcastsWindow = std::make_shared<BroadcastsWindow>(m_guiLib);
-    broadcastsWindow->initialize(broadcastsPos, standardDimensions);
-    broadcastsWindow->setVisible(false);
-    m_windows["broadcasts"] = broadcastsWindow;
-
-    auto controlsWindow = std::make_shared<ControlsWindow>(m_guiLib);
-    controlsWindow->initialize(controlsPos, controleDimensions);
-    controlsWindow->setVisible(false);
-    m_windows["controls"] = controlsWindow;
-
-    auto timeInfoWindow = std::make_shared<TimeInfoWindow>(m_guiLib);
-    timeInfoWindow->initialize(timeInfoPos, timeInfoDimensions);
-    timeInfoWindow->setVisible(false);
-    m_windows["timeInfo"] = timeInfoWindow;
-
-    auto menuWindow = std::make_shared<MenuWindow>(m_guiLib);
-    menuWindow->initialize(menuPos, menuDimensionsLarger);
-    menuWindow->setVisible(true);
-    m_windows["menu"] = menuWindow;
-    menuWindow->setUIWindowFactory(shared_from_this());
+    const struct WindowConfig {
+        std::string id;
+        ZappyTypes::Vector2 position;
+        ZappyTypes::Vector2 dimensions;
+        bool initiallyVisible;
+    } windowConfigs[] = {
+        {"tileInfo", {10, 810}, {400, 300}, false},
+        {"playerInfo", {10, 500}, {400, 300}, false},
+        {"broadcasts", {1520, 540}, {400, 300}, false},
+        {"controls", {1520, 860}, {400, 200}, false},
+        {"timeInfo", {1450, 10}, {250, 150}, false},
+        {"menu", {10, 10}, {40, 40}, true}
+    };
+    for (const auto& config : windowConfigs) {
+        createWindow(config.id, config.position, config.dimensions, config.initiallyVisible);
+    }
+    auto menuWindow = std::dynamic_pointer_cast<GUI::MenuWindow>(m_windows["menu"]);
+    if (menuWindow) {
+        menuWindow->setUIWindowFactory(shared_from_this());
+    }
 }
 
-std::shared_ptr<IUIWindow> UIWindowFactory::getWindow(const std::string& windowId) {
+std::shared_ptr<GUI::IUIWindow> UIWindowFactory::getWindow(const std::string& windowId) {
     auto it = m_windows.find(windowId);
     if (it != m_windows.end()) {
         return it->second;
@@ -80,38 +61,42 @@ std::shared_ptr<IUIWindow> UIWindowFactory::getWindow(const std::string& windowI
 }
 
 void UIWindowFactory::renderAllWindows() {
-    std::string menuId = "menu";
+    renderRegularWindows();
+    renderMenuWindow();
+}
+
+void UIWindowFactory::renderRegularWindows() {
     for (auto& pair : m_windows) {
-        if (pair.first != menuId && pair.second->isVisible()) {
+        if (pair.first != "menu" && pair.second->isVisible()) {
             bool keepWindowOpen = pair.second->render();
             if (!keepWindowOpen) {
                 pair.second->setVisible(false);
             }
         }
     }
-    auto menuIt = m_windows.find(menuId);
+}
+
+void UIWindowFactory::renderMenuWindow() {
+    auto menuIt = m_windows.find("menu");
     if (menuIt != m_windows.end()) {
-        if (menuIt->second->isVisible()) {
-            bool keepWindowOpen = menuIt->second->render();
-            if (!keepWindowOpen) {
-                menuIt->second->setVisible(false);
-            }
-        } else {
+        if (!menuIt->second->isVisible())
             menuIt->second->setVisible(true);
-            menuIt->second->render();
+        bool keepWindowOpen = menuIt->second->render();
+        if (!keepWindowOpen) {
+            menuIt->second->setVisible(false);
         }
     } else {
         ZappyTypes::Vector2 menuPos = {10, 10};
         ZappyTypes::Vector2 menuDimensions = {40, 40};
-        auto menuWindow = std::make_shared<MenuWindow>(m_guiLib);
+        auto menuWindow = std::make_shared<GUI::MenuWindow>(m_guiLib);
         menuWindow->initialize(menuPos, menuDimensions);
         menuWindow->setVisible(true);
-        m_windows[menuId] = menuWindow;
+        m_windows["menu"] = menuWindow;
         menuWindow->setUIWindowFactory(shared_from_this());
     }
 }
 
-void UIWindowFactory::updateAllWindows(const GameData& gameData) {
+void UIWindowFactory::updateAllWindows(const GUI::GameData& gameData) {
     for (auto& pair : m_windows) {
         pair.second->updateData(gameData);
     }
@@ -119,14 +104,14 @@ void UIWindowFactory::updateAllWindows(const GameData& gameData) {
 
 void UIWindowFactory::setSelectedTile(int x, int y) {
     m_selectedTile = {x, y, true};
-    auto tileInfoWindow = std::dynamic_pointer_cast<TileInfoWindow>(m_windows["tileInfo"]);
+    auto tileInfoWindow = std::dynamic_pointer_cast<GUI::TileInfoWindow>(m_windows["tileInfo"]);
     if (tileInfoWindow) {
         tileInfoWindow->setSelectedTile(x, y);
     }
 }
 
 void UIWindowFactory::addBroadcast(const std::string& team, const std::string& message) {
-    auto broadcastsWindow = std::dynamic_pointer_cast<BroadcastsWindow>(m_windows["broadcasts"]);
+    auto broadcastsWindow = std::dynamic_pointer_cast<GUI::BroadcastsWindow>(m_windows["broadcasts"]);
     if (broadcastsWindow)
         broadcastsWindow->addBroadcast(team, message);
 }
@@ -134,18 +119,30 @@ void UIWindowFactory::addBroadcast(const std::string& team, const std::string& m
 void UIWindowFactory::setViewMode(int mode) {
     if (mode >= 0 && mode < static_cast<int>(m_viewModes.size())) {
         m_currentViewMode = mode;
-        auto controlsWindow = std::dynamic_pointer_cast<ControlsWindow>(m_windows["controls"]);
+        auto controlsWindow = std::dynamic_pointer_cast<GUI::ControlsWindow>(m_windows["controls"]);
         if (controlsWindow)
             controlsWindow->setViewMode(mode);
     }
 }
 
 bool UIWindowFactory::handleWindowDragging(const ZappyTypes::Vector2& mousePosition) {
-    std::vector<std::pair<std::string, std::shared_ptr<IUIWindow>>> windowsVec;
+    std::vector<std::pair<std::string, std::shared_ptr<GUI::IUIWindow>>> windowsInZOrder =
+        getWindowsInZOrder();
+    return tryStartDraggingWindowInZOrder(windowsInZOrder, mousePosition);
+}
+
+std::vector<std::pair<std::string, std::shared_ptr<GUI::IUIWindow>>> UIWindowFactory::getWindowsInZOrder() {
+    std::vector<std::pair<std::string, std::shared_ptr<GUI::IUIWindow>>> windowsVec;
     windowsVec.reserve(m_windows.size());
     for (const auto& pair : m_windows)
         windowsVec.push_back(pair);
-    for (auto it = windowsVec.rbegin(); it != windowsVec.rend(); ++it) {
+    return windowsVec;
+}
+
+bool UIWindowFactory::tryStartDraggingWindowInZOrder(
+    const std::vector<std::pair<std::string, std::shared_ptr<GUI::IUIWindow>>>& windows,
+    const ZappyTypes::Vector2& mousePosition) {
+    for (auto it = windows.rbegin(); it != windows.rend(); ++it) {
         if (it->second->isVisible() && it->second->startDragging(mousePosition))
             return true;
     }
@@ -153,16 +150,38 @@ bool UIWindowFactory::handleWindowDragging(const ZappyTypes::Vector2& mousePosit
 }
 
 void UIWindowFactory::updateWindowDragging(const ZappyTypes::Vector2& mousePosition) {
-    for (auto& pair : m_windows) {
-        if (pair.second->isDragging())
-            pair.second->updateDragging(mousePosition);
+    for (auto& [id, window] : m_windows) {
+        if (window->isDragging()) {
+            window->updateDragging(mousePosition);
+        }
     }
 }
 
 void UIWindowFactory::stopWindowDragging() {
-    for (auto& pair : m_windows) {
-        if (pair.second->isDragging())
-            pair.second->stopDragging();
+    for (auto& [id, window] : m_windows) {
+        if (window->isDragging()) {
+            window->stopDragging();
+        }
+    }
+}
+
+void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vector2& position,
+                                 const ZappyTypes::Vector2& dimensions, bool visible) {
+    static const std::unordered_map<std::string, std::function<std::shared_ptr<GUI::IUIWindow>(std::shared_ptr<IGuiLib>)>> windowCreators = {
+        {"tileInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TileInfoWindow>(lib); }},
+        {"playerInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::PlayerInfoWindow>(lib); }},
+        {"broadcasts", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::BroadcastsWindow>(lib); }},
+        {"controls", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::ControlsWindow>(lib); }},
+        {"timeInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TimeInfoWindow>(lib); }},
+        {"menu", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MenuWindow>(lib); }}
+    };
+
+    auto it = windowCreators.find(id);
+    if (it != windowCreators.end()) {
+        auto window = it->second(m_guiLib);
+        window->initialize(position, dimensions);
+        window->setVisible(visible);
+        m_windows[id] = window;
     }
 }
 

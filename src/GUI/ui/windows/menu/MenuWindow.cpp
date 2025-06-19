@@ -1,11 +1,6 @@
 /*
 ** EPITECH PROJECT, 2025
-*    m_visible = true;
-    m_defaultPositions[0] = {10, 810};   // TileInfo
-    m_defaultPositions[1] = {10, 500};   // PlayerInfo
-    m_defaultPositions[2] = {1520, 540};  // Broadcasts
-    m_defaultPositions[3] = {1520, 860};  // Controls
-    m_defaultPositions[4] = {1450, 10};   // TimeInfo-400
+** B-YEP-400 Zappy
 ** File description:
 ** MenuWindow implementation
 */
@@ -40,13 +35,118 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     m_defaultPositions[4] = {1450, 10};  // TimeInfo
 }
 
-void GUI::MenuWindow::renderContent() {
+void GUI::MenuWindow::drawMenuButton() {
     m_guiLib->DrawPanel(m_position.x, m_position.y, m_dimensions.x, m_dimensions.y);
     m_guiLib->DrawButton(
         m_position.x, m_position.y,
         m_dimensions.x, m_dimensions.y,
         "#185#"
     );
+}
+
+void GUI::MenuWindow::handleMenuButtonClick(bool mouseOnButton, bool mousePressed) {
+    bool menuButtonPressed = mouseOnButton && mousePressed;
+    if (menuButtonPressed) {
+        m_showMenu = !m_showMenu;
+        if (!m_showMenu) {
+            resetAllSubmenus();
+        }
+    }
+}
+
+void GUI::MenuWindow::resetAllSubmenus() {
+    m_showGraphicsSubmenu = false;
+    m_showAudioSubmenu = false;
+    m_showGameplaySubmenu = false;
+    m_showWindowsSubmenu = false;
+}
+
+float GUI::MenuWindow::getSubmenuHeight() const {
+    if (m_showGraphicsSubmenu) return 150;
+    if (m_showAudioSubmenu) return 150;
+    if (m_showGameplaySubmenu) return 150;
+    if (m_showWindowsSubmenu) return 300;
+    return 0;
+}
+
+void GUI::MenuWindow::handleMenuClickOutside(ZappyTypes::Vector2& mousePosition, float menuItemWidth, float menuItemHeight, float startY, bool mousePressed) {
+    if (!mousePressed) return;
+    ZappyTypes::Rectangle menuMainRect = {
+        m_position.x, startY,
+        menuItemWidth, menuItemHeight * 4
+    };
+    float submenuWidth = 300;
+    float submenuHeight = getSubmenuHeight();
+    float startX = m_position.x + menuItemWidth;
+    ZappyTypes::Rectangle submenuRect = {
+        startX, startY,
+        submenuWidth, submenuHeight
+    };
+    ZappyTypes::Rectangle buttonRect = {
+        m_position.x, m_position.y,
+        m_dimensions.x, m_dimensions.y
+    };
+    bool mouseOnButton = m_guiLib->CheckCollisionPointRec(mousePosition, buttonRect);
+    bool clickOnMainMenu = m_guiLib->CheckCollisionPointRec(mousePosition, menuMainRect);
+    bool clickOnSubmenu = submenuHeight > 0 && m_guiLib->CheckCollisionPointRec(mousePosition, submenuRect);
+    if (!clickOnMainMenu && !clickOnSubmenu && !mouseOnButton) {
+        m_showMenu = false;
+        resetAllSubmenus();
+    }
+}
+
+void GUI::MenuWindow::showSubmenu(bool& submenu) {
+    submenu = !submenu;
+    if (submenu) {
+        if (&submenu != &m_showGraphicsSubmenu) m_showGraphicsSubmenu = false;
+        if (&submenu != &m_showAudioSubmenu) m_showAudioSubmenu = false;
+        if (&submenu != &m_showGameplaySubmenu) m_showGameplaySubmenu = false;
+        if (&submenu != &m_showWindowsSubmenu) m_showWindowsSubmenu = false;
+    }
+}
+
+void GUI::MenuWindow::handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY) {
+    if (m_guiLib->ButtonPressed(
+        m_position.x, startY,
+        menuItemWidth, menuItemHeight,
+        "Graphiques"
+    )) {
+        showSubmenu(m_showGraphicsSubmenu);
+    }
+    if (m_guiLib->ButtonPressed(
+        m_position.x, startY + menuItemHeight,
+        menuItemWidth, menuItemHeight,
+        "Audio"
+    )) {
+        showSubmenu(m_showAudioSubmenu);
+    }
+    if (m_guiLib->ButtonPressed(
+        m_position.x, startY + menuItemHeight * 2,
+        menuItemWidth, menuItemHeight,
+        "Gameplay"
+    )) {
+        showSubmenu(m_showGameplaySubmenu);
+    }
+    if (m_guiLib->ButtonPressed(
+        m_position.x, startY + menuItemHeight * 3,
+        menuItemWidth, menuItemHeight,
+        "Fenêtres"
+    )) {
+        showSubmenu(m_showWindowsSubmenu);
+    }
+}
+
+void GUI::MenuWindow::drawMainMenu(float menuItemWidth, float menuItemHeight, float startY) {
+    m_guiLib->DrawPanel(
+        m_position.x,
+        startY,
+        menuItemWidth,
+        menuItemHeight * 4
+    );
+}
+
+void GUI::MenuWindow::renderContent() {
+    drawMenuButton();
     ZappyTypes::Vector2 mousePosition = m_guiLib->GetMousePosition();
     ZappyTypes::Rectangle buttonRect = {
         m_position.x, m_position.y,
@@ -54,91 +154,14 @@ void GUI::MenuWindow::renderContent() {
     };
     bool mouseOnButton = m_guiLib->CheckCollisionPointRec(mousePosition, buttonRect);
     bool mousePressed = m_guiLib->IsMouseButtonPressed(0);
-    bool menuButtonPressed = mouseOnButton && mousePressed;
-    if (menuButtonPressed) {
-        m_showMenu = !m_showMenu;
-        if (!m_showMenu) {
-            m_showGraphicsSubmenu = false;
-            m_showAudioSubmenu = false;
-            m_showGameplaySubmenu = false;
-            m_showWindowsSubmenu = false;
-        }
-    }
+    handleMenuButtonClick(mouseOnButton, mousePressed);
     if (m_showMenu) {
         float menuItemHeight = 30;
         float menuItemWidth = m_dimensions.x + 160;
         float startY = m_position.y + m_dimensions.y;
-        m_guiLib->DrawPanel(
-            m_position.x,
-            startY,
-            menuItemWidth,
-            menuItemHeight * 4
-        );
-        if (mousePressed) {
-            ZappyTypes::Rectangle menuMainRect = {
-                m_position.x, startY,
-                menuItemWidth, menuItemHeight * 4
-            };
-            float submenuWidth = 300;
-            float submenuHeight = m_showGraphicsSubmenu ? 150 :
-                                (m_showAudioSubmenu ? 150 :
-                                (m_showGameplaySubmenu ? 150 :
-                                (m_showWindowsSubmenu ? 300 : 0)));
-            float startX = m_position.x + menuItemWidth;
-            ZappyTypes::Rectangle submenuRect = {
-                startX, startY,
-                submenuWidth, submenuHeight
-            };
-            bool clickOnMainMenu = m_guiLib->CheckCollisionPointRec(mousePosition, menuMainRect);
-            bool clickOnSubmenu = submenuHeight > 0 && m_guiLib->CheckCollisionPointRec(mousePosition, submenuRect);
-            if (!clickOnMainMenu && !clickOnSubmenu && !mouseOnButton) {
-                m_showMenu = false;
-                m_showGraphicsSubmenu = false;
-                m_showAudioSubmenu = false;
-                m_showGameplaySubmenu = false;
-                m_showWindowsSubmenu = false;
-            }
-        }
-        if (m_guiLib->ButtonPressed(
-            m_position.x, startY,
-            menuItemWidth, menuItemHeight,
-            "Graphiques"
-        )) {
-            m_showGraphicsSubmenu = !m_showGraphicsSubmenu;
-            m_showAudioSubmenu = false;
-            m_showGameplaySubmenu = false;
-            m_showWindowsSubmenu = false;
-        }
-        if (m_guiLib->ButtonPressed(
-            m_position.x, startY + menuItemHeight,
-            menuItemWidth, menuItemHeight,
-            "Audio"
-        )) {
-            m_showAudioSubmenu = !m_showAudioSubmenu;
-            m_showGraphicsSubmenu = false;
-            m_showGameplaySubmenu = false;
-            m_showWindowsSubmenu = false;
-        }
-        if (m_guiLib->ButtonPressed(
-            m_position.x, startY + menuItemHeight * 2,
-            menuItemWidth, menuItemHeight,
-            "Gameplay"
-        )) {
-            m_showGameplaySubmenu = !m_showGameplaySubmenu;
-            m_showGraphicsSubmenu = false;
-            m_showAudioSubmenu = false;
-            m_showWindowsSubmenu = false;
-        }
-        if (m_guiLib->ButtonPressed(
-            m_position.x, startY + menuItemHeight * 3,
-            menuItemWidth, menuItemHeight,
-            "Fenêtres"
-        )) {
-            m_showWindowsSubmenu = !m_showWindowsSubmenu;
-            m_showGraphicsSubmenu = false;
-            m_showAudioSubmenu = false;
-            m_showGameplaySubmenu = false;
-        }
+        drawMainMenu(menuItemWidth, menuItemHeight, startY);
+        handleMenuClickOutside(mousePosition, menuItemWidth, menuItemHeight, startY, mousePressed);
+        handleSubmenuButtons(menuItemWidth, menuItemHeight, startY);
         if (m_showGraphicsSubmenu) {
             renderGraphicsSubmenu();
         } else if (m_showAudioSubmenu) {
@@ -151,21 +174,7 @@ void GUI::MenuWindow::renderContent() {
     }
 }
 
-void GUI::MenuWindow::renderGraphicsSubmenu() {
-    float submenuWidth = 300;
-    float submenuHeight = 150;
-    float sliderHeight = 30;
-    float startX = m_position.x + m_dimensions.x + 160;
-    float startY = m_position.y + m_dimensions.y;
-    m_guiLib->DrawPanel(
-        startX, startY,
-        submenuWidth, submenuHeight
-    );
-    m_guiLib->DrawLabel(
-        startX + 30, startY + 5,
-        submenuWidth - 60, 20,
-        "Paramètres graphiques"
-    );
+void GUI::MenuWindow::drawGraphicsSliders(float startX, float startY, float submenuWidth, float sliderHeight) {
     m_guiLib->DrawLabel(
         startX + 30, startY + 30,
         submenuWidth - 60, 20,
@@ -190,7 +199,7 @@ void GUI::MenuWindow::renderGraphicsSubmenu() {
     );
 }
 
-void GUI::MenuWindow::renderAudioSubmenu() {
+void GUI::MenuWindow::renderGraphicsSubmenu() {
     float submenuWidth = 300;
     float submenuHeight = 150;
     float sliderHeight = 30;
@@ -203,8 +212,12 @@ void GUI::MenuWindow::renderAudioSubmenu() {
     m_guiLib->DrawLabel(
         startX + 30, startY + 5,
         submenuWidth - 60, 20,
-        "Paramètres audio"
+        "Paramètres graphiques"
     );
+    drawGraphicsSliders(startX, startY, submenuWidth, sliderHeight);
+}
+
+void GUI::MenuWindow::drawAudioSliders(float startX, float startY, float submenuWidth, float sliderHeight) {
     m_guiLib->DrawLabel(
         startX + 30, startY + 30,
         submenuWidth - 60, 20,
@@ -229,9 +242,9 @@ void GUI::MenuWindow::renderAudioSubmenu() {
     );
 }
 
-void MenuWindow::renderGameplaySubmenu() {
+void GUI::MenuWindow::renderAudioSubmenu() {
     float submenuWidth = 300;
-    float submenuHeight = 120;
+    float submenuHeight = 150;
     float sliderHeight = 30;
     float startX = m_position.x + m_dimensions.x + 160;
     float startY = m_position.y + m_dimensions.y;
@@ -242,8 +255,12 @@ void MenuWindow::renderGameplaySubmenu() {
     m_guiLib->DrawLabel(
         startX + 30, startY + 5,
         submenuWidth - 60, 20,
-        "Paramètres de gameplay"
+        "Paramètres audio"
     );
+    drawAudioSliders(startX, startY, submenuWidth, sliderHeight);
+}
+
+void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWidth, float sliderHeight) {
     m_guiLib->DrawLabel(
         startX + 30, startY + 30,
         submenuWidth - 60, 20,
@@ -264,13 +281,12 @@ void MenuWindow::renderGameplaySubmenu() {
     );
 }
 
-void MenuWindow::renderWindowsSubmenu() {
+void MenuWindow::renderGameplaySubmenu() {
     float submenuWidth = 300;
-    float submenuHeight = 300;
-    float buttonHeight = 30;
+    float submenuHeight = 120;
+    float sliderHeight = 30;
     float startX = m_position.x + m_dimensions.x + 160;
     float startY = m_position.y + m_dimensions.y;
-
     m_guiLib->DrawPanel(
         startX, startY,
         submenuWidth, submenuHeight
@@ -278,8 +294,19 @@ void MenuWindow::renderWindowsSubmenu() {
     m_guiLib->DrawLabel(
         startX + 30, startY + 5,
         submenuWidth - 60, 20,
-        "Gestion des fenêtres"
+        "Paramètres de gameplay"
     );
+    drawGameplaySliders(startX, startY, submenuWidth, sliderHeight);
+}
+
+void MenuWindow::drawWindowsList(float startX, float startY, float submenuWidth, float buttonHeight) {
+    WindowInfo windows[] = {
+        {"tileInfo", "Informations sur la case", 0},
+        {"playerInfo", "Informations joueurs", 1},
+        {"broadcasts", "Broadcasts récents", 2},
+        {"controls", "Contrôles", 3},
+        {"timeInfo", "Informations temporelles", 4}
+    };
     float yPos = startY + 30;
     if (!m_windowFactory) {
         m_guiLib->DrawLabel(
@@ -289,20 +316,6 @@ void MenuWindow::renderWindowsSubmenu() {
         );
         return;
     }
-    struct WindowInfo {
-        std::string id;
-        std::string name;
-        int positionIndex;
-    };
-
-    WindowInfo windows[] = {
-        {"tileInfo", "Informations sur la case", 0},
-        {"playerInfo", "Informations joueurs", 1},
-        {"broadcasts", "Broadcasts récents", 2},
-        {"controls", "Contrôles", 3},
-        {"timeInfo", "Informations temporelles", 4}
-    };
-
     for (const auto& window : windows) {
         auto windowPtr = m_windowFactory->getWindow(window.id);
         if (windowPtr) {
@@ -324,6 +337,17 @@ void MenuWindow::renderWindowsSubmenu() {
             yPos += buttonHeight + 5;
         }
     }
+    drawWindowButtons(startX, startY, submenuWidth, buttonHeight, yPos);
+}
+
+void MenuWindow::drawWindowButtons(float startX, float startY, float submenuWidth, float buttonHeight, float& yPos) {
+    WindowInfo windows[] = {
+        {"tileInfo", "Informations sur la case", 0},
+        {"playerInfo", "Informations joueurs", 1},
+        {"broadcasts", "Broadcasts récents", 2},
+        {"controls", "Contrôles", 3},
+        {"timeInfo", "Informations temporelles", 4}
+    };
     if (m_guiLib->ButtonPressed(startX + 10, yPos, submenuWidth - 20, buttonHeight, "Afficher toutes les fenêtres")) {
         for (const auto& window : windows) {
             auto windowPtr = m_windowFactory->getWindow(window.id);
@@ -343,6 +367,24 @@ void MenuWindow::renderWindowsSubmenu() {
     }
 }
 
+void MenuWindow::renderWindowsSubmenu() {
+    float submenuWidth = 300;
+    float submenuHeight = 300;
+    float buttonHeight = 30;
+    float startX = m_position.x + m_dimensions.x + 160;
+    float startY = m_position.y + m_dimensions.y;
+    m_guiLib->DrawPanel(
+        startX, startY,
+        submenuWidth, submenuHeight
+    );
+    m_guiLib->DrawLabel(
+        startX + 30, startY + 5,
+        submenuWidth - 60, 20,
+        "Gestion des fenêtres"
+    );
+    drawWindowsList(startX, startY, submenuWidth, buttonHeight);
+}
+
 void GUI::MenuWindow::updateSpecificData(const GameData& gameData) {
     (void)gameData;
 }
@@ -350,13 +392,11 @@ void GUI::MenuWindow::updateSpecificData(const GameData& gameData) {
 void MenuWindow::setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory) {
     m_windowFactory = factory;
     if (m_windowFactory) {
-        for (int i = 0; i < 6; ++i) {
-            m_windowFactory->getWindow("tileInfo")->setPosition(m_defaultPositions[0]);
-            m_windowFactory->getWindow("playerInfo")->setPosition(m_defaultPositions[1]);
-            m_windowFactory->getWindow("broadcasts")->setPosition(m_defaultPositions[2]);
-            m_windowFactory->getWindow("controls")->setPosition(m_defaultPositions[3]);
-            m_windowFactory->getWindow("timeInfo")->setPosition(m_defaultPositions[4]);
-        }
+        m_windowFactory->getWindow("tileInfo")->setPosition(m_defaultPositions[0]);
+        m_windowFactory->getWindow("playerInfo")->setPosition(m_defaultPositions[1]);
+        m_windowFactory->getWindow("broadcasts")->setPosition(m_defaultPositions[2]);
+        m_windowFactory->getWindow("controls")->setPosition(m_defaultPositions[3]);
+        m_windowFactory->getWindow("timeInfo")->setPosition(m_defaultPositions[4]);
     }
 }
 
