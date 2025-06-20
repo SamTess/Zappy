@@ -84,10 +84,8 @@ ModelWrap::ModelWrap(const std::string& objPath) {
 }
 
 ModelWrap::~ModelWrap() {
-    // Vérification pour éviter les libérations invalides
     if (model.meshes != nullptr && model.meshCount > 0) {
         UnloadModel(model);
-        // Invalidation pour éviter les doubles libérations
         model.meshes = nullptr;
         model.meshCount = 0;
     }

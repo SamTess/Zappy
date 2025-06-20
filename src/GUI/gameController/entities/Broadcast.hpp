@@ -36,7 +36,7 @@ public:
 private:
     std::string _team;
     std::string _message;
-    float _timeLeft = 15.0f; // Temps en secondes avant disparition
+    float _timeLeft = 15.0f;
     int _playerId = 0;
 };
 
