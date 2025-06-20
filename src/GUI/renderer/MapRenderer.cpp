@@ -58,6 +58,47 @@ void MapRenderer::render() {
             renderTile(x, y, resourceIndex);
         }
     }
+    renderVictoryScreen();
+}
+
+void MapRenderer::renderVictoryScreen() {
+    if (!gameState->isGameEnded())
+        return;
+    auto winningTeam = gameState->getWinningTeam();
+    if (winningTeam.empty())
+        return;
+    std::string text = "Team " + winningTeam + " wins!";
+    int mapWidth = gameState->getMapWidth();
+    int mapHeight = gameState->getMapHeight();
+    float fontSize = 2.0f;
+    float fontSpacing = 1.0f;
+    float lineSpacing = 1.0f;
+    ZappyTypes::Vector3 textSize = graphicsLib->MeasureText3D(text, fontSize, fontSpacing, lineSpacing);
+    float centerX = (mapWidth - 1) / 2.0f - textSize.x / 2.0f;
+    float centerZ = (mapHeight - 1) / 2.0f - textSize.z / 2.0f;
+    // toyute les couleurs pour chaque lettre
+    std::vector<ZappyTypes::Color> colors = {
+        {255, 0, 0, 255},
+        {255, 165, 0, 255},
+        {255, 255, 0, 255},
+        {0, 255, 0, 255},
+        {0, 0, 255, 255},
+        {75, 0, 130, 255},
+        {148, 0, 211, 255},
+        {255, 20, 147, 255},
+        {0, 255, 255, 255},
+        {255, 105, 180, 255}
+    };
+    float currentX = centerX;
+    for (size_t i = 0; i < text.length(); ++i) {
+        char c = text[i];
+        ZappyTypes::Color color = colors[i % colors.size()];
+        std::string singleChar(1, c);
+        ZappyTypes::Vector3 charPosition = {currentX, 5.0f, centerZ};
+        graphicsLib->DrawText3D(singleChar, charPosition, fontSize, fontSpacing, lineSpacing, true, color);
+        ZappyTypes::Vector3 charSize = graphicsLib->MeasureText3D(singleChar, fontSize, fontSpacing, lineSpacing);
+        currentX += charSize.x + fontSpacing;
+    }
 }
 
 void MapRenderer::setTileRenderStrategy(std::shared_ptr<ITileRenderStrategy> strategy) {
