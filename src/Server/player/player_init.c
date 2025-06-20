@@ -74,7 +74,7 @@ void init_player(player_t *player, char *player_team)
 {
     player->pos_x = 0;
     player->pos_y = 0;
-    player->rotation = UP;
+    player->rotation = rand() % 4 + 1;
     player->busy_until = 0;
     player->queue_size = 0;
     player->command_queue = calloc(10, sizeof(char *));
