@@ -16,7 +16,7 @@ class CircularBuffer {
         explicit CircularBuffer(size_t capacity = 4096);
         ~CircularBuffer() = default;
 
-        bool write(const std::string data, size_t size);
+        bool write(const std::string& data, size_t size);
         bool write(const std::string& data);
 
         std::string readLine();

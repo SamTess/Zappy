@@ -9,12 +9,13 @@
 #include <algorithm>
 #include <cstring>
 #include <cstdio>
+#include <string>
 
 CircularBuffer::CircularBuffer(size_t capacity)
     : _buffer(capacity, '\0'), _head(0), _tail(0), _size(0), _capacity(capacity) {
 }
 
-bool CircularBuffer::write(const std::string data, size_t size) {
+bool CircularBuffer::write(const std::string& data, size_t size) {
     std::lock_guard<std::mutex> lock(_mutex);
     for (size_t i = 0; i < size; ++i) {
         _buffer[_head] = data[i];
