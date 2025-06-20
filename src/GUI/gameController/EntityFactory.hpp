@@ -9,6 +9,7 @@
 #define ENTITY_FACTORY_HPP_
 
 #include <memory>
+#include <string>
 #include "IGameEntity.hpp"
 #include "ITile.hpp"
 #include "IPlayer.hpp"
@@ -62,7 +63,8 @@ public:
     std::shared_ptr<ITile> createTile(int x, int y);
     std::shared_ptr<ITile> createTile(const TileContentData& data);
     std::shared_ptr<IResource> createResource(ResourceType type, int quantity = 0);
-    std::shared_ptr<IBroadcast> createBroadcast(const std::string& team, const std::string& message, int playerId, float timeLeft = 15.0f);
+    std::shared_ptr<IBroadcast> createBroadcast(const std::string& team,
+        const std::string& message, int playerId, float timeLeft = 15.0f);
 
 private:
     std::unique_ptr<IEntityFactory> _factory;

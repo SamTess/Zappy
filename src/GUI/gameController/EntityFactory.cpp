@@ -6,6 +6,7 @@
 */
 
 #include <memory>
+#include <string>
 #include <utility>
 #include "EntityFactory.hpp"
 #include "entities/Player.hpp"
