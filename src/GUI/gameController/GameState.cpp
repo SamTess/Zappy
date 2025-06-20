@@ -290,11 +290,10 @@ void GameState::setGameEnded(bool ended, const std::string& winningTeam) {
 
 void GameState::addBroadcast(int playerId, const std::string& team, const std::string& message) {
     std::lock_guard<std::mutex> lock(_mutex);
-    // Utilisation du factory pour créer un objet Broadcast
     auto newBroadcast = _entityFactory != nullptr ?
         _entityFactory->createBroadcast(team, message, playerId) :
         std::make_shared<Broadcast>(team, message, playerId);
-    
+
     _broadcasts.push_back(newBroadcast);
     while (_broadcasts.size() > _maxBroadcasts) {
         _broadcasts.pop_front();
