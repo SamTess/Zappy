@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <chrono>
 #include "UserInterface.hpp"
+#include "../gameController/GameState.hpp"
 
 namespace GUI {
 
@@ -36,8 +37,16 @@ void UserInterface::render() {
     m_windowFactory->renderAllWindows();
 }
 
-void UserInterface::updateData(const GameData& gameData) {
-    m_windowFactory->updateAllWindows(gameData);
+void UserInterface::updateDataFromGameState(
+    std::shared_ptr<const GameState> gameState,
+    int mapWidth,
+    int mapHeight,
+    float gameTime,
+    int frequency,
+    int gameTick
+) {
+    // Utiliser directement le GameState pour mettre à jour l'interface
+    m_windowFactory->updateAllWindows(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
 }
 
 void UserInterface::setSelectedTile(int x, int y) {

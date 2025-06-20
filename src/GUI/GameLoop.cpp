@@ -99,6 +99,14 @@ int GameLoop::run() {
         m_mapRenderer->render();
         m_graphics->EndCamera3D();
         updateGameData();
+        
+        // Mise à jour de l'interface utilisateur avec le GameState
+        if (m_gameController) {
+            auto gameState = m_gameController->getGameState();
+            m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight, 
+                                                   m_gameTime, m_frequency, m_gameTick);
+        }
+        
         m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();

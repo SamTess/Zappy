@@ -29,7 +29,9 @@ public:
     void initialize(const ZappyTypes::Vector2& position,
                    const ZappyTypes::Vector2& dimensions) override;
     bool render() override;
-    void updateData(const GameData& gameData) override;
+    void updateData(std::shared_ptr<const GameState> gameState,
+                   int mapWidth, int mapHeight,
+                   float gameTime, int frequency, int gameTick) override;
     void setPosition(const ZappyTypes::Vector2& position) override;
     ZappyTypes::Vector2 getPosition() const override;
     ZappyTypes::Vector2 getDimensions() const override;
@@ -51,7 +53,9 @@ protected:
     /**
      * @brief Met à jour les données spécifiques à la fenêtre
      */
-    virtual void updateSpecificData(const GameData& gameData) = 0;
+    virtual void updateSpecificData(std::shared_ptr<const GameState> gameState,
+                                  int mapWidth, int mapHeight,
+                                  float gameTime, int frequency, int gameTick) = 0;
 
     // Bibliothèque GUI
     std::shared_ptr<IGuiLib> m_guiLib;
@@ -69,8 +73,13 @@ protected:
     bool m_dragging;
     ZappyTypes::Vector2 m_dragOffset;
 
-    // Données de jeu
-    GameData m_gameData;
+    // Références au GameState (pas de copie de données)
+    std::shared_ptr<const GameState> m_gameState;
+    int m_mapWidth = 0;
+    int m_mapHeight = 0;
+    float m_gameTime = 0.0f;
+    int m_frequency = 100;
+    int m_gameTick = 0;
 };
 
 } // namespace GUI

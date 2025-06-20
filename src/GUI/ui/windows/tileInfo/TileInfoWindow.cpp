@@ -51,18 +51,18 @@ void GUI::TileInfoWindow::renderTilePosition() {
 
 float GUI::TileInfoWindow::renderResourceInfo() {
     int resources[7] = {0};
-    for (const auto& tile : m_gameData.tiles) {
-        if (tile.x == m_selectedTile.x && tile.y == m_selectedTile.y) {
-            resources[0] = tile.food;
-            resources[1] = tile.linemate;
-            resources[2] = tile.deraumere;
-            resources[3] = tile.sibur;
-            resources[4] = tile.mendiane;
-            resources[5] = tile.phiras;
-            resources[6] = tile.thystame;
-            break;
+    
+    // Utilise le GameState pour récupérer les informations de la tuile
+    if (m_gameState && m_gameState->isMapInitialized()) {
+        auto tile = m_gameState->getTile(m_selectedTile.x, m_selectedTile.y);
+        if (tile) {
+            const auto& tileResources = tile->getResources();
+            for (int i = 0; i < 7; ++i) {
+                resources[i] = tileResources[i];
+            }
         }
     }
+    
     const char* resourceNames[] = {
         "Nourriture", "Linemate", "Deraumere", "Sibur",
         "Mendiane", "Phiras", "Thystame"
@@ -85,11 +85,13 @@ float GUI::TileInfoWindow::renderResourceInfo() {
 
 void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     int playerCount = 0;
-    for (const auto& player : m_gameData.players) {
-        if (player.x == m_selectedTile.x && player.y == m_selectedTile.y) {
-            playerCount++;
-        }
+    
+    // Utilise le GameState pour récupérer le nombre de joueurs sur la tuile
+    if (m_gameState && m_gameState->isMapInitialized()) {
+        auto playerIds = m_gameState->getPlayersOnTile(m_selectedTile.x, m_selectedTile.y);
+        playerCount = static_cast<int>(playerIds.size());
     }
+    
     std::stringstream playersTitle;
     playersTitle << "Joueurs sur cette case: " << playerCount;
     m_guiLib->DrawLabel(
@@ -101,7 +103,11 @@ void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     );
 }
 
-void GUI::TileInfoWindow::updateSpecificData(const GUI::GameData&) {
+void GUI::TileInfoWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
+                                             int mapWidth, int mapHeight,
+                                             float gameTime, int frequency, int gameTick) {
+    (void)gameState; (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
+    // Cette méthode peut être utilisée pour mettre à jour les données de tuile si nécessaire
 }
 
 void GUI::TileInfoWindow::setSelectedTile(int x, int y) {

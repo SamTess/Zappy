@@ -20,7 +20,6 @@
 #include "gameController/GameController.hpp"
 #include "gameController/GameState.hpp"
 #include "ui/UserInterface.hpp"
-#include "shared/GameData.hpp"
 #include "./network/networkManager/NetworkManager.hpp"
 
 namespace Zappy {
@@ -50,15 +49,9 @@ private:
     void handleViewModeChange(int mode);
     void onMapSizeChanged(int width, int height);
     void onTileChanged(int x, int y, const TileData& tileData);
-    void updateTilesFromGameState(std::shared_ptr<const GameState> gameState);
-    void updatePlayersFromGameState(std::shared_ptr<const GameState> gameState);
-    void updateTeamsFromGameState(std::shared_ptr<const GameState> gameState);
-    void updateBroadcastsFromGameState(std::shared_ptr<const GameState> gameState);
+    
     std::string m_host;
     int m_port;
-
-    int m_mapWidth = 20;
-    int m_mapHeight = 20;
 
     std::shared_ptr<IGraphicsLib> m_graphics;
     std::shared_ptr<IGuiLib> m_gui;
@@ -69,8 +62,14 @@ private:
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
-    GUI::GameData m_gameData;
     std::shared_ptr<NetworkManager> m_networkManager;
+
+    // Variables de jeu remplaçant l'ancienne structure GameData
+    int m_mapWidth = 20;
+    int m_mapHeight = 20;
+    float m_gameTime = 0.0f;
+    int m_frequency = 100;
+    int m_gameTick = 0;
 
     int m_cubeModelId = -1;
     struct {

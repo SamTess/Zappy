@@ -8,8 +8,8 @@
 #pragma once
 
 #include <memory>
-#include "../../shared/GameData.hpp"
 #include "../../../Shared/IGuiLib.hpp"
+#include "../../gameController/GameState.hpp"
 
 namespace GUI {
 
@@ -33,10 +33,17 @@ public:
     virtual bool render() = 0;
 
     /**
-     * @brief Met à jour les données de la fenêtre
-     * @param gameData Données du jeu actualisées
+     * @brief Met à jour les données de la fenêtre avec le GameState
+     * @param gameState État actuel du jeu
+     * @param mapWidth Largeur de la carte
+     * @param mapHeight Hauteur de la carte
+     * @param gameTime Temps de jeu écoulé
+     * @param frequency Fréquence du jeu
+     * @param gameTick Tick de jeu actuel
      */
-    virtual void updateData(const GameData& gameData) = 0;
+    virtual void updateData(std::shared_ptr<const GameState> gameState,
+                          int mapWidth, int mapHeight,
+                          float gameTime, int frequency, int gameTick) = 0;
 
     /**
      * @brief Déplace la fenêtre

@@ -48,9 +48,16 @@ bool AUIWindow::render() {
     }
 }
 
-void AUIWindow::updateData(const GameData& gameData) {
-    m_gameData = gameData;
-    updateSpecificData(gameData);
+void AUIWindow::updateData(std::shared_ptr<const GameState> gameState,
+                          int mapWidth, int mapHeight,
+                          float gameTime, int frequency, int gameTick) {
+    m_gameState = gameState;
+    m_mapWidth = mapWidth;
+    m_mapHeight = mapHeight;
+    m_gameTime = gameTime;
+    m_frequency = frequency;
+    m_gameTick = gameTick;
+    updateSpecificData(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
 }
 
 void AUIWindow::setPosition(const ZappyTypes::Vector2& position) {
