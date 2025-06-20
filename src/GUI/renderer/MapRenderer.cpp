@@ -9,6 +9,7 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <vector>
 #include "MapRenderer.hpp"
 #include "strategies/TileRenderStrategyFactory.hpp"
 #include "../gameController/GameState.hpp"
