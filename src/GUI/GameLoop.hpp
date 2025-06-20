@@ -49,7 +49,6 @@ private:
     void handleViewModeChange(int mode);
     void onMapSizeChanged(int width, int height);
     void onTileChanged(int x, int y, const TileData& tileData);
-    
     std::string m_host;
     int m_port;
 
@@ -63,8 +62,6 @@ private:
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
     std::shared_ptr<NetworkManager> m_networkManager;
-
-    // Variables de jeu remplaçant l'ancienne structure GameData
     int m_mapWidth = 20;
     int m_mapHeight = 20;
     float m_gameTime = 0.0f;

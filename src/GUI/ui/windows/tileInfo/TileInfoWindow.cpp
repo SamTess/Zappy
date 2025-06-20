@@ -51,8 +51,6 @@ void GUI::TileInfoWindow::renderTilePosition() {
 
 float GUI::TileInfoWindow::renderResourceInfo() {
     int resources[7] = {0};
-    
-    // Utilise le GameState pour récupérer les informations de la tuile
     if (m_gameState && m_gameState->isMapInitialized()) {
         auto tile = m_gameState->getTile(m_selectedTile.x, m_selectedTile.y);
         if (tile) {
@@ -62,7 +60,6 @@ float GUI::TileInfoWindow::renderResourceInfo() {
             }
         }
     }
-    
     const char* resourceNames[] = {
         "Nourriture", "Linemate", "Deraumere", "Sibur",
         "Mendiane", "Phiras", "Thystame"
@@ -85,13 +82,10 @@ float GUI::TileInfoWindow::renderResourceInfo() {
 
 void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     int playerCount = 0;
-    
-    // Utilise le GameState pour récupérer le nombre de joueurs sur la tuile
     if (m_gameState && m_gameState->isMapInitialized()) {
         auto playerIds = m_gameState->getPlayersOnTile(m_selectedTile.x, m_selectedTile.y);
         playerCount = static_cast<int>(playerIds.size());
     }
-    
     std::stringstream playersTitle;
     playersTitle << "Joueurs sur cette case: " << playerCount;
     m_guiLib->DrawLabel(
@@ -101,13 +95,6 @@ void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
         20,
         playersTitle.str()
     );
-}
-
-void GUI::TileInfoWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                             int mapWidth, int mapHeight,
-                                             float gameTime, int frequency, int gameTick) {
-    (void)gameState; (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
-    // Cette méthode peut être utilisée pour mettre à jour les données de tuile si nécessaire
 }
 
 void GUI::TileInfoWindow::setSelectedTile(int x, int y) {

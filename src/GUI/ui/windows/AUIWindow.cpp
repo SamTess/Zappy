@@ -57,7 +57,6 @@ void AUIWindow::updateData(std::shared_ptr<const GameState> gameState,
     m_gameTime = gameTime;
     m_frequency = frequency;
     m_gameTick = gameTick;
-    updateSpecificData(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
 }
 
 void AUIWindow::setPosition(const ZappyTypes::Vector2& position) {
