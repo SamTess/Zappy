@@ -14,7 +14,7 @@
 #include <vector>
 #include <unordered_map>
 #include "windows/IUIWindow.hpp"
-#include "../shared/GameData.hpp"
+#include "../gameController/GameState.hpp"
 #include "../../Shared/IGuiLib.hpp"
 
 namespace GUI {
@@ -51,10 +51,17 @@ public:
     void renderAllWindows();
 
     /**
-     * @brief Mise à jour des données pour toutes les fenêtres
-     * @param gameData Données du jeu
+     * @brief Mise à jour des données pour toutes les fenêtres avec le GameState
+     * @param gameState État actuel du jeu
+     * @param mapWidth Largeur de la carte
+     * @param mapHeight Hauteur de la carte
+     * @param gameTime Temps de jeu écoulé
+     * @param frequency Fréquence du jeu
+     * @param gameTick Tick de jeu actuel
      */
-    void updateAllWindows(const GameData& gameData);
+    void updateAllWindows(std::shared_ptr<const GameState> gameState,
+                         int mapWidth, int mapHeight,
+                         float gameTime, int frequency, int gameTick);
 
     /**
      * @brief Définit la case sélectionnée

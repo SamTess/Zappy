@@ -21,24 +21,31 @@
 static std::map<int, float> playerIncantationTimers;
 
 /**
- * Met à jour les données de jeu et rafraîchit l'interface utilisateur
+ * Met à jour les données de jeu et le GameState
  */
 void GameLoop::updateGameData() {
     static auto lastTime = std::chrono::high_resolution_clock::now();
     auto currentTime = std::chrono::high_resolution_clock::now();
     float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
     lastTime = currentTime;
-    m_gameData.time += deltaTime;
-    m_gameData.tick++;
+    
+    // Mise à jour du temps de jeu
+    m_gameTime += deltaTime;
+    m_gameTick++;
+    
+    // Gestion des timers d'incantation
     for (auto it = playerIncantationTimers.begin(); it != playerIncantationTimers.end(); ) {
         int playerId = it->first;
         float& timer = it->second;
         timer -= deltaTime;
         if (timer <= 0.0f) {
-            for (auto& player : m_gameData.players) {
-                if (player.id == playerId) {
-                    player.isIncantating = false;
-                    break;
+            // Mettre à jour le joueur via le GameState
+            if (m_gameController) {
+                auto gameState = m_gameController->getGameState();
+                auto player = gameState->getPlayerInfo(playerId);
+                if (player) {
+                    // Cette logique devrait être dans le GameController
+                    // À implémenter: marquage de fin d'incantation pour ce joueur
                 }
             }
             it = playerIncantationTimers.erase(it);
@@ -46,49 +53,62 @@ void GameLoop::updateGameData() {
             ++it;
         }
     }
+    
+    // Mise à jour du GameController et GameState
     if (m_gameController) {
         m_gameController->updateBroadcasts(deltaTime);
         auto gameState = m_gameController->getGameState();
-        if (gameState->isMapInitialized()) {
-            m_gameData.mapWidth = gameState->getMapWidth();
-            m_gameData.mapHeight = gameState->getMapHeight();
-            m_gameData.frequency = gameState->getTimeUnit();
-            updateTilesFromGameState(gameState);
-            updatePlayersFromGameState(gameState);
-            updateTeamsFromGameState(gameState);
-            updateBroadcastsFromGameState(gameState);
+        if (gameState && gameState->isMapInitialized()) {
+            // Mise à jour des informations de carte
+            m_mapWidth = gameState->getMapWidth();
+            m_mapHeight = gameState->getMapHeight();
+            m_frequency = gameState->getTimeUnit();
         }
     }
-    bool uiHandledMouseEvent = m_userInterface->hasHandledMouseEvent();
-    bool mouseOverUI = m_userInterface->isMouseOverUI();
-    if (!uiHandledMouseEvent && !mouseOverUI && m_graphics->IsMouseButtonPressed(0)) {
+    
+    // Si le joueur a cliqué sur une case, vérifier les interactions
+    if (!m_userInterface->hasHandledMouseEvent() && 
+        !m_userInterface->isMouseOverUI() && 
+        m_graphics->IsMouseButtonPressed(0)) {
         ZappyTypes::Vector2 mousePos = m_graphics->GetMousePosition();
-        int tileX = static_cast<int>(mousePos.x / 32) % m_gameData.mapWidth;
-        int tileY = static_cast<int>(mousePos.y / 32) % m_gameData.mapHeight;
+        
+        // Calcul des coordonnées de la case cliquée (à adapter selon votre système de rendu)
+        int tileX = static_cast<int>(mousePos.x / 32) % m_mapWidth;
+        int tileY = static_cast<int>(mousePos.y / 32) % m_mapHeight;
+        
+        handleTileSelection(tileX, tileY);
+    }    // Si le joueur a cliqué sur une case, vérifier les interactions
+    if (!m_userInterface->hasHandledMouseEvent() && 
+        !m_userInterface->isMouseOverUI() && 
+        m_graphics->IsMouseButtonPressed(0)) {
+        ZappyTypes::Vector2 mousePos = m_graphics->GetMousePosition();
+        
+        // Calcul des coordonnées de la case cliquée (à adapter selon votre système de rendu)
+        int tileX = static_cast<int>(mousePos.x / 32) % m_mapWidth;
+        int tileY = static_cast<int>(mousePos.y / 32) % m_mapHeight;
+        
         handleTileSelection(tileX, tileY);
     }
-    m_userInterface->updateData(m_gameData);
 }
 
 /**
  * Gère la sélection d'une case par l'utilisateur
  */
 void GameLoop::handleTileSelection(int x, int y) {
-    if (x < 0 || y < 0 || x >= m_gameData.mapWidth || y >= m_gameData.mapHeight)
+    if (x < 0 || y < 0 || x >= m_mapWidth || y >= m_mapHeight)
         return;
 
     m_userInterface->setSelectedTile(x, y);
-
-    auto tileIt = std::find_if(m_gameData.tiles.begin(), m_gameData.tiles.end(),
-        [x, y](const auto& tile) {
-            return tile.x == x && tile.y == y;
-        });
-
-    if (tileIt == m_gameData.tiles.end()) {
-        GUI::Tile newTile;
-        newTile.x = x;
-        newTile.y = y;
-        m_gameData.tiles.push_back(newTile);
+    
+    // Au lieu de créer une tuile, on en récupère une du GameState
+    if (m_gameController) {
+        auto gameState = m_gameController->getGameState();
+        auto tile = gameState->getTile(x, y);
+        // La tuile est déjà dans le GameState, pas besoin de la créer
+        
+        m_selectedTile.x = x;
+        m_selectedTile.y = y;
+        m_selectedTile.selected = true;
     }
 }
 
@@ -117,164 +137,34 @@ void GameLoop::onMapSizeChanged(int width, int height) {
     m_mapWidth = width;
     m_mapHeight = height;
     m_camera->setMapDimensions(width, height);
-    m_gameData.mapWidth = width;
-    m_gameData.mapHeight = height;
+    // Les dimensions sont maintenant stockées directement dans m_mapWidth et m_mapHeight
+    updateCameraForMapSize();
 }
 
 void GameLoop::onTileChanged(int x, int y, const TileData& tileData) {
-    auto tileIt = std::find_if(m_gameData.tiles.begin(), m_gameData.tiles.end(),
-        [x, y](const auto& tile) {
-            return tile.x == x && tile.y == y;
-        });
-    GUI::Tile* targetTile;
-    if (tileIt == m_gameData.tiles.end()) {
-        GUI::Tile newTile;
-        newTile.x = x;
-        newTile.y = y;
-        m_gameData.tiles.push_back(newTile);
-        targetTile = &m_gameData.tiles.back();
-    } else {
-        targetTile = &(*tileIt);
+    if (m_gameController) {
+        // Utilise la méthode du GameState pour mettre à jour les ressources de la tuile
+        auto gameState = m_gameController->getGameState();
+        if (gameState && gameState->isMapInitialized()) {
+            // Utilise const_cast pour accéder aux méthodes non-const du GameState
+            // C'est safe car nous savons que gameState pointe vers l'instance gérée par GameController
+            auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
+            mutableGameState->updateTileResources(x, y,
+                tileData.resources[0],  // food
+                tileData.resources[1],  // linemate
+                tileData.resources[2],  // deraumere
+                tileData.resources[3],  // sibur
+                tileData.resources[4],  // mendiane
+                tileData.resources[5],  // phiras
+                tileData.resources[6]   // thystame
+            );
+        }
     }
-    targetTile->food = tileData.resources[0]; // ResourceType::FOOD
-    targetTile->linemate = tileData.resources[1]; // ResourceType::LINEMATE
-    targetTile->deraumere = tileData.resources[2]; // ResourceType::DERAUMERE
-    targetTile->sibur = tileData.resources[3]; // ResourceType::SIBUR
-    targetTile->mendiane = tileData.resources[4]; // ResourceType::MENDIANE
-    targetTile->phiras = tileData.resources[5]; // ResourceType::PHIRAS
-    targetTile->thystame = tileData.resources[6]; // ResourceType::THYSTAME
+    
     if (m_selectedTile.selected && m_selectedTile.x == x && m_selectedTile.y == y) {
-        // Rafraîchir les informations affichées
+        // Rafraîchir les informations affichées si nécessaire
     }
 }
 
-/**
- * Met à jour les tuiles depuis le GameState
- */
-void GameLoop::updateTilesFromGameState(std::shared_ptr<const GameState> gameState) {
-    int mapWidth = gameState->getMapWidth();
-    int mapHeight = gameState->getMapHeight();
-    for (int y = 0; y < mapHeight; ++y) {
-        for (int x = 0; x < mapWidth; ++x) {
-            auto tile = gameState->getTile(x, y);
-            auto tileIt = std::find_if(m_gameData.tiles.begin(), m_gameData.tiles.end(),
-                [x, y](const GUI::Tile& tile) {
-                    return tile.x == x && tile.y == y;
-                });
-            GUI::Tile* targetTile;
-            if (tileIt == m_gameData.tiles.end()) {
-                GUI::Tile newTile;
-                newTile.x = x;
-                newTile.y = y;
-                m_gameData.tiles.push_back(newTile);
-                targetTile = &m_gameData.tiles.back();
-            } else {
-                targetTile = &(*tileIt);
-            }
-            targetTile->food = tile->getResourceQuantity(ResourceType::FOOD);
-            targetTile->linemate = tile->getResourceQuantity(ResourceType::LINEMATE);
-            targetTile->deraumere = tile->getResourceQuantity(ResourceType::DERAUMERE);
-            targetTile->sibur = tile->getResourceQuantity(ResourceType::SIBUR);
-            targetTile->mendiane = tile->getResourceQuantity(ResourceType::MENDIANE);
-            targetTile->phiras = tile->getResourceQuantity(ResourceType::PHIRAS);
-            targetTile->thystame = tile->getResourceQuantity(ResourceType::THYSTAME);
-        }
-    }
-}
-
-/**
- * Met à jour les joueurs depuis le GameState
- */
-void GameLoop::updatePlayersFromGameState(std::shared_ptr<const GameState> gameState) {
-    int mapWidth = gameState->getMapWidth();
-    int mapHeight = gameState->getMapHeight();
-    std::vector<int> updatedPlayerIds;
-    for (int y = 0; y < mapHeight; ++y) {
-        for (int x = 0; x < mapWidth; ++x) {
-            auto tile = gameState->getTile(x, y);
-            std::vector<int> playerIds = gameState->getPlayersOnTile(x, y);
-            for (int playerId : playerIds) {
-                updatedPlayerIds.push_back(playerId);
-                auto playerInfo = gameState->getPlayerInfo(playerId);
-                auto playerInventory = gameState->getPlayerInventory(playerId);
-                if (playerInfo) {
-                    auto playerIt = std::find_if(m_gameData.players.begin(), m_gameData.players.end(),
-                        [playerId](const GUI::Player& player) {
-                            return player.id == playerId;
-                        });
-                    GUI::Player* targetPlayer;
-                    if (playerIt == m_gameData.players.end()) {
-                        GUI::Player newPlayer;
-                        newPlayer.id = playerId;
-                        m_gameData.players.push_back(newPlayer);
-                        targetPlayer = &m_gameData.players.back();
-                    } else {
-                        targetPlayer = &(*playerIt);
-                    }
-                    targetPlayer->team = playerInfo->getTeamName();
-                    targetPlayer->x = playerInfo->getX();
-                    targetPlayer->y = playerInfo->getY();
-                    targetPlayer->orientation = playerInfo->getOrientation();
-                    targetPlayer->level = playerInfo->getLevel();
-                    if (playerInventory) {
-                        targetPlayer->inventory.food = playerInventory->getFood();
-                        targetPlayer->inventory.linemate = playerInventory->getLinemate();
-                        targetPlayer->inventory.deraumere = playerInventory->getDeraumere();
-                        targetPlayer->inventory.sibur = playerInventory->getSibur();
-                        targetPlayer->inventory.mendiane = playerInventory->getMendiane();
-                        targetPlayer->inventory.phiras = playerInventory->getPhiras();
-                        targetPlayer->inventory.thystame = playerInventory->getThystame();
-                    }
-                }
-            }
-        }
-    }
-    m_gameData.players.erase(
-        std::remove_if(m_gameData.players.begin(), m_gameData.players.end(),
-            [&updatedPlayerIds](const GUI::Player& player) {
-                return std::find(updatedPlayerIds.begin(), updatedPlayerIds.end(), player.id) == updatedPlayerIds.end();
-            }),
-        m_gameData.players.end()
-    );
-}
-
-/**
- * Met à jour les équipes depuis le GameState
- */
-void GameLoop::updateTeamsFromGameState(std::shared_ptr<const GameState> gameState) {
-    const std::vector<std::string>& teamNames = gameState->getTeamNames();
-    for (const auto& teamName : teamNames) {
-        auto teamIt = std::find_if(m_gameData.teams.begin(), m_gameData.teams.end(),
-            [&teamName](const GUI::Team& team) {
-                return team.name == teamName;
-            });
-        if (teamIt == m_gameData.teams.end()) {
-            GUI::Team newTeam;
-            newTeam.name = teamName;
-            m_gameData.teams.push_back(newTeam);
-        }
-    }
-    m_gameData.teams.erase(
-        std::remove_if(m_gameData.teams.begin(), m_gameData.teams.end(),
-            [&teamNames](const GUI::Team& team) {
-                return std::find(teamNames.begin(), teamNames.end(), team.name) == teamNames.end();
-            }),
-        m_gameData.teams.end()
-    );
-}
-
-/**
- * Met à jour les broadcasts depuis le GameState
- */
-void GameLoop::updateBroadcastsFromGameState(std::shared_ptr<const GameState> gameState) {
-    const auto& stateBroadcasts = gameState->getBroadcasts();
-    m_gameData.broadcasts.clear();
-    for (const auto& stateBroadcast : stateBroadcasts) {
-        GUI::Broadcast guiBroadcast;
-        guiBroadcast.team = stateBroadcast.team;
-        guiBroadcast.message = stateBroadcast.message;
-        guiBroadcast.timeLeft = stateBroadcast.timeLeft;
-        guiBroadcast.playerId = stateBroadcast.playerId;
-        m_gameData.broadcasts.push_back(guiBroadcast);
-    }
-}
+// Les méthodes de mise à jour ont été supprimées car nous utilisons
+// directement les entités du GameState au lieu des structs de GameData

@@ -96,9 +96,11 @@ void UIWindowFactory::renderMenuWindow() {
     }
 }
 
-void UIWindowFactory::updateAllWindows(const GUI::GameData& gameData) {
+void UIWindowFactory::updateAllWindows(std::shared_ptr<const GameState> gameState,
+                                      int mapWidth, int mapHeight,
+                                      float gameTime, int frequency, int gameTick) {
     for (auto& pair : m_windows) {
-        pair.second->updateData(gameData);
+        pair.second->updateData(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
     }
 }
 

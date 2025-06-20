@@ -37,7 +37,9 @@ public:
 
 protected:
     void renderContent() override;
-    void updateSpecificData(const GameData& gameData) override;
+    void updateSpecificData(std::shared_ptr<const GameState> gameState,
+                          int mapWidth, int mapHeight,
+                          float gameTime, int frequency, int gameTick) override;
 
 private:
     /**

@@ -20,6 +20,7 @@
 #include "IGameEntity.hpp"
 #include "GameEntitiesAll.hpp"
 #include "EntityFactory.hpp"
+#include "IBroadcast.hpp"
 
 class GameState {
 public:
@@ -43,6 +44,10 @@ public:
     int getTimeUnit() const;
     bool isGameEnded() const;
     const std::string& getWinningTeam() const;
+
+    // Récupère tous les IDs de joueurs présents dans le jeu
+    std::vector<int> getPlayerIds() const;
+
     void setMapSize(int width, int height);
     void updateTileResources(int x, int y, int food, int linemate, int deraumere,
                             int sibur, int mendiane, int phiras, int thystame);
@@ -61,7 +66,7 @@ public:
     // Méthodes pour gérer les broadcasts
     void addBroadcast(int playerId, const std::string& team, const std::string& message);
     void updateBroadcasts(float deltaTime);
-    std::deque<Broadcast> getBroadcasts() const;
+    std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
 
 private:
     bool isValidCoordinates(int x, int y) const;

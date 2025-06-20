@@ -35,7 +35,9 @@ public:
 
 protected:
     void renderContent() override;
-    void updateSpecificData(const GameData& gameData) override;
+    void updateSpecificData(std::shared_ptr<const GameState> gameState,
+                          int mapWidth, int mapHeight,
+                          float gameTime, int frequency, int gameTick) override;
 
 private:
     /**
@@ -44,10 +46,10 @@ private:
     void displayNoPlayerSelected();
 
     /**
-     * @brief Recherche le joueur sélectionné dans les données de jeu
+     * @brief Recherche le joueur sélectionné dans l'état de jeu
      * @return Pointeur vers le joueur sélectionné ou nullptr si non trouvé
      */
-    const Player* findSelectedPlayer();
+    std::shared_ptr<const IPlayer> findSelectedPlayer();
 
     /**
      * @brief Affiche le message lorsque le joueur sélectionné n'est pas trouvé
@@ -60,7 +62,7 @@ private:
      * @param yOffset Position Y pour l'affichage
      * @return Nouvelle position Y après l'affichage
      */
-    float displayPlayerIdentity(const Player* selectedPlayer, float yOffset);
+    float displayPlayerIdentity(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset);
 
     /**
      * @brief Affiche les informations de position et d'orientation du joueur
@@ -68,7 +70,7 @@ private:
      * @param yOffset Position Y pour l'affichage
      * @return Nouvelle position Y après l'affichage
      */
-    float displayPositionInfo(const Player* selectedPlayer, float yOffset);
+    float displayPositionInfo(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset);
 
     /**
      * @brief Affiche le niveau du joueur
@@ -76,7 +78,7 @@ private:
      * @param yOffset Position Y pour l'affichage
      * @return Nouvelle position Y après l'affichage
      */
-    float displayLevelInfo(const Player* selectedPlayer, float yOffset);
+    float displayLevelInfo(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset);
 
     /**
      * @brief Affiche l'inventaire du joueur
@@ -84,7 +86,7 @@ private:
      * @param yOffset Position Y pour l'affichage
      * @return Nouvelle position Y après l'affichage
      */
-    float displayInventory(const Player* selectedPlayer, float yOffset);
+    float displayInventory(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset);
 
     /**
      * @brief Obtient la représentation textuelle de l'orientation du joueur
@@ -94,11 +96,11 @@ private:
     std::string getOrientationString(int orientation);
 
     /**
-     * @brief Vérifie si le joueur sélectionné existe dans les données de jeu
-     * @param gameData Les données de jeu actuelles
+     * @brief Vérifie si le joueur sélectionné existe dans l'état de jeu
+     * @param gameState L'état de jeu actuel
      * @return true si le joueur existe, false sinon
      */
-    bool playerExistsInGameData(const GameData& gameData);
+    bool playerExistsInGameState(std::shared_ptr<const GameState> gameState);
 
     int m_selectedPlayerId;
     bool m_hasSelectedPlayer;

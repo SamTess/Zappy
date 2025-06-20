@@ -14,6 +14,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include "entities/Broadcast.hpp"
 
 GameState::GameState() {
     _isMapInitialized = false;
@@ -148,6 +149,15 @@ const std::string& GameState::getWinningTeam() const {
     return _winningTeam;
 }
 
+std::vector<int> GameState::getPlayerIds() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    std::vector<int> playerIds;
+    playerIds.reserve(_players.size());
+    for (const auto& pair : _players) {
+        playerIds.push_back(pair.first);
+    }
+    return playerIds;
+}
 
 void GameState::setMapSize(int width, int height) {
     std::lock_guard<std::mutex> lock(_mutex);
@@ -280,11 +290,11 @@ void GameState::setGameEnded(bool ended, const std::string& winningTeam) {
 
 void GameState::addBroadcast(int playerId, const std::string& team, const std::string& message) {
     std::lock_guard<std::mutex> lock(_mutex);
-    Broadcast newBroadcast;
-    newBroadcast.playerId = playerId;
-    newBroadcast.team = team;
-    newBroadcast.message = message;
-    newBroadcast.timeLeft = 15.0f;
+    // Utilisation du factory pour créer un objet Broadcast
+    auto newBroadcast = _entityFactory != nullptr ?
+        _entityFactory->createBroadcast(team, message, playerId) :
+        std::make_shared<Broadcast>(team, message, playerId);
+    
     _broadcasts.push_back(newBroadcast);
     while (_broadcasts.size() > _maxBroadcasts) {
         _broadcasts.pop_front();
@@ -294,8 +304,8 @@ void GameState::addBroadcast(int playerId, const std::string& team, const std::s
 void GameState::updateBroadcasts(float deltaTime) {
     std::lock_guard<std::mutex> lock(_mutex);
     for (auto it = _broadcasts.begin(); it != _broadcasts.end();) {
-        it->timeLeft -= deltaTime;
-        if (it->timeLeft <= 0.0f) {
+        (*it)->updateTimeLeft(deltaTime);
+        if ((*it)->getTimeLeft() <= 0.0f) {
             it = _broadcasts.erase(it);
         } else {
             ++it;
@@ -303,9 +313,14 @@ void GameState::updateBroadcasts(float deltaTime) {
     }
 }
 
-std::deque<Broadcast> GameState::getBroadcasts() const {
+std::vector<std::shared_ptr<const IBroadcast>> GameState::getBroadcasts() const {
     std::lock_guard<std::mutex> lock(_mutex);
-    return _broadcasts;
+    std::vector<std::shared_ptr<const IBroadcast>> result;
+    result.reserve(_broadcasts.size());
+    for (const auto& broadcast : _broadcasts) {
+        result.push_back(broadcast);
+    }
+    return result;
 }
 
 bool GameState::isValidCoordinates(int x, int y) const {

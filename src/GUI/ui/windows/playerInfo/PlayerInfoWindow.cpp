@@ -25,7 +25,7 @@ void GUI::PlayerInfoWindow::renderContent() {
         displayNoPlayerSelected();
         return;
     }
-    const Player* selectedPlayer = findSelectedPlayer();
+    auto selectedPlayer = findSelectedPlayer();
     if (!selectedPlayer) {
         displayPlayerNotFound();
         return;
@@ -47,13 +47,11 @@ void GUI::PlayerInfoWindow::displayNoPlayerSelected() {
     );
 }
 
-const Player* GUI::PlayerInfoWindow::findSelectedPlayer() {
-    for (const auto& player : m_gameData.players) {
-        if (player.id == m_selectedPlayerId) {
-            return &player;
-        }
+std::shared_ptr<const IPlayer> GUI::PlayerInfoWindow::findSelectedPlayer() {
+    if (!m_gameState) {
+        return nullptr;
     }
-    return nullptr;
+    return m_gameState->getPlayerInfo(m_selectedPlayerId);
 }
 
 void GUI::PlayerInfoWindow::displayPlayerNotFound() {
@@ -66,9 +64,9 @@ void GUI::PlayerInfoWindow::displayPlayerNotFound() {
     );
 }
 
-float GUI::PlayerInfoWindow::displayPlayerIdentity(const Player* selectedPlayer, float yOffset) {
+float GUI::PlayerInfoWindow::displayPlayerIdentity(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
     std::stringstream idTeam;
-    idTeam << "ID: " << selectedPlayer->id << " | Équipe: " << selectedPlayer->team;
+    idTeam << "ID: " << selectedPlayer->getId() << " | Équipe: " << selectedPlayer->getTeamName();
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -89,10 +87,10 @@ std::string GUI::PlayerInfoWindow::getOrientationString(int orientation) {
     }
 }
 
-float GUI::PlayerInfoWindow::displayPositionInfo(const Player* selectedPlayer, float yOffset) {
+float GUI::PlayerInfoWindow::displayPositionInfo(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
     std::stringstream posInfo;
-    std::string orientationStr = getOrientationString(selectedPlayer->orientation);
-    posInfo << "Position: (" << selectedPlayer->x << ", " << selectedPlayer->y
+    std::string orientationStr = getOrientationString(selectedPlayer->getOrientation());
+    posInfo << "Position: (" << selectedPlayer->getX() << ", " << selectedPlayer->getY()
             << ") | Orientation: " << orientationStr;
     m_guiLib->DrawLabel(
         m_position.x + 10,
@@ -104,9 +102,9 @@ float GUI::PlayerInfoWindow::displayPositionInfo(const Player* selectedPlayer, f
     return yOffset + 20;
 }
 
-float GUI::PlayerInfoWindow::displayLevelInfo(const Player* selectedPlayer, float yOffset) {
+float GUI::PlayerInfoWindow::displayLevelInfo(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
     std::stringstream levelInfo;
-    levelInfo << "Niveau: " << selectedPlayer->level;
+    levelInfo << "Niveau: " << selectedPlayer->getLevel();
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -117,7 +115,7 @@ float GUI::PlayerInfoWindow::displayLevelInfo(const Player* selectedPlayer, floa
     return yOffset + 30;
 }
 
-float GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, float yOffset) {
+float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -126,44 +124,53 @@ float GUI::PlayerInfoWindow::displayInventory(const Player* selectedPlayer, floa
         "Inventaire:"
     );
     float newYOffset = yOffset + 20;
-    const std::pair<std::string, int> resources[] = {
-        {"Nourriture", selectedPlayer->inventory.food},
-        {"Linemate", selectedPlayer->inventory.linemate},
-        {"Deraumere", selectedPlayer->inventory.deraumere},
-        {"Sibur", selectedPlayer->inventory.sibur},
-        {"Mendiane", selectedPlayer->inventory.mendiane},
-        {"Phiras", selectedPlayer->inventory.phiras},
-        {"Thystame", selectedPlayer->inventory.thystame}
-    };
+    
+    // Récupérer l'inventaire du joueur depuis le GameState
+    if (m_gameState) {
+        auto inventory = m_gameState->getPlayerInventory(selectedPlayer->getId());
+        if (inventory) {
+            const std::pair<std::string, int> resources[] = {
+                {"Nourriture", inventory->getFood()},
+                {"Linemate", inventory->getLinemate()},
+                {"Deraumere", inventory->getDeraumere()},
+                {"Sibur", inventory->getSibur()},
+                {"Mendiane", inventory->getMendiane()},
+                {"Phiras", inventory->getPhiras()},
+                {"Thystame", inventory->getThystame()}
+            };
 
-    for (const auto& resource : resources) {
-        std::stringstream ss;
-        ss << resource.first << ": " << resource.second;
-        m_guiLib->DrawLabel(
-            m_position.x + 10,
-            newYOffset,
-            m_dimensions.x - 20,
-            20,
-            ss.str()
-        );
-        newYOffset += 20;
+            for (const auto& resource : resources) {
+                std::stringstream ss;
+                ss << resource.first << ": " << resource.second;
+                m_guiLib->DrawLabel(
+                    m_position.x + 10,
+                    newYOffset,
+                    m_dimensions.x - 20,
+                    20,
+                    ss.str()
+                );
+                newYOffset += 20;
+            }
+        }
     }
     return newYOffset;
 }
 
-void GUI::PlayerInfoWindow::updateSpecificData(const GUI::GameData& gameData) {
-    if (m_hasSelectedPlayer && !playerExistsInGameData(gameData)) {
+void GUI::PlayerInfoWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
+                                              int mapWidth, int mapHeight,
+                                              float gameTime, int frequency, int gameTick) {
+    (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
+    if (m_hasSelectedPlayer && !playerExistsInGameState(gameState)) {
         m_hasSelectedPlayer = false;
     }
 }
 
-bool GUI::PlayerInfoWindow::playerExistsInGameData(const GUI::GameData& gameData) {
-    for (const auto& player : gameData.players) {
-        if (player.id == m_selectedPlayerId) {
-            return true;
-        }
+bool GUI::PlayerInfoWindow::playerExistsInGameState(std::shared_ptr<const GameState> gameState) {
+    if (!gameState) {
+        return false;
     }
-    return false;
+    auto player = gameState->getPlayerInfo(m_selectedPlayerId);
+    return player != nullptr;
 }
 
 void GUI::PlayerInfoWindow::setSelectedPlayer(int playerId) {
