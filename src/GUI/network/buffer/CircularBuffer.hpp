@@ -10,17 +10,14 @@
 
 #include <string>
 #include <mutex>
-
+#include <memory>
 class CircularBuffer {
     public:
         explicit CircularBuffer(size_t capacity = 4096);
         ~CircularBuffer() = default;
 
-        bool write(const char* data, size_t size);
+        bool write(const std::string data, size_t size);
         bool write(const std::string& data);
-
-        size_t read(std::string& data, size_t size);
-        std::string read(size_t size);
 
         std::string readLine();
 

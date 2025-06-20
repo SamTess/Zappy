@@ -14,7 +14,7 @@ CircularBuffer::CircularBuffer(size_t capacity)
     : _buffer(capacity, '\0'), _head(0), _tail(0), _size(0), _capacity(capacity) {
 }
 
-bool CircularBuffer::write(const char* data, size_t size) {
+bool CircularBuffer::write(const std::string data, size_t size) {
     std::lock_guard<std::mutex> lock(_mutex);
     for (size_t i = 0; i < size; ++i) {
         _buffer[_head] = data[i];
@@ -29,34 +29,7 @@ bool CircularBuffer::write(const char* data, size_t size) {
 }
 
 bool CircularBuffer::write(const std::string& data) {
-    return write(data.c_str(), data.size());
-}
-
-size_t CircularBuffer::read(std::string& data, size_t size) { // a modifier par un pointer de std string
-    std::lock_guard<std::mutex> lock(_mutex);
-    size_t toRead = std::min(size, _size);
-    data.clear();
-    data.reserve(toRead);
-
-    for (size_t i = 0; i < toRead; ++i) {
-        data += _buffer[_tail];
-        _tail = nextIndex(_tail);
-        --_size;
-    }
-    return toRead;
-}
-
-std::string CircularBuffer::read(size_t size) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    size_t toRead = std::min(size, _size);
-    std::string result;
-    result.reserve(toRead);
-    for (size_t i = 0; i < toRead; ++i) {
-        result += _buffer[_tail];
-        _tail = nextIndex(_tail);
-        --_size;
-    }
-    return result;
+    return write(data, data.size());
 }
 
 std::string CircularBuffer::readLine() {

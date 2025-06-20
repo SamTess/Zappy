@@ -26,7 +26,6 @@ NetworkManager::NetworkManager()
       _receiveBuffer(4096),
       _gameController(nullptr),
       _isConnected(false) {
-    // Activer le logging pour debug
     NetworkLogger::get().setEnabled(true);
 }
 
@@ -153,7 +152,7 @@ void NetworkManager::networkThreadLoop() {
 bool NetworkManager::processInitialWelcomeData() {
     while (_receiveBuffer.hasLine()) {
         std::string message = _receiveBuffer.readLine();
-        message += "\n"; // Remettre le \n pour compatibilité
+        message += "\n";
         NetworkLogger::get().log(std::string("Initial message extracted: ") + message);
         if (message.find("WELCOME") != std::string::npos) {
             NetworkLogger::get().log("WELCOME message received during initialization");
