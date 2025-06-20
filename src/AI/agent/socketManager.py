@@ -2,6 +2,7 @@ import threading
 import queue
 import socket
 import uuid
+import agent.circularBuffer as circularBuffer
 
 class SocketManager:
   def __init__(self, sock):
@@ -10,8 +11,8 @@ class SocketManager:
     self.pending_requests = {}
     self.running = False
     self.thread = None
-    self.buffer = ""
     self.lock = threading.Lock()
+    self.circ_buffer = circularBuffer.CharCircularBuffer(8192)
 
 
   def start(self):
@@ -25,20 +26,18 @@ class SocketManager:
     if self.thread:
       self.thread.join()
 
-
 # fonction bloquante
   def _read_line(self):
-    while '\n' not in self.buffer:
+    data = ""
+    while not self.circ_buffer.has_newline():
       try:
-        data = self.sock.recv(1024).decode('utf-8')
+        data += self.sock.recv(1024).decode('utf-8')
         if not data:
           return None
-        self.buffer += data
+        self.circ_buffer.write(data)
       except socket.error:
         return None
-    line, self.buffer = self.buffer.split('\n', 1)
-    return line.strip()
-
+    return self.circ_buffer.read()
 
 # détermine si la ligne est une réponse à une requête ou un message du serveur
   def _handle_message(self, message):
@@ -68,7 +67,6 @@ class SocketManager:
           self._handle_message(message)
         elif message is None:
           break
-
       except Exception as e:
         print(f"Communication error: {e}")
         self.running = False
