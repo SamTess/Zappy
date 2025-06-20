@@ -14,13 +14,13 @@
 #include "../../textureManager/ModelManager.hpp"
 
 Player::Player() : _id(0), _x(0), _y(0), _orientation(0), _level(1), _teamName(""), _isAlive(true),
-    _lastRotation(180.0f), _currentRotation(180.0f) {}
+    _lastRotation(180.0f), _currentRotation(0.0f) {}
 
 Player::Player(const PlayerInfoData& data)
     : _id(data.getId()), _x(data.getX()), _y(data.getY()),
     _orientation(data.getOrientation()), _level(data.getLevel()),
     _teamName(data.getTeamName()), _isAlive(data.isAlive()) {
-    _currentRotation = 180.0f;
+    _currentRotation = orientationToRotationDegrees(_orientation);
     _lastRotation = _currentRotation;
 }
 
@@ -134,11 +134,11 @@ void Player::renderPlayer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
 float Player::orientationToRotationDegrees(int orientation) const {
     switch (orientation) {
         case 1: // RIGHT
-            return 0.0f;
+            return 180.0f;
         case 2: // DOWN
             return 90.0f;
         case 3: // LEFT
-            return 180.0f;
+            return 0.0f;
         case 4: // UP
             return 270.0f;
         default:
