@@ -61,24 +61,6 @@ std::string GUI::BroadcastsWindow::formatBroadcastMessage(const Broadcast& broad
            std::to_string(static_cast<int>(broadcast.timeLeft)) + "s)";
 }
 
-void GUI::BroadcastsWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                               int mapWidth, int mapHeight,
-                                               float gameTime, int frequency, int gameTick) {
-    (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
-    if (gameState) {
-        // Récupérer les broadcasts depuis le GameState
-        auto broadcasts = gameState->getBroadcasts();
-        m_broadcasts.clear();
-        for (const auto& broadcast : broadcasts) {
-            Broadcast localBroadcast;
-            localBroadcast.team = broadcast->getTeam();
-            localBroadcast.message = broadcast->getMessage();
-            localBroadcast.timeLeft = broadcast->getTimeLeft();
-            m_broadcasts.push_back(localBroadcast);
-        }
-    }
-}
-
 void GUI::BroadcastsWindow::updateBroadcastMessages() {
     const float frameDuration = 0.016f;
     for (auto it = m_broadcasts.begin(); it != m_broadcasts.end();) {

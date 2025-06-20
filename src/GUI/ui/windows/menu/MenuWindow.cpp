@@ -392,13 +392,6 @@ void MenuWindow::renderWindowsSubmenu() {
     drawWindowsList(startX, startY, submenuWidth, buttonHeight);
 }
 
-void GUI::MenuWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                         int mapWidth, int mapHeight,
-                                         float gameTime, int frequency, int gameTick) {
-    (void)gameState; (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
-    // Cette fenêtre n'a pas besoin de données spécifiques du jeu
-}
-
 void MenuWindow::setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory) {
     m_windowFactory = factory;
     if (m_windowFactory) {

@@ -50,11 +50,4 @@ void TimeInfoWindow::renderContent() {
     );
 }
 
-void TimeInfoWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                        int mapWidth, int mapHeight,
-                                        float gameTime, int frequency, int gameTick) {
-    (void)gameState; (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
-    // Ces données sont maintenant directement accessible via les membres de la classe de base
-}
-
 } // namespace GUI

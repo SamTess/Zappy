@@ -71,13 +71,6 @@ bool ControlsWindow::drawViewModeButton(float yOffset, size_t index,
     );
 }
 
-void ControlsWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                        int mapWidth, int mapHeight,
-                                        float gameTime, int frequency, int gameTick) {
-    (void)gameState; (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
-    // Cette fenêtre n'a pas besoin de données spécifiques du jeu
-}
-
 void ControlsWindow::setViewMode(int mode) {
     if (mode >= 0 && mode < static_cast<int>(m_viewModes.size()))
         m_currentViewMode = mode;

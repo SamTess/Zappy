@@ -50,12 +50,6 @@ protected:
      */
     virtual void renderContent() = 0;
 
-    /**
-     * @brief Met à jour les données spécifiques à la fenêtre
-     */
-    virtual void updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                  int mapWidth, int mapHeight,
-                                  float gameTime, int frequency, int gameTick) = 0;
 
     // Bibliothèque GUI
     std::shared_ptr<IGuiLib> m_guiLib;

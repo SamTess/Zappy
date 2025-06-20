@@ -13,7 +13,6 @@
 #include "UIWindowFactory.hpp"
 #include "../gameController/GameState.hpp"
 #include "../../Shared/IGuiLib.hpp"
-#include "../gameController/GameState.hpp"
 
 namespace GUI {
 

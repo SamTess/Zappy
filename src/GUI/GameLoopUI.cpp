@@ -28,18 +28,13 @@ void GameLoop::updateGameData() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
     lastTime = currentTime;
-    
-    // Mise à jour du temps de jeu
     m_gameTime += deltaTime;
     m_gameTick++;
-    
-    // Gestion des timers d'incantation
     for (auto it = playerIncantationTimers.begin(); it != playerIncantationTimers.end(); ) {
         int playerId = it->first;
         float& timer = it->second;
         timer -= deltaTime;
         if (timer <= 0.0f) {
-            // Mettre à jour le joueur via le GameState
             if (m_gameController) {
                 auto gameState = m_gameController->getGameState();
                 auto player = gameState->getPlayerInfo(playerId);
@@ -53,40 +48,29 @@ void GameLoop::updateGameData() {
             ++it;
         }
     }
-    
-    // Mise à jour du GameController et GameState
     if (m_gameController) {
         m_gameController->updateBroadcasts(deltaTime);
         auto gameState = m_gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
-            // Mise à jour des informations de carte
             m_mapWidth = gameState->getMapWidth();
             m_mapHeight = gameState->getMapHeight();
             m_frequency = gameState->getTimeUnit();
         }
     }
-    
-    // Si le joueur a cliqué sur une case, vérifier les interactions
-    if (!m_userInterface->hasHandledMouseEvent() && 
-        !m_userInterface->isMouseOverUI() && 
+    if (!m_userInterface->hasHandledMouseEvent() &&
+        !m_userInterface->isMouseOverUI() &&
         m_graphics->IsMouseButtonPressed(0)) {
         ZappyTypes::Vector2 mousePos = m_graphics->GetMousePosition();
-        
-        // Calcul des coordonnées de la case cliquée (à adapter selon votre système de rendu)
         int tileX = static_cast<int>(mousePos.x / 32) % m_mapWidth;
         int tileY = static_cast<int>(mousePos.y / 32) % m_mapHeight;
-        
         handleTileSelection(tileX, tileY);
-    }    // Si le joueur a cliqué sur une case, vérifier les interactions
-    if (!m_userInterface->hasHandledMouseEvent() && 
-        !m_userInterface->isMouseOverUI() && 
+    }
+    if (!m_userInterface->hasHandledMouseEvent() &&
+        !m_userInterface->isMouseOverUI() &&
         m_graphics->IsMouseButtonPressed(0)) {
         ZappyTypes::Vector2 mousePos = m_graphics->GetMousePosition();
-        
-        // Calcul des coordonnées de la case cliquée (à adapter selon votre système de rendu)
         int tileX = static_cast<int>(mousePos.x / 32) % m_mapWidth;
         int tileY = static_cast<int>(mousePos.y / 32) % m_mapHeight;
-        
         handleTileSelection(tileX, tileY);
     }
 }
@@ -97,15 +81,10 @@ void GameLoop::updateGameData() {
 void GameLoop::handleTileSelection(int x, int y) {
     if (x < 0 || y < 0 || x >= m_mapWidth || y >= m_mapHeight)
         return;
-
     m_userInterface->setSelectedTile(x, y);
-    
-    // Au lieu de créer une tuile, on en récupère une du GameState
     if (m_gameController) {
         auto gameState = m_gameController->getGameState();
         auto tile = gameState->getTile(x, y);
-        // La tuile est déjà dans le GameState, pas besoin de la créer
-        
         m_selectedTile.x = x;
         m_selectedTile.y = y;
         m_selectedTile.selected = true;
@@ -137,17 +116,13 @@ void GameLoop::onMapSizeChanged(int width, int height) {
     m_mapWidth = width;
     m_mapHeight = height;
     m_camera->setMapDimensions(width, height);
-    // Les dimensions sont maintenant stockées directement dans m_mapWidth et m_mapHeight
     updateCameraForMapSize();
 }
 
 void GameLoop::onTileChanged(int x, int y, const TileData& tileData) {
     if (m_gameController) {
-        // Utilise la méthode du GameState pour mettre à jour les ressources de la tuile
         auto gameState = m_gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
-            // Utilise const_cast pour accéder aux méthodes non-const du GameState
-            // C'est safe car nous savons que gameState pointe vers l'instance gérée par GameController
             auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
             mutableGameState->updateTileResources(x, y,
                 tileData.resources[0],  // food
@@ -160,11 +135,7 @@ void GameLoop::onTileChanged(int x, int y, const TileData& tileData) {
             );
         }
     }
-    
     if (m_selectedTile.selected && m_selectedTile.x == x && m_selectedTile.y == y) {
         // Rafraîchir les informations affichées si nécessaire
     }
 }
-
-// Les méthodes de mise à jour ont été supprimées car nous utilisons
-// directement les entités du GameState au lieu des structs de GameData

@@ -124,8 +124,6 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
         "Inventaire:"
     );
     float newYOffset = yOffset + 20;
-    
-    // Récupérer l'inventaire du joueur depuis le GameState
     if (m_gameState) {
         auto inventory = m_gameState->getPlayerInventory(selectedPlayer->getId());
         if (inventory) {
@@ -154,15 +152,6 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
         }
     }
     return newYOffset;
-}
-
-void GUI::PlayerInfoWindow::updateSpecificData(std::shared_ptr<const GameState> gameState,
-                                              int mapWidth, int mapHeight,
-                                              float gameTime, int frequency, int gameTick) {
-    (void)mapWidth; (void)mapHeight; (void)gameTime; (void)frequency; (void)gameTick;
-    if (m_hasSelectedPlayer && !playerExistsInGameState(gameState)) {
-        m_hasSelectedPlayer = false;
-    }
 }
 
 bool GUI::PlayerInfoWindow::playerExistsInGameState(std::shared_ptr<const GameState> gameState) {
