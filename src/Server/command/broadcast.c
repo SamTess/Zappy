@@ -13,24 +13,26 @@
 #include <stdlib.h>
 #include <math.h>
 
-static int calculate_shortest_distance_x(int sender_x, int receiver_x, int width)
+static int calculate_shortest_distance_x(int sender_x,
+    int receiver_x, int width)
 {
     int dx = sender_x - receiver_x;
 
     if (dx > width / 2)
         dx -= width;
-    if (dx < -width / 2)
+    if (dx < (-width) / 2)
         dx += width;
     return dx;
 }
 
-static int calculate_shortest_distance_y(int sender_y, int receiver_y, int height)
+static int calculate_shortest_distance_y(int sender_y,
+    int receiver_y, int height)
 {
     int dy = sender_y - receiver_y;
 
     if (dy > height / 2)
         dy -= height;
-    if (dy < -height / 2)
+    if (dy < (-height) / 2)
         dy += height;
     return dy;
 }
@@ -62,7 +64,8 @@ static int get_tile_for_north_orientation(int dx, int dy)
 {
     if (dx == 0 && dy == 0)
         return 0;
-    return get_tile_for_north_bis(atan2(-dy, dx) * 180.0 / 3.141592653589793238460);
+    return get_tile_for_north_bis(atan2(-dy, dx) *
+        180.0 / 3.141592653589793238460);
 }
 
 static int calculate_direction(client_t *receiver, int dx, int dy)
