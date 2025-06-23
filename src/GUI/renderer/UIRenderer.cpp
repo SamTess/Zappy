@@ -19,7 +19,7 @@ UIRenderer::UIRenderer()
 }
 
 void UIRenderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui, std::shared_ptr<CameraController> camera) {
-    m_fps = graphics->GetFPS();    
+    m_fps = graphics->GetFPS();
     renderCameraInfo(gui, camera);
 }
 

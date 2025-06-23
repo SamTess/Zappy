@@ -30,7 +30,7 @@ void AUIWindow::initialize(const ZappyTypes::Vector2& position,
 
 bool AUIWindow::render() {
     if (!m_visible)
-        return true; 
+        return true;
     if (m_showWindowBox) {
         ZappyTypes::Rectangle windowRect = {
             m_position.x, m_position.y,

@@ -43,13 +43,13 @@ public:
     void stopDragging() override;
     bool isDragging() const override;
     bool isPositionInWindow(const ZappyTypes::Vector2& position) const override;
-    
+
     /**
      * @brief Contrôle l'affichage de la boîte de fenêtre avec barre de titre
      * @param show true pour afficher, false pour masquer
      */
     void setShowWindowBox(bool show);
-    
+
     /**
      * @brief Récupère l'état d'affichage de la boîte de fenêtre
      * @return true si la boîte est affichée, false sinon
