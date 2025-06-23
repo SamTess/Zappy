@@ -110,6 +110,7 @@ private:
      * @return La couleur calculée
      */
     ZappyTypes::Color calculateTileColor(int x, int y);
+    void renderVictoryScreen();
 };
 
 } // namespace Zappy

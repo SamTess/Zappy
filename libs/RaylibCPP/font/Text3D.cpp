@@ -43,7 +43,6 @@ void Text3D::DrawTextWave3D(::Font font, const std::string& text, Vector3 positi
 
 Vector3 Text3D::MeasureTextWave3D(::Font font, const std::string& text,
     float fontSize, float fontSpacing, float lineSpacing) {
-    std::cout << "MeasureTextWave3D: " << text << std::endl;
     return Text3DMeasurement::measureText(font, text, fontSize, fontSpacing, lineSpacing);
 }
 
