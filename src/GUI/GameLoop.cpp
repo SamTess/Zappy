@@ -84,6 +84,7 @@ void GameLoop::setupComponents() {
     m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
     m_userInterface = std::make_shared<GUI::UserInterface>(m_gui);
     m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    m_userInterface->setNetworkManager(m_networkManager);
 }
 
 int GameLoop::run() {

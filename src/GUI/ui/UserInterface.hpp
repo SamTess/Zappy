@@ -70,6 +70,12 @@ public:
     void addBroadcast(const std::string& team, const std::string& message);
 
     /**
+     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
+     * @param networkManager Pointeur vers le NetworkManager
+     */
+    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
+
+    /**
      * @brief Définit le mode de vue
      * @param mode Indice du mode de vue
      */
