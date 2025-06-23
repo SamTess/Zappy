@@ -15,6 +15,7 @@
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
+
 GameLoop::GameLoop(std::shared_ptr<NetworkManager> networkManager)
     : m_host("localhost"), m_port(4242), m_networkManager(networkManager) {
 }
@@ -26,6 +27,13 @@ bool GameLoop::init() {
     if (!loadModels())
         return false;
     setupComponents();
+    try {
+        m_graphics->PlayMusic("assets/music/music.mp3");
+        m_graphics->SetMusicVolume(0.5f);
+        std::cout << "Musique chargée et démarrée avec succès" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur lors du chargement de la musique: " << e.what() << std::endl;
+    }
     return true;
 }
 
@@ -87,6 +95,7 @@ int GameLoop::run() {
         return 84;
     while (!m_graphics->WindowShouldClose()) {
         m_camera->update(m_graphics);
+        m_graphics->UpdateMusic();
         m_graphics->BeginDrawing();
         if (m_renderer) {
             m_renderer->renderSkybox(m_graphics);
@@ -142,6 +151,7 @@ void GameLoop::updateCameraForMapSize() {
         cameraDistance = 10.0f;
     if (cameraDistance > 50.0f)
         cameraDistance = 50.0f;
+    m_graphics->UpdateMusic();
     m_camera->reset();
     m_camera->distance() = cameraDistance;
 }

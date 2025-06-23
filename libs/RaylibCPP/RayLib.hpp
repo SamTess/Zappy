@@ -19,6 +19,7 @@
 #include "font/Font.hpp"
 #include "input/Input.hpp"
 #include "audio/Audio.hpp"
+#include "audio/Audio.hpp"
 #include "camera/Camera.hpp"
 
 class RayLib : public IGraphicsLib {
@@ -109,5 +110,6 @@ private:
     std::optional<raylibcpp::Camera2DWrap> _camera2D;
     std::optional<raylibcpp::Camera3DWrap> _camera3D;
     std::optional<raylibcpp::Texture3DWrap> _texture3D;
+    std::optional<raylibcpp::Audio> _audio;
     bool _initialized = false;
 };
