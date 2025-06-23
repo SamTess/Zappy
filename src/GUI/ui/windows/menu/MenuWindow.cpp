@@ -74,7 +74,7 @@ void GUI::MenuWindow::resetAllSubmenus() {
 float GUI::MenuWindow::getSubmenuHeight() const {
     if (m_showGraphicsSubmenu) return 150;
     if (m_showAudioSubmenu) return 150;
-    if (m_showGameplaySubmenu) return 280;  // Augmenté pour accommoder tous les contrôles
+    if (m_showGameplaySubmenu) return 200;
     if (m_showWindowsSubmenu) return 300;
     return 0;
 }
@@ -319,7 +319,7 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
 
 void MenuWindow::renderGameplaySubmenu() {
     float submenuWidth = 300;
-    float submenuHeight = 280;  // Augmenté pour accommoder tous les contrôles
+    float submenuHeight = 200;
     float sliderHeight = 30;
     float startX = m_position.x + m_dimensions.x + 160;
     float startY = m_position.y + m_dimensions.y;

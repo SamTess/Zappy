@@ -117,7 +117,7 @@ public:
     void stopWindowDragging();
 
     /**
-     * @brief Vérifie si la souris est sur une fenêtret
+     * @brief Vérifie si la souris est sur une fenêtre
      * @param mousePosition Position de la souris
      * @return true si la souris est sur une fenêtre
      */
