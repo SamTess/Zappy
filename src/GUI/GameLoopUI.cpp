@@ -119,19 +119,20 @@ void GameLoop::onMapSizeChanged(int width, int height) {
     updateCameraForMapSize();
 }
 
-void GameLoop::onTileChanged(int x, int y, const TileData& tileData) {
-    if (m_gameController) {
+void GameLoop::onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile) {
+    if (m_gameController && tile) {
         auto gameState = m_gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
             auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
+            const auto& resources = tile->getResources();
             mutableGameState->updateTileResources(x, y,
-                tileData.resources[0],  // food
-                tileData.resources[1],  // linemate
-                tileData.resources[2],  // deraumere
-                tileData.resources[3],  // sibur
-                tileData.resources[4],  // mendiane
-                tileData.resources[5],  // phiras
-                tileData.resources[6]   // thystame
+                resources[0],  // food
+                resources[1],  // linemate
+                resources[2],  // deraumere
+                resources[3],  // sibur
+                resources[4],  // mendiane
+                resources[5],  // phiras
+                resources[6]   // thystame
             );
         }
     }

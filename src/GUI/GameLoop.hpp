@@ -48,7 +48,7 @@ private:
     void handleTileSelection(int x, int y);
     void handleViewModeChange(int mode);
     void onMapSizeChanged(int width, int height);
-    void onTileChanged(int x, int y, const TileData& tileData);
+    void onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile);
     std::string m_host;
     int m_port;
 

@@ -21,12 +21,7 @@
 #include "EntityFactory.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 
-struct TileData {
-    std::array<int, 7> resources{0};
-    std::vector<int> playerIds;
-    std::vector<int> eggIds;
-    bool isIncantating{false};
-};
+
 class GameState {
 public:
     GameState();
