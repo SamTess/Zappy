@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include "MenuWindow.hpp"
+#include "../../../network/networkManager/NetworkManager.hpp"
 
 namespace GUI {
 
@@ -73,7 +74,7 @@ void GUI::MenuWindow::resetAllSubmenus() {
 float GUI::MenuWindow::getSubmenuHeight() const {
     if (m_showGraphicsSubmenu) return 150;
     if (m_showAudioSubmenu) return 150;
-    if (m_showGameplaySubmenu) return 150;
+    if (m_showGameplaySubmenu) return 200;
     if (m_showWindowsSubmenu) return 300;
     return 0;
 }
@@ -278,26 +279,47 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
     m_guiLib->DrawLabel(
         startX + 30, startY + 30,
         submenuWidth - 60, 20,
-        "Vitesse du jeu:"
+        "Fréquence du serveur:"
     );
-    m_gameSpeed = m_guiLib->DrawSlider(
-        startX + 30, startY + 50,
-        submenuWidth - 60, sliderHeight,
-        "0.1x", "5.0x",
-        m_gameSpeed, 0.1f, 5.0f
-    );
-    std::stringstream ss;
-    ss << std::fixed << std::setprecision(1) << m_gameSpeed << "x";
+    int currentFrequency = m_frequency;
+    std::stringstream freqSs;
+    freqSs << "Actuelle: " << currentFrequency << " ticks/seconde";
     m_guiLib->DrawLabel(
-        startX + 30, startY + 80,
+        startX + 30, startY + 50,
         submenuWidth - 60, 20,
-        "Valeur actuelle: " + ss.str()
+        freqSs.str()
     );
+    static float newFrequency = static_cast<float>(currentFrequency);
+    newFrequency = m_guiLib->DrawSlider(
+        startX + 30, startY + 75,
+        submenuWidth - 60, sliderHeight,
+        "1", "2000",
+        newFrequency, 1.0f, 2000.0f
+    );
+    std::stringstream newFreqSs;
+    newFreqSs << "Nouvelle: " << static_cast<int>(newFrequency) << " ticks/sec";
+    m_guiLib->DrawLabel(
+        startX + 30, startY + 105,
+        submenuWidth - 60, 20,
+        newFreqSs.str()
+    );
+    if (m_guiLib->ButtonPressed(
+        startX + 30, startY + 130,
+        submenuWidth - 60, 25,
+        "Appliquer fréquence"
+    )) {
+        if (m_windowFactory && m_windowFactory->getNetworkManager()) {
+            auto networkManager = m_windowFactory->getNetworkManager();
+            std::stringstream cmd;
+            cmd << "sst " << static_cast<int>(newFrequency);
+            networkManager->sendCommand(cmd.str());
+        }
+    }
 }
 
 void MenuWindow::renderGameplaySubmenu() {
     float submenuWidth = 300;
-    float submenuHeight = 120;
+    float submenuHeight = 200;
     float sliderHeight = 30;
     float startX = m_position.x + m_dimensions.x + 160;
     float startY = m_position.y + m_dimensions.y;

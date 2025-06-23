@@ -29,6 +29,10 @@ UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
     m_viewModes = {"Vue standard", "Vue aérienne", "Vue wireframe", "Vue ressources"};
 }
 
+void UIWindowFactory::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
+    m_networkManager = networkManager;
+}
+
 void UIWindowFactory::createAllWindows(int, int) {
     const struct WindowConfig {
         std::string id;
@@ -116,6 +120,10 @@ void UIWindowFactory::addBroadcast(const std::string& team, const std::string& m
     auto broadcastsWindow = std::dynamic_pointer_cast<GUI::BroadcastsWindow>(m_windows["broadcasts"]);
     if (broadcastsWindow)
         broadcastsWindow->addBroadcast(team, message);
+}
+
+std::shared_ptr<NetworkManager> UIWindowFactory::getNetworkManager() const {
+    return m_networkManager;
 }
 
 void UIWindowFactory::setViewMode(int mode) {

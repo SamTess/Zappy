@@ -52,6 +52,14 @@ void UserInterface::setSelectedTile(int x, int y) {
     m_windowFactory->setSelectedTile(x, y);
 }
 
+void UserInterface::addBroadcast(const std::string& team, const std::string& message) {
+    m_windowFactory->addBroadcast(team, message);
+}
+
+void UserInterface::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
+    m_windowFactory->setNetworkManager(networkManager);
+}
+
 void UserInterface::setViewMode(int mode) {
     m_windowFactory->setViewMode(mode);
 }

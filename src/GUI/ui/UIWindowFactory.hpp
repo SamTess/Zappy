@@ -17,6 +17,8 @@
 #include "../gameController/GameState.hpp"
 #include "../../Shared/IGuiLib.hpp"
 
+class NetworkManager;
+
 namespace GUI {
 
 /**
@@ -30,6 +32,12 @@ public:
      */
     explicit UIWindowFactory(std::shared_ptr<IGuiLib> guiLib);
     ~UIWindowFactory() = default;
+
+    /**
+     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
+     * @param networkManager Pointeur vers le NetworkManager
+     */
+    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
 
     /**
      * @brief Crée toutes les fenêtres nécessaires pour l'interface utilisateur
@@ -76,6 +84,12 @@ public:
      * @param message Message diffusé
      */
     void addBroadcast(const std::string& team, const std::string& message);
+
+    /**
+     * @brief Obtient le NetworkManager pour l'envoi de commandes
+     * @return Pointeur partagé vers le NetworkManager
+     */
+    std::shared_ptr<NetworkManager> getNetworkManager() const;
 
     /**
      * @brief Définit le mode de vue
@@ -146,6 +160,9 @@ private:
 
     // Bibliothèque GUI
     std::shared_ptr<IGuiLib> m_guiLib;
+
+    // NetworkManager pour l'envoi de commandes
+    std::shared_ptr<NetworkManager> m_networkManager;
 
     // Map des fenêtres avec leurs identifiants
     std::unordered_map<std::string, std::shared_ptr<IUIWindow>> m_windows;
