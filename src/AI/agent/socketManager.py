@@ -31,10 +31,7 @@ class SocketManager:
     data = ""
     while not self.circ_buffer.has_newline():
       try:
-        data += self.sock.recv(1024).decode('utf-8')
-        if not data:
-          return None
-        self.circ_buffer.write(data)
+        self.circ_buffer.write(self.sock.recv(1024).decode('utf-8'))
       except socket.error:
         return None
     return self.circ_buffer.read()
