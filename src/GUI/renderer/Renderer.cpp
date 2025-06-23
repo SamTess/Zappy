@@ -11,6 +11,8 @@
 #include <iostream>
 #include "Renderer.hpp"
 #include "Skybox.hpp"
+#include "ParticleSystem.hpp"
+#include "EjectionAnimationManager.hpp"
 #include "../Constants.hpp"
 
 Renderer::Renderer()
@@ -53,8 +55,10 @@ void Renderer::renderGrid(std::shared_ptr<IGraphicsLib> graphics) {
 void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
     auto& modelManager = ModelManager::getInstance();
     (void)modelManager;
-    (void)graphics;
-    //TODO(Sam): Implement scene rendering logic
+
+    Zappy::ParticleSystem::getInstance().render(graphics);
+    Zappy::EjectionAnimationManager::getInstance().render(graphics);
+    // TODO(Sam): Implement scene rendering logic
 }
 
 void Renderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,

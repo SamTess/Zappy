@@ -4,14 +4,18 @@
 ** File description:
 ** Detailed tile Renderer
 */
-
-#include "DetailedTileRenderStrategy.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <memory>
 #include <string>
+#include "DetailedTileRenderStrategy.hpp"
+#include "../../gameController/entities/Tile.hpp"
+#include "../../gameController/entities/Player.hpp"
 #include "../../gameController/entities/Resource.hpp"
+#include "../../gameController/entities/Egg.hpp"
+#include "../../gameController/GameState.hpp"
+#include "../EjectionAnimationManager.hpp"
 
 namespace Zappy {
 
@@ -47,7 +51,13 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
             int playerId = playerIds[i];
             auto playerInfo = gameState->getPlayerInfo(playerId);
             if (playerInfo) {
-                playerInfo->renderPlayer(graphicsLib, position, tileSize, i, playerIds.size());
+                ZappyTypes::Vector3 renderPosition = position;
+                if (Zappy::EjectionAnimationManager::getInstance().isPlayerBeingEjected(playerId)) {
+                    ZappyTypes::Vector3 animPos = Zappy::EjectionAnimationManager::getInstance().getPlayerAnimationPosition(playerId);
+                    if (animPos.x != 0 || animPos.y != 0 || animPos.z != 0)
+                        renderPosition = animPos;
+                }
+                playerInfo->renderPlayer(graphicsLib, renderPosition, tileSize, i, playerIds.size());
             } else {
                 std::cout << "WARNING: Player " << playerId << " not found in gameState during rendering!" << std::endl;
             }

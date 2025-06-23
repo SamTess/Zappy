@@ -15,6 +15,8 @@
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
+#include "renderer/ParticleSystem.hpp"
+#include "renderer/EjectionAnimationManager.hpp"
 
 GameLoop::GameLoop(std::shared_ptr<NetworkManager> networkManager)
     : m_host("localhost"), m_port(4242), m_networkManager(networkManager) {
@@ -102,6 +104,9 @@ int GameLoop::run() {
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();
         m_mapRenderer->render();
+        // Render particle effects and ejection animations
+        Zappy::ParticleSystem::getInstance().render(m_graphics);
+        Zappy::EjectionAnimationManager::getInstance().render(m_graphics);
         m_graphics->EndCamera3D();
         updateGameData();
         if (m_gameController) {
