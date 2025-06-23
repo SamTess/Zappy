@@ -135,6 +135,7 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     if (existingPlayer && playerData->getOrientation() != -1) {
         if (!playerData->isAlive()) {
             _gameState->removePlayer(playerId);
+            _graphics->PlaySound("assets/music/death.mp3");
             return;
         }
         int oldX = existingPlayer->getX();

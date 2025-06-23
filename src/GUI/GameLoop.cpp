@@ -29,6 +29,7 @@ bool GameLoop::init() {
     setupComponents();
     m_graphics->PlayMusic("assets/music/music.mp3");
     m_graphics->SetMusicVolume(0.5f);
+    m_gameController->setGraphics(m_graphics);
     return true;
 }
 
@@ -113,6 +114,9 @@ void GameLoop::setServerInfo(const std::string& host, int port) {
 
 void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
     m_gameController = controller;
+    if (m_gameController && m_graphics) {
+        m_gameController->setGraphics(m_graphics);
+    }
     if (m_gameController && m_graphics && m_modelManagerAdapter) {
         auto gameState = m_gameController->getGameState();
         m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, gameState, m_modelManagerAdapter);
