@@ -7,6 +7,8 @@
 
 #include <sstream>
 #include <memory>
+#include <string>
+#include <vector>
 #include <utility>
 #include "TileInfoWindow.hpp"
 
@@ -60,7 +62,7 @@ float GUI::TileInfoWindow::renderResourceInfo() {
             }
         }
     }
-    const char* resourceNames[] = {
+    const std::vector<std::string> resourceNames = {
         "Nourriture", "Linemate", "Deraumere", "Sibur",
         "Mendiane", "Phiras", "Thystame"
     };

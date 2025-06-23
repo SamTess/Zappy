@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 #include <memory>
-#include <algorithm> // Pour std::min, std::max
+#include <algorithm>
 #include "BroadcastsWindow.hpp"
 
 namespace GUI {

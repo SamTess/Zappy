@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include "../AUIWindow.hpp"
 #include "../../UIWindowFactory.hpp"
 
@@ -53,6 +54,9 @@ private:
     // Factory pour les fenêtres
     std::shared_ptr<GUI::UIWindowFactory> m_windowFactory;
     ZappyTypes::Vector2 m_defaultPositions[6];
+
+    // Liste unifiée des informations sur les fenêtres
+    std::vector<WindowInfo> m_windows;
 
     // Fonctions pour le dessin du menu principal
     void drawMenuButton();

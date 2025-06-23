@@ -45,7 +45,6 @@ void UserInterface::updateDataFromGameState(
     int frequency,
     int gameTick
 ) {
-    // Utiliser directement le GameState pour mettre à jour l'interface
     m_windowFactory->updateAllWindows(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
 }
 

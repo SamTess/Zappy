@@ -18,8 +18,6 @@
 #include "gameController/GameState.hpp"
 
 // Timers pour les incantations
-static std::map<int, float> playerIncantationTimers;
-
 /**
  * Met à jour les données de jeu et le GameState
  */
@@ -30,24 +28,6 @@ void GameLoop::updateGameData() {
     lastTime = currentTime;
     m_gameTime += deltaTime;
     m_gameTick++;
-    for (auto it = playerIncantationTimers.begin(); it != playerIncantationTimers.end(); ) {
-        int playerId = it->first;
-        float& timer = it->second;
-        timer -= deltaTime;
-        if (timer <= 0.0f) {
-            if (m_gameController) {
-                auto gameState = m_gameController->getGameState();
-                auto player = gameState->getPlayerInfo(playerId);
-                if (player) {
-                    // Cette logique devrait être dans le GameController
-                    // À implémenter: marquage de fin d'incantation pour ce joueur
-                }
-            }
-            it = playerIncantationTimers.erase(it);
-        } else {
-            ++it;
-        }
-    }
     if (m_gameController) {
         m_gameController->updateBroadcasts(deltaTime);
         auto gameState = m_gameController->getGameState();
@@ -135,8 +115,5 @@ void GameLoop::onTileChanged(int x, int y, const std::shared_ptr<const ITile>& t
                 resources[6]   // thystame
             );
         }
-    }
-    if (m_selectedTile.selected && m_selectedTile.x == x && m_selectedTile.y == y) {
-        // Rafraîchir les informations affichées si nécessaire
     }
 }

@@ -33,6 +33,15 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     m_defaultPositions[2] = {1520, 540};  // Broadcasts
     m_defaultPositions[3] = {1520, 860};  // Controls
     m_defaultPositions[4] = {1450, 10};  // TimeInfo
+
+    // Initialisation de la liste unifiée des fenêtres
+    m_windows = {
+        {"tileInfo", "Informations sur la case", 0},
+        {"playerInfo", "Informations joueurs", 1},
+        {"broadcasts", "Broadcasts récents", 2},
+        {"controls", "Contrôles", 3},
+        {"timeInfo", "Informations temporelles", 4}
+    };
 }
 
 void GUI::MenuWindow::drawMenuButton() {
@@ -305,13 +314,6 @@ void MenuWindow::renderGameplaySubmenu() {
 }
 
 void MenuWindow::drawWindowsList(float startX, float startY, float submenuWidth, float buttonHeight) {
-    WindowInfo windows[] = {
-        {"tileInfo", "Informations sur la case", 0},
-        {"playerInfo", "Informations joueurs", 1},
-        {"broadcasts", "Broadcasts récents", 2},
-        {"controls", "Contrôles", 3},
-        {"timeInfo", "Informations temporelles", 4}
-    };
     float yPos = startY + 30;
     if (!m_windowFactory) {
         m_guiLib->DrawLabel(
@@ -321,7 +323,7 @@ void MenuWindow::drawWindowsList(float startX, float startY, float submenuWidth,
         );
         return;
     }
-    for (const auto& window : windows) {
+    for (const auto& window : m_windows) {
         auto windowPtr = m_windowFactory->getWindow(window.id);
         if (windowPtr) {
             bool isVisible = windowPtr->isVisible();
@@ -347,15 +349,8 @@ void MenuWindow::drawWindowsList(float startX, float startY, float submenuWidth,
 
 float MenuWindow::drawWindowButtons(float startX, float startY, float submenuWidth, float buttonHeight, float yPos) {
     (void)startY;
-    WindowInfo windows[] = {
-        {"tileInfo", "Informations sur la case", 0},
-        {"playerInfo", "Informations joueurs", 1},
-        {"broadcasts", "Broadcasts récents", 2},
-        {"controls", "Contrôles", 3},
-        {"timeInfo", "Informations temporelles", 4}
-    };
     if (m_guiLib->ButtonPressed(startX + 10, yPos, submenuWidth - 20, buttonHeight, "Afficher toutes les fenêtres")) {
-        for (const auto& window : windows) {
+        for (const auto& window : m_windows) {
             auto windowPtr = m_windowFactory->getWindow(window.id);
             if (windowPtr) {
                 windowPtr->setVisible(true);
@@ -364,7 +359,7 @@ float MenuWindow::drawWindowButtons(float startX, float startY, float submenuWid
     }
     yPos += buttonHeight + 5;
     if (m_guiLib->ButtonPressed(startX + 10, yPos, submenuWidth - 20, buttonHeight, "Masquer toutes les fenêtres (sauf menu)")) {
-        for (const auto& window : windows) {
+        for (const auto& window : m_windows) {
             auto windowPtr = m_windowFactory->getWindow(window.id);
             if (windowPtr && window.id != "menu") {
                 windowPtr->setVisible(false);
@@ -395,11 +390,12 @@ void MenuWindow::renderWindowsSubmenu() {
 void MenuWindow::setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory) {
     m_windowFactory = factory;
     if (m_windowFactory) {
-        m_windowFactory->getWindow("tileInfo")->setPosition(m_defaultPositions[0]);
-        m_windowFactory->getWindow("playerInfo")->setPosition(m_defaultPositions[1]);
-        m_windowFactory->getWindow("broadcasts")->setPosition(m_defaultPositions[2]);
-        m_windowFactory->getWindow("controls")->setPosition(m_defaultPositions[3]);
-        m_windowFactory->getWindow("timeInfo")->setPosition(m_defaultPositions[4]);
+        for (const auto& window : m_windows) {
+            auto windowPtr = m_windowFactory->getWindow(window.id);
+            if (windowPtr && window.positionIndex < 6) {
+                windowPtr->setPosition(m_defaultPositions[window.positionIndex]);
+            }
+        }
     }
 }
 
