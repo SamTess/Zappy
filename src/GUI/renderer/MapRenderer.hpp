@@ -54,6 +54,14 @@ public:
      * @brief Rend la carte complète
      */
     void render();
+    
+    /**
+     * @brief Rend la carte avec les effets de sélection
+     * @param selectedTileX Coordonnée X de la tuile sélectionnée (-1 si aucune)
+     * @param selectedTileY Coordonnée Y de la tuile sélectionnée (-1 si aucune) 
+     * @param selectedPlayerId ID du joueur sélectionné (-1 si aucun)
+     */
+    void renderWithSelection(int selectedTileX, int selectedTileY, int selectedPlayerId);
     /**
      * @brief Définit la stratégie de rendu pour toutes les tuiles
      * @param strategy La stratégie à utiliser
@@ -110,6 +118,20 @@ private:
      * @return La couleur calculée
      */
     ZappyTypes::Color calculateTileColor(int x, int y);
+    
+    /**
+     * @brief Rend l'effet de sélection pour une tuile
+     * @param x Position X de la tuile
+     * @param y Position Y de la tuile
+     */
+    void renderTileSelectionEffect(int x, int y);
+    
+    /**
+     * @brief Rend l'effet de sélection pour un joueur
+     * @param playerId ID du joueur sélectionné
+     */
+    void renderPlayerSelectionEffect(int playerId);
+    
     void renderVictoryScreen();
 };
 

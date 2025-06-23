@@ -27,6 +27,7 @@ public:
     virtual void DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Color color) = 0;
     // Formes 3D
     virtual void DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) = 0;
+    virtual void DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) = 0;
     virtual void DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) = 0;
     virtual void DrawPlane(ZappyTypes::Vector3 centerPos, ZappyTypes::Vector2 size, ZappyTypes::Color color) = 0;
     virtual void DrawGrid(int slices, float spacing) = 0;

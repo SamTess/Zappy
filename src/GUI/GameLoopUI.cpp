@@ -74,6 +74,8 @@ void GameLoop::handleTileSelection(int x, int y) {
         m_selectedTile.x = x;
         m_selectedTile.y = y;
         m_selectedTile.selected = true;
+        // Désélectionner le joueur quand une tuile est sélectionnée
+        m_selectedPlayer.selected = false;
     }
 }
 
@@ -84,6 +86,10 @@ void GameLoop::handlePlayerSelection(int playerId) {
     if (playerId < 0)
         return;
     m_userInterface->setSelectedPlayer(playerId);
+    m_selectedPlayer.playerId = playerId;
+    m_selectedPlayer.selected = true;
+    // Désélectionner la tuile quand un joueur est sélectionné
+    m_selectedTile.selected = false;
 }
 
 /**

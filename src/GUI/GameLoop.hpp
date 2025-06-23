@@ -80,4 +80,9 @@ private:
         int y = 0;
         bool selected = false;
     } m_selectedTile;
+    
+    struct {
+        int playerId = -1;
+        bool selected = false;
+    } m_selectedPlayer;
 };

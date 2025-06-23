@@ -39,6 +39,7 @@ public:
     void DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Color color) override;
 
     void DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
+    void DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
     void DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) override;
     void DrawPlane(ZappyTypes::Vector3 centerPos, ZappyTypes::Vector2 size, ZappyTypes::Color color) override;
     void DrawGrid(int slices, float spacing) override;

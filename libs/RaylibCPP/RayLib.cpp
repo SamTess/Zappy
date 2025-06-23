@@ -88,6 +88,12 @@ void RayLib::DrawCube(ZappyTypes::Vector3 position, float width, float height, f
     raylibcpp::Shape::drawCube(TypeAdapter::ToRaylib(position), width, height, length, TypeAdapter::ToRaylib(color));
 }
 
+void RayLib::DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) {
+    Vector3 pos = TypeAdapter::ToRaylib(position);
+    Color col = TypeAdapter::ToRaylib(color);
+    ::DrawCubeWires(pos, width, height, length, col);
+}
+
 void RayLib::DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) {
     raylibcpp::Shape::drawSphere(TypeAdapter::ToRaylib(centerPos), radius, TypeAdapter::ToRaylib(color));
 }
