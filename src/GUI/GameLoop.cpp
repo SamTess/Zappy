@@ -15,6 +15,7 @@
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
+#include "ui/windows/timeInfo/TimeInfoWindow.hpp"
 
 GameLoop::GameLoop(std::shared_ptr<NetworkManager> networkManager)
     : m_host("localhost"), m_port(4242), m_networkManager(networkManager) {
@@ -113,6 +114,13 @@ int GameLoop::run() {
         }
         m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
+        if (m_userInterface) {
+            auto timeInfoWindow = std::dynamic_pointer_cast<GUI::TimeInfoWindow>(
+                m_userInterface->getWindow("timeInfo"));
+            if (timeInfoWindow) {
+                timeInfoWindow->setFPS(m_uiRenderer->getFPS());
+            }
+        }
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }

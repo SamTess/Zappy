@@ -186,6 +186,7 @@ void MapRenderer::renderTileSelectionEffect(int x, int y) {
     graphicsLib->DrawCube({position.x + cornerOffset, position.y + cornerHeight, position.z + cornerOffset},
                          cornerSize, cornerSize, cornerSize, cornerColor);
 }
+
 void MapRenderer::renderPlayerSelectionEffect(int playerId) {
     if (!gameState)
         return;

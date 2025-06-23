@@ -29,6 +29,7 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
       m_uiTransparency(0.9f),
       m_windowFactory(nullptr) {
     m_visible = true;
+    setShowWindowBox(false); // Désactive la boîte de fenêtre pour le menu
     m_defaultPositions[0] = {10, 810};   // TileInfo
     m_defaultPositions[1] = {10, 500};   // PlayerInfo
     m_defaultPositions[2] = {1520, 540};  // Broadcasts

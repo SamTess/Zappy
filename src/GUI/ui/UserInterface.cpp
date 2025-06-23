@@ -124,4 +124,8 @@ bool UserInterface::hasHandledMouseEvent() const {
     return m_mouseCapture;
 }
 
+std::shared_ptr<GUI::IUIWindow> UserInterface::getWindow(const std::string& windowId) {
+    return m_windowFactory->getWindow(windowId);
+}
+
 } // namespace GUI

@@ -19,6 +19,18 @@ TimeInfoWindow::TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib)
 void TimeInfoWindow::renderContent() {
     float yOffset = m_position.y + 30;
 
+    // Affichage des FPS
+    std::stringstream fpsInfo;
+    fpsInfo << "FPS: " << m_fps;
+    m_guiLib->DrawLabel(
+        m_position.x + 10,
+        yOffset,
+        m_dimensions.x - 20,
+        20,
+        fpsInfo.str()
+    );
+    yOffset += 25;
+
     std::stringstream timeInfo;
     timeInfo << "Temps: " << std::fixed << std::setprecision(2) << m_gameTime;
     m_guiLib->DrawLabel(

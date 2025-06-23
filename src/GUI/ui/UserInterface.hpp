@@ -113,6 +113,13 @@ public:
      */
     bool hasHandledMouseEvent() const;
 
+    /**
+     * @brief Obtient une fenêtre par son identifiant
+     * @param windowId Identifiant de la fenêtre
+     * @return Pointeur vers la fenêtre ou nullptr si non trouvée
+     */
+    std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
+
 private:
     /**
      * @brief Gère les interactions de souris sur les éléments d'interface

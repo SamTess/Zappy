@@ -438,3 +438,7 @@ bool RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vec
     intersectionPoint = TypeAdapter::FromRaylib(intersection);
     return true;
 }
+
+int RayLib::GetFPS() {
+    return ::GetFPS();
+}
