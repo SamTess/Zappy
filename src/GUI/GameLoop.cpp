@@ -27,13 +27,8 @@ bool GameLoop::init() {
     if (!loadModels())
         return false;
     setupComponents();
-    try {
-        m_graphics->PlayMusic("assets/music/music.mp3");
-        m_graphics->SetMusicVolume(0.5f);
-        std::cout << "Musique chargée et démarrée avec succès" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Erreur lors du chargement de la musique: " << e.what() << std::endl;
-    }
+    m_graphics->PlayMusic("assets/music/music.mp3");
+    m_graphics->SetMusicVolume(0.5f);
     return true;
 }
 
