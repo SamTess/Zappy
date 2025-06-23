@@ -17,7 +17,6 @@
 #include "../gameController/GameState.hpp"
 #include "../../Shared/IGuiLib.hpp"
 
-// Forward declaration
 class NetworkManager;
 
 namespace GUI {
