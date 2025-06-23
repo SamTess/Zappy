@@ -88,4 +88,10 @@ public:
 
     // Modèle avec texture
     virtual int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) = 0;
+
+    // Ray casting pour la sélection 3D
+    virtual ZappyTypes::Vector3 GetCameraPosition() = 0;
+    virtual ZappyTypes::Vector3 GetCameraTarget() = 0;
+    virtual ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) = 0;
+    virtual bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) = 0;
 };

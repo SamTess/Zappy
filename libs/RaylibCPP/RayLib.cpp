@@ -10,9 +10,12 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cmath>
 #include "RayLib.hpp"
 #include "../TypeAdapter.hpp"
 #include "font/Text3D.hpp"
+#include <raylib.h>
+#include <raymath.h>
 
 RayLib::RayLib() {
     _audio.emplace();
@@ -383,4 +386,67 @@ extern "C" {
         static std::shared_ptr<RayLib> instance = std::make_shared<RayLib>();
         return instance;
     }
+}
+
+// Ray casting pour la sélection 3D
+ZappyTypes::Vector3 RayLib::GetCameraPosition() {
+    if (_camera3D.has_value()) {
+        Vector3 pos = _camera3D->get().position;
+        return TypeAdapter::FromRaylib(pos);
+    }
+    return {0.0f, 0.0f, 0.0f};
+}
+
+ZappyTypes::Vector3 RayLib::GetCameraTarget() {
+    if (_camera3D.has_value()) {
+        Vector3 target = _camera3D->get().target;
+        return TypeAdapter::FromRaylib(target);
+    }
+    return {0.0f, 0.0f, 0.0f};
+}
+
+ZappyTypes::Vector3 RayLib::ScreenToWorldRay(ZappyTypes::Vector2 screenPos) {
+    if (_camera3D.has_value()) {
+        Vector2 rayPos = TypeAdapter::ToRaylib(screenPos);
+        Ray ray = GetMouseRay(rayPos, _camera3D->get());
+        return TypeAdapter::FromRaylib(ray.direction);
+    }
+    return {0.0f, 0.0f, -1.0f};
+}
+
+bool RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, 
+                                  ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, 
+                                  ZappyTypes::Vector3& intersectionPoint) {
+    // Convertir en types Raylib
+    Vector3 origin = TypeAdapter::ToRaylib(rayOrigin);
+    Vector3 direction = TypeAdapter::ToRaylib(rayDirection);
+    Vector3 point = TypeAdapter::ToRaylib(planePoint);
+    Vector3 normal = TypeAdapter::ToRaylib(planeNormal);
+    
+    // Normaliser la direction du rayon
+    direction = Vector3Normalize(direction);
+    normal = Vector3Normalize(normal);
+    
+    // Calculer le produit scalaire entre la direction du rayon et la normale du plan
+    float denominator = Vector3DotProduct(direction, normal);
+    
+    // Si le dénominateur est proche de zéro, le rayon est parallèle au plan
+    if (fabsf(denominator) < 0.0001f) {
+        return false;
+    }
+    
+    // Calculer la distance t le long du rayon jusqu'à l'intersection
+    Vector3 pointToOrigin = Vector3Subtract(point, origin);
+    float t = Vector3DotProduct(pointToOrigin, normal) / denominator;
+    
+    // Si t est négatif, l'intersection est derrière l'origine du rayon
+    if (t < 0) {
+        return false;
+    }
+    
+    // Calculer le point d'intersection
+    Vector3 intersection = Vector3Add(origin, Vector3Scale(direction, t));
+    intersectionPoint = TypeAdapter::FromRaylib(intersection);
+    
+    return true;
 }

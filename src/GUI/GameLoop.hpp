@@ -49,6 +49,8 @@ private:
     void handleViewModeChange(int mode);
     void onMapSizeChanged(int width, int height);
     void onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile);
+    bool worldToTileCoordinates(ZappyTypes::Vector3 worldPos, int& tileX, int& tileY);
+    bool performTileSelection(ZappyTypes::Vector2 screenPos, int& tileX, int& tileY);
     std::string m_host;
     int m_port;
 

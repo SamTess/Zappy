@@ -99,6 +99,12 @@ public:
     void UnloadModel3D(int modelId) override;
     int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override;
 
+    // Ray casting pour la sélection 3D
+    ZappyTypes::Vector3 GetCameraPosition() override;
+    ZappyTypes::Vector3 GetCameraTarget() override;
+    ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) override;
+    bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) override;
+
 private:
     std::unique_ptr<raylibcpp::Window> _window;
     std::map<int, std::unique_ptr<raylibcpp::Texture>> _textures;
