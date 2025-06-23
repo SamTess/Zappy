@@ -100,20 +100,16 @@ int GameLoop::run() {
         }
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->BeginCamera3D();
-        
-        // Transmission des informations de sélection au renderer
-        int selectedTileX = m_selectedTile.selected ? m_selectedTile.x : -1;
+                int selectedTileX = m_selectedTile.selected ? m_selectedTile.x : -1;
         int selectedTileY = m_selectedTile.selected ? m_selectedTile.y : -1;
         int selectedPlayerId = m_selectedPlayer.selected ? m_selectedPlayer.playerId : -1;
-        
         m_mapRenderer->renderWithSelection(selectedTileX, selectedTileY, selectedPlayerId);
-        
         m_graphics->EndCamera3D();
         updateGameData();
         if (m_gameController) {
             auto gameState = m_gameController->getGameState();
             m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight,
-                                                   m_gameTime, m_frequency, m_gameTick);
+                m_gameTime, m_frequency, m_gameTick);
         }
         m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);

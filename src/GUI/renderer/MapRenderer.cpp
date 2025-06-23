@@ -63,17 +63,12 @@ void MapRenderer::renderWithSelection(int selectedTileX, int selectedTileY, int 
             renderTile(x, y, resourceIndex);
         }
     }
-    
-    // Rendu des effets de sélection
-    if (selectedTileX >= 0 && selectedTileY >= 0 && 
+    if (selectedTileX >= 0 && selectedTileY >= 0 &&
         selectedTileX < mapWidth && selectedTileY < mapHeight) {
         renderTileSelectionEffect(selectedTileX, selectedTileY);
     }
-    
-    if (selectedPlayerId >= 0) {
+    if (selectedPlayerId >= 0)
         renderPlayerSelectionEffect(selectedPlayerId);
-    }
-    
     renderVictoryScreen();
 }
 
@@ -92,7 +87,6 @@ void MapRenderer::renderVictoryScreen() {
     ZappyTypes::Vector3 textSize = graphicsLib->MeasureText3D(text, fontSize, fontSpacing, lineSpacing);
     float centerX = (mapWidth - 1) / 2.0f - textSize.x / 2.0f;
     float centerZ = (mapHeight - 1) / 2.0f - textSize.z / 2.0f;
-    // toyute les couleurs pour chaque lettre
     std::vector<ZappyTypes::Color> colors = {
         {255, 0, 0, 255},
         {255, 165, 0, 255},
@@ -170,27 +164,18 @@ ZappyTypes::Color MapRenderer::calculateTileColor(int x, int y) {
 void MapRenderer::renderTileSelectionEffect(int x, int y) {
     if (!gameState)
         return;
-    
-    // Calculer la position de la tuile dans le monde 3D
     float mapCenterX = gameState->getMapWidth() / 2.0f;
     float mapCenterY = gameState->getMapHeight() / 2.0f;
-    
     ZappyTypes::Vector3 position = {
         (x - mapCenterX + 0.5f) * (tileSize + tileSpacing),
-        0.8f, // Élever les effets au-dessus du modèle ISLAND
+        0.8f,
         (y - mapCenterY + 0.5f) * (tileSize + tileSpacing)
     };
-    
-    // Dessiner un contour doré pulsant autour de la tuile
     float time = static_cast<float>(clock()) / CLOCKS_PER_SEC;
-    
     float borderWidth = 0.08f;
-    
-    // 3. Coins scintillants aux 4 angles de la tuile
-    float cornerSize = 0.12f; // Augmenter la taille des coins
-    float cornerHeight = 0.45f + 0.15f * sin(time * 5.0f); // Élever les coins
+    float cornerSize = 0.12f;
+    float cornerHeight = 0.45f + 0.15f * sin(time * 5.0f);
     ZappyTypes::Color cornerColor = {255, 255, 255, static_cast<unsigned char>(150 + 105 * sin(time * 6.0f))};
-    
     float cornerOffset = tileSize / 2.0f + borderWidth / 2.0f;
     graphicsLib->DrawCube({position.x - cornerOffset, position.y + cornerHeight, position.z - cornerOffset},
                          cornerSize, cornerSize, cornerSize, cornerColor);
@@ -205,26 +190,18 @@ void MapRenderer::renderTileSelectionEffect(int x, int y) {
 void MapRenderer::renderPlayerSelectionEffect(int playerId) {
     if (!gameState)
         return;
-    
     auto player = gameState->getPlayerInfo(playerId);
     if (!player)
         return;
-    
-    // Obtenir la position du joueur
     int playerX = player->getX();
     int playerY = player->getY();
-    
-    // Calculer la position dans le monde 3D
     float mapCenterX = gameState->getMapWidth() / 2.0f;
     float mapCenterY = gameState->getMapHeight() / 2.0f;
-    
     ZappyTypes::Vector3 basePosition = {
         (playerX - mapCenterX + 0.5f) * (tileSize + tileSpacing),
         0.0f,
         (playerY - mapCenterY + 0.5f) * (tileSize + tileSpacing)
     };
-    
-    // Trouver l'index du joueur sur sa tuile pour calculer sa position Y exacte
     auto playersOnTile = gameState->getPlayersOnTile(playerX, playerY);
     int playerIndex = 0;
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
@@ -233,37 +210,26 @@ void MapRenderer::renderPlayerSelectionEffect(int playerId) {
             break;
         }
     }
-    
     ZappyTypes::Vector3 playerPosition = basePosition;
     if (playersOnTile.size() > 1) {
         float stackHeight = 1.1f;
         playerPosition.y += playerIndex * stackHeight;
     }
-    playerPosition.y += 0.55f; // Hauteur de base du joueur
-    
-    // Effet de sélection : cercle pulsant et particules
+    playerPosition.y += 0.55f;
     float time = static_cast<float>(clock()) / CLOCKS_PER_SEC;
     float pulseIntensity = 0.8f + 0.2f * sin(time * 4.0f);
-    
-    // 1. Contour wireframe autour du joueur
-    ZappyTypes::Color wireframeColor = {255, 255, 255, static_cast<unsigned char>(255 * pulseIntensity)}; // Blanc
-    float wireframeSize = 0.5f * (1.0f + 0.1f * sin(time * 6.0f)); // Légère pulsation de taille
+    ZappyTypes::Color wireframeColor = {255, 255, 255, static_cast<unsigned char>(255 * pulseIntensity)};
+    float wireframeSize = 0.5f * (1.0f + 0.1f * sin(time * 6.0f));
     graphicsLib->DrawCubeWires(playerPosition, wireframeSize, wireframeSize, wireframeSize, wireframeColor);
-    
-    // 2. Cylindre translucide autour du joueur
-    ZappyTypes::Color selectionColor = {0, 255, 255, static_cast<unsigned char>(120 * pulseIntensity)}; // Cyan translucide
+    ZappyTypes::Color selectionColor = {0, 255, 255, static_cast<unsigned char>(120 * pulseIntensity)};
     float radius = 0.6f * pulseIntensity;
     float height = 2.5f;
     graphicsLib->DrawCylinder({playerPosition.x, playerPosition.y - 0.3f, playerPosition.z},
                              radius, radius, height, 12, selectionColor);
-    
-    // 3. Anneau au sol avec effet de rotation
-    ZappyTypes::Color ringColor = {255, 255, 0, static_cast<unsigned char>(200 * pulseIntensity)}; // Jaune
+    ZappyTypes::Color ringColor = {255, 255, 0, static_cast<unsigned char>(200 * pulseIntensity)};
     float ringRadius = 0.8f + 0.1f * sin(time * 2.0f);
-    
-    // Dessiner l'anneau comme plusieurs petits cubes en cercle avec rotation
     int segments = 20;
-    float rotationOffset = time * 2.0f; // Rotation de l'anneau
+    float rotationOffset = time * 2.0f;
     for (int i = 0; i < segments; ++i) {
         float angle = (2.0f * M_PI * i) / segments + rotationOffset;
         ZappyTypes::Vector3 ringPos = {
@@ -271,7 +237,6 @@ void MapRenderer::renderPlayerSelectionEffect(int playerId) {
             basePosition.y + 0.05f,
             basePosition.z + static_cast<float>(ringRadius * sin(angle))
         };
-        // Alternance de cubes pleins et wireframe
         if (i % 2 == 0) {
             graphicsLib->DrawCube(ringPos, 0.1f, 0.1f, 0.1f, ringColor);
         } else {
@@ -279,21 +244,17 @@ void MapRenderer::renderPlayerSelectionEffect(int playerId) {
             graphicsLib->DrawCubeWires(ringPos, 0.12f, 0.12f, 0.12f, wireRingColor);
         }
     }
-    
-    // 4. Particules scintillantes autour du joueur
     int particleCount = 8;
     for (int i = 0; i < particleCount; ++i) {
         float particleTime = time + (i * 0.5f);
         float particleHeight = 0.3f + 0.2f * sin(particleTime * 3.0f);
         float particleAngle = (2.0f * M_PI * i) / particleCount + time * 1.5f;
         float particleRadius = 0.4f + 0.1f * sin(particleTime * 4.0f);
-        
         ZappyTypes::Vector3 particlePos = {
             playerPosition.x + static_cast<float>(particleRadius * cos(particleAngle)),
             playerPosition.y + particleHeight,
             playerPosition.z + static_cast<float>(particleRadius * sin(particleAngle))
         };
-        
         ZappyTypes::Color particleColor = {255, 255, 255, static_cast<unsigned char>(100 + 155 * sin(particleTime * 5.0f))};
         graphicsLib->DrawCube(particlePos, 0.05f, 0.05f, 0.05f, particleColor);
     }
