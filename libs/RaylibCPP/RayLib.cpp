@@ -13,7 +13,9 @@
 #include "../TypeAdapter.hpp"
 #include "font/Text3D.hpp"
 
-RayLib::RayLib() {}
+RayLib::RayLib() {
+    _audio.emplace();
+}
 
 RayLib::~RayLib() {
     if (_initialized)
@@ -34,6 +36,7 @@ void RayLib::CloseWindow() {
     _sound.reset();
     _music.reset();
     _texture3D.reset();
+    _audio.reset();
 }
 
 bool RayLib::WindowShouldClose() {
