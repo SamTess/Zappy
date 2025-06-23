@@ -15,11 +15,10 @@
 #include <array>
 #include <mutex>
 #include <deque>
-#include "../network/protocol/messageData/MessageDataAll.hpp"
+#include "IBroadcast.hpp"
 #include "IGameEntity.hpp"
 #include "GameEntitiesAll.hpp"
 #include "EntityFactory.hpp"
-#include "IBroadcast.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 
 struct TileData {

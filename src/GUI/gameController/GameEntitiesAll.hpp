@@ -13,5 +13,6 @@
 #include "entities/Resource.hpp"
 #include "entities/Tile.hpp"
 #include "entities/PlayerInventory.hpp"
+#include "entities/Broadcast.hpp"
 
 #endif /* !GAME_ENTITIES_HPP_ */

@@ -21,9 +21,6 @@
 #include "gameController/GameState.hpp"
 #include "ui/UserInterface.hpp"
 #include "./network/networkManager/NetworkManager.hpp"
-#include "graphicalContext/GraphicalContext.hpp"
-#include "ui/UserInterface.hpp"
-#include "./network/networkManager/NetworkManager.hpp"
 
 namespace Zappy {
     class MapRenderer;
@@ -65,7 +62,6 @@ private:
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
     std::shared_ptr<NetworkManager> m_networkManager;
-    std::shared_ptr<GUI::UserInterface> m_userInterface;
     int m_mapWidth = 20;
     int m_mapHeight = 20;
     float m_gameTime = 0.0f;
@@ -78,9 +74,4 @@ private:
         int y = 0;
         bool selected = false;
     } m_selectedTile;
-
-    // Méthodes pour l'interface utilisateur
-    void updateGameData();
-    void handleTileSelection(int x, int y);
-    void handleViewModeChange(int mode);
 };
