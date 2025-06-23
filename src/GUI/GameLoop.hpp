@@ -67,8 +67,6 @@ private:
     float m_gameTime = 0.0f;
     int m_frequency = 100;
     int m_gameTick = 0;
-
-    int m_cubeModelId = -1;
     struct {
         int x = 0;
         int y = 0;
