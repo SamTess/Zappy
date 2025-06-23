@@ -68,7 +68,6 @@ bool GameLoop::loadModels() {
     modelManager.loadModel("assets/models/baby_tung_tung_tung_sahur.glb");
     modelManager.loadModel("assets/models/island.glb");
     modelManager.loadModel("assets/models/labubu.glb");
-
     return true;
 }
 
@@ -77,6 +76,9 @@ void GameLoop::setupComponents() {
     m_camera->init(m_graphics);
     m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
+    m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
+    m_modelManagerAdapter->setGraphicsLib(m_graphics);
+    m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
     m_userInterface = std::make_shared<GUI::UserInterface>(m_gui);
     m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 }
@@ -163,4 +165,3 @@ void GameLoop::setSkyboxTexture(const std::string& texturePath) {
 bool GameLoop::isSkyboxLoaded() const {
     return m_renderer && m_renderer->isSkyboxLoaded();
 }
-

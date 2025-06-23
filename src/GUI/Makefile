@@ -35,6 +35,16 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
 	  GameLoop.cpp \
+	  GameLoopUI.cpp \
+	  ui/UserInterface.cpp \
+	  ui/UIWindowFactory.cpp \
+	  ui/windows/AUIWindow.cpp \
+	  ui/windows/tileInfo/TileInfoWindow.cpp \
+	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
+	  ui/windows/broadcasts/BroadcastsWindow.cpp \
+	  ui/windows/controls/ControlsWindow.cpp \
+	  ui/windows/timeInfo/TimeInfoWindow.cpp \
+	  ui/windows/menu/MenuWindow.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
 	  gameController/entities/Egg.cpp \

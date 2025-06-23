@@ -15,12 +15,19 @@
 #include <array>
 #include <mutex>
 #include <deque>
-
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 #include "IGameEntity.hpp"
 #include "GameEntitiesAll.hpp"
 #include "EntityFactory.hpp"
 #include "IBroadcast.hpp"
+#include "../network/protocol/messageData/MessageDataAll.hpp"
+
+struct TileData {
+    std::array<int, 7> resources{0};
+    std::vector<int> playerIds;
+    std::vector<int> eggIds;
+    bool isIncantating{false};
+};
 class GameState {
 public:
     GameState();
@@ -84,6 +91,8 @@ private:
     int _timeUnit = 100;
     bool _gameEnded = false;
     std::string _winningTeam;
+    std::deque<std::shared_ptr<IBroadcast>> _broadcasts;
+    const size_t _maxBroadcasts = 20;
     std::shared_ptr<EntityFactoryManager> _entityFactory;
 };
 

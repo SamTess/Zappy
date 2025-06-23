@@ -18,6 +18,8 @@
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "gameController/GameController.hpp"
+#include "gameController/GameState.hpp"
+#include "ui/UserInterface.hpp"
 #include "./network/networkManager/NetworkManager.hpp"
 #include "graphicalContext/GraphicalContext.hpp"
 #include "ui/UserInterface.hpp"
@@ -61,9 +63,11 @@ private:
     std::shared_ptr<GameController> m_gameController;
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
+    std::shared_ptr<GUI::UserInterface> m_userInterface;
     std::shared_ptr<NetworkManager> m_networkManager;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
     int m_mapWidth = 20;
+    int m_mapHeight = 20;
     float m_gameTime = 0.0f;
     int m_frequency = 100;
     int m_gameTick = 0;
