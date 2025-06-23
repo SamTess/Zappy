@@ -18,6 +18,8 @@
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
 #include "gameController/GameController.hpp"
+#include "gameController/GameState.hpp"
+#include "ui/UserInterface.hpp"
 #include "./network/networkManager/NetworkManager.hpp"
 
 namespace Zappy {
@@ -42,12 +44,13 @@ private:
     void setupComponents();
     bool loadModels();
     void updateCameraForMapSize();
-
+    void updateGameData();
+    void handleTileSelection(int x, int y);
+    void handleViewModeChange(int mode);
+    void onMapSizeChanged(int width, int height);
+    void onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile);
     std::string m_host;
     int m_port;
-
-    int m_mapWidth = 20;
-    int m_mapHeight = 20;
 
     std::shared_ptr<IGraphicsLib> m_graphics;
     std::shared_ptr<IGuiLib> m_gui;
@@ -57,7 +60,16 @@ private:
     std::shared_ptr<GameController> m_gameController;
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
+    std::shared_ptr<GUI::UserInterface> m_userInterface;
     std::shared_ptr<NetworkManager> m_networkManager;
-
-    int m_cubeModelId = -1;
+    int m_mapWidth = 20;
+    int m_mapHeight = 20;
+    float m_gameTime = 0.0f;
+    int m_frequency = 100;
+    int m_gameTick = 0;
+    struct {
+        int x = 0;
+        int y = 0;
+        bool selected = false;
+    } m_selectedTile;
 };

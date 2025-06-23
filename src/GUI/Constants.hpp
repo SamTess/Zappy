@@ -11,8 +11,8 @@
 #include <vector>
 #include "../Shared/Common.hpp"
 
-const int DEFAULT_WIDTH = 1280;
-const int DEFAULT_HEIGHT = 720;
+const int DEFAULT_WIDTH = 1920;
+const int DEFAULT_HEIGHT = 1080;
 const char DEFAULT_TITLE[] = "Zappy GUI";
 const int NUM_RANDOM_MODELS = 20;
 

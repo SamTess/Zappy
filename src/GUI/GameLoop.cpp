@@ -71,7 +71,6 @@ bool GameLoop::loadModels() {
     modelManager.loadModel("assets/models/baby_tung_tung_tung_sahur.glb");
     modelManager.loadModel("assets/models/island.glb");
     modelManager.loadModel("assets/models/labubu.glb");
-
     return true;
 }
 
@@ -83,14 +82,17 @@ void GameLoop::setupComponents() {
     m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     m_modelManagerAdapter->setGraphicsLib(m_graphics);
     m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
+    m_userInterface = std::make_shared<GUI::UserInterface>(m_gui);
+    m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 }
 
 int GameLoop::run() {
     if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer)
         return 84;
     while (!m_graphics->WindowShouldClose()) {
-        m_camera->update(m_graphics);
-        m_graphics->UpdateMusic();
+        bool uiHandledMouse = m_userInterface->handleMouseEvents();
+        bool mouseOverUI = m_userInterface->isMouseOverUI();
+        m_camera->update(m_graphics, uiHandledMouse, mouseOverUI);
         m_graphics->BeginDrawing();
         if (m_renderer) {
             m_renderer->renderSkybox(m_graphics);
@@ -99,6 +101,13 @@ int GameLoop::run() {
         m_graphics->BeginCamera3D();
         m_mapRenderer->render();
         m_graphics->EndCamera3D();
+        updateGameData();
+        if (m_gameController) {
+            auto gameState = m_gameController->getGameState();
+            m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight,
+                                                   m_gameTime, m_frequency, m_gameTick);
+        }
+        m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -160,4 +169,3 @@ void GameLoop::setSkyboxTexture(const std::string& texturePath) {
 bool GameLoop::isSkyboxLoaded() const {
     return m_renderer && m_renderer->isSkyboxLoaded();
 }
-

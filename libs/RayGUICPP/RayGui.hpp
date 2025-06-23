@@ -43,4 +43,11 @@ public:
     void LoadStyle(const std::string& file) override;
     void SetStyle(int control, int property, int value) override;
     int GetStyle(int control, int property) override;
+    
+    // Fonctions de souris et clavier pour le glissement des fenêtres
+    ZappyTypes::Vector2 GetMousePosition() override;
+    bool IsMouseButtonDown(int button) override;
+    bool IsMouseButtonPressed(int button) override;
+    bool IsMouseButtonReleased(int button) override;
+    bool CheckCollisionPointRec(ZappyTypes::Vector2 point, ZappyTypes::Rectangle rect) override;
 };

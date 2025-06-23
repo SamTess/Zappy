@@ -7,9 +7,9 @@
 
 #include "GameController.hpp"
 #include <iostream>
+#include <string>
 #include <algorithm>
 #include <memory>
-#include <string>
 
 GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
     std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
@@ -174,8 +174,14 @@ void GameController::handlePlayerExpulsion(std::shared_ptr<IMessageData> data) {
 
 void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     auto broadcastData = std::static_pointer_cast<BroadcastData>(data);
-    if (unknownPlayerId(broadcastData->getPlayerId()))
-        return;
+    int playerId = broadcastData->getPlayerId();
+    const std::string& message = broadcastData->getMessage();
+    std::string teamName = "Inconnu";
+    auto playerInfo = _gameState->getPlayerInfo(playerId);
+    if (playerInfo) {
+        teamName = playerInfo->getTeamName();
+    }
+    _gameState->addBroadcast(playerId, teamName, message);
 }
 
 void GameController::handleResourceDrop(std::shared_ptr<IMessageData> data) {
@@ -270,6 +276,10 @@ void GameController::handleEndGame(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
     auto serverData = std::static_pointer_cast<ServerMessageData>(data);
+}
+
+void GameController::updateBroadcasts(float deltaTime) {
+    _gameState->updateBroadcasts(deltaTime);
 }
 
 void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {

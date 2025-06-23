@@ -9,12 +9,14 @@
 #define ENTITY_FACTORY_HPP_
 
 #include <memory>
+#include <string>
 #include "IGameEntity.hpp"
 #include "ITile.hpp"
 #include "IPlayer.hpp"
 #include "IPlayerInventory.hpp"
 #include "IEgg.hpp"
 #include "IResource.hpp"
+#include "IBroadcast.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 
 class Player;
@@ -22,6 +24,7 @@ class PlayerInventory;
 class Egg;
 class Tile;
 class Resource;
+class Broadcast;
 
 class IEntityFactory {
 public:
@@ -32,6 +35,7 @@ public:
     virtual std::shared_ptr<ITile> createTile(int x, int y) = 0;
     virtual std::shared_ptr<ITile> createTile(const TileContentData& data) = 0;
     virtual std::shared_ptr<IResource> createResource(ResourceType type, int quantity = 0) = 0;
+    virtual std::shared_ptr<IBroadcast> createBroadcast(const std::string& team, const std::string& message, int playerId, float timeLeft = 15.0f) = 0;
 };
 
 class GameEntityFactory : public IEntityFactory {
@@ -42,6 +46,7 @@ public:
     std::shared_ptr<ITile> createTile(int x, int y) override;
     std::shared_ptr<ITile> createTile(const TileContentData& data) override;
     std::shared_ptr<IResource> createResource(ResourceType type, int quantity = 0) override;
+    std::shared_ptr<IBroadcast> createBroadcast(const std::string& team, const std::string& message, int playerId, float timeLeft = 15.0f) override;
 };
 
 class EntityFactoryManager {
@@ -50,6 +55,16 @@ public:
     explicit EntityFactoryManager(std::unique_ptr<IEntityFactory> factory);
     void setFactory(std::unique_ptr<IEntityFactory> factory);
     IEntityFactory& getFactory();
+
+    // Méthodes utilitaires pour simplifier la création d'entités
+    std::shared_ptr<IPlayer> createPlayer(const PlayerInfoData& data);
+    std::shared_ptr<IPlayerInventory> createPlayerInventory(const PlayerInventoryData& data);
+    std::shared_ptr<IEgg> createEgg(const EggData& data);
+    std::shared_ptr<ITile> createTile(int x, int y);
+    std::shared_ptr<ITile> createTile(const TileContentData& data);
+    std::shared_ptr<IResource> createResource(ResourceType type, int quantity = 0);
+    std::shared_ptr<IBroadcast> createBroadcast(const std::string& team,
+        const std::string& message, int playerId, float timeLeft = 15.0f);
 
 private:
     std::unique_ptr<IEntityFactory> _factory;

@@ -35,12 +35,22 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
 	  GameLoop.cpp \
+	  GameLoopUI.cpp \
+	  ui/UserInterface.cpp \
+	  ui/UIWindowFactory.cpp \
+	  ui/windows/AUIWindow.cpp \
+	  ui/windows/tileInfo/TileInfoWindow.cpp \
+	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
+	  ui/windows/broadcasts/BroadcastsWindow.cpp \
+	  ui/windows/controls/ControlsWindow.cpp \
+	  ui/windows/timeInfo/TimeInfoWindow.cpp \
+	  ui/windows/menu/MenuWindow.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
 	  gameController/entities/Egg.cpp \
 	  gameController/entities/Resource.cpp \
 	  gameController/entities/Tile.cpp \
-	  gameController/entities/PlayerInventory.cpp \
+	  gameController/entities/PlayerInventory.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
@@ -95,6 +105,13 @@ setup_dirs:
 	@mkdir -p $(BUILD_DIR)/network/protocol
 	@mkdir -p $(BUILD_DIR)/network/utils
 	@mkdir -p $(BUILD_DIR)/network/networkManager
+	@mkdir -p $(BUILD_DIR)/ui/windows/logs
+	@mkdir -p $(BUILD_DIR)/ui/windows/tileInfo
+	@mkdir -p $(BUILD_DIR)/ui/windows/playerInfo
+	@mkdir -p $(BUILD_DIR)/ui/windows/broadcasts
+	@mkdir -p $(BUILD_DIR)/ui/windows/controls
+	@mkdir -p $(BUILD_DIR)/ui/windows/timeInfo
+	@mkdir -p $(BUILD_DIR)/ui/windows/menu
 	@mkdir -p ../../build
 
 # Display a fancy banner for the build process
@@ -207,5 +224,5 @@ re: fclean all
 -include $(DEP)
 -include $(MAIN_DEP)
 
-.PHONY: all clean fclean re debug coverage test_dlloader \
+.PHONY: all clean fclean re debug coverage test_dlloader test_gui \
 compile_animation setup_dirs

@@ -14,11 +14,13 @@
 #include <string>
 #include <array>
 #include <mutex>
-
-#include "../network/protocol/messageData/MessageDataAll.hpp"
+#include <deque>
+#include "IBroadcast.hpp"
 #include "IGameEntity.hpp"
 #include "GameEntitiesAll.hpp"
 #include "EntityFactory.hpp"
+#include "../network/protocol/messageData/MessageDataAll.hpp"
+
 
 class GameState {
 public:
@@ -42,6 +44,9 @@ public:
     int getTimeUnit() const;
     bool isGameEnded() const;
     const std::string& getWinningTeam() const;
+
+    std::vector<int> getPlayerIds() const;
+
     void setMapSize(int width, int height);
     void updateTileResources(int x, int y, int food, int linemate, int deraumere,
                             int sibur, int mendiane, int phiras, int thystame);
@@ -56,6 +61,10 @@ public:
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
     std::map<int, std::shared_ptr<IPlayer>> getPlayers();
+
+    void addBroadcast(int playerId, const std::string& team, const std::string& message);
+    void updateBroadcasts(float deltaTime);
+    std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
 
 private:
     bool isValidCoordinates(int x, int y) const;
@@ -76,6 +85,8 @@ private:
     int _timeUnit = 100;
     bool _gameEnded = false;
     std::string _winningTeam;
+    std::deque<std::shared_ptr<IBroadcast>> _broadcasts;
+    const size_t _maxBroadcasts = 20;
     std::shared_ptr<EntityFactoryManager> _entityFactory;
 };
 

@@ -18,9 +18,13 @@ public:
 
     void init(std::shared_ptr<IGraphicsLib> graphics);
     void update(std::shared_ptr<IGraphicsLib> graphics);
+    void update(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse);
+    void update(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse, bool mouseOverUI);
     void reset();
 
     void handleMouseInput(std::shared_ptr<IGraphicsLib> graphics);
+    void handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse);
+    void handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse, bool mouseOverUI);
     void handleKeyboardInput(std::shared_ptr<IGraphicsLib> graphics);
     void updateCameraPosition(std::shared_ptr<IGraphicsLib> graphics);
 

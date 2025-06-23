@@ -6,6 +6,7 @@
 */
 #include <stdexcept>
 #include <memory>
+#include <utility>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -28,6 +29,15 @@ void RayLib::InitWindow(int width, int height, const std::string& title) {
 }
 
 void RayLib::CloseWindow() {
+    _texture3D.reset();
+    _music.reset();
+    _sound.reset();
+    _font.reset();
+    _models.clear();
+    for (auto it = _textures.begin(); it != _textures.end(); ) {
+        auto current = it++;
+        _textures.erase(current);
+    }
     _window.reset();
     _initialized = false;
     _textures.clear();
@@ -37,6 +47,7 @@ void RayLib::CloseWindow() {
     _music.reset();
     _texture3D.reset();
     _audio.reset();
+
 }
 
 bool RayLib::WindowShouldClose() {
@@ -98,7 +109,12 @@ void RayLib::DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos
 int RayLib::LoadTexture2D(const std::string& path) {
     try {
         int id = raylibcpp::Texture::getNextId();
-        _textures[id] = std::make_unique<raylibcpp::Texture>(path);
+        std::unique_ptr<raylibcpp::Texture> texture = std::make_unique<raylibcpp::Texture>(path);
+        if (!texture->isReady()) {
+            std::cerr << "Échec de chargement de la texture: " << path << std::endl;
+            return -1;
+        }
+        _textures[id] = std::move(texture);
         return id;
     } catch (const std::exception& e) {
         std::cerr << "Erreur de chargement de texture: " << e.what() << std::endl;
@@ -113,7 +129,11 @@ void RayLib::DrawTexture2D(int textureId, int x, int y) {
 }
 
 void RayLib::UnloadTexture2D(int textureId) {
-    _textures.erase(textureId);
+    auto it = _textures.find(textureId);
+    if (it != _textures.end()) {
+        std::unique_ptr<raylibcpp::Texture> texture = std::move(it->second);
+        _textures.erase(it);
+    }
 }
 
 bool RayLib::IsTextureReady(int textureId) const {

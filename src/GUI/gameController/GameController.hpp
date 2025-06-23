@@ -42,6 +42,12 @@ public:
     std::shared_ptr<const GameState> getGameState() const { return _gameState; }
     void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory);
 
+    /**
+     * @brief Met à jour les minuteurs de broadcasts
+     * @param deltaTime Temps écoulé depuis la dernière mise à jour
+     */
+    void updateBroadcasts(float deltaTime);
+
 private:
     void processMessage(const Message& message);
     void handleMapSize(std::shared_ptr<IMessageData> data);
