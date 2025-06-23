@@ -15,6 +15,7 @@
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
+
 GameLoop::GameLoop(std::shared_ptr<NetworkManager> networkManager)
     : m_host("localhost"), m_port(4242), m_networkManager(networkManager) {
 }
@@ -26,6 +27,8 @@ bool GameLoop::init() {
     if (!loadModels())
         return false;
     setupComponents();
+    m_graphics->PlayMusic("assets/music/music.mp3");
+    m_graphics->SetMusicVolume(0.5f);
     return true;
 }
 
@@ -152,6 +155,7 @@ void GameLoop::updateCameraForMapSize() {
         cameraDistance = 10.0f;
     if (cameraDistance > 50.0f)
         cameraDistance = 50.0f;
+    m_graphics->UpdateMusic();
     m_camera->reset();
     m_camera->distance() = cameraDistance;
 }
