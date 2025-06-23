@@ -63,6 +63,12 @@ public:
     void setSelectedTile(int x, int y);
 
     /**
+     * @brief Définit le joueur sélectionné
+     * @param playerId Identifiant du joueur sélectionné
+     */
+    void setSelectedPlayer(int playerId);
+
+    /**
      * @brief Ajoute un message de diffusion
      * @param team Équipe émettrice
      * @param message Message diffusé

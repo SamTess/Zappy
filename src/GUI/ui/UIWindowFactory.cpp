@@ -116,6 +116,13 @@ void UIWindowFactory::setSelectedTile(int x, int y) {
     }
 }
 
+void UIWindowFactory::setSelectedPlayer(int playerId) {
+    auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(m_windows["playerInfo"]);
+    if (playerInfoWindow) {
+        playerInfoWindow->setSelectedPlayer(playerId);
+    }
+}
+
 void UIWindowFactory::addBroadcast(const std::string& team, const std::string& message) {
     auto broadcastsWindow = std::dynamic_pointer_cast<GUI::BroadcastsWindow>(m_windows["broadcasts"]);
     if (broadcastsWindow)

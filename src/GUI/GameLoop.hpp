@@ -51,6 +51,12 @@ private:
     void onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile);
     bool worldToTileCoordinates(ZappyTypes::Vector3 worldPos, int& tileX, int& tileY);
     bool performTileSelection(ZappyTypes::Vector2 screenPos, int& tileX, int& tileY);
+    bool performPlayerSelection(ZappyTypes::Vector2 screenPos, int& playerId);
+    void handlePlayerSelection(int playerId);
+    
+    // Méthodes utilitaires pour le ray casting précis des joueurs
+    float calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 point);
+    ZappyTypes::Vector3 calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers);
     std::string m_host;
     int m_port;
 
