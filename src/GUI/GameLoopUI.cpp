@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <algorithm>
 #include <chrono>
