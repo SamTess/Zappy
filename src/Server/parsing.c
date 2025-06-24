@@ -96,7 +96,7 @@ static int parse_frequence(char **av, int i, parsing_info_t *parsed_info)
     if (check_zero(av[i + 1]))
         parsing_error("frequence can't be null", parsed_info);
     res = atoi(av[i + 1]);
-    if (res < 1 || res > 10000)
+    if (res < 1 || res > 10000 || strlen(av[i + 1]) > 9)
         parsing_error("frequence must be between 1 and 10000", parsed_info);
     return res;
 }

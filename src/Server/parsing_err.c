@@ -8,6 +8,7 @@
 #include "include/server.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 static void free_names(char **names)
 {
