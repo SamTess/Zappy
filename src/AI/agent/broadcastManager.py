@@ -93,15 +93,15 @@ class BroadcastManager:
       return
 
 
-    def _handle_stopfork_message(self, sender_agent_id, sender_agent_direction, message):
-        if not hasattr(self.agent, 'stop_fork'):
-            print("Agent is missing 'stop_fork' method for handling stop fork messages.")
-            return
-        try:
-            self.agent.stop_fork(sender_agent_id, sender_agent_direction, message)
-        except Exception as e:
-            print(f"Error stopping fork: {e}")
-            return
+  def _handle_stopfork_message(self, sender_agent_id, sender_agent_direction, message):
+    if not hasattr(self.agent, 'stop_fork'):
+        print("Agent is missing 'stop_fork' method for handling stop fork messages.")
+        return
+    try:
+        self.agent.stop_fork(sender_agent_id, sender_agent_direction, message)
+    except Exception as e:
+        print(f"Error stopping fork: {e}")
+        return
 
 
   def send_broadcast(self, message_type, message):
