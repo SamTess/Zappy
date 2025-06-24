@@ -21,7 +21,11 @@ SRC = parsing/ParsingCLI.cpp \
 	  network/networkThread/NetworkThread.cpp \
 	  network/protocol/Message.cpp \
 	  network/protocol/ProtocolParser.cpp \
-	  network/utils/SystemWrapper.cpp \
+	  network/systemWrapper/implementation/TcpSocket.cpp \
+	  network/systemWrapper/implementation/NetworkAddress.cpp \
+	  network/systemWrapper/implementation/SocketPoller.cpp \
+	  network/systemWrapper/implementation/Buffer.cpp \
+	  network/systemWrapper/factory/NetworkFactory.cpp \
 	  network/networkManager/NetworkManager.cpp \
 	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \

@@ -11,7 +11,7 @@
 #include <string>
 #include <memory>
 #include "../../shared/exception/AException.hpp"
-#include "../utils/SystemWrapper.hpp"
+#include "../systemWrapper/NetworkAPI.hpp"
 
 class TcpConnection {
     public:
@@ -27,20 +27,14 @@ class TcpConnection {
         bool hasData() const;
 
     private:
-        int _socket;
-        std::unique_ptr<SystemWrapper::SafePollFd> _pollfd;
-        std::unique_ptr<SystemWrapper::SafeSockAddr> _sockaddr;
-        std::shared_ptr<SystemWrapper::SafeBuffer> _recvBuffer;
+        std::unique_ptr<Network::ISocket> _socket;
+        std::unique_ptr<Network::IBuffer> _recvBuffer;
+        std::unique_ptr<Network::INetworkFactory> _networkFactory;
         size_t _initialBufferSize;
 
         void createAndConfigureSocket();
-        void resolveAddress(const std::string &host, int port);
-        void performConnect();
-        void waitForConnection(int timeoutMs = 5000);
-        bool waitForReadData(int timeoutMs);
+        void performConnect(const std::string &host, int port);
         std::string readDataFromSocket();
-        void ensureBufferSize();
-        void adjustBufferSize(ssize_t bytesReceived);
 
         class TcpConnectionException : public AException {
             public:
