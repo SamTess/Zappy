@@ -29,6 +29,9 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
 	  renderer/UIRenderer.cpp \
+	  renderer/ParticleSystem.cpp \
+	  renderer/EjectionAnimationManager.cpp \
+	  renderer/DeathAnimationManager.cpp \
 	  renderer/strategies/DetailedTileRenderStrategy.cpp \
 	  renderer/strategies/ModelTileRenderStrategy.cpp \
 	  renderer/strategies/SimpleTileRenderStrategy.cpp \

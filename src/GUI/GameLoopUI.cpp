@@ -32,6 +32,7 @@ void GameLoop::updateGameData() {
     m_gameTick++;
     if (m_gameController) {
         m_gameController->updateBroadcasts(deltaTime);
+        m_gameController->updateAnimations(deltaTime);
         auto gameState = m_gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
             m_mapWidth = gameState->getMapWidth();
