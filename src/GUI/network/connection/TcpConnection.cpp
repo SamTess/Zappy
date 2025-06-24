@@ -32,7 +32,7 @@ void TcpConnection::createAndConfigureSocket() {
 }
 
 void TcpConnection::performConnect(const std::string &host, int port) {
-    if (!_socket->connect(host, port)) {
+    if (!_socket || !_socket->connect(host, port)) {
         throw TcpConnectionException("Connection failed to " + host + ":" + std::to_string(port));
     }
 }
