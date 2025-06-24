@@ -118,7 +118,7 @@ std::string TcpSocket::receive() {
 
     if (!isConnected())
         return "";
-    pollfd pfd = {_fd, POLLIN, 0};
+    pfd = {_fd, POLLIN, 0};
     if (poll(&pfd, 1, 500) <= 0)
         return "";
     bytesRead = read(_fd, buffer.data(), buffer.size() - 1);
