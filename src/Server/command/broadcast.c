@@ -18,9 +18,9 @@ static int adapt_rota_player(enum rotation_e rota_player)
     switch (rota_player) {
         case UP:
             return 0;
-        case DOWN:
-            return 1;
         case LEFT:
+            return 1;
+        case DOWN:
             return 2;
         case RIGHT:
             return 3;

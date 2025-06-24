@@ -61,6 +61,8 @@ class BroadcastManager:
 
       if msg_type == 'I':
         self._handle_inventory_message(sender_agent_id, sender_agent_direction, payload)
+      elif msg_type == "S":
+        self._handle_stopfork_message(sender_agent_id, sender_agent_direction, payload)
       else:
         print(f"Unknown message type: {msg_type} in decrypted message: {decrypted_message}")
     else:
@@ -89,6 +91,17 @@ class BroadcastManager:
     except Exception as e:
       print(f"Error updating last known enemy direction: {e}")
       return
+
+
+    def _handle_stopfork_message(self, sender_agent_id, sender_agent_direction, message):
+        if not hasattr(self.agent, 'stop_fork'):
+            print("Agent is missing 'stop_fork' method for handling stop fork messages.")
+            return
+        try:
+            self.agent.stop_fork(sender_agent_id, sender_agent_direction, message)
+        except Exception as e:
+            print(f"Error stopping fork: {e}")
+            return
 
 
   def send_broadcast(self, message_type, message):

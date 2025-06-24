@@ -18,6 +18,7 @@ class DecisionManager:
       "TakeOneFoodHere": behaviors.TakeOneFoodHereBehavior(agent),
       "DropEveryMinerals": behaviors.DropEveryMineralsBehavior(agent),
       "DropAllFood": behaviors.DropAllFoodBehavior(agent),
+      "FillTeam": behaviors.FillTeamBehavior(agent),
       "Fork": behaviors.ForkBehavior(agent),
       "None": behaviors.NoActionBehavior(agent),
       "": behaviors.NoActionBehavior(agent),
@@ -25,7 +26,8 @@ class DecisionManager:
 
 
     self.decisions = {
-      "collecting": {"miner": ["Fork", "BigDyson"], "fighter": ["FoodDyson"]},
+      "reproducing": {"miner": ["FoodBigDyson", "Fork", "FillTeam"], "fighter": ["FoodBigDyson"]},
+      "collecting": {"miner": ["BigDyson"], "fighter": ["FoodDyson", "FillTeam"]},
       "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["JoinTeamMates"]},
       "setting": {"miner": ["DropEveryMinerals"], "fighter": ["DropAllFood"]},
       "upgrading": {"miner": ["Upgrade", "TakeOneFoodHere", "TakeOneFoodHere"], "fighter": ["FoodBigDyson"]}

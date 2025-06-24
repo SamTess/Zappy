@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from time import sleep
 from agent.agentActionsService import AgentActionManager
+from constants.upgrades import get_total_upgrade_resources, minimum_players_for_upgrade
 import utils.zappy as zappy
 
 class Behavior(ABC):
@@ -80,14 +81,15 @@ class FoodDysonBehavior(Behavior):
       self.agent.send_command("Left")
       self.current_index = 0
 
+from random import choice
 class BigDysonBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     for _ in range(self.agent.map_size_x):
       AgentActionManager(self.agent).take_everything_here()
       self.agent.send_command("Forward")
-    self.agent.send_command("Right")
+    self.agent.send_command(choice(["Right", "Left"]))
     self.agent.send_command("Forward")
-    self.agent.send_command("Left")
+    self.agent.send_command(choice(["Right", "Left"]))
 
 
 class FoodBigDysonBehavior(Behavior):
@@ -95,9 +97,9 @@ class FoodBigDysonBehavior(Behavior):
     for _ in range(self.agent.map_size_x):
       self.agent.send_command("Forward")
       AgentActionManager(self.agent).take_all_of_item_here("food")
-    self.agent.send_command("Right")
+    self.agent.send_command(choice(["Right", "Left"]))
     self.agent.send_command("Forward")
-    self.agent.send_command("Left")
+    self.agent.send_command(choice(["Right", "Left"]))
 
 
 class GetFoodAndMineralsBehavior(Behavior):
@@ -114,19 +116,17 @@ class GetFoodAndMineralsBehavior(Behavior):
 
 class JoinTeamMatesBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    if not surroundings:
-      print("JoinTeamMatesBehavior: Surroundings is None.")
-      return
 
     if not self.agent.other_agents:
       print("JoinTeamMatesBehavior: No other agents known.")
       return
 
-    lowest_id = min([int(agent_id) for agent_id in self.agent.other_agents.keys()])
-    if self.agent.id <= lowest_id:
+    max_id = max([int(agent_id) for agent_id in self.agent.other_agents.keys()])
+    if self.agent.id >= max_id:
       return
 
-    self.agent.other_agents[lowest_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[lowest_id]["direction"])
+    print("Going on the way to the highest id agent:", max_id)
+    self.agent.other_agents[max_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[max_id]["direction"])
 
 
 class TakeEverythingHereBehavior(Behavior):
@@ -180,13 +180,13 @@ class DropAllFoodBehavior(Behavior):
         self.agent.send_command("Set food")
 
 
-class ForkBehavior(Behavior):
+class FillTeamBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     while True:
       slots_available = self.agent.send_command("Connect_nbr")
       if slots_available is None or "ko" in slots_available:
         print(f"ForkAgentBehavior: Failed to get available slots. Response: {slots_available}")
-        return
+        break
       try:
         slots_available = int(slots_available)
       except ValueError:
@@ -194,6 +194,18 @@ class ForkBehavior(Behavior):
         return
       if slots_available > 0:
         from utils.mutliprocessing import fork_agent
-        fork_agent(self.agent.ip, self.agent.port, self.agent.team, 0, self.agent.performance_mode)
+        fork_agent(self.agent.ip, self.agent.port, self.agent.team, self.agent.performance_mode)
       else:
-        return
+        break
+
+
+class ForkBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    self.agent.process_server_message()
+
+    if self.agent.stop_forking:
+      print("Fork command is stopped.")
+      return
+
+    self.agent.send_command("Fork")
+    print("Fork command sent.")
