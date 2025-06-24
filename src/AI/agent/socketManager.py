@@ -22,9 +22,30 @@ class SocketManager:
 
 
   def stop(self):
+    if not self.running:
+      return
+
     self.running = False
-    if self.thread:
-      self.thread.join()
+
+    try:
+      if self.sock:
+        self.sock.shutdown(socket.SHUT_RDWR)
+        self.sock.close()
+    except Exception:
+      pass
+
+    if self.thread and self.thread.is_alive():
+      self.thread.join(timeout=1.0)
+      if self.thread.is_alive():
+        print("Warning: Socket thread did not stop gracefully")
+
+    with self.lock:
+      for request_id, response_queue in self.pending_requests.items():
+        try:
+          response_queue.put(None)
+        except Exception:
+          pass
+      self.pending_requests.clear()
 
 # fonction bloquante
   def _read_line(self):

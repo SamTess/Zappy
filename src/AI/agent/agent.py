@@ -37,15 +37,12 @@ class Agent:
 
       self.performance_mode = performance_mode
 
-      # TODO(ms-tristan): garder une info sur tous les autres agents + sur la dernière direction ennemie connue
       self.other_agents = {}                #? {"id": {"direction": "N", "inventory": {}}}
       self.last_enemy_direction = None      #? 0 - 8
 
-      # TODO(ms-tristan): garder des infos sur l'état actuel de l'agent -(rôle et phase)
       self.current_role = "miner"           #? "fighter", "miner"
       self.current_phase = "collecting"     #? "collecting", "rallying", "setting", "upgrading", "reproducing"
 
-      # TODO(ms-tristan): garder en mémoire les dernières infos connues sur soi
       self.last_known_inventory = {}
       self.last_known_surroundings = {}
 
@@ -86,12 +83,28 @@ class Agent:
 
 
   def stop(self):
+    if hasattr(self, '_stopping') and self._stopping:
+      return
+
+    self._stopping = True
+
     if self.running:
       self.logger.info(f"Stopping agent {self.id}...")
-      self.socketManager.stop()
-      self.sock.close()
-      print(f"Agent {self.id} stopped.")
       self.running = False
+
+      try:
+        if hasattr(self, 'socketManager') and self.socketManager:
+          self.socketManager.stop()
+      except Exception as e:
+        print(f"Error stopping socket manager: {e}")
+
+      try:
+        if hasattr(self, 'sock') and self.sock:
+          self.sock.close()
+      except Exception as e:
+        print(f"Error closing socket: {e}")
+
+      print(f"Agent {self.id} stopped.")
 
 
   def _run(self):
