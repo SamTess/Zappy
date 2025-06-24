@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** EjectionAnimationManager - Manages player ejection animations
+** EjectionAnimationManager
 */
 
 #pragma once

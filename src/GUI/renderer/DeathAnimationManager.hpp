@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** DeathAnimationManager - Manages player death animations (falling 3D models)
+** DeathAnimationManager
 */
 
 #pragma once
@@ -58,10 +58,10 @@ private:
     DeathAnimationManager(const DeathAnimationManager&) = delete;
     DeathAnimationManager& operator=(const DeathAnimationManager&) = delete;
 
-    void updateDeathAnimation(DeathAnimation* animation, float deltaTime);
+    void updateDeathAnimation(std::shared_ptr<DeathAnimation> animation, float deltaTime);
     void removeFinishedAnimations();
 
-    std::map<int, DeathAnimation> activeAnimations;
+    std::map<int, std::shared_ptr<DeathAnimation>> activeAnimations;
 
     const float gravity = -15.0f;
     const float bounceReduction = 0.3f;

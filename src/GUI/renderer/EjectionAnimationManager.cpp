@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** EjectionAnimationManager - Implementation of player ejection animations
+** EjectionAnimationManager
 */
 
 #include "EjectionAnimationManager.hpp"

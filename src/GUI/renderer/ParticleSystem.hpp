@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** ParticleSystem - System for handling particle effects and animations
+** ParticleSystem
 */
 
 #pragma once

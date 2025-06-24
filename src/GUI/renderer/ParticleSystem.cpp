@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** ParticleSystem - Implementation of particle effects and animations
+** ParticleSystem
 */
 
 #include "ParticleSystem.hpp"

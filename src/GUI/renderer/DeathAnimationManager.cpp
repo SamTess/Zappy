@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** DeathAnimationManager - Implementation for player death animations with 3D models
+** DeathAnimationManager
 */
 #include <random>
 #include <algorithm>
@@ -29,12 +29,12 @@ void DeathAnimationManager::startDeathAnimation(int playerId, const ZappyTypes::
 
     activeAnimations.erase(playerId);
 
-    DeathAnimation animation;
-    animation.playerId = playerId;
-    animation.teamName = teamName;
-    animation.startPosition = position;
-    animation.currentPosition = position;
-    animation.currentPosition.y += 1.5f;
+    auto animation = std::make_shared<DeathAnimation>();
+    animation->playerId = playerId;
+    animation->teamName = teamName;
+    animation->startPosition = position;
+    animation->currentPosition = position;
+    animation->currentPosition.y += 1.5f;
 
     static std::random_device rd;
     static std::mt19937 gen(rd());
@@ -42,19 +42,19 @@ void DeathAnimationManager::startDeathAnimation(int playerId, const ZappyTypes::
     std::uniform_real_distribution<float> upwardDist(6.0f, 9.0f);
     std::uniform_real_distribution<float> rotationDist(-360.0f, 360.0f);
 
-    animation.velocity.x = velocityDist(gen);
-    animation.velocity.y = upwardDist(gen);
-    animation.velocity.z = velocityDist(gen);
+    animation->velocity.x = velocityDist(gen);
+    animation->velocity.y = upwardDist(gen);
+    animation->velocity.z = velocityDist(gen);
 
-    animation.rotationVelocity.x = rotationDist(gen);
-    animation.rotationVelocity.y = rotationDist(gen) * 0.5f;
-    animation.rotationVelocity.z = rotationDist(gen) * 0.3f;
+    animation->rotationVelocity.x = rotationDist(gen);
+    animation->rotationVelocity.y = rotationDist(gen) * 0.5f;
+    animation->rotationVelocity.z = rotationDist(gen) * 0.3f;
 
-    animation.rotation = {0.0f, 0.0f, 0.0f};
-    animation.timeAlive = 0.0f;
-    animation.duration = 3.0f;
-    animation.active = true;
-    animation.hasHitGround = false;
+    animation->rotation = {0.0f, 0.0f, 0.0f};
+    animation->timeAlive = 0.0f;
+    animation->duration = 3.0f;
+    animation->active = true;
+    animation->hasHitGround = false;
 
     activeAnimations[playerId] = animation;
 
@@ -63,14 +63,14 @@ void DeathAnimationManager::startDeathAnimation(int playerId, const ZappyTypes::
 
 void DeathAnimationManager::update(float deltaTime) {
     for (auto& pair : activeAnimations) {
-        if (pair.second.active)
-            updateDeathAnimation(&pair.second, deltaTime);
+        if (pair.second && pair.second->active)
+            updateDeathAnimation(pair.second, deltaTime);
     }
 
     removeFinishedAnimations();
 }
 
-void DeathAnimationManager::updateDeathAnimation(DeathAnimation* animation, float deltaTime) {
+void DeathAnimationManager::updateDeathAnimation(std::shared_ptr<DeathAnimation> animation, float deltaTime) {
     if (!animation || !animation->active) return;
 
     animation->timeAlive += deltaTime;
@@ -125,31 +125,31 @@ void DeathAnimationManager::render(const std::shared_ptr<IGraphicsLib>& graphics
     if (!graphicsLib) return;
 
     for (const auto& pair : activeAnimations) {
-        const DeathAnimation& animation = pair.second;
-        if (!animation.active) continue;
+        const auto& animation = pair.second;
+        if (!animation || !animation->active) continue;
 
         ZappyTypes::Color teamColor = {255, 255, 255, 255};
-        if (!animation.teamName.empty()) {
+        if (!animation->teamName.empty()) {
             std::hash<std::string> hasher;
-            size_t hash = hasher(animation.teamName);
+            size_t hash = hasher(animation->teamName);
             teamColor.r = static_cast<unsigned char>((hash & 0xFF0000) >> 16);
             teamColor.g = static_cast<unsigned char>((hash & 0x00FF00) >> 8);
             teamColor.b = static_cast<unsigned char>(hash & 0x0000FF);
             teamColor.a = 255;
         }
 
-        float fadeRatio = std::max(0.3f, 1.0f - (animation.timeAlive / animation.duration));
+        float fadeRatio = std::max(0.3f, 1.0f - (animation->timeAlive / animation->duration));
         teamColor.a = static_cast<unsigned char>(255 * fadeRatio);
 
         ZappyTypes::Vector3 rotationAxis = {1.0f, 0.0f, 0.0f};
-        float rotationAngle = animation.rotation.x;
+        float rotationAngle = animation->rotation.x;
 
         ModelManager::getInstance().drawModelEx(
             LABUBU,
-            animation.currentPosition,
+            animation->currentPosition,
             rotationAxis,
             rotationAngle,
-            animation.scale,
+            animation->scale,
             teamColor
         );
     }
@@ -157,22 +157,20 @@ void DeathAnimationManager::render(const std::shared_ptr<IGraphicsLib>& graphics
 
 bool DeathAnimationManager::isPlayerInDeathAnimation(int playerId) const {
     auto it = activeAnimations.find(playerId);
-    return it != activeAnimations.end() && it->second.active;
+    return it != activeAnimations.end() && it->second && it->second->active;
 }
 
 ZappyTypes::Vector3 DeathAnimationManager::getPlayerDeathPosition(int playerId) const {
     auto it = activeAnimations.find(playerId);
-    if (it != activeAnimations.end() && it->second.active) {
-        return it->second.currentPosition;
-    }
+    if (it != activeAnimations.end() && it->second && it->second->active)
+        return it->second->currentPosition;
     return {0.0f, 0.0f, 0.0f};
 }
 
 ZappyTypes::Vector3 DeathAnimationManager::getPlayerDeathRotation(int playerId) const {
     auto it = activeAnimations.find(playerId);
-    if (it != activeAnimations.end() && it->second.active) {
-        return it->second.rotation;
-    }
+    if (it != activeAnimations.end() && it->second && it->second->active)
+        return it->second->rotation;
     return {0.0f, 0.0f, 0.0f};
 }
 
@@ -183,7 +181,7 @@ void DeathAnimationManager::cleanup() {
 void DeathAnimationManager::removeFinishedAnimations() {
     auto it = activeAnimations.begin();
     while (it != activeAnimations.end()) {
-        if (!it->second.active) {
+        if (!it->second || !it->second->active) {
             it = activeAnimations.erase(it);
         } else {
             ++it;
