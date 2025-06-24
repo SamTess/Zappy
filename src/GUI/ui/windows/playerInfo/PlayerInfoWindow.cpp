@@ -11,6 +11,7 @@
 #include <utility>
 #include <memory>
 #include "PlayerInfoWindow.hpp"
+#include "../../../network/networkManager/NetworkManager.hpp"
 
 namespace GUI {
 
@@ -29,6 +30,11 @@ void GUI::PlayerInfoWindow::renderContent() {
     if (!selectedPlayer) {
         displayPlayerNotFound();
         return;
+    }
+    if (m_networkManager && m_networkManager->isConnected()) {
+        std::stringstream pinCommand;
+        pinCommand << "pin #" << m_selectedPlayerId;
+        m_networkManager->sendCommand(pinCommand.str());
     }
     float yOffset = m_position.y + 30;
     yOffset = displayPlayerIdentity(selectedPlayer, yOffset);
@@ -174,6 +180,10 @@ int GUI::PlayerInfoWindow::getSelectedPlayer() const {
 
 bool GUI::PlayerInfoWindow::hasPlayerSelected() const {
     return m_hasSelectedPlayer;
+}
+
+void GUI::PlayerInfoWindow::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
+    m_networkManager = networkManager;
 }
 
 } // namespace GUI

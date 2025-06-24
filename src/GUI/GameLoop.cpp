@@ -15,6 +15,7 @@
 #include "Constants.hpp"
 #include "textureManager/ModelManager.hpp"
 #include "textureManager/ModelManagerAdapter.hpp"
+#include "ui/windows/timeInfo/TimeInfoWindow.hpp"
 #include "renderer/ParticleSystem.hpp"
 #include "renderer/EjectionAnimationManager.hpp"
 #include "renderer/DeathAnimationManager.hpp"
@@ -104,6 +105,10 @@ int GameLoop::run() {
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->UpdateMusic();
         m_graphics->BeginCamera3D();
+                int selectedTileX = m_selectedTile.selected ? m_selectedTile.x : -1;
+        int selectedTileY = m_selectedTile.selected ? m_selectedTile.y : -1;
+        int selectedPlayerId = m_selectedPlayer.selected ? m_selectedPlayer.playerId : -1;
+        m_mapRenderer->renderWithSelection(selectedTileX, selectedTileY, selectedPlayerId);
         m_mapRenderer->render();
         Zappy::ParticleSystem::getInstance().render(m_graphics);
         Zappy::EjectionAnimationManager::getInstance().render(m_graphics);
@@ -113,10 +118,17 @@ int GameLoop::run() {
         if (m_gameController) {
             auto gameState = m_gameController->getGameState();
             m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight,
-                                                   m_gameTime, m_frequency, m_gameTick);
+                m_gameTime, m_frequency, m_gameTick);
         }
         m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
+        if (m_userInterface) {
+            auto timeInfoWindow = std::dynamic_pointer_cast<GUI::TimeInfoWindow>(
+                m_userInterface->getWindow("timeInfo"));
+            if (timeInfoWindow) {
+                timeInfoWindow->setFPS(m_uiRenderer->getFPS());
+            }
+        }
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }

@@ -49,9 +49,14 @@ private:
     void handleViewModeChange(int mode);
     void onMapSizeChanged(int width, int height);
     void onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile);
+    bool worldToTileCoordinates(ZappyTypes::Vector3 worldPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY);
+    bool performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY);
+    bool performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> playerId);
+    void handlePlayerSelection(int playerId);
+    float calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 point);
+    ZappyTypes::Vector3 calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers);
     std::string m_host;
     int m_port;
-
     std::shared_ptr<IGraphicsLib> m_graphics;
     std::shared_ptr<IGuiLib> m_gui;
     std::shared_ptr<Renderer> m_renderer;
@@ -72,4 +77,8 @@ private:
         int y = 0;
         bool selected = false;
     } m_selectedTile;
+    struct {
+        int playerId = -1;
+        bool selected = false;
+    } m_selectedPlayer;
 };

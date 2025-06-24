@@ -18,6 +18,7 @@ AUIWindow::AUIWindow(std::shared_ptr<IGuiLib> guiLib, const std::string& title)
       m_dimensions({0, 0}),
       m_scrollPosition({0, 0}),
       m_visible(false),
+      m_showWindowBox(true),
       m_dragging(false),
       m_dragOffset({0, 0}) { }
 
@@ -30,22 +31,23 @@ void AUIWindow::initialize(const ZappyTypes::Vector2& position,
 bool AUIWindow::render() {
     if (!m_visible)
         return true;
-    ZappyTypes::Rectangle windowRect = {
-        m_position.x, m_position.y,
-        m_dimensions.x, m_dimensions.y
-    };
-    bool closeButtonClicked = m_guiLib->DrawWindowBox(
-        windowRect.x, windowRect.y,
-        windowRect.width, windowRect.height,
-        m_title
-    );
-    if (closeButtonClicked) {
-        m_visible = false;
-        return false;
-    } else {
-        renderContent();
-        return true;
+    if (m_showWindowBox) {
+        ZappyTypes::Rectangle windowRect = {
+            m_position.x, m_position.y,
+            m_dimensions.x, m_dimensions.y
+        };
+        bool closeButtonClicked = m_guiLib->DrawWindowBox(
+            windowRect.x, windowRect.y,
+            windowRect.width, windowRect.height,
+            m_title
+        );
+        if (closeButtonClicked) {
+            m_visible = false;
+            return false;
+        }
     }
+    renderContent();
+    return true;
 }
 
 void AUIWindow::updateData(std::shared_ptr<const GameState> gameState,
@@ -86,7 +88,7 @@ void AUIWindow::toggleVisibility() {
 bool AUIWindow::startDragging(const ZappyTypes::Vector2& mousePosition) {
     ZappyTypes::Rectangle titleBarRect = {
         m_position.x, m_position.y,
-        m_dimensions.x, 20.0f
+        m_dimensions.x, 20
     };
     if (m_guiLib->CheckCollisionPointRec(mousePosition, titleBarRect)) {
         m_dragging = true;
@@ -118,6 +120,10 @@ bool AUIWindow::isPositionInWindow(const ZappyTypes::Vector2& position) const {
         m_dimensions.x, m_dimensions.y
     };
     return m_guiLib->CheckCollisionPointRec(position, windowRect);
+}
+
+void AUIWindow::setShowWindowBox(bool show) {
+    m_showWindowBox = show;
 }
 
 } // namespace GUI

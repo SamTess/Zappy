@@ -52,6 +52,10 @@ void UserInterface::setSelectedTile(int x, int y) {
     m_windowFactory->setSelectedTile(x, y);
 }
 
+void UserInterface::setSelectedPlayer(int playerId) {
+    m_windowFactory->setSelectedPlayer(playerId);
+}
+
 void UserInterface::addBroadcast(const std::string& team, const std::string& message) {
     m_windowFactory->addBroadcast(team, message);
 }
@@ -118,6 +122,10 @@ bool UserInterface::isMouseOverUI() const {
 
 bool UserInterface::hasHandledMouseEvent() const {
     return m_mouseCapture;
+}
+
+std::shared_ptr<GUI::IUIWindow> UserInterface::getWindow(const std::string& windowId) {
+    return m_windowFactory->getWindow(windowId);
 }
 
 } // namespace GUI

@@ -11,6 +11,8 @@
 #include <string>
 #include "../AUIWindow.hpp"
 
+class NetworkManager;
+
 namespace GUI {
 
 class PlayerInfoWindow : public AUIWindow {
@@ -32,6 +34,12 @@ public:
      * @return true si un joueur est sélectionné, false sinon
      */
     bool hasPlayerSelected() const;
+
+    /**
+     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
+     * @param networkManager Pointeur vers le NetworkManager
+     */
+    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
 
 protected:
     void renderContent() override;
@@ -101,6 +109,7 @@ private:
 
     int m_selectedPlayerId;
     bool m_hasSelectedPlayer;
+    std::shared_ptr<NetworkManager> m_networkManager;
 };
 
 } // namespace GUI

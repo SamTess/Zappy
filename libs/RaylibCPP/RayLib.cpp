@@ -4,12 +4,15 @@
 ** File description:
 ** RayLib implementation
 */
+#include <raylib.h>
+#include <raymath.h>
 #include <stdexcept>
 #include <memory>
 #include <utility>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cmath>
 #include "RayLib.hpp"
 #include "../TypeAdapter.hpp"
 #include "font/Text3D.hpp"
@@ -47,7 +50,6 @@ void RayLib::CloseWindow() {
     _music.reset();
     _texture3D.reset();
     _audio.reset();
-
 }
 
 bool RayLib::WindowShouldClose() {
@@ -83,6 +85,12 @@ void RayLib::DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Colo
 
 void RayLib::DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) {
     raylibcpp::Shape::drawCube(TypeAdapter::ToRaylib(position), width, height, length, TypeAdapter::ToRaylib(color));
+}
+
+void RayLib::DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) {
+    Vector3 pos = TypeAdapter::ToRaylib(position);
+    Color col = TypeAdapter::ToRaylib(color);
+    ::DrawCubeWires(pos, width, height, length, col);
 }
 
 void RayLib::DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) {
@@ -383,4 +391,54 @@ extern "C" {
         static std::shared_ptr<RayLib> instance = std::make_shared<RayLib>();
         return instance;
     }
+}
+
+ZappyTypes::Vector3 RayLib::GetCameraPosition() {
+    if (_camera3D.has_value()) {
+        Vector3 pos = _camera3D->get().position;
+        return TypeAdapter::FromRaylib(pos);
+    }
+    return {0.0f, 0.0f, 0.0f};
+}
+
+ZappyTypes::Vector3 RayLib::GetCameraTarget() {
+    if (_camera3D.has_value()) {
+        Vector3 target = _camera3D->get().target;
+        return TypeAdapter::FromRaylib(target);
+    }
+    return {0.0f, 0.0f, 0.0f};
+}
+
+ZappyTypes::Vector3 RayLib::ScreenToWorldRay(ZappyTypes::Vector2 screenPos) {
+    if (_camera3D.has_value()) {
+        Vector2 rayPos = TypeAdapter::ToRaylib(screenPos);
+        Ray ray = GetMouseRay(rayPos, _camera3D->get());
+        return TypeAdapter::FromRaylib(ray.direction);
+    }
+    return {0.0f, 0.0f, -1.0f};
+}
+
+bool RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection,
+    ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal,
+    ZappyTypes::Vector3& intersectionPoint) {
+    Vector3 origin = TypeAdapter::ToRaylib(rayOrigin);
+    Vector3 direction = TypeAdapter::ToRaylib(rayDirection);
+    Vector3 point = TypeAdapter::ToRaylib(planePoint);
+    Vector3 normal = TypeAdapter::ToRaylib(planeNormal);
+    direction = Vector3Normalize(direction);
+    normal = Vector3Normalize(normal);
+    float denominator = Vector3DotProduct(direction, normal);
+    if (fabsf(denominator) < 0.0001f)
+        return false;
+    Vector3 pointToOrigin = Vector3Subtract(point, origin);
+    float t = Vector3DotProduct(pointToOrigin, normal) / denominator;
+    if (t < 0)
+        return false;
+    Vector3 intersection = Vector3Add(origin, Vector3Scale(direction, t));
+    intersectionPoint = TypeAdapter::FromRaylib(intersection);
+    return true;
+}
+
+int RayLib::GetFPS() {
+    return ::GetFPS();
 }

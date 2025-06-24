@@ -44,6 +44,18 @@ public:
     bool isDragging() const override;
     bool isPositionInWindow(const ZappyTypes::Vector2& position) const override;
 
+    /**
+     * @brief Contrôle l'affichage de la boîte de fenêtre avec barre de titre
+     * @param show true pour afficher, false pour masquer
+     */
+    void setShowWindowBox(bool show);
+
+    /**
+     * @brief Récupère l'état d'affichage de la boîte de fenêtre
+     * @return true si la boîte est affichée, false sinon
+     */
+    bool getShowWindowBox() const;
+
 protected:
     /**
      * @brief Méthode à implémenter par les classes dérivées pour le rendu du contenu
@@ -62,6 +74,7 @@ protected:
 
     // État de la fenêtre
     bool m_visible;
+    bool m_showWindowBox;
 
     // État de glissement
     bool m_dragging;

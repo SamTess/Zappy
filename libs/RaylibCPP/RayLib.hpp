@@ -39,6 +39,7 @@ public:
     void DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Color color) override;
 
     void DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
+    void DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
     void DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) override;
     void DrawPlane(ZappyTypes::Vector3 centerPos, ZappyTypes::Vector2 size, ZappyTypes::Color color) override;
     void DrawGrid(int slices, float spacing) override;
@@ -98,6 +99,15 @@ public:
     void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE) override;
     void UnloadModel3D(int modelId) override;
     int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override;
+
+    // Ray casting pour la sélection 3D
+    ZappyTypes::Vector3 GetCameraPosition() override;
+    ZappyTypes::Vector3 GetCameraTarget() override;
+    ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) override;
+    bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) override;
+    
+    // Performance
+    int GetFPS() override;
 
 private:
     std::unique_ptr<raylibcpp::Window> _window;

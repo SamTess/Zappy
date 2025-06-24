@@ -63,6 +63,12 @@ public:
     void setSelectedTile(int x, int y);
 
     /**
+     * @brief Définit le joueur sélectionné
+     * @param playerId Identifiant du joueur sélectionné
+     */
+    void setSelectedPlayer(int playerId);
+
+    /**
      * @brief Ajoute un message de diffusion
      * @param team Équipe émettrice
      * @param message Message diffusé
@@ -106,6 +112,13 @@ public:
      * @return true si l'UI a capturé l'événement
      */
     bool hasHandledMouseEvent() const;
+
+    /**
+     * @brief Obtient une fenêtre par son identifiant
+     * @param windowId Identifiant de la fenêtre
+     * @return Pointeur vers la fenêtre ou nullptr si non trouvée
+     */
+    std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
 
 private:
     /**

@@ -27,6 +27,7 @@ public:
     virtual void DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Color color) = 0;
     // Formes 3D
     virtual void DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) = 0;
+    virtual void DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) = 0;
     virtual void DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) = 0;
     virtual void DrawPlane(ZappyTypes::Vector3 centerPos, ZappyTypes::Vector2 size, ZappyTypes::Color color) = 0;
     virtual void DrawGrid(int slices, float spacing) = 0;
@@ -88,4 +89,13 @@ public:
 
     // Modèle avec texture
     virtual int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) = 0;
+
+    // Ray casting pour la sélection 3D
+    virtual ZappyTypes::Vector3 GetCameraPosition() = 0;
+    virtual ZappyTypes::Vector3 GetCameraTarget() = 0;
+    virtual ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) = 0;
+    virtual bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) = 0;
+    
+    // Performance
+    virtual int GetFPS() = 0;
 };
