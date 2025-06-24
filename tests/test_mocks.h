@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** test_mocks.h - Shared mock function declarations for unit tests
+** test_mocks - header file for mock function declarations
 */
 
 #ifndef TEST_MOCKS_H_
@@ -40,26 +40,40 @@ extern int last_pic_x;
 extern int last_pic_y;
 extern int last_pic_level;
 extern bool mock_can_start_result;
+extern int mock_arr_len_result;
 
-// Mock function declarations - shared functions 
-void __wrap_write_command_output(int client_fd, char *msg);
-void __wrap_command_pex(void *server, void *client);
-bool __wrap_send_ppo_command(void *server, int id);
-void __wrap_send_ppo_command_void(void *server, void *client); // Alternative signature
-void __wrap_send_edi_command(void *server, int id);
-int __wrap_tile_add_player(void *tile, int player_id);
-int __wrap_tile_remove_player(void *tile, int player_id);
-void __wrap_remove_egg(void *server, int id, void *tile);
-void __wrap_server_err(char *msg);
-void __wrap_command_pie(void *server, int x, int y, int result);
-void __wrap_command_seg(void *server, const char *team_name);
-void __wrap_send_plv_to_all(void *server, void *client);
-bool __wrap_can_start_incantation(void *server, void *client);
-void __wrap_command_pic(void *server, int x, int y, int level);
-void __wrap_command_pgt(void *server, void *client, void *resource_type);
-void __wrap_command_pdr(void *server, void *client, void *resource_type);
+// Nouveaux mocks pour parse_command tests
+extern bool __wrap_can_connect_return;
+extern bool __wrap_send_pnw_command_to_all_called;
+extern int __wrap_write_command_output_calls;
+extern char *__wrap_write_command_output_last_msg;
+extern bool __wrap_send_map_info_to_one_client_called;
+extern bool __wrap_add_graphic_client_called;
+extern bool __wrap_add_pending_cmd_called;
+extern bool __wrap_add_to_command_queue_called;
+extern bool __wrap_send_all_player_info_to_one_client_called;
 
-// Note: arr_len, create_egg, add_egg, and send_enw_command are implemented
-// separately in each test file when needed
+// Mocks pour les commandes spécifiques
+extern bool __wrap_command_msz_called;
+extern bool __wrap_command_bct_called;
+extern bool __wrap_command_mtc_called;
+extern bool __wrap_command_tna_called;
+extern bool __wrap_command_ppo_called;
+extern bool __wrap_command_plv_called;
+extern bool __wrap_command_pin_called;
+extern bool __wrap_command_sgt_called;
+extern bool __wrap_command_sst_called;
+extern bool __wrap_start_incantation_called;
+extern bool __wrap_command_pfk_called;
+extern bool __wrap_broadcast_called;
+extern bool __wrap_right_called;
+extern bool __wrap_left_called;
+extern bool __wrap_eject_called;
+extern bool __wrap_connect_nbr_called;
+extern bool __wrap_take_object_called;
+extern bool __wrap_set_object_called;
+
+// Mock functions
+void reset_mocks(void);
 
 #endif /* !TEST_MOCKS_H_ */
