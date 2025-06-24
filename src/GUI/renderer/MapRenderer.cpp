@@ -242,7 +242,7 @@ void MapRenderer::renderPlayerWireframe(const ZappyTypes::Vector3& position, flo
 void MapRenderer::renderSelectionCylinder(const ZappyTypes::Vector3& position, float pulseIntensity) {
     ZappyTypes::Color selectionColor = {0, 255, 255, static_cast<unsigned char>(120 * pulseIntensity)};
     float radius = 0.6f * pulseIntensity;
-    float height = 2.5f;
+    float height = 1.4f;
     graphicsLib->DrawCylinder({position.x, position.y - 0.3f, position.z},
                              radius, radius, height, 12, selectionColor);
 }
