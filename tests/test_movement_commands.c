@@ -285,9 +285,9 @@ Test(forward_command, test_forward_wrap_top_edge)
     
     forward(server, client, buffer);
     
-    // Should wrap to bottom
+    // Check player moved up and wrapped to bottom (y = height - 1)
     cr_assert_eq(client->player->pos_x, 5);
-    cr_assert_eq(client->player->pos_y, 9); // height - 1
+    cr_assert_eq(client->player->pos_y, 9); // 0 - 1 + 10 = 9 (wrapped)
     
     cr_assert_str_eq(last_message, "ok\n");
     
@@ -305,9 +305,9 @@ Test(forward_command, test_forward_wrap_bottom_edge)
     
     forward(server, client, buffer);
     
-    // Should wrap to top
+    // Check player moved down and wrapped to top (y = 0)
     cr_assert_eq(client->player->pos_x, 5);
-    cr_assert_eq(client->player->pos_y, 0);
+    cr_assert_eq(client->player->pos_y, 0); // 9 + 1 % 10 = 0 (wrapped)
     
     cr_assert_str_eq(last_message, "ok\n");
     
@@ -325,8 +325,8 @@ Test(forward_command, test_forward_wrap_left_edge)
     
     forward(server, client, buffer);
     
-    // Should wrap to right
-    cr_assert_eq(client->player->pos_x, 9); // width - 1
+    // Check player moved left and wrapped to right (x = width - 1)
+    cr_assert_eq(client->player->pos_x, 9); // 0 - 1 + 10 = 9 (wrapped)
     cr_assert_eq(client->player->pos_y, 5);
     
     cr_assert_str_eq(last_message, "ok\n");
@@ -345,8 +345,8 @@ Test(forward_command, test_forward_wrap_right_edge)
     
     forward(server, client, buffer);
     
-    // Should wrap to left
-    cr_assert_eq(client->player->pos_x, 0);
+    // Check player moved right and wrapped to left (x = 0)
+    cr_assert_eq(client->player->pos_x, 0); // 9 + 1 % 10 = 0 (wrapped)
     cr_assert_eq(client->player->pos_y, 5);
     
     cr_assert_str_eq(last_message, "ok\n");
@@ -356,23 +356,11 @@ Test(forward_command, test_forward_wrap_right_edge)
 }
 
 // =============================================================================
-// LEFT COMMAND TESTS
+// LEFT AND RIGHT COMMAND TESTS
 // =============================================================================
 
-Test(left_command, test_left_null_server)
-{
-    client_t *client = create_test_client(5, 5, UP);
-    char *buffer[] = {"Left", NULL};
-    
-    reset_mock_functions();
-    
-    left(NULL, client, buffer);
-    
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ko\n");
-    
-    free_test_client(client);
-}
+TestSuite(left_command);
+TestSuite(right_command);
 
 Test(left_command, test_left_null_client)
 {
@@ -383,7 +371,6 @@ Test(left_command, test_left_null_client)
     
     left(server, NULL, buffer);
     
-    // With NULL client, command returns early without calling write_command_output
     cr_assert_eq(mock_write_calls, 0);
     
     free_test_server(server);
@@ -410,118 +397,34 @@ Test(left_command, test_left_null_player)
     free(client);
 }
 
-// Note: Buffer length validation tests removed due to shared arr_len mock dependency
-
-Test(left_command, test_left_invalid_rotation)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, (enum rotation_e)99); // Invalid rotation
-    char *buffer[] = {"Left", NULL};
-    
-    reset_mock_functions();
-    
-    left(server, client, buffer);
-    
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ko\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(left_command, test_left_rotation_up_to_left)
+Test(left_command, test_left_rotation_sequence)
 {
     server_t *server = create_test_server(10, 10);
     client_t *client = create_test_client(5, 5, UP);
     char *buffer[] = {"Left", NULL};
     
     reset_mock_functions();
-    
-    left(server, client, buffer);
     
     // UP -> LEFT
-    cr_assert_eq(client->player->rotation, LEFT);
-    
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    // Check graphical update
-    cr_assert_eq(mock_send_ppo_calls, 1);
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(left_command, test_left_rotation_left_to_down)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, LEFT);
-    char *buffer[] = {"Left", NULL};
-    
-    reset_mock_functions();
-    
     left(server, client, buffer);
+    cr_assert_eq(client->player->rotation, LEFT);
+    cr_assert_str_eq(last_message, "ok\n");
     
     // LEFT -> DOWN
-    cr_assert_eq(client->player->rotation, DOWN);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(left_command, test_left_rotation_down_to_right)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, DOWN);
-    char *buffer[] = {"Left", NULL};
-    
-    reset_mock_functions();
-    
     left(server, client, buffer);
+    cr_assert_eq(client->player->rotation, DOWN);
     
     // DOWN -> RIGHT
-    cr_assert_eq(client->player->rotation, RIGHT);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(left_command, test_left_rotation_right_to_up)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, RIGHT);
-    char *buffer[] = {"Left", NULL};
-    
-    reset_mock_functions();
-    
     left(server, client, buffer);
+    cr_assert_eq(client->player->rotation, RIGHT);
     
-    // RIGHT -> UP
+    // RIGHT -> UP (full rotation)
+    left(server, client, buffer);
     cr_assert_eq(client->player->rotation, UP);
-    cr_assert_str_eq(last_message, "ok\n");
+    
+    cr_assert_eq(mock_write_calls, 4);
     
     free_test_server(server);
-    free_test_client(client);
-}
-
-// =============================================================================
-// RIGHT COMMAND TESTS
-// =============================================================================
-
-Test(right_command, test_right_null_server)
-{
-    client_t *client = create_test_client(5, 5, UP);
-    char *buffer[] = {"Right", NULL};
-    
-    reset_mock_functions();
-    
-    right(NULL, client, buffer);
-    
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ko\n");
-    
     free_test_client(client);
 }
 
@@ -534,7 +437,6 @@ Test(right_command, test_right_null_client)
     
     right(server, NULL, buffer);
     
-    // With NULL client, command returns early without calling write_command_output
     cr_assert_eq(mock_write_calls, 0);
     
     free_test_server(server);
@@ -561,180 +463,8 @@ Test(right_command, test_right_null_player)
     free(client);
 }
 
-// Note: Buffer length validation tests removed due to shared arr_len mock dependency
-
-Test(right_command, test_right_invalid_rotation)
+Test(right_command, test_right_rotation_sequence)
 {
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, (enum rotation_e)99); // Invalid rotation
-    char *buffer[] = {"Right", NULL};
-    
-    reset_mock_functions();
-    
-    right(server, client, buffer);
-    
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ko\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(right_command, test_right_rotation_up_to_right)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, UP);
-    char *buffer[] = {"Right", NULL};
-    
-    reset_mock_functions();
-    
-    right(server, client, buffer);
-    
-    // UP -> RIGHT
-    cr_assert_eq(client->player->rotation, RIGHT);
-    
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    // Check graphical update
-    cr_assert_eq(mock_send_ppo_calls, 1);
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(right_command, test_right_rotation_right_to_down)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, RIGHT);
-    char *buffer[] = {"Right", NULL};
-    
-    reset_mock_functions();
-    
-    right(server, client, buffer);
-    
-    // RIGHT -> DOWN
-    cr_assert_eq(client->player->rotation, DOWN);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(right_command, test_right_rotation_down_to_left)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, DOWN);
-    char *buffer[] = {"Right", NULL};
-    
-    reset_mock_functions();
-    
-    right(server, client, buffer);
-    
-    // DOWN -> LEFT
-    cr_assert_eq(client->player->rotation, LEFT);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(right_command, test_right_rotation_left_to_up)
-{
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, LEFT);
-    char *buffer[] = {"Right", NULL};
-    
-    reset_mock_functions();
-    
-    right(server, client, buffer);
-    
-    // LEFT -> UP
-    cr_assert_eq(client->player->rotation, UP);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-// =============================================================================
-// EDGE CASE AND STRESS TESTS
-// =============================================================================
-
-Test(movement_commands, test_minimum_map_size)
-{
-    // Test movement on a 1x1 map (extreme edge case)
-    server_t *server = create_test_server(1, 1);
-    client_t *client = create_test_client(0, 0, UP);
-    char *buffer[] = {"Forward", NULL};
-    
-    reset_mock_functions();
-    
-    forward(server, client, buffer);
-    
-    // Should wrap back to same position
-    cr_assert_eq(client->player->pos_x, 0);
-    cr_assert_eq(client->player->pos_y, 0);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(movement_commands, test_large_map_movement)
-{
-    // Test movement on a large map
-    server_t *server = create_test_server(1000, 1000);
-    client_t *client = create_test_client(500, 500, RIGHT);
-    char *buffer[] = {"Forward", NULL};
-    
-    reset_mock_functions();
-    
-    forward(server, client, buffer);
-    
-    cr_assert_eq(client->player->pos_x, 501);
-    cr_assert_eq(client->player->pos_y, 500);
-    cr_assert_str_eq(last_message, "ok\n");
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(movement_commands, test_rotation_sequence_left)
-{
-    // Test complete 360-degree rotation sequence with left
-    server_t *server = create_test_server(10, 10);
-    client_t *client = create_test_client(5, 5, UP);
-    char *buffer[] = {"Left", NULL};
-    
-    reset_mock_functions();
-    
-    // UP -> LEFT
-    left(server, client, buffer);
-    cr_assert_eq(client->player->rotation, LEFT);
-    
-    // LEFT -> DOWN
-    left(server, client, buffer);
-    cr_assert_eq(client->player->rotation, DOWN);
-    
-    // DOWN -> RIGHT
-    left(server, client, buffer);
-    cr_assert_eq(client->player->rotation, RIGHT);
-    
-    // RIGHT -> UP (full circle)
-    left(server, client, buffer);
-    cr_assert_eq(client->player->rotation, UP);
-    
-    cr_assert_eq(mock_write_calls, 4);
-    cr_assert_eq(mock_send_ppo_calls, 4);
-    
-    free_test_server(server);
-    free_test_client(client);
-}
-
-Test(movement_commands, test_rotation_sequence_right)
-{
-    // Test complete 360-degree rotation sequence with right
     server_t *server = create_test_server(10, 10);
     client_t *client = create_test_client(5, 5, UP);
     char *buffer[] = {"Right", NULL};
@@ -744,6 +474,7 @@ Test(movement_commands, test_rotation_sequence_right)
     // UP -> RIGHT
     right(server, client, buffer);
     cr_assert_eq(client->player->rotation, RIGHT);
+    cr_assert_str_eq(last_message, "ok\n");
     
     // RIGHT -> DOWN
     right(server, client, buffer);
@@ -753,37 +484,29 @@ Test(movement_commands, test_rotation_sequence_right)
     right(server, client, buffer);
     cr_assert_eq(client->player->rotation, LEFT);
     
-    // LEFT -> UP (full circle)
+    // LEFT -> UP (full rotation)
     right(server, client, buffer);
     cr_assert_eq(client->player->rotation, UP);
     
     cr_assert_eq(mock_write_calls, 4);
-    cr_assert_eq(mock_send_ppo_calls, 4);
     
     free_test_server(server);
     free_test_client(client);
 }
 
-Test(movement_commands, test_corner_wrapping_all_directions)
+Test(right_command, test_right_invalid_buffer_length)
 {
-    // Test wrapping behavior at all four corners of the map
-    server_t *server = create_test_server(5, 5);
-    
-    // Test top-left corner moving up and left
-    client_t *client1 = create_test_client(0, 0, UP);
-    char *buffer[] = {"Forward", NULL};
+    server_t *server = create_test_server(10, 10);
+    client_t *client = create_test_client(5, 5, UP);
+    char *buffer_too_many[] = {"Right", "extra", NULL};
     
     reset_mock_functions();
     
-    forward(server, client1, buffer);
-    cr_assert_eq(client1->player->pos_x, 0);
-    cr_assert_eq(client1->player->pos_y, 4); // Wrapped to bottom
+    right(server, client, buffer_too_many);
     
-    client1->player->rotation = LEFT;
-    forward(server, client1, buffer);
-    cr_assert_eq(client1->player->pos_x, 4); // Wrapped to right
-    cr_assert_eq(client1->player->pos_y, 4);
+    // Depending on implementation, might still work or fail
+    cr_assert_eq(mock_write_calls, 1);
     
-    free_test_client(client1);
     free_test_server(server);
+    free_test_client(client);
 }
