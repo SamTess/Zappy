@@ -2,68 +2,68 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Tests unitaires pour SystemWrapper
+** Tests unitaires pour NetworkAPI
 */
 
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
-#include "../../../../src/GUI/network/utils/SystemWrapper.hpp"
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include "../../../../src/GUI/network/systemWrapper/NetworkAPI.hpp"
 #include <string>
 #include <chrono>
 #include <thread>
 #include <iostream>
 #include <functional>
 
-using namespace SystemWrapper;
+using namespace Network;
 
-// Tests pour SafeSockAddr
-Test(SystemWrapper_SafeSockAddr, creation_manipulation) {
-    // Créer une adresse sockaddr_in
-    sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(8080);
-    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-    // Construire SafeSockAddr à partir de sockaddr_in
-    SafeSockAddr safeAddr(addr);
-    
-    // Vérifier les propriétés
-    cr_assert_eq(safeAddr.getAddr().sin_family, AF_INET, "La famille d'adresse doit être AF_INET");
-    cr_assert_eq(ntohs(safeAddr.getAddr().sin_port), 8080, "Le port doit être 8080");
-    cr_assert_eq(safeAddr.getAddr().sin_addr.s_addr, inet_addr("127.0.0.1"), "L'adresse IP doit être 127.0.0.1");
-    
-    // Vérifier les méthodes d'accès
-    cr_assert(safeAddr.getSockAddr() != nullptr, "getSockAddr() ne doit pas retourner nullptr");
-    cr_assert_eq(safeAddr.getSize(), sizeof(sockaddr_in), "La taille doit correspondre à sizeof(sockaddr_in)");
-    
-    // Construction par défaut
-    SafeSockAddr defaultAddr;
-    cr_assert_eq(defaultAddr.getAddr().sin_family, 0, "La famille d'adresse par défaut doit être 0");
+// Tests pour NetworkAPI - Factory
+Test(NetworkAPI_Factory, create_factory) {
+    auto factory = createFactory();
+    cr_assert(factory != nullptr, "createFactory() ne doit pas retourner nullptr");
 }
 
-// Tests pour SafePollFd
-Test(SystemWrapper_SafePollFd, creation_manipulation) {
-    // Créer un SafePollFd avec un descripteur de fichier et des événements
-    int fd = 5;  // Un descripteur de fichier factice
-    SafePollFd pollFd(fd, POLLIN | POLLOUT);
+// Tests pour NetworkAPI - Socket creation
+Test(NetworkAPI_Socket, create_tcp_socket) {
+    auto factory = createFactory();
+    auto socket = factory->createTcpSocket();
+    cr_assert(socket != nullptr, "createTcpSocket() ne doit pas retourner nullptr");
+    cr_assert(!socket->isConnected(), "Un nouveau socket ne doit pas être connecté");
+}
+
+// Tests pour NetworkAPI - Buffer creation
+Test(NetworkAPI_Buffer, create_buffer) {
+    auto factory = createFactory();
+    auto buffer = factory->createBuffer(1024);
+    cr_assert(buffer != nullptr, "createBuffer() ne doit pas retourner nullptr");
+    cr_assert_eq(buffer->size(), 1024, "La taille du buffer doit être 1024");
     
-    // Vérifier les propriétés
-    cr_assert_eq(pollFd.getFd(), fd, "Le descripteur de fichier doit être 5");
-    cr_assert_eq(pollFd.getEvents(), POLLIN | POLLOUT, "Les événements doivent être POLLIN | POLLOUT");
-    cr_assert_eq(pollFd.getRevents(), 0, "Les revents doivent être initialisés à 0");
+    // Test de manipulation des données
+    buffer->setData("Hello World");
+    cr_assert_str_eq(buffer->getData().c_str(), "Hello World", "Les données doivent être 'Hello World'");
+    cr_assert_str_eq(buffer->toString().c_str(), "Hello World", "toString() doit retourner 'Hello World'");
+}
+
+// Tests pour NetworkAPI - Address creation
+Test(NetworkAPI_Address, create_address) {
+    auto factory = createFactory();
+    auto address = factory->createAddress("localhost", 8080);
+    cr_assert(address != nullptr, "createAddress() ne doit pas retourner nullptr");
+    cr_assert_str_eq(address->getHost().c_str(), "localhost", "L'hôte doit être 'localhost'");
+    cr_assert_eq(address->getPort(), 8080, "Le port doit être 8080");
+    cr_assert_neq(address->toString().size(), 0, "toString() ne doit pas être vide");
+}
+
+// Tests pour NetworkAPI - Poller creation
+Test(NetworkAPI_Poller, create_poller) {
+    auto factory = createFactory();
+    auto poller = factory->createPoller();
+    cr_assert(poller != nullptr, "createPoller() ne doit pas retourner nullptr");
     
-    // Modifier les propriétés
-    pollFd.setFd(10);
-    pollFd.setEvents(POLLIN);
-    pollFd.setRevents(POLLERR);
-    
-    // Vérifier les changements
-    cr_assert_eq(pollFd.getFd(), 10, "Le descripteur de fichier doit être modifié à 10");
+    // Test de manipulation basique
+    poller->clear();
+    int result = poller->poll(100);  // timeout de 100ms
+    cr_assert_eq(result, 0, "poll() sans socket doit retourner 0 (timeout)");
+}
     cr_assert_eq(pollFd.getEvents(), POLLIN, "Les événements doivent être modifiés à POLLIN");
     cr_assert_eq(pollFd.getRevents(), POLLERR, "Les revents doivent être modifiés à POLLERR");
     
