@@ -49,8 +49,6 @@ void DeathAnimationManager::startDeathAnimation(int playerId, const ZappyTypes::
     animation.rotationVelocity.x = rotationDist(gen);
     animation.rotationVelocity.y = rotationDist(gen) * 0.5f;
     animation.rotationVelocity.z = rotationDist(gen) * 0.3f;
-    animation.rotationVelocity.y = rotationDist(gen);
-    animation.rotationVelocity.z = rotationDist(gen);
 
     animation.rotation = {0.0f, 0.0f, 0.0f};
     animation.timeAlive = 0.0f;
