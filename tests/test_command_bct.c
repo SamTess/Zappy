@@ -197,3 +197,25 @@ Test(command_bct, test_send_mtc_to_all_graphical_clients)
     
     free_mock_server(server);
 }
+
+void test_graphical_connection(void)
+{
+    server_t server = {0};
+    client_t client = {0};
+    char buffer[] = "GRAPHIC\n";
+    
+    // Set up the client properly - this is what happens in the actual flow
+    client.type = GRAPHICAL;  // This is set by is_valid_team_name when "GRAPHIC" is detected
+    client.is_fully_connected = false;
+    client.client_fd = 1;
+    
+    // Set up server
+    server.graphical_clients = NULL;
+    
+    // This should set is_fully_connected to true for GRAPHICAL clients
+    execute_com(&server, &client, buffer);
+    
+    // Verify the client is now fully connected
+    cr_assert_eq(client.is_fully_connected, true, 
+                "Graphical client should be fully connected after execute_com");
+}
