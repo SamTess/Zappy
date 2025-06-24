@@ -84,6 +84,10 @@ static int handle_write_result(ssize_t bytes_written, int *retry_count)
         perror("Write failed");
         return -1;
     }
+    if (bytes_written == 0) {
+        (*retry_count)++;
+        return 0;
+    }
     *retry_count = 0;
     return 1;
 }
@@ -127,7 +131,7 @@ static void write_with_poll(int client_fd, struct pollfd *pfd,
 static int validate_client_fd(int client_fd)
 {
     if (fcntl(client_fd, F_GETFD) == -1) {
-        perror("FD isn't up anymore\n");
+        perror("FD isn't up anymore");
         return 0;
     }
     return 1;
