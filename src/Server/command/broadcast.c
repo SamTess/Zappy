@@ -13,6 +13,22 @@
 #include <stdlib.h>
 #include <math.h>
 
+static int adapt_rota_player(enum rotation_e rota_player)
+{
+    switch (rota_player) {
+        case UP:
+            return 0;
+        case DOWN:
+            return 1;
+        case LEFT:
+            return 2;
+        case RIGHT:
+            return 3;
+        default:
+            return -1;
+    }
+}
+
 static int get_tile_for_north_orientation(int source_rel_x, int source_rel_y)
 {
     if (source_rel_x == 0 && source_rel_y < 0)
@@ -64,17 +80,20 @@ static int calculate_shortest_distance_y(int sender_y,
     return wrap_distance_up;
 }
 
-static int calculate_direction(client_t *receiver, int source_rel_x, int source_rel_y)
+static int calculate_direction(client_t *receiver, int source_rel_x,
+    int source_rel_y)
 {
     int base_tile_for_north;
+    int new_rota = adapt_rota_player(receiver->player->rotation);
 
     if (source_rel_x == 0 && source_rel_y == 0)
         return 0;
-
-    base_tile_for_north = get_tile_for_north_orientation(source_rel_x, source_rel_y);
+    base_tile_for_north = get_tile_for_north_orientation(source_rel_x,
+        source_rel_y);
     if (base_tile_for_north == 0)
         return 0;
-    return ((base_tile_for_north - 1 + (2 * receiver->player->rotation) + 8) % 8) + 1;
+    return ((base_tile_for_north - 1 + (2 * new_rota)
+        + 8) % 8) + 1;
 }
 
 static void send_broadcast_to_client(server_t *server, client_t *sender,
