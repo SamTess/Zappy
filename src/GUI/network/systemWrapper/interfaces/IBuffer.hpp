@@ -8,7 +8,6 @@
 
 #include <string>
 #include <memory>
-#include "ISocket.hpp"
 
 namespace Network {
 
