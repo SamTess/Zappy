@@ -137,6 +137,9 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     }
     if (existingPlayer && playerData->getOrientation() != -1) {
         if (!playerData->isAlive()) {
+            ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
+                existingPlayer->getX(), existingPlayer->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
+            Zappy::DeathAnimationManager::getInstance().startDeathAnimation(playerId, playerWorldPos, existingPlayer->getTeamName());
             _gameState->removePlayer(playerId);
             _graphics->PlaySound("assets/music/death.mp3");
             return;
@@ -243,8 +246,6 @@ void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     auto playerInfo = _gameState->getPlayerInfo(playerId);
     if (playerInfo) {
         teamName = playerInfo->getTeamName();
-        std::cout << "[DEBUG] Player found - Team: " << teamName << ", Position: (" << playerInfo->getX() << ", " << playerInfo->getY() << ")" << std::endl;
-
         ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
             playerInfo->getX(), playerInfo->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
 
@@ -356,6 +357,7 @@ void GameController::updateBroadcasts(float deltaTime) {
 void GameController::updateAnimations(float deltaTime) {
     Zappy::EjectionAnimationManager::getInstance().update(deltaTime);
     Zappy::ParticleSystem::getInstance().update(deltaTime);
+    Zappy::DeathAnimationManager::getInstance().update(deltaTime);
 }
 
 void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {

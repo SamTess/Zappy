@@ -270,6 +270,117 @@ void BroadcastEffect::reset() {
     particles.clear();
 }
 
+void BroadcastEffect::createRingParticles(const ZappyTypes::Vector3& position, float radius, int count) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * M_PI);
+    std::uniform_real_distribution<float> lifeDist(2.0f, 4.0f);
+    std::uniform_real_distribution<float> sizeDist(0.05f, 0.15f);
+
+    for (int i = 0; i < count; ++i) {
+        Particle particle;
+        float angle = angleDist(gen);
+
+        particle.position = position;
+        particle.position.x += static_cast<float>(cos(angle)) * radius;
+        particle.position.z += static_cast<float>(sin(angle)) * radius;
+        particle.position.y += 0.2f;
+
+        particle.velocity.x = static_cast<float>(cos(angle)) * 2.0f;
+        particle.velocity.z = static_cast<float>(sin(angle)) * 2.0f;
+        particle.velocity.y = 0.5f;
+
+        particle.acceleration = {0.0f, -1.0f, 0.0f};
+        particle.color = {100, 255, 255, 255};
+        particle.life = lifeDist(gen);
+        particle.maxLife = particle.life;
+        particle.size = sizeDist(gen) * 3.0f;
+        particle.active = true;
+
+        particles.push_back(particle);
+    }
+}
+
+void BroadcastEffect::createPulseParticles(const ZappyTypes::Vector3& position, int count) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * M_PI);
+    std::uniform_real_distribution<float> speedDist(1.5f, 3.5f);
+    std::uniform_real_distribution<float> lifeDist(1.0f, 2.5f);
+    std::uniform_real_distribution<float> sizeDist(0.08f, 0.2f);
+
+    for (int i = 0; i < count; ++i) {
+        Particle particle;
+        float angle = angleDist(gen);
+        float speed = speedDist(gen);
+
+        particle.position = position;
+        particle.position.y += 1.0f;
+
+        particle.velocity.x = static_cast<float>(cos(angle)) * speed;
+        particle.velocity.z = static_cast<float>(sin(angle)) * speed;
+        particle.velocity.y = 2.0f;
+
+        particle.acceleration = {0.0f, -2.0f, 0.0f};
+        particle.color = {255, 255, 0, 255};
+        particle.life = lifeDist(gen);
+        particle.maxLife = particle.life;
+        particle.size = sizeDist(gen) * 4.0f;
+        particle.active = true;
+
+        particles.push_back(particle);
+    }
+}
+
+void BroadcastEffect::updateRingParticle(Particle* particle, float deltaTime) {
+    if (!particle || !particle->active) return;
+
+    particle->position.x += particle->velocity.x * deltaTime;
+    particle->position.y += particle->velocity.y * deltaTime;
+    particle->position.z += particle->velocity.z * deltaTime;
+
+    particle->velocity.x += particle->acceleration.x * deltaTime;
+    particle->velocity.y += particle->acceleration.y * deltaTime;
+    particle->velocity.z += particle->acceleration.z * deltaTime;
+
+    particle->velocity.x *= 0.95f;
+    particle->velocity.z *= 0.95f;
+
+    particle->life -= deltaTime;
+    if (particle->life <= 0.0f) {
+        particle->active = false;
+        return;
+    }
+
+    float lifeRatio = particle->life / particle->maxLife;
+    particle->color.a = static_cast<unsigned char>(255 * lifeRatio);
+}
+
+void BroadcastEffect::updatePulseParticle(Particle* particle, float deltaTime) {
+    if (!particle || !particle->active) return;
+
+    particle->position.x += particle->velocity.x * deltaTime;
+    particle->position.y += particle->velocity.y * deltaTime;
+    particle->position.z += particle->velocity.z * deltaTime;
+
+    particle->velocity.x += particle->acceleration.x * deltaTime;
+    particle->velocity.y += particle->acceleration.y * deltaTime;
+    particle->velocity.z += particle->acceleration.z * deltaTime;
+
+    particle->life -= deltaTime;
+    if (particle->life <= 0.0f) {
+        particle->active = false;
+        return;
+    }
+
+    float pulseFreq = 8.0f;
+    float pulse = (sin(timeAlive * pulseFreq) + 1.0f) * 0.5f;
+    float lifeRatio = particle->life / particle->maxLife;
+
+    particle->size = 0.1f + pulse * 0.1f;
+    particle->color.a = static_cast<unsigned char>(255 * lifeRatio * (0.7f + pulse * 0.3f));
+}
+
 void BroadcastEffect::renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     const ZappyTypes::Vector3& center, float radius, float alpha) {
     if (radius <= 0.0f || alpha <= 0.0f) return;
@@ -297,6 +408,12 @@ void BroadcastEffect::renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLi
 
         graphicsLib->DrawLine3D(point1, point2, ringColor);
     }
+}
+
+void BroadcastEffect::renderParticle(const Particle& particle, const std::shared_ptr<IGraphicsLib>& graphicsLib) {
+    if (!particle.active) return;
+
+    graphicsLib->DrawSphere(particle.position, particle.size, particle.color);
 }
 
 ParticleSystem& ParticleSystem::getInstance() {

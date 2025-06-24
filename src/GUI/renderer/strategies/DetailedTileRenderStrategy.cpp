@@ -16,6 +16,7 @@
 #include "../../gameController/entities/Egg.hpp"
 #include "../../gameController/GameState.hpp"
 #include "../EjectionAnimationManager.hpp"
+#include "../DeathAnimationManager.hpp"
 
 namespace Zappy {
 

@@ -23,6 +23,7 @@
 #include "../network/networkManager/NetworkManager.hpp"
 #include "../Shared/IGraphicsLib.hpp"
 #include "../renderer/EjectionAnimationManager.hpp"
+#include "../renderer/DeathAnimationManager.hpp"
 
 /**
  * @brief Interface pour recevoir les messages du réseau

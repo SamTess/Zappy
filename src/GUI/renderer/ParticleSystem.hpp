@@ -95,7 +95,12 @@ public:
     void reset() override;
 
 private:
+    void createRingParticles(const ZappyTypes::Vector3& position, float radius, int count);
+    void createPulseParticles(const ZappyTypes::Vector3& position, int count);
+    void updateRingParticle(Particle* particle, float deltaTime);
+    void updatePulseParticle(Particle* particle, float deltaTime);
     void renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& center, float radius, float alpha);
+    void renderParticle(const Particle& particle, const std::shared_ptr<IGraphicsLib>& graphicsLib);
 
     float currentRadius;
     float maxRadius;
