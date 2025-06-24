@@ -31,6 +31,10 @@ UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
 
 void UIWindowFactory::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
     m_networkManager = networkManager;
+    auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(m_windows["playerInfo"]);
+    if (playerInfoWindow) {
+        playerInfoWindow->setNetworkManager(networkManager);
+    }
 }
 
 void UIWindowFactory::createAllWindows(int, int) {
@@ -192,13 +196,17 @@ void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vect
         {"timeInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TimeInfoWindow>(lib); }},
         {"menu", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MenuWindow>(lib); }}
     };
-
     auto it = windowCreators.find(id);
     if (it != windowCreators.end()) {
         auto window = it->second(m_guiLib);
         window->initialize(position, dimensions);
         window->setVisible(visible);
         m_windows[id] = window;
+        if (id == "playerInfo" && m_networkManager) {
+            auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(window);
+            if (playerInfoWindow)
+                playerInfoWindow->setNetworkManager(m_networkManager);
+        }
     }
 }
 
