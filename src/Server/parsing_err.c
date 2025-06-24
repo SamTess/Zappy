@@ -8,6 +8,7 @@
 #include "include/server.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 static void free_names(char **names)
 {
@@ -24,4 +25,15 @@ void parsing_error(char *error_message, parsing_info_t *parsed_info)
     printf("%s\n", error_message);
     display_help();
     exit(84);
+}
+
+bool check_if_names_exist(char **names, char *name, int k)
+{
+    for (int i = 0; names[i] != NULL; i++) {
+        if (i == k)
+            continue;
+        if (strcmp(names[i], name) == 0)
+            return true;
+    }
+    return false;
 }

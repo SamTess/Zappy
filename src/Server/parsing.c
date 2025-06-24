@@ -63,6 +63,11 @@ static char **parse_names(char **av, int i)
         count++;
     }
     result[count] = NULL;
+    for (int k = 0; k < count; k++) {
+        if (check_if_names_exist(result, result[k], k)) {
+            server_err("Duplicate name found in -n argument");
+        }
+    }
     return result;
 }
 
@@ -91,8 +96,8 @@ static int parse_frequence(char **av, int i, parsing_info_t *parsed_info)
     if (check_zero(av[i + 1]))
         parsing_error("frequence can't be null", parsed_info);
     res = atoi(av[i + 1]);
-    if (res < 1)
-        parsing_error("frequence can't be less than 1", parsed_info);
+    if (res < 1 || res > 10000 || strlen(av[i + 1]) > 9)
+        parsing_error("frequence must be between 1 and 10000", parsed_info);
     return res;
 }
 

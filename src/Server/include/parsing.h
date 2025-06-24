@@ -23,4 +23,6 @@ void parsing_error(char *error_message, parsing_info_t *parsed_info);
 int arr_len(char **array);
 void free_arr(char **array);
 char **str_to_word_arr(char *str, char *delim);
+bool check_if_names_exist(char **names, char *name, int k);
+
 #endif /* !PARSING_H_ */
