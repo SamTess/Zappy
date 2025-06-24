@@ -99,10 +99,10 @@ int GameLoop::run() {
         bool mouseOverUI = m_userInterface->isMouseOverUI();
         m_camera->update(m_graphics, uiHandledMouse, mouseOverUI);
         m_graphics->BeginDrawing();
-        if (m_renderer) {
+        if (m_renderer)
             m_renderer->renderSkybox(m_graphics);
-        }
         m_graphics->ClearBackground({32, 32, 64, 255});
+        m_graphics->UpdateMusic();
         m_graphics->BeginCamera3D();
         m_mapRenderer->render();
         Zappy::ParticleSystem::getInstance().render(m_graphics);
@@ -137,9 +137,8 @@ void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
         auto gameState = m_gameController->getGameState();
         m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, gameState, m_modelManagerAdapter);
         m_mapRenderer->initialize();
-        if (gameState->isMapInitialized()) {
+        if (gameState->isMapInitialized())
             updateCameraForMapSize();
-        }
     }
 }
 
@@ -166,7 +165,6 @@ void GameLoop::updateCameraForMapSize() {
         cameraDistance = 10.0f;
     if (cameraDistance > 50.0f)
         cameraDistance = 50.0f;
-    m_graphics->UpdateMusic();
     m_camera->reset();
     m_camera->distance() = cameraDistance;
 }
