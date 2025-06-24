@@ -13,86 +13,107 @@
 #include <stdlib.h>
 #include <math.h>
 
+static int adapt_rota_player(enum rotation_e rota_player)
+{
+    switch (rota_player) {
+        case UP:
+            return 0;
+        case DOWN:
+            return 1;
+        case LEFT:
+            return 2;
+        case RIGHT:
+            return 3;
+        default:
+            return -1;
+    }
+}
+
+static int get_tile_for_north_orientation(int source_rel_x, int source_rel_y)
+{
+    if (source_rel_x == 0 && source_rel_y < 0)
+        return 1;
+    if (source_rel_x < 0 && source_rel_y < 0)
+        return 2;
+    if (source_rel_x < 0 && source_rel_y == 0)
+        return 3;
+    if (source_rel_x < 0 && source_rel_y > 0)
+        return 4;
+    if (source_rel_x == 0 && source_rel_y > 0)
+        return 5;
+    if (source_rel_x > 0 && source_rel_y > 0)
+        return 6;
+    if (source_rel_x > 0 && source_rel_y == 0)
+        return 7;
+    if (source_rel_x > 0 && source_rel_y < 0)
+        return 8;
+    return 0;
+}
+
 static int calculate_shortest_distance_x(int sender_x,
     int receiver_x, int width)
 {
-    int dx = sender_x - receiver_x;
+    int direct_distance = receiver_x - sender_x;
+    int wrap_distance_right = (receiver_x + width) - sender_x;
+    int wrap_distance_left = receiver_x - (sender_x + width);
 
-    if (dx > width / 2)
-        dx -= width;
-    if (dx < (-width) / 2)
-        dx += width;
-    return dx;
+    if (abs(direct_distance) <= abs(wrap_distance_right) &&
+        abs(direct_distance) <= abs(wrap_distance_left))
+        return direct_distance;
+    if (abs(wrap_distance_right) <= abs(wrap_distance_left))
+        return wrap_distance_right;
+    return wrap_distance_left;
 }
 
 static int calculate_shortest_distance_y(int sender_y,
     int receiver_y, int height)
 {
-    int dy = sender_y - receiver_y;
+    int direct_distance = receiver_y - sender_y;
+    int wrap_distance_down = (receiver_y + height) - sender_y;
+    int wrap_distance_up = receiver_y - (sender_y + height);
 
-    if (dy > height / 2)
-        dy -= height;
-    if (dy < (-height) / 2)
-        dy += height;
-    return dy;
+    if (abs(direct_distance) <= abs(wrap_distance_down) &&
+        abs(direct_distance) <= abs(wrap_distance_up))
+        return direct_distance;
+    if (abs(wrap_distance_down) <= abs(wrap_distance_up))
+        return wrap_distance_down;
+    return wrap_distance_up;
 }
 
-static int get_tile_for_north_bis(double angle)
+static int calculate_direction(client_t *receiver, int source_rel_x,
+    int source_rel_y)
 {
-    if (angle < 0)
-        angle += 360.0;
-    if (angle >= 337.5 || angle < 22.5)
-        return 1;
-    if (angle >= 22.5 && angle < 67.5)
-        return 8;
-    if (angle >= 67.5 && angle < 112.5)
-        return 7;
-    if (angle >= 112.5 && angle < 157.5)
-        return 6;
-    if (angle >= 157.5 && angle < 202.5)
-        return 5;
-    if (angle >= 202.5 && angle < 247.5)
-        return 4;
-    if (angle >= 247.5 && angle < 292.5)
-        return 3;
-    if (angle >= 292.5 && angle < 337.5)
-        return 2;
-    return 1;
-}
+    int base_tile_for_north;
+    int new_rota = adapt_rota_player(receiver->player->rotation);
 
-static int get_tile_for_north_orientation(int dx, int dy)
-{
-    if (dx == 0 && dy == 0)
+    if (source_rel_x == 0 && source_rel_y == 0)
         return 0;
-    return get_tile_for_north_bis(atan2(-dy, dx) *
-        180.0 / 3.141592653589793238460);
-}
-
-static int calculate_direction(client_t *receiver, int dx, int dy)
-{
-    int base_tile_for_north = get_tile_for_north_orientation(dx, dy);
-    int orientation_offset = (receiver->player->rotation - 1) * 2;
-
-    if (dx == 0 && dy == 0)
+    base_tile_for_north = get_tile_for_north_orientation(source_rel_x,
+        source_rel_y);
+    if (base_tile_for_north == 0)
         return 0;
-    return ((base_tile_for_north - 1 - orientation_offset + 8) % 8) + 1;
+    return ((base_tile_for_north - 1 + (2 * new_rota)
+        + 8) % 8) + 1;
 }
 
 static void send_broadcast_to_client(server_t *server, client_t *sender,
     client_t *receiver, char *message)
 {
-    int dx = calculate_shortest_distance_x(sender->player->pos_x,
-        receiver->player->pos_x, server->parsed_info->width);
-    int dy = calculate_shortest_distance_y(sender->player->pos_y,
-        receiver->player->pos_y, server->parsed_info->height);
-    int direction = calculate_direction(receiver, dx, dy);
+    int direction = 0;
     size_t res_size = snprintf(NULL, 0, "message %d, %s\n", 0, message) + 1;
     char *response = calloc(res_size, sizeof(char));
+    int source_rel_x;
+    int source_rel_y;
 
-    if (!response)
-        server_err("Calloc for response failed in broadcast");
     if (!receiver || !receiver->player || receiver == sender)
         return;
+    if (response == NULL)
+        server_err("Malloc failed for allocating response for broadcast");
+    source_rel_x = calculate_shortest_distance_x(receiver->player->pos_x,
+        sender->player->pos_x, server->parsed_info->width);
+    source_rel_y = calculate_shortest_distance_y(receiver->player->pos_y,
+        sender->player->pos_y, server->parsed_info->height);
+    direction = calculate_direction(receiver, source_rel_x, source_rel_y);
     snprintf(response, res_size, "message %d, %s\n", direction, message);
     write_command_output(receiver->client_fd, response);
     free(response);
