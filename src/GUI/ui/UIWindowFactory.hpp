@@ -84,12 +84,6 @@ public:
      */
     void setSelectedPlayer(int playerId);
 
-    /**
-     * @brief Ajoute un message de diffusion
-     * @param team Équipe émettrice
-     * @param message Message diffusé
-     */
-    void addBroadcast(const std::string& team, const std::string& message);
 
     /**
      * @brief Obtient le NetworkManager pour l'envoi de commandes
