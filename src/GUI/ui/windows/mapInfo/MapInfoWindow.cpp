@@ -9,13 +9,14 @@
 #include <string>
 #include <memory>
 #include <algorithm>
+#include <vector>
 #include "MapInfoWindow.hpp"
 #include "../../../gameController/IRenderable.hpp"
 
 namespace GUI {
 
 MapInfoWindow::MapInfoWindow(std::shared_ptr<IGuiLib> guiLib)
-    : AUIWindow(guiLib, "Broadcasts") {
+    : AUIWindow(guiLib, "mapInfo") {
 }
 
 void MapInfoWindow::renderContent() {
@@ -29,7 +30,6 @@ void MapInfoWindow::renderContent() {
         panelWidth,
         panelHeight
     };
-    // int maxVisibleItems = calculateVisibleItemCount(panelHeight, lineHeight);
     int startIndex = 0;
 
     renderMapInfo(view, startIndex, lineHeight, contentWidth);
@@ -43,8 +43,6 @@ void GUI::MapInfoWindow::initialize(const ZappyTypes::Vector2& position,
     m_showWindowBox = true;
     m_dragging = false;
     m_dragOffset = {0, 0};
-    if (m_gameState)
-        m_dimensions.y = 120 + (m_gameState->getPlayerCount() * 90);
 }
 
 int GUI::MapInfoWindow::calculateVisibleItemCount(float panelHeight, float lineHeight) {

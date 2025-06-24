@@ -30,6 +30,7 @@ public:
     void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
     void initialize(const ZappyTypes::Vector2& position,
                     const ZappyTypes::Vector2& dimensions) override;
+
 protected:
     void renderContent() override;
 
@@ -61,12 +62,8 @@ private:
     struct Broadcast {
         std::string team;
         std::string message;
-        float timeLeft; // Temps restant avant disparition
+        float timeLeft;
     };
-
-
     std::shared_ptr<NetworkManager> m_networkManager;
-
-
 };
 } // namespace GUI
