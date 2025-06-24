@@ -12,6 +12,7 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <chrono>
 
 #include "../network/protocol/Message.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
@@ -20,6 +21,9 @@
 #include "GameState.hpp"
 #include "EntityFactory.hpp"
 #include "../network/networkManager/NetworkManager.hpp"
+#include "../Shared/IGraphicsLib.hpp"
+#include "../renderer/EjectionAnimationManager.hpp"
+#include "../renderer/DeathAnimationManager.hpp"
 
 /**
  * @brief Interface pour recevoir les messages du réseau
@@ -41,12 +45,19 @@ public:
     void onMessageReceived(const Message& message);
     std::shared_ptr<const GameState> getGameState() const { return _gameState; }
     void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory);
+    void setGraphics(std::shared_ptr<IGraphicsLib> graphics) { _graphics = graphics; }
 
     /**
      * @brief Met à jour les minuteurs de broadcasts
      * @param deltaTime Temps écoulé depuis la dernière mise à jour
      */
     void updateBroadcasts(float deltaTime);
+
+    /**
+     * @brief Met à jour les animations et effets visuels
+     * @param deltaTime Temps écoulé depuis la dernière mise à jour
+     */
+    void updateAnimations(float deltaTime);
 
 private:
     void processMessage(const Message& message);
@@ -72,7 +83,9 @@ private:
 
     std::shared_ptr<GameState> _gameState;
     std::shared_ptr<NetworkManager> _networkManager;
+    std::shared_ptr<IGraphicsLib> _graphics;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
+    std::map<int, std::chrono::steady_clock::time_point> _lastBroadcastTime;  // Player ID -> last broadcast time
     void initializeMessageHandlers();
 };
 

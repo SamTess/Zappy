@@ -31,6 +31,7 @@ void GameLoop::updateGameData() {
     m_gameTick++;
     if (m_gameController) {
         m_gameController->updateBroadcasts(deltaTime);
+        m_gameController->updateAnimations(deltaTime);
         auto gameState = m_gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
             m_mapWidth = gameState->getMapWidth();
@@ -78,16 +79,16 @@ void GameLoop::handleTileSelection(int x, int y) {
 void GameLoop::handleViewModeChange(int mode) {
     m_userInterface->setViewMode(mode);
     switch (mode) {
-        case 0: // Standard
+        case 0:  // Standard
             // Configuration caméra standard
             break;
-        case 1: // Aérien
+        case 1:  // Aérien
             // Configuration caméra aérienne (top-down)
             break;
-        case 2: // Wireframe
+        case 2:  // Wireframe
             // Mode wireframe
             break;
-        case 3: // Ressources
+        case 3:  // Ressources
             // Mode affichant les ressources
             break;
     }

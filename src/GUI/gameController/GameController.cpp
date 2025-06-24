@@ -5,11 +5,14 @@
 ** GameController implementation
 */
 
-#include "GameController.hpp"
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <memory>
+#include "GameController.hpp"
+#include "../renderer/EjectionAnimationManager.hpp"
+#include "../renderer/ParticleSystem.hpp"
+
 
 GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
     std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
@@ -134,7 +137,11 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
     }
     if (existingPlayer && playerData->getOrientation() != -1) {
         if (!playerData->isAlive()) {
+            ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
+                existingPlayer->getX(), existingPlayer->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
+            Zappy::DeathAnimationManager::getInstance().startDeathAnimation(playerId, playerWorldPos, existingPlayer->getTeamName());
             _gameState->removePlayer(playerId);
+            _graphics->PlaySound("assets/music/death.mp3");
             return;
         }
         int oldX = existingPlayer->getX();
@@ -167,19 +174,84 @@ void GameController::handlePlayerInventory(std::shared_ptr<IMessageData> data) {
 
 void GameController::handlePlayerExpulsion(std::shared_ptr<IMessageData> data) {
     auto expulsionData = std::static_pointer_cast<PlayerExpulsionData>(data);
-    if (unknownPlayerId(expulsionData->getPlayerId()))
+    int playerId = expulsionData->getPlayerId();
+
+    if (unknownPlayerId(playerId))
         return;
-    // faire une animation ici
+
+    auto playerInfo = _gameState->getPlayerInfo(playerId);
+    if (!playerInfo)
+        return;
+    int mapWidth = _gameState->getMapWidth();
+    int mapHeight = _gameState->getMapHeight();
+
+    ZappyTypes::Vector3 currentPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
+        playerInfo->getX(), playerInfo->getY(), mapWidth, mapHeight);
+
+    int orientation = playerInfo->getOrientation();
+    ZappyTypes::Vector3 ejectionDirection = {0.0f, 0.0f, 0.0f};
+
+    switch (orientation) {
+        case 1:
+            ejectionDirection = {0.0f, 0.0f, -1.0f};
+            break;
+        case 2:
+            ejectionDirection = {1.0f, 0.0f, 0.0f};
+            break;
+        case 3:
+            ejectionDirection = {0.0f, 0.0f, 1.0f};
+            break;
+        case 4:
+            ejectionDirection = {-1.0f, 0.0f, 0.0f};
+            break;
+        default:
+            ejectionDirection = {1.0f, 0.0f, 0.0f};
+            break;
+    }
+
+    int destTileX = playerInfo->getX() + static_cast<int>(ejectionDirection.x);
+    int destTileY = playerInfo->getY() + static_cast<int>(ejectionDirection.z);
+
+    ZappyTypes::Vector3 destinationPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
+        destTileX, destTileY, mapWidth, mapHeight);
+
+    Zappy::EjectionAnimationManager::getInstance().startEjectionAnimation(
+        playerId, currentPos, destinationPos);
 }
 
 void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     auto broadcastData = std::static_pointer_cast<BroadcastData>(data);
     int playerId = broadcastData->getPlayerId();
     const std::string& message = broadcastData->getMessage();
+
+    if (message.empty() || playerId < 0) {
+        std::cout << "[DEBUG] Skipping invalid broadcast - Player ID: " << playerId << ", Message: '" << message << "'" << std::endl;
+        return;
+    }
+
+    auto now = std::chrono::steady_clock::now();
+    auto it = _lastBroadcastTime.find(playerId);
+    if (it != _lastBroadcastTime.end()) {
+        auto timeDiff = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->second);
+        if (timeDiff.count() < 500) {
+            std::cout << "[DEBUG] Broadcast throttled for player " << playerId << " (too frequent)" << std::endl;
+            return;
+        }
+    }
+    _lastBroadcastTime[playerId] = now;
+
+    std::cout << "[DEBUG] Broadcast triggered - Player ID: " << playerId << ", Message: '" << message << "'" << std::endl;
+
     std::string teamName = "Inconnu";
     auto playerInfo = _gameState->getPlayerInfo(playerId);
     if (playerInfo) {
         teamName = playerInfo->getTeamName();
+        ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
+            playerInfo->getX(), playerInfo->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
+
+        Zappy::ParticleSystem::getInstance().createPlayerBroadcastEffect(playerWorldPos, teamName);
+    } else {
+        std::cout << "[DEBUG] Player " << playerId << " not found in game state - broadcast animation skipped" << std::endl;
     }
     _gameState->addBroadcast(playerId, teamName, message);
 }
@@ -280,6 +352,12 @@ void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
 
 void GameController::updateBroadcasts(float deltaTime) {
     _gameState->updateBroadcasts(deltaTime);
+}
+
+void GameController::updateAnimations(float deltaTime) {
+    Zappy::EjectionAnimationManager::getInstance().update(deltaTime);
+    Zappy::ParticleSystem::getInstance().update(deltaTime);
+    Zappy::DeathAnimationManager::getInstance().update(deltaTime);
 }
 
 void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {

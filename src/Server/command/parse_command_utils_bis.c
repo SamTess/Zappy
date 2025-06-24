@@ -5,6 +5,7 @@
 ** parse_command_utils_bis
 */
 #include "../include/command.h"
+#include "../include/graphical_commands.h"
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -13,6 +14,7 @@
 static int check_disconnect(int bytes_read, client_t *user, server_t *server)
 {
     if (bytes_read <= 0){
+        command_pdi(server, user);
         remove_fd(server, user->client_fd);
         return 1;
     }
