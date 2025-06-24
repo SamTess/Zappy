@@ -7,6 +7,7 @@
 
 #ifndef PARSING_H_
     #define PARSING_H_
+    #define MAX_RETRY 3
     #include <stdbool.h>
 
 typedef struct parsing_info_s {
