@@ -17,135 +17,33 @@
 namespace GUI {
 
 class UserInterface {
-public:
-    /**
-     * @brief Constructeur de l'interface utilisateur
-     * @param guiLib Bibliothèque graphique à utiliser
-     */
-    explicit UserInterface(std::shared_ptr<IGuiLib> guiLib);
-    ~UserInterface() = default;
+    public:
 
-    /**
-     * @brief Initialise l'interface utilisateur
-     * @param screenWidth Largeur de l'écran
-     * @param screenHeight Hauteur de l'écran
-     */
-    void initialize(int screenWidth, int screenHeight);
+        explicit UserInterface(std::shared_ptr<IGuiLib> guiLib);
+        ~UserInterface() = default;
+        void initialize(int screenWidth, int screenHeight);
+        void render();
+        void updateDataFromGameState(std::shared_ptr<const GameState> gameState, int mapWidth, int mapHeight, float gameTime, int frequency, int gameTick);
+        void setSelectedTile(int x, int y);
+        void setSelectedPlayer(int playerId);
+        void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
+        void setViewMode(int mode);
+        bool toggleWindowVisibility(const std::string& windowId, bool visible);
+        bool handleMouseEvents();
+        bool isMouseOverUI() const;
+        bool hasHandledMouseEvent() const;
+        std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
 
-    /**
-     * @brief Effectue le rendu de l'interface
-     */
-    void render();
-
-    /**
-     * @brief Met à jour les données de l'interface depuis l'état du jeu
-     * @param gameState État actuel du jeu
-     * @param mapWidth Largeur de la carte
-     * @param mapHeight Hauteur de la carte
-     * @param gameTime Temps de jeu écoulé
-     * @param frequency Fréquence du jeu
-     * @param gameTick Tick de jeu actuel
-     */
-    void updateDataFromGameState(
-        std::shared_ptr<const GameState> gameState,
-        int mapWidth,
-        int mapHeight,
-        float gameTime,
-        int frequency,
-        int gameTick
-    );
-
-    /**
-     * @brief Définit la case sélectionnée
-     * @param x Coordonnée X
-     * @param y Coordonnée Y
-     */
-    void setSelectedTile(int x, int y);
-
-    /**
-     * @brief Définit le joueur sélectionné
-     * @param playerId Identifiant du joueur sélectionné
-     */
-    void setSelectedPlayer(int playerId);
-
-    /**
-     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
-     * @param networkManager Pointeur vers le NetworkManager
-     */
-    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-
-    /**
-     * @brief Définit le mode de vue
-     * @param mode Indice du mode de vue
-     */
-    void setViewMode(int mode);
-
-    /**
-     * @brief Affiche ou masque une fenêtre
-     * @param windowId Identifiant de la fenêtre
-     * @param visible true pour afficher, false pour masquer
-     * @return true si l'opération a réussi
-     */
-    bool toggleWindowVisibility(const std::string& windowId, bool visible);
-
-    /**
-     * @brief Gère les événements de la souris
-     * @return true si l'UI a capturé l'événement de souris
-     */
-    bool handleMouseEvents();
-
-    /**
-     * @brief Vérifie si la souris est sur une fenêtre de l'interface
-     * @return true si la souris est sur une fenêtre
-     */
-    bool isMouseOverUI() const;
-
-    /**
-     * @brief Vérifie si l'UI a traité le dernier événement de souris
-     * @return true si l'UI a capturé l'événement
-     */
-    bool hasHandledMouseEvent() const;
-
-    /**
-     * @brief Obtient une fenêtre par son identifiant
-     * @param windowId Identifiant de la fenêtre
-     * @return Pointeur vers la fenêtre ou nullptr si non trouvée
-     */
-    std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
-
-private:
-    /**
-     * @brief Gère les interactions de souris sur les éléments d'interface
-     * @param mousePosition Position actuelle de la souris
-     */
-    void handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition);
-
-    /**
-     * @brief Démarre le glissement d'une fenêtre si possible
-     * @param mousePosition Position actuelle de la souris
-     */
-    void startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition);
-
-    /**
-     * @brief Gère la fin du glissement si nécessaire
-     */
-    void handleDragEndIfNeeded();
-
-    // Référence à la bibliothèque graphique
-    std::shared_ptr<IGuiLib> m_guiLib;
-
-    // Factory pour la création et gestion des fenêtres
-    std::shared_ptr<UIWindowFactory> m_windowFactory;
-
-    // Dimensions de l'écran
-    int m_screenWidth;
-    int m_screenHeight;
-
-    // État du glissement des fenêtres
-    bool m_isDragging;
-
-    // Indique si l'UI a capturé le dernier clic de souris
-    bool m_mouseCapture;
+    private:
+        void handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition);
+        void startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition);
+        void handleDragEndIfNeeded();
+        std::shared_ptr<IGuiLib> _guiLib;
+        std::shared_ptr<UIWindowFactory> _windowFactory;
+        int _screenWidth;
+        int _screenHeight;
+        bool _isDragging;
+        bool _mouseCapture;
 };
 
 } // namespace GUI
