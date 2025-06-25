@@ -57,6 +57,8 @@ void init_new_player_pos(server_t *server, client_t *new_client)
 static void init_pending(player_t *player)
 {
     player->pending_cmd = calloc(1, sizeof(pending_cmd_t));
+    if (!player->pending_cmd)
+        return;
     player->pending_cmd->args = NULL;
     player->pending_cmd->func = NULL;
 }
@@ -75,6 +77,13 @@ static int check_command_queue(player_t *player)
 {
     player->command_queue = calloc(10, sizeof(char *));
     if (player->command_queue == NULL){
+        free(player);
+        player = NULL;
+        return -1;
+    }
+    init_pending(player);
+    if (!player->pending_cmd){
+        free(player->command_queue);
         free(player);
         player = NULL;
         return -1;
@@ -101,5 +110,4 @@ void init_player(player_t *player, char *player_team)
     init_inventory(player);
     player->is_in_incantation = false;
     player->incantation_leader_id = -1;
-    init_pending(player);
 }

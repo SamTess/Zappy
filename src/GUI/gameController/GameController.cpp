@@ -9,6 +9,8 @@
 #include <string>
 #include <algorithm>
 #include <memory>
+#include <thread>
+#include <chrono>
 #include "GameController.hpp"
 #include "../renderer/EjectionAnimationManager.hpp"
 #include "../renderer/ParticleSystem.hpp"
@@ -229,6 +231,7 @@ void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
         return;
     }
 
+    _graphics->PlaySound("assets/music/discord.mp3");
     auto now = std::chrono::steady_clock::now();
     auto it = _lastBroadcastTime.find(playerId);
     if (it != _lastBroadcastTime.end()) {
