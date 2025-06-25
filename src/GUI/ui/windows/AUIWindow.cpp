@@ -12,37 +12,25 @@
 namespace GUI {
 
 AUIWindow::AUIWindow(std::shared_ptr<IGuiLib> guiLib, const std::string& title)
-    : m_guiLib(guiLib),
-      m_title(title),
-      m_position({0, 0}),
-      m_dimensions({0, 0}),
-      m_scrollPosition({0, 0}),
-      m_visible(false),
-      m_showWindowBox(true),
-      m_dragging(false),
-      m_dragOffset({0, 0}) { }
+    : _guiLib(guiLib), _title(title), _position({0, 0}), _dimensions({0, 0}), _visible(false),
+      _showWindowBox(true), _dragging(false), _dragOffset({0, 0}) { }
 
 void AUIWindow::initialize(const ZappyTypes::Vector2& position,
-                         const ZappyTypes::Vector2& dimensions) {
-    m_position = position;
-    m_dimensions = dimensions;
+    const ZappyTypes::Vector2& dimensions) {
+    _position = position;
+    _dimensions = dimensions;
 }
 
 bool AUIWindow::render() {
-    if (!m_visible)
+    if (!_visible)
         return true;
-    if (m_showWindowBox) {
-        ZappyTypes::Rectangle windowRect = {
-            m_position.x, m_position.y,
-            m_dimensions.x, m_dimensions.y
-        };
-        bool closeButtonClicked = m_guiLib->DrawWindowBox(
-            windowRect.x, windowRect.y,
-            windowRect.width, windowRect.height,
-            m_title
-        );
+    if (_showWindowBox) {
+        ZappyTypes::Rectangle windowRect = {_position.x, _position.y,
+            _dimensions.x, _dimensions.y};
+        bool closeButtonClicked = _guiLib->DrawWindowBox(
+            windowRect.x, windowRect.y, windowRect.width, windowRect.height, _title );
         if (closeButtonClicked) {
-            m_visible = false;
+            _visible = false;
             return false;
         }
     }
@@ -50,80 +38,68 @@ bool AUIWindow::render() {
     return true;
 }
 
-void AUIWindow::updateData(std::shared_ptr<const GameState> gameState,
-                          int mapWidth, int mapHeight,
-                          float gameTime, int frequency, int gameTick) {
-    m_gameState = gameState;
-    m_mapWidth = mapWidth;
-    m_mapHeight = mapHeight;
-    m_gameTime = gameTime;
-    m_frequency = frequency;
-    m_gameTick = gameTick;
+void AUIWindow::updateData(std::shared_ptr<const GameState> gameState) {
+    _gameState = gameState;
+
 }
 
 void AUIWindow::setPosition(const ZappyTypes::Vector2& position) {
-    m_position = position;
+    _position = position;
 }
 
 ZappyTypes::Vector2 AUIWindow::getPosition() const {
-    return m_position;
+    return _position;
 }
 
 ZappyTypes::Vector2 AUIWindow::getDimensions() const {
-    return m_dimensions;
+    return _dimensions;
 }
 
 bool AUIWindow::isVisible() const {
-    return m_visible;
+    return _visible;
 }
 
 void AUIWindow::setVisible(bool visible) {
-    m_visible = visible;
+    _visible = visible;
 }
 
 void AUIWindow::toggleVisibility() {
-    m_visible = !m_visible;
+    _visible = !_visible;
 }
 
 bool AUIWindow::startDragging(const ZappyTypes::Vector2& mousePosition) {
-    ZappyTypes::Rectangle titleBarRect = {
-        m_position.x, m_position.y,
-        m_dimensions.x, 20
-    };
-    if (m_guiLib->CheckCollisionPointRec(mousePosition, titleBarRect)) {
-        m_dragging = true;
-        m_dragOffset.x = mousePosition.x - m_position.x;
-        m_dragOffset.y = mousePosition.y - m_position.y;
+    ZappyTypes::Rectangle titleBarRect = { _position.x, _position.y, _dimensions.x, 20};
+    if (_guiLib->CheckCollisionPointRec(mousePosition, titleBarRect)) {
+        _dragging = true;
+        _dragOffset.x = mousePosition.x - _position.x;
+        _dragOffset.y = mousePosition.y - _position.y;
         return true;
     }
     return false;
 }
 
 void AUIWindow::updateDragging(const ZappyTypes::Vector2& mousePosition) {
-    if (m_dragging) {
-        m_position.x = mousePosition.x - m_dragOffset.x;
-        m_position.y = mousePosition.y - m_dragOffset.y;
+    if (_dragging) {
+        _position.x = mousePosition.x - _dragOffset.x;
+        _position.y = mousePosition.y - _dragOffset.y;
     }
 }
 
 void AUIWindow::stopDragging() {
-    m_dragging = false;
+    _dragging = false;
 }
 
 bool AUIWindow::isDragging() const {
-    return m_dragging;
+    return _dragging;
 }
 
 bool AUIWindow::isPositionInWindow(const ZappyTypes::Vector2& position) const {
-    ZappyTypes::Rectangle windowRect = {
-        m_position.x, m_position.y,
-        m_dimensions.x, m_dimensions.y
-    };
-    return m_guiLib->CheckCollisionPointRec(position, windowRect);
+    ZappyTypes::Rectangle windowRect = {_position.x, _position.y, _dimensions.x, _dimensions.y};
+    return _guiLib->CheckCollisionPointRec(position, windowRect);
 }
 
 void AUIWindow::setShowWindowBox(bool show) {
-    m_showWindowBox = show;
+    _showWindowBox = show;
 }
 
 } // namespace GUI

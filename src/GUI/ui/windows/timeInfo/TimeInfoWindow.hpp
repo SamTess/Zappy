@@ -13,18 +13,18 @@
 namespace GUI {
 
 class TimeInfoWindow : public AUIWindow {
-public:
-    explicit TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib);
-    ~TimeInfoWindow() = default;
+    public:
+        explicit TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib);
+        ~TimeInfoWindow() = default;
+        void setFPS(int fps) { _fps = fps; }
+        int getFPS() const { return _fps; }
+    private:
+        void renderContent() override;
+        int _fps = 60;
+        int _frequency = 100;
+        float _gameTime = 0.0f;
+        int _gameTick = 0;
 
-    void setFPS(int fps) { m_fps = fps; }
-    int getFPS() const { return m_fps; }
-
-protected:
-    void renderContent() override;
-
-private:
-    int m_fps = 60;
 };
 
 } // namespace GUI

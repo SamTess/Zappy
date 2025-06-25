@@ -213,7 +213,6 @@ bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared
 void GameLoop::onMapSizeChanged(int width, int height) {
     m_mapWidth = width;
     m_mapHeight = height;
-    // m_camera->setMapDimensions(width, height);
     updateCameraForMapSize();
 }
 
