@@ -16,10 +16,7 @@ TimeInfoWindow::TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Informations temporelles") {
 }
 
-void TimeInfoWindow::renderContent() {
-    float yOffset = m_position.y + 30;
-
-    // Affichage des FPS
+void TimeInfoWindow::renderFpsInfo(float& yOffset) {
     std::stringstream fpsInfo;
     fpsInfo << "FPS: " << m_fps;
     m_guiLib->DrawLabel(
@@ -30,9 +27,13 @@ void TimeInfoWindow::renderContent() {
         fpsInfo.str()
     );
     yOffset += 25;
+}
 
+void TimeInfoWindow::renderTimeInfo(float& yOffset) {
+    if (!m_dataProvider)
+        return;
     std::stringstream timeInfo;
-    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << m_gameTime;
+    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << m_dataProvider->getGameTime();
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -41,8 +42,13 @@ void TimeInfoWindow::renderContent() {
         timeInfo.str()
     );
     yOffset += 25;
+}
+
+void TimeInfoWindow::renderFrequencyInfo(float& yOffset) {
+    if (!m_dataProvider)
+        return;
     std::stringstream freqInfo;
-    freqInfo << "Fréquence: " << m_frequency << " Hz";
+    freqInfo << "Fréquence: " << m_dataProvider->getFrequency() << " Hz";
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -51,8 +57,13 @@ void TimeInfoWindow::renderContent() {
         freqInfo.str()
     );
     yOffset += 25;
+}
+
+void TimeInfoWindow::renderTickInfo(float& yOffset) {
+    if (!m_dataProvider)
+        return;
     std::stringstream tickInfo;
-    tickInfo << "Tick: " << m_gameTick;
+    tickInfo << "Tick: " << m_dataProvider->getGameTick();
     m_guiLib->DrawLabel(
         m_position.x + 10,
         yOffset,
@@ -60,6 +71,16 @@ void TimeInfoWindow::renderContent() {
         20,
         tickInfo.str()
     );
+}
+
+void TimeInfoWindow::renderContent() {
+    float yOffset = m_position.y + 30;
+    renderFpsInfo(yOffset);
+    if (m_dataProvider) {
+        renderTimeInfo(yOffset);
+        renderFrequencyInfo(yOffset);
+        renderTickInfo(yOffset);
+    }
 }
 
 } // namespace GUI

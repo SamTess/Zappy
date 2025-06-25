@@ -282,7 +282,7 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
         submenuWidth - 60, 20,
         "Fréquence du serveur:"
     );
-    int currentFrequency = m_frequency;
+    int currentFrequency = m_dataProvider ? m_dataProvider->getFrequency() : 7;
     std::stringstream freqSs;
     freqSs << "Actuelle: " << currentFrequency << " ticks/seconde";
     m_guiLib->DrawLabel(

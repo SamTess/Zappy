@@ -50,15 +50,8 @@ bool AUIWindow::render() {
     return true;
 }
 
-void AUIWindow::updateData(std::shared_ptr<const GameState> gameState,
-                          int mapWidth, int mapHeight,
-                          float gameTime, int frequency, int gameTick) {
-    m_gameState = gameState;
-    m_mapWidth = mapWidth;
-    m_mapHeight = mapHeight;
-    m_gameTime = gameTime;
-    m_frequency = frequency;
-    m_gameTick = gameTick;
+void AUIWindow::updateData(std::shared_ptr<IUIDataProvider> dataProvider) {
+    m_dataProvider = dataProvider;
 }
 
 void AUIWindow::setPosition(const ZappyTypes::Vector2& position) {
@@ -124,6 +117,10 @@ bool AUIWindow::isPositionInWindow(const ZappyTypes::Vector2& position) const {
 
 void AUIWindow::setShowWindowBox(bool show) {
     m_showWindowBox = show;
+}
+
+void AUIWindow::setUIContext(std::shared_ptr<IUIContext> uiContext) {
+    m_uiContext = uiContext;
 }
 
 } // namespace GUI

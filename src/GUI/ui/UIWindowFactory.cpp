@@ -14,6 +14,7 @@
 #include <utility>
 #include <functional>
 #include "UIWindowFactory.hpp"
+#include "context/UIContext.hpp"
 #include "windows/tileInfo/TileInfoWindow.hpp"
 #include "windows/playerInfo/PlayerInfoWindow.hpp"
 #include "windows/broadcasts/BroadcastsWindow.hpp"
@@ -119,26 +120,27 @@ void UIWindowFactory::renderMenuWindow() {
 }
 
 void UIWindowFactory::updateAllWindows(std::shared_ptr<const GameState> gameState,
-                                      int mapWidth, int mapHeight,
+                                      int /*mapWidth*/, int /*mapHeight*/,
                                       float gameTime, int frequency, int gameTick) {
-    for (auto& pair : m_windows) {
-        pair.second->updateData(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
-    }
+    auto dataProvider = std::make_shared<UIDataProvider>(gameState);
+    dataProvider->updateTimeData(gameTime, frequency, gameTick);
+    if (m_uiContext)
+        m_uiContext->setDataProvider(dataProvider);
+    for (auto& pair : m_windows)
+        pair.second->updateData(dataProvider);
 }
 
 void UIWindowFactory::setSelectedTile(int x, int y) {
     m_selectedTile = {x, y, true};
     auto tileInfoWindow = std::dynamic_pointer_cast<GUI::TileInfoWindow>(m_windows["tileInfo"]);
-    if (tileInfoWindow) {
+    if (tileInfoWindow)
         tileInfoWindow->setSelectedTile(x, y);
-    }
 }
 
 void UIWindowFactory::setSelectedPlayer(int playerId) {
     auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(m_windows["playerInfo"]);
-    if (playerInfoWindow) {
+    if (playerInfoWindow)
         playerInfoWindow->setSelectedPlayer(playerId);
-    }
 }
 
 void UIWindowFactory::addBroadcast(const std::string& team, const std::string& message) {
@@ -182,17 +184,15 @@ bool UIWindowFactory::tryStartDraggingWindowInZOrder(
 
 void UIWindowFactory::updateWindowDragging(const ZappyTypes::Vector2& mousePosition) {
     for (auto& [id, window] : m_windows) {
-        if (window->isDragging()) {
+        if (window->isDragging())
             window->updateDragging(mousePosition);
-        }
     }
 }
 
 void UIWindowFactory::stopWindowDragging() {
     for (auto& [id, window] : m_windows) {
-        if (window->isDragging()) {
+        if (window->isDragging())
             window->stopDragging();
-        }
     }
 }
 
@@ -219,11 +219,19 @@ void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vect
 
 bool UIWindowFactory::isMouseOverWindow(const ZappyTypes::Vector2& mousePosition) const {
     for (const auto& pair : m_windows) {
-        if (pair.second->isVisible() && pair.second->isPositionInWindow(mousePosition)) {
+        if (pair.second->isVisible() && pair.second->isPositionInWindow(mousePosition))
             return true;
-        }
     }
     return false;
+}
+
+void UIWindowFactory::setUIContext(std::shared_ptr<IUIContext> uiContext) {
+    m_uiContext = uiContext;
+    for (auto& pair : m_windows) {
+        auto auiWindow = std::dynamic_pointer_cast<AUIWindow>(pair.second);
+        if (auiWindow)
+            auiWindow->setUIContext(uiContext);
+    }
 }
 
 } // namespace GUI

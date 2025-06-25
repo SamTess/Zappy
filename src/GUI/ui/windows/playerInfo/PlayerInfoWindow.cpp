@@ -31,10 +31,10 @@ void GUI::PlayerInfoWindow::renderContent() {
         displayPlayerNotFound();
         return;
     }
-    if (m_commandSender) {
+    if (m_uiContext) {
         std::stringstream pinCommand;
         pinCommand << "pin #" << m_selectedPlayerId;
-        m_commandSender->sendCommand(pinCommand.str());
+        m_uiContext->executeNetworkCommand(pinCommand.str());
     }
     float yOffset = m_position.y + 30;
     yOffset = displayPlayerIdentity(selectedPlayer, yOffset);
@@ -54,10 +54,10 @@ void GUI::PlayerInfoWindow::displayNoPlayerSelected() {
 }
 
 std::shared_ptr<const IPlayer> GUI::PlayerInfoWindow::findSelectedPlayer() {
-    if (!m_gameState) {
+    if (!m_dataProvider) {
         return nullptr;
     }
-    return m_gameState->getPlayerInfo(m_selectedPlayerId);
+    return m_dataProvider->getPlayerInfo(m_selectedPlayerId);
 }
 
 void GUI::PlayerInfoWindow::displayPlayerNotFound() {
@@ -130,8 +130,8 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
         "Inventaire:"
     );
     float newYOffset = yOffset + 20;
-    if (m_gameState) {
-        auto inventory = m_gameState->getPlayerInventory(selectedPlayer->getId());
+    if (m_dataProvider) {
+        auto inventory = m_dataProvider->getPlayerInventory(selectedPlayer->getId());
         if (inventory) {
             const std::pair<std::string, int> resources[] = {
                 {"Nourriture", inventory->getFood()},
@@ -142,7 +142,6 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
                 {"Phiras", inventory->getPhiras()},
                 {"Thystame", inventory->getThystame()}
             };
-
             for (const auto& resource : resources) {
                 std::stringstream ss;
                 ss << resource.first << ": " << resource.second;
@@ -160,11 +159,11 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
     return newYOffset;
 }
 
-bool GUI::PlayerInfoWindow::playerExistsInGameState(std::shared_ptr<const GameState> gameState) {
-    if (!gameState) {
+bool GUI::PlayerInfoWindow::playerExistsInDataProvider() {
+    if (!m_dataProvider) {
         return false;
     }
-    auto player = gameState->getPlayerInfo(m_selectedPlayerId);
+    auto player = m_dataProvider->getPlayerInfo(m_selectedPlayerId);
     return player != nullptr;
 }
 

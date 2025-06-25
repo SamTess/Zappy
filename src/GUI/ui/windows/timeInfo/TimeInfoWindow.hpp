@@ -25,6 +25,10 @@ protected:
 
 private:
     int m_fps = 60;
+    void renderFpsInfo(float& yOffset);
+    void renderTimeInfo(float& yOffset);
+    void renderFrequencyInfo(float& yOffset);
+    void renderTickInfo(float& yOffset);
 };
 
 } // namespace GUI

@@ -52,6 +52,8 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp \
+	  ui/data/UIDataProvider.cpp \
+	  ui/context/UIContext.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
 	  gameController/entities/Egg.cpp \
@@ -120,6 +122,8 @@ setup_dirs:
 	@mkdir -p $(BUILD_DIR)/ui/windows/controls
 	@mkdir -p $(BUILD_DIR)/ui/windows/timeInfo
 	@mkdir -p $(BUILD_DIR)/ui/windows/menu
+	@mkdir -p $(BUILD_DIR)/ui/data
+	@mkdir -p $(BUILD_DIR)/ui/context
 	@mkdir -p ../../build
 
 # Display a fancy banner for the build process

@@ -53,8 +53,8 @@ void GUI::TileInfoWindow::renderTilePosition() {
 
 float GUI::TileInfoWindow::renderResourceInfo() {
     int resources[7] = {0};
-    if (m_gameState && m_gameState->isMapInitialized()) {
-        auto tile = m_gameState->getTile(m_selectedTile.x, m_selectedTile.y);
+    if (m_dataProvider && m_dataProvider->isMapInitialized()) {
+        auto tile = m_dataProvider->getTile(m_selectedTile.x, m_selectedTile.y);
         if (tile) {
             const auto& tileResources = tile->getResources();
             for (int i = 0; i < 7; ++i) {
@@ -84,8 +84,8 @@ float GUI::TileInfoWindow::renderResourceInfo() {
 
 void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     int playerCount = 0;
-    if (m_gameState && m_gameState->isMapInitialized()) {
-        auto playerIds = m_gameState->getPlayersOnTile(m_selectedTile.x, m_selectedTile.y);
+    if (m_dataProvider && m_dataProvider->isMapInitialized()) {
+        auto playerIds = m_dataProvider->getPlayersOnTile(m_selectedTile.x, m_selectedTile.y);
         playerCount = static_cast<int>(playerIds.size());
     }
     std::stringstream playersTitle;

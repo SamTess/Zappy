@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <chrono>
 #include "UserInterface.hpp"
+#include "context/UIContext.hpp"
 #include "../gameController/GameState.hpp"
 
 namespace GUI {
@@ -32,6 +33,8 @@ void UserInterface::initialize(int screenWidth, int screenHeight) {
     m_screenWidth = screenWidth;
     m_screenHeight = screenHeight;
     m_windowFactory->createAllWindows(screenWidth, screenHeight);
+    auto uiContext = std::make_shared<UIContext>(m_windowFactory, m_commandSender);
+    m_windowFactory->setUIContext(uiContext);
     m_isDragging = false;
 }
 
