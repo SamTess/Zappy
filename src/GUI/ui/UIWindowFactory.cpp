@@ -16,7 +16,7 @@
 #include "UIWindowFactory.hpp"
 #include "windows/tileInfo/TileInfoWindow.hpp"
 #include "windows/playerInfo/PlayerInfoWindow.hpp"
-#include "windows/broadcasts/BroadcastsWindow.hpp"
+#include "windows/mapInfo/MapInfoWindow.hpp"
 #include "windows/controls/ControlsWindow.hpp"
 #include "windows/timeInfo/TimeInfoWindow.hpp"
 #include "windows/menu/MenuWindow.hpp"
@@ -35,6 +35,10 @@ void UIWindowFactory::setNetworkManager(std::shared_ptr<NetworkManager> networkM
     if (playerInfoWindow) {
         playerInfoWindow->setNetworkManager(networkManager);
     }
+    auto mapInfoWindow = std::dynamic_pointer_cast<GUI::MapInfoWindow>(m_windows["mapInfo"]);
+    if (mapInfoWindow) {
+        mapInfoWindow->setNetworkManager(networkManager);
+    }
 }
 
 void UIWindowFactory::createAllWindows(int, int) {
@@ -46,7 +50,7 @@ void UIWindowFactory::createAllWindows(int, int) {
     } windowConfigs[] = {
         {"tileInfo", {10, 810}, {400, 300}, false},
         {"playerInfo", {10, 500}, {400, 300}, false},
-        {"broadcasts", {1520, 540}, {400, 300}, false},
+        {"mapInfo", {1520, 540}, {400, 300}, false},
         {"controls", {1520, 860}, {400, 200}, false},
         {"timeInfo", {1450, 10}, {250, 150}, false},
         {"menu", {10, 10}, {40, 40}, true}
@@ -127,12 +131,6 @@ void UIWindowFactory::setSelectedPlayer(int playerId) {
     }
 }
 
-void UIWindowFactory::addBroadcast(const std::string& team, const std::string& message) {
-    auto broadcastsWindow = std::dynamic_pointer_cast<GUI::BroadcastsWindow>(m_windows["broadcasts"]);
-    if (broadcastsWindow)
-        broadcastsWindow->addBroadcast(team, message);
-}
-
 std::shared_ptr<NetworkManager> UIWindowFactory::getNetworkManager() const {
     return m_networkManager;
 }
@@ -191,7 +189,7 @@ void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vect
     static const std::unordered_map<std::string, std::function<std::shared_ptr<GUI::IUIWindow>(std::shared_ptr<IGuiLib>)>> windowCreators = {
         {"tileInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TileInfoWindow>(lib); }},
         {"playerInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::PlayerInfoWindow>(lib); }},
-        {"broadcasts", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::BroadcastsWindow>(lib); }},
+        {"mapInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MapInfoWindow>(lib); }},
         {"controls", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::ControlsWindow>(lib); }},
         {"timeInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TimeInfoWindow>(lib); }},
         {"menu", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MenuWindow>(lib); }}
