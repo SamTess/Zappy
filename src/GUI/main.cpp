@@ -47,7 +47,6 @@ int main(int argc, char** argv) {
             std::cerr << "[ERROR] Impossible de se connecter au serveur." << std::endl;
             return 84;
         }
-        coordinator->setupConnections();
         gameLoop->run();
         networkManager->disconnect();
         return 0;

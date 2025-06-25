@@ -88,7 +88,7 @@ void NetworkManager::sendCommand(const std::string& command) {
         return;
     }
     std::string finalCommand = formatCommand(command);
-    logOutgoingCommand(finalCommand);
+    NetworkLogger::get().log(std::string("[SEND] ") + finalCommand);
     queueCommandForSending(finalCommand);
 }
 

@@ -50,8 +50,6 @@ std::shared_ptr<const ITile> GameState::getTile(int x, int y) const {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!isValidCoordinates(x, y))
         return nullptr;
-    if (y >= static_cast<int>(_tiles.size()) || x >= static_cast<int>(_tiles[y].size()))
-        return nullptr;
 
     return _tiles[y][x];
 }
@@ -59,8 +57,6 @@ std::shared_ptr<const ITile> GameState::getTile(int x, int y) const {
 std::shared_ptr<ITile> GameState::getTileMutable(int x, int y) {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!isValidCoordinates(x, y))
-        return nullptr;
-    if (y >= static_cast<int>(_tiles.size()) || x >= static_cast<int>(_tiles[y].size()))
         return nullptr;
     return _tiles[y][x];
 }
@@ -113,9 +109,6 @@ bool GameState::isPlayerOnTile(int x, int y, int playerId) const {
 std::vector<int> GameState::getPlayersOnTile(int x, int y) const {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!isValidCoordinates(x, y))
-        return {};
-    if (y >= static_cast<int>(_tiles.size())
-    || x >= static_cast<int>(_tiles[y].size()))
         return {};
     auto tile = _tiles[y][x];
     return tile ? tile->getPlayerIds() : std::vector<int>{};
