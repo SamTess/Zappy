@@ -66,7 +66,6 @@ public:
     void setSfxEnabled(bool enabled);
     float getMusicVolume() const;
     void setMusicVolume(float volume);
-    std::map<int, std::shared_ptr<IPlayer>> getPlayers();
 
 private:
     bool isValidCoordinates(int x, int y) const;
