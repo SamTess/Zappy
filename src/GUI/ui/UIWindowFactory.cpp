@@ -29,11 +29,11 @@ UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
     m_viewModes = {"Vue standard", "Vue aérienne", "Vue wireframe", "Vue ressources"};
 }
 
-void UIWindowFactory::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
-    m_networkManager = networkManager;
+void UIWindowFactory::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {
+    m_commandSender = sender;
     auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(m_windows["playerInfo"]);
     if (playerInfoWindow) {
-        playerInfoWindow->setNetworkManager(networkManager);
+        playerInfoWindow->setCommandSender(sender);
     }
 }
 
@@ -133,10 +133,6 @@ void UIWindowFactory::addBroadcast(const std::string& team, const std::string& m
         broadcastsWindow->addBroadcast(team, message);
 }
 
-std::shared_ptr<NetworkManager> UIWindowFactory::getNetworkManager() const {
-    return m_networkManager;
-}
-
 void UIWindowFactory::setViewMode(int mode) {
     if (mode >= 0 && mode < static_cast<int>(m_viewModes.size())) {
         m_currentViewMode = mode;
@@ -202,11 +198,8 @@ void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vect
         window->initialize(position, dimensions);
         window->setVisible(visible);
         m_windows[id] = window;
-        if (id == "playerInfo" && m_networkManager) {
+        if (id == "playerInfo")
             auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(window);
-            if (playerInfoWindow)
-                playerInfoWindow->setNetworkManager(m_networkManager);
-        }
     }
 }
 

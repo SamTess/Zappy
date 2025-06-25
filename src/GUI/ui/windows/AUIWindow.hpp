@@ -80,7 +80,6 @@ protected:
     bool m_dragging;
     ZappyTypes::Vector2 m_dragOffset;
 
-    // Références au GameState (pas de copie de données)
     std::shared_ptr<const GameState> m_gameState;
     int m_mapWidth = 0;
     int m_mapHeight = 0;

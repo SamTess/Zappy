@@ -20,9 +20,6 @@
 #include "GameLoop.hpp"
 #include "gameController/GameState.hpp"
 
-/**
- * Met à jour les données de jeu et le GameState
- */
 void GameLoop::updateGameData() {
     static auto lastTime = std::chrono::high_resolution_clock::now();
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -40,7 +37,8 @@ void GameLoop::updateGameData() {
             m_frequency = gameState->getTimeUnit();
         }
     }
-    if (!m_userInterface->hasHandledMouseEvent() &&
+    if (m_userInterface && m_graphics &&
+        !m_userInterface->hasHandledMouseEvent() &&
         !m_userInterface->isMouseOverUI() &&
         m_graphics->IsMouseButtonPressed(0)) {
         ZappyTypes::Vector2 mousePos = m_graphics->GetMousePosition();
@@ -57,9 +55,6 @@ void GameLoop::updateGameData() {
     }
 }
 
-/**
- * Gère la sélection d'une case par l'utilisateur
- */
 void GameLoop::handleTileSelection(int x, int y) {
     if (x < 0 || y < 0 || x >= m_mapWidth || y >= m_mapHeight)
         return;
@@ -74,9 +69,6 @@ void GameLoop::handleTileSelection(int x, int y) {
     }
 }
 
-/**
- * Gère la sélection d'un joueur par l'utilisateur
- */
 void GameLoop::handlePlayerSelection(int playerId) {
     if (playerId < 0)
         return;
@@ -86,9 +78,7 @@ void GameLoop::handlePlayerSelection(int playerId) {
     m_selectedTile.selected = false;
 }
 
-/**
- * Convertit les coordonnées du monde 3D en coordonnées de tuiles
- */
+
 bool GameLoop::worldToTileCoordinates(ZappyTypes::Vector3 worldPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY) {
     if (m_mapWidth <= 0 || m_mapHeight <= 0)
         return false;
@@ -107,9 +97,6 @@ bool GameLoop::worldToTileCoordinates(ZappyTypes::Vector3 worldPos, std::shared_
     return (*tileX >= 0 && *tileX < m_mapWidth && *tileY >= 0 && *tileY < m_mapHeight);
 }
 
-/**
- * Effectue un ray casting pour la sélection de tuiles 3D
- */
 bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY) {
     if (!m_graphics)
         return false;
@@ -124,9 +111,6 @@ bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_p
     return false;
 }
 
-/**
- * Calcule la distance entre un rayon 3D et un point
- */
 float GameLoop::calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 point) {
     ZappyTypes::Vector3 rayToPoint = {
         point.x - rayOrigin.x,
@@ -147,9 +131,6 @@ float GameLoop::calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, Zappy
     return std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 }
 
-/**
- * Calcule la position 3D d'un joueur basée sur sa position sur la tuile
- */
 ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers) {
     float tileSize = 1.0f;
     float spacing = 1.5f;
@@ -171,9 +152,6 @@ ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int play
     return playerPos;
 }
 
-/**
- * Effectue la sélection d'un joueur en 3D avec ray casting précis
- */
 bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> playerId) {
     if (!m_gameController || !m_graphics)
         return false;

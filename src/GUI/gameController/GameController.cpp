@@ -12,10 +12,17 @@
 #include "GameController.hpp"
 #include "../renderer/EjectionAnimationManager.hpp"
 #include "../renderer/ParticleSystem.hpp"
+#include "../shared/commands/ICommandExecutor.hpp"
+#include "GameNetworkCommand.hpp"
+#include "../shared/Message.hpp"
 
+GameController::GameController() : _commandExecutor(nullptr) {
+    _gameState = std::make_shared<GameState>(std::make_shared<EntityFactoryManager>());
+    initializeMessageHandlers();
+}
 
-GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
-    std::shared_ptr<EntityFactoryManager> entityFactory) : _networkManager(networkManager) {
+GameController::GameController(std::shared_ptr<ICommandExecutor> commandExecutor,
+    std::shared_ptr<EntityFactoryManager> entityFactory) : _commandExecutor(commandExecutor) {
     _gameState = std::make_shared<GameState>(entityFactory);
     initializeMessageHandlers();
 }
@@ -23,18 +30,21 @@ GameController::GameController(std::shared_ptr<NetworkManager> networkManager,
 bool GameController::unknownPlayerId(int playerID) {
     const auto &players = _gameState->getPlayers();
     if (players.empty() || (!players.empty() && players.find(playerID) == players.end())) {
-        std::string ppo = "ppo #" + std::to_string(playerID) + "\n";
-        std::string plv = "plv #" + std::to_string(playerID) + "\n";
-        std::string pin = "pin #" + std::to_string(playerID) + "\n";
-        _networkManager->sendCommand(ppo);
-        _networkManager->sendCommand(plv);
-        _networkManager->sendCommand(pin);
+        if (!_commandExecutor) {
+            std::cerr << "[GameController] No command executor set - cannot request player info" << std::endl;
+            return true;
+        }
+        auto ppoCommand = std::make_shared<GameNetworkCommand>("ppo #" + std::to_string(playerID));
+        auto plvCommand = std::make_shared<GameNetworkCommand>("plv #" + std::to_string(playerID));
+        auto pinCommand = std::make_shared<GameNetworkCommand>("pin #" + std::to_string(playerID));
+        _commandExecutor->executeCommand(ppoCommand);
+        _commandExecutor->executeCommand(plvCommand);
+        _commandExecutor->executeCommand(pinCommand);
         return true;
     }
     return false;
 }
 
-// pas beau mais efficace
 void GameController::initializeMessageHandlers() {
     _messageHandlers[MessageType::MapSize] = [this](std::shared_ptr<IMessageData> data) {
         handleMapSize(data);
@@ -81,13 +91,10 @@ void GameController::onMessageReceived(const Message& message) {
     processMessage(message);
 }
 
-// a faire autrement map surement
 void GameController::processMessage(const Message& message) {
     if (!message.getStructuredData())
         return;
     MessageType messageType = message.getStructuredData()->getType();
-
-    // la faire le check du map size
     auto it = _messageHandlers.find(messageType);
     if (it != _messageHandlers.end()) {
         it->second(message.getStructuredData());
@@ -104,8 +111,12 @@ void GameController::handleMapSize(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleTileContent(std::shared_ptr<IMessageData> data) {
     if (!_gameState->isMapInitialized()) {
-        _networkManager->sendCommand("msz\n");
-        _networkManager->sendCommand("mct\n");
+        if (_commandExecutor) {
+            auto mszCommand = std::make_shared<GameNetworkCommand>("msz\n");
+            auto mctCommand = std::make_shared<GameNetworkCommand>("mct\n");
+            _commandExecutor->executeCommand(mszCommand);
+            _commandExecutor->executeCommand(mctCommand);
+        }
         return;
     }
     auto tileData = std::static_pointer_cast<TileContentData>(data);
@@ -141,7 +152,10 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
                 existingPlayer->getX(), existingPlayer->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
             Zappy::DeathAnimationManager::getInstance().startDeathAnimation(playerId, playerWorldPos, existingPlayer->getTeamName());
             _gameState->removePlayer(playerId);
-            _graphics->PlaySound("assets/music/death.mp3");
+            // Protection contre segfault : vérifier que _graphics est initialisé
+            if (_graphics) {
+                _graphics->PlaySound("assets/music/death.mp3");
+            }
             return;
         }
         int oldX = existingPlayer->getX();
@@ -272,7 +286,6 @@ void GameController::handleIncantationStart(std::shared_ptr<IMessageData> data) 
     auto incantationData = std::static_pointer_cast<IncantationData>(data);
     int x = incantationData->getX();
     int y = incantationData->getY();
-    // int level = incantationData->getLevel();
     for (int playerId : incantationData->getPlayerIds()) {
         unknownPlayerId(playerId);
     }
@@ -284,8 +297,6 @@ void GameController::handleIncantationEnd(std::shared_ptr<IMessageData> data) {
     auto incantationData = std::static_pointer_cast<IncantationEndData>(data);
     int x = incantationData->getX();
     int y = incantationData->getY();
-    // bool success = incantationData->isSuccess();
-
     _gameState->setTileIncantationState(x, y, false);
 }
 
@@ -297,9 +308,6 @@ void GameController::handleEggLaying(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleEggDrop(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
-    // server au debut c'est -1 donc il affiche pas les oeuf de depart
-    // if (unknownPlayerId(eggData->getPlayerId()))
-    //     return;
 
     switch (eggData->getAction()) {
         case EggData::EggAction::Drop: {
@@ -361,6 +369,12 @@ void GameController::updateAnimations(float deltaTime) {
 }
 
 void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {
+    if (_gameState)
+        return;
     _gameState = std::make_shared<GameState>(factory);
     initializeMessageHandlers();
+}
+
+void GameController::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
+    _commandExecutor = executor;
 }

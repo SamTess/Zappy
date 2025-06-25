@@ -14,38 +14,26 @@
 #include <map>
 #include <chrono>
 
-#include "../network/protocol/Message.hpp"
-#include "../network/protocol/messageData/MessageDataAll.hpp"
-#include "../network/protocol/HeaderMessage.hpp"
-#include "../network/protocol/ProtocolParser.hpp"
 #include "GameState.hpp"
 #include "EntityFactory.hpp"
-#include "../network/networkManager/NetworkManager.hpp"
+#include "../shared/commands/ICommand.hpp"
 #include "../Shared/IGraphicsLib.hpp"
 #include "../renderer/EjectionAnimationManager.hpp"
 #include "../renderer/DeathAnimationManager.hpp"
+#include "../shared/Message.hpp"
+#include "../shared/commands/ICommandExecutor.hpp"
+#include "GameNetworkCommand.hpp"
 
-/**
- * @brief Interface pour recevoir les messages du réseau
- */
-class INetworkObserver {
-public:
-    virtual ~INetworkObserver() = default;
-    virtual void onMessageReceived(const Message& message) = 0;
-};
-
-/**
- * @brief Contrôleur principal du jeu - gère la logique métier et orchestre les mises à jour
- */
 class GameController {
 public:
     GameController();
-    GameController(std::shared_ptr<NetworkManager> networkManager, std::shared_ptr<EntityFactoryManager> entityFactory);
+    GameController(std::shared_ptr<ICommandExecutor> commandExecutor, std::shared_ptr<EntityFactoryManager> entityFactory);
     ~GameController() = default;
     void onMessageReceived(const Message& message);
     std::shared_ptr<const GameState> getGameState() const { return _gameState; }
     void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory);
     void setGraphics(std::shared_ptr<IGraphicsLib> graphics) { _graphics = graphics; }
+    void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
 
     /**
      * @brief Met à jour les minuteurs de broadcasts
@@ -82,10 +70,10 @@ private:
     bool unknownPlayerId(int playerID);
 
     std::shared_ptr<GameState> _gameState;
-    std::shared_ptr<NetworkManager> _networkManager;
+    std::shared_ptr<ICommandExecutor> _commandExecutor;
     std::shared_ptr<IGraphicsLib> _graphics;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
-    std::map<int, std::chrono::steady_clock::time_point> _lastBroadcastTime;  // Player ID -> last broadcast time
+    std::map<int, std::chrono::steady_clock::time_point> _lastBroadcastTime;
     void initializeMessageHandlers();
 };
 

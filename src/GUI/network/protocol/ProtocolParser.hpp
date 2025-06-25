@@ -14,8 +14,8 @@
 #include <memory>
 #include <utility>
 #include <functional>
-#include "Message.hpp"
-#include "HeaderMessage.hpp"
+#include "../../shared/Message.hpp"
+#include "../../shared/HeaderMessage.hpp"
 #include "messageData/MessageDataAll.hpp"
 #include "../../shared/exception/AException.hpp"
 

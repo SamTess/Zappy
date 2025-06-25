@@ -31,10 +31,10 @@ void GUI::PlayerInfoWindow::renderContent() {
         displayPlayerNotFound();
         return;
     }
-    if (m_networkManager && m_networkManager->isConnected()) {
+    if (m_commandSender) {
         std::stringstream pinCommand;
         pinCommand << "pin #" << m_selectedPlayerId;
-        m_networkManager->sendCommand(pinCommand.str());
+        m_commandSender->sendCommand(pinCommand.str());
     }
     float yOffset = m_position.y + 30;
     yOffset = displayPlayerIdentity(selectedPlayer, yOffset);
@@ -184,6 +184,10 @@ bool GUI::PlayerInfoWindow::hasPlayerSelected() const {
 
 void GUI::PlayerInfoWindow::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
     m_networkManager = networkManager;
+}
+
+void GUI::PlayerInfoWindow::setCommandSender(std::shared_ptr<INetworkCommandSender> commandSender) {
+    m_commandSender = commandSender;
 }
 
 } // namespace GUI

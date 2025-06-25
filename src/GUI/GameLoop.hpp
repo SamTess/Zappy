@@ -21,6 +21,7 @@
 #include "gameController/GameState.hpp"
 #include "ui/UserInterface.hpp"
 #include "./network/networkManager/NetworkManager.hpp"
+#include "shared/services/ComponentCoordinator.hpp"
 
 namespace Zappy {
     class MapRenderer;
@@ -37,6 +38,7 @@ public:
     void setGameController(std::shared_ptr<GameController> controller);
     void setSkyboxTexture(const std::string& texturePath);
     bool isSkyboxLoaded() const;
+    void setComponentCoordinator(std::shared_ptr<ComponentCoordinator> coordinator);
 
 private:
     bool loadLibraries();
@@ -67,6 +69,7 @@ private:
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
     std::shared_ptr<NetworkManager> m_networkManager;
+    std::shared_ptr<ComponentCoordinator> m_coordinator; // DÉCOUPLÉ
     int m_mapWidth = 20;
     int m_mapHeight = 20;
     float m_gameTime = 0.0f;

@@ -12,40 +12,17 @@
 #include <iostream>
 #include "UIWindowFactory.hpp"
 #include "../gameController/GameState.hpp"
+#include "../shared/services/ComponentCoordinator.hpp"
 #include "../../Shared/IGuiLib.hpp"
 
 namespace GUI {
 
-class UserInterface {
+class UserInterface : public IUINotifier {
 public:
-    /**
-     * @brief Constructeur de l'interface utilisateur
-     * @param guiLib Bibliothèque graphique à utiliser
-     */
     explicit UserInterface(std::shared_ptr<IGuiLib> guiLib);
     ~UserInterface() = default;
-
-    /**
-     * @brief Initialise l'interface utilisateur
-     * @param screenWidth Largeur de l'écran
-     * @param screenHeight Hauteur de l'écran
-     */
     void initialize(int screenWidth, int screenHeight);
-
-    /**
-     * @brief Effectue le rendu de l'interface
-     */
     void render();
-
-    /**
-     * @brief Met à jour les données de l'interface depuis l'état du jeu
-     * @param gameState État actuel du jeu
-     * @param mapWidth Largeur de la carte
-     * @param mapHeight Hauteur de la carte
-     * @param gameTime Temps de jeu écoulé
-     * @param frequency Fréquence du jeu
-     * @param gameTick Tick de jeu actuel
-     */
     void updateDataFromGameState(
         std::shared_ptr<const GameState> gameState,
         int mapWidth,
@@ -54,104 +31,28 @@ public:
         int frequency,
         int gameTick
     );
-
-    /**
-     * @brief Définit la case sélectionnée
-     * @param x Coordonnée X
-     * @param y Coordonnée Y
-     */
     void setSelectedTile(int x, int y);
-
-    /**
-     * @brief Définit le joueur sélectionné
-     * @param playerId Identifiant du joueur sélectionné
-     */
     void setSelectedPlayer(int playerId);
-
-    /**
-     * @brief Ajoute un message de diffusion
-     * @param team Équipe émettrice
-     * @param message Message diffusé
-     */
     void addBroadcast(const std::string& team, const std::string& message);
-
-    /**
-     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
-     * @param networkManager Pointeur vers le NetworkManager
-     */
-    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-
-    /**
-     * @brief Définit le mode de vue
-     * @param mode Indice du mode de vue
-     */
+    void notifyConnectionStatus(bool connected) override;
+    void setCommandSender(std::shared_ptr<INetworkCommandSender> sender) override;
     void setViewMode(int mode);
-
-    /**
-     * @brief Affiche ou masque une fenêtre
-     * @param windowId Identifiant de la fenêtre
-     * @param visible true pour afficher, false pour masquer
-     * @return true si l'opération a réussi
-     */
     bool toggleWindowVisibility(const std::string& windowId, bool visible);
-
-    /**
-     * @brief Gère les événements de la souris
-     * @return true si l'UI a capturé l'événement de souris
-     */
     bool handleMouseEvents();
-
-    /**
-     * @brief Vérifie si la souris est sur une fenêtre de l'interface
-     * @return true si la souris est sur une fenêtre
-     */
     bool isMouseOverUI() const;
-
-    /**
-     * @brief Vérifie si l'UI a traité le dernier événement de souris
-     * @return true si l'UI a capturé l'événement
-     */
     bool hasHandledMouseEvent() const;
-
-    /**
-     * @brief Obtient une fenêtre par son identifiant
-     * @param windowId Identifiant de la fenêtre
-     * @return Pointeur vers la fenêtre ou nullptr si non trouvée
-     */
     std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
 
 private:
-    /**
-     * @brief Gère les interactions de souris sur les éléments d'interface
-     * @param mousePosition Position actuelle de la souris
-     */
     void handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition);
-
-    /**
-     * @brief Démarre le glissement d'une fenêtre si possible
-     * @param mousePosition Position actuelle de la souris
-     */
     void startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition);
-
-    /**
-     * @brief Gère la fin du glissement si nécessaire
-     */
     void handleDragEndIfNeeded();
-
-    // Référence à la bibliothèque graphique
     std::shared_ptr<IGuiLib> m_guiLib;
-
-    // Factory pour la création et gestion des fenêtres
     std::shared_ptr<UIWindowFactory> m_windowFactory;
-
-    // Dimensions de l'écran
+    std::shared_ptr<INetworkCommandSender> m_commandSender;
     int m_screenWidth;
     int m_screenHeight;
-
-    // État du glissement des fenêtres
     bool m_isDragging;
-
-    // Indique si l'UI a capturé le dernier clic de souris
     bool m_mouseCapture;
 };
 

@@ -15,7 +15,6 @@
 #include <memory>
 #include "NetworkManager.hpp"
 #include "NetworkLogger.hpp"
-#include "../../gameController/GameController.hpp"
 
 NetworkManager::NetworkManager()
     : _connection(std::make_unique<TcpConnection>()),
@@ -24,7 +23,6 @@ NetworkManager::NetworkManager()
       _incomingQueue(std::make_unique<MessageQueue>()),
       _outgoingQueue(std::make_unique<MessageQueue>()),
       _receiveBuffer(4096),
-      _gameController(nullptr),
       _isConnected(false) {
     NetworkLogger::get().setEnabled(true);
 }
@@ -54,12 +52,15 @@ bool NetworkManager::connect(const std::string& host, int port) {
         _connection->connect(host, port);
         _isConnected = true;
         _networkThread->start([this]() { this->networkThreadLoop(); });
+        NetworkLogger::get().log("[INFO] Connection established successfully");
         if (_connectionCallback)
             _connectionCallback(true);
         return true;
     } catch (const std::exception& e) {
         NetworkLogger::get().log(std::string("[ERROR] Connection error: ") + e.what());
         _isConnected = false;
+        if (_connectionCallback)
+            _connectionCallback(false);
         return false;
     }
 }
@@ -74,8 +75,7 @@ void NetworkManager::disconnect() {
     if (wasConnected) {
         _networkThread->stop();
         _connection->close();
-        if (_connectionCallback)
-            _connectionCallback(false);
+        NetworkLogger::get().log("[INFO] Disconnected successfully");
     }
 }
 
@@ -286,100 +286,33 @@ void NetworkManager::handleWelcomeMessage(const std::string& message) {
     NetworkLogger::get().log(std::string("Message de bienvenue reçu: ") + message);
     NetworkLogger::get().log("Envoi automatique de la commande GRAPHIC suite au WELCOME");
     sendCommand("GRAPHIC");
-    MessageCallback localCallback;
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        localCallback = _messageCallback;
-    }
-    if (localCallback) {
-        try {
-            localCallback("WELCOME", "");
-        } catch (const std::exception& e) {
-            NetworkLogger::get().log(std::string("[ERROR] Error in WELCOME callback: ") + e.what());
-        }
-    }
+    // Plus de callback - le welcome sera géré par le handler s'il est configuré
 }
 
 void NetworkManager::handleRegularMessage(const std::string& message) {
     std::cout << "[NetworkManager] Attempting to parse message: " << message.substr(0, 20) << std::endl;
     try {
         Message parsedMessage = _protocolParser->parseMessage(message);
-        std::cout << "[NetworkManager] Message parsed successfully, sending to GameController" << std::endl;
+        std::cout << "[NetworkManager] Message parsed successfully, sending to handler" << std::endl;
 
-        if (_gameController)
-            _gameController->onMessageReceived(parsedMessage);
-        MessageCallback localCallback;
-        {
-            std::lock_guard<std::mutex> lock(_mutex);
-            localCallback = _messageCallback;
-        }
-        if (localCallback) {
-            try {
-                const ProtocolParser* constParser = _protocolParser.get();
-                std::pair<std::string, std::string> cmdParams = constParser->parseMessage(message);
-                localCallback(cmdParams.first, cmdParams.second);
-            } catch (const std::exception& e) {
-                NetworkLogger::get().log(std::string("[ERROR] Error in message callback: ") + e.what());
-                try {
-                    localCallback("RAW", message);
-                } catch (const std::exception& e2) {
-                    NetworkLogger::get().log(std::string("[ERROR] Error in raw message callback: ") + e2.what());
-                }
-            }
-        }
+        // DÉCOUPLÉ: Utilisation du handler au lieu d'appel direct
+        if (_messageHandler)
+            _messageHandler(parsedMessage);
     } catch (const std::exception& e) {
         std::cout << "[NetworkManager] Failed to parse message: " << e.what() << std::endl;
         std::cout << "[NetworkManager] Problem message was: " << message << std::endl;
-        MessageCallback localCallback;
-        {
-            std::lock_guard<std::mutex> lock(_mutex);
-            localCallback = _messageCallback;
-        }
-        if (localCallback) {
-            try {
-                const ProtocolParser* constParser = _protocolParser.get();
-                std::pair<std::string, std::string> cmdParams = constParser->parseMessage(message);
-                localCallback(cmdParams.first, cmdParams.second);
-            } catch (const std::exception& e) {
-                NetworkLogger::get().log(std::string("[ERROR] Error in message callback: ") + e.what());
-                try {
-                    localCallback("RAW", message);
-                } catch (const std::exception& e2) {
-                    NetworkLogger::get().log(std::string("[ERROR] Error in raw message callback: ") + e2.what());
-                }
-            }
-        }
     }
 }
 
-void NetworkManager::handleInvalidMessage(const std::string& message, const std::exception& e) {
+void NetworkManager::handleInvalidMessage(const std::string& /*message*/, const std::exception& e) {
     NetworkLogger::get().log(std::string("[ERROR] Error processing message: ") + e.what());
-    MessageCallback localCallback;
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        localCallback = _messageCallback;
-    }
-    if (localCallback) {
-        try {
-            localCallback("RAW", message);
-        } catch (const std::exception& e) {
-            NetworkLogger::get().log(std::string("[ERROR] Error in raw message callback: ") + e.what());
-        }
-    }
+    // Plus de callback legacy - les erreurs sont maintenant loggées seulement
 }
 
-void NetworkManager::setMessageCallback(MessageCallback callback) {
-    _messageCallback = callback;
+void NetworkManager::setMessageHandler(MessageHandler handler) {
+    _messageHandler = handler;
 }
 
 void NetworkManager::setConnectionCallback(ConnectionCallback callback) {
     _connectionCallback = callback;
-}
-
-std::shared_ptr<GameController> NetworkManager::getGameController() const {
-    return _gameController;
-}
-
-void NetworkManager::setGameController(std::shared_ptr<GameController> controller) {
-    _gameController = controller;
 }

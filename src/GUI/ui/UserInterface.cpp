@@ -19,6 +19,8 @@ namespace GUI {
 
 UserInterface::UserInterface(std::shared_ptr<IGuiLib> guiLib)
     : m_guiLib(guiLib),
+      m_windowFactory(nullptr),
+      m_commandSender(nullptr),
       m_screenWidth(1920),
       m_screenHeight(1080),
       m_isDragging(false),
@@ -58,10 +60,6 @@ void UserInterface::setSelectedPlayer(int playerId) {
 
 void UserInterface::addBroadcast(const std::string& team, const std::string& message) {
     m_windowFactory->addBroadcast(team, message);
-}
-
-void UserInterface::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
-    m_windowFactory->setNetworkManager(networkManager);
 }
 
 void UserInterface::setViewMode(int mode) {
@@ -126,6 +124,17 @@ bool UserInterface::hasHandledMouseEvent() const {
 
 std::shared_ptr<GUI::IUIWindow> UserInterface::getWindow(const std::string& windowId) {
     return m_windowFactory->getWindow(windowId);
+}
+
+void UserInterface::notifyConnectionStatus(bool connected) {
+    if (!connected) {
+        // Optionnel : gestion UI quand la connexion est perdue
+    }
+}
+
+void UserInterface::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {
+    m_commandSender = sender;
+    m_windowFactory->setCommandSender(sender);
 }
 
 } // namespace GUI

@@ -33,7 +33,10 @@ bool GameLoop::init() {
     setupComponents();
     m_graphics->PlayMusic("assets/music/music.mp3");
     m_graphics->SetMusicVolume(0.5f);
-    m_gameController->setGraphics(m_graphics);
+    // Vérification de sécurité avant d'appeler setGraphics
+    if (m_gameController) {
+        m_gameController->setGraphics(m_graphics);
+    }
     return true;
 }
 
@@ -86,9 +89,15 @@ void GameLoop::setupComponents() {
     m_uiRenderer = std::make_shared<UIRenderer>();
     m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     m_modelManagerAdapter->setGraphicsLib(m_graphics);
-    m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
+    if (m_gameController) {
+        m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
+    }
     m_userInterface = std::make_shared<GUI::UserInterface>(m_gui);
     m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    if (m_coordinator)
+        m_coordinator->setUINotifier(m_userInterface);
+    else
+        m_userInterface->setNetworkManager(m_networkManager);
     m_userInterface->setNetworkManager(m_networkManager);
 }
 
@@ -105,11 +114,13 @@ int GameLoop::run() {
         m_graphics->ClearBackground({32, 32, 64, 255});
         m_graphics->UpdateMusic();
         m_graphics->BeginCamera3D();
-                int selectedTileX = m_selectedTile.selected ? m_selectedTile.x : -1;
+        int selectedTileX = m_selectedTile.selected ? m_selectedTile.x : -1;
         int selectedTileY = m_selectedTile.selected ? m_selectedTile.y : -1;
         int selectedPlayerId = m_selectedPlayer.selected ? m_selectedPlayer.playerId : -1;
-        m_mapRenderer->renderWithSelection(selectedTileX, selectedTileY, selectedPlayerId);
-        m_mapRenderer->render();
+        if (m_mapRenderer) {
+            m_mapRenderer->renderWithSelection(selectedTileX, selectedTileY, selectedPlayerId);
+            m_mapRenderer->render();
+        }
         Zappy::ParticleSystem::getInstance().render(m_graphics);
         Zappy::EjectionAnimationManager::getInstance().render(m_graphics);
         Zappy::DeathAnimationManager::getInstance().render(m_graphics);
@@ -117,8 +128,10 @@ int GameLoop::run() {
         updateGameData();
         if (m_gameController) {
             auto gameState = m_gameController->getGameState();
-            m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight,
-                m_gameTime, m_frequency, m_gameTick);
+            if (gameState) {
+                m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight,
+                    m_gameTime, m_frequency, m_gameTick);
+            }
         }
         m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
@@ -147,10 +160,12 @@ void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
     }
     if (m_gameController && m_graphics && m_modelManagerAdapter) {
         auto gameState = m_gameController->getGameState();
-        m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, gameState, m_modelManagerAdapter);
-        m_mapRenderer->initialize();
-        if (gameState->isMapInitialized())
-            updateCameraForMapSize();
+        if (gameState) {
+            m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, gameState, m_modelManagerAdapter);
+            m_mapRenderer->initialize();
+            if (gameState->isMapInitialized())
+                updateCameraForMapSize();
+        }
     }
 }
 
@@ -189,4 +204,8 @@ void GameLoop::setSkyboxTexture(const std::string& texturePath) {
 
 bool GameLoop::isSkyboxLoaded() const {
     return m_renderer && m_renderer->isSkyboxLoaded();
+}
+
+void GameLoop::setComponentCoordinator(std::shared_ptr<ComponentCoordinator> coordinator) {
+    m_coordinator = coordinator;
 }

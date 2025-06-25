@@ -15,7 +15,9 @@
 #include <unordered_map>
 #include "windows/IUIWindow.hpp"
 #include "../gameController/GameState.hpp"
+#include "../shared/commands/ICommand.hpp"
 #include "../../Shared/IGuiLib.hpp"
+#include "../shared/commands/INetworkCommandSender.hpp"
 
 class NetworkManager;
 
@@ -34,10 +36,10 @@ public:
     ~UIWindowFactory() = default;
 
     /**
-     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
-     * @param networkManager Pointeur vers le NetworkManager
+     * @brief Configure l'envoyeur de commandes (DÉCOUPLÉ)
+     * @param sender Interface pour envoyer des commandes réseau
      */
-    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
+    void setCommandSender(std::shared_ptr<INetworkCommandSender> sender);
 
     /**
      * @brief Crée toutes les fenêtres nécessaires pour l'interface utilisateur
@@ -166,11 +168,7 @@ private:
 
     // Bibliothèque GUI
     std::shared_ptr<IGuiLib> m_guiLib;
-
-    // NetworkManager pour l'envoi de commandes
-    std::shared_ptr<NetworkManager> m_networkManager;
-
-    // Map des fenêtres avec leurs identifiants
+    std::shared_ptr<INetworkCommandSender> m_commandSender;
     std::unordered_map<std::string, std::shared_ptr<IUIWindow>> m_windows;
 
     // Données partagées

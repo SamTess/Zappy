@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 #include "../AUIWindow.hpp"
+#include "../../../shared/commands/ICommand.hpp"
+#include "../../../shared/commands/INetworkCommandSender.hpp"
 
 class NetworkManager;
 
@@ -36,10 +38,16 @@ public:
     bool hasPlayerSelected() const;
 
     /**
-     * @brief Définit le NetworkManager pour permettre l'envoi de commandes
+     * @brief Définit le NetworkManager pour permettre l'envoi de commandes (LEGACY)
      * @param networkManager Pointeur vers le NetworkManager
      */
     void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
+
+    /**
+     * @brief Configure l'envoyeur de commandes (DÉCOUPLÉ)
+     * @param sender Interface pour envoyer des commandes réseau
+     */
+    void setCommandSender(std::shared_ptr<INetworkCommandSender> sender);
 
 protected:
     void renderContent() override;
@@ -109,7 +117,8 @@ private:
 
     int m_selectedPlayerId;
     bool m_hasSelectedPlayer;
-    std::shared_ptr<NetworkManager> m_networkManager;
+    std::shared_ptr<NetworkManager> m_networkManager;  // LEGACY
+    std::shared_ptr<INetworkCommandSender> m_commandSender;  // DÉCOUPLÉ
 };
 
 } // namespace GUI

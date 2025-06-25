@@ -19,7 +19,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  network/buffer/CircularBuffer.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \
-	  network/protocol/Message.cpp \
+	  shared/Message.cpp \
 	  network/protocol/ProtocolParser.cpp \
 	  network/systemWrapper/implementation/TcpSocket.cpp \
 	  network/systemWrapper/implementation/NetworkAddress.cpp \
@@ -57,7 +57,8 @@ SRC = parsing/ParsingCLI.cpp \
 	  gameController/entities/Egg.cpp \
 	  gameController/entities/Resource.cpp \
 	  gameController/entities/Tile.cpp \
-	  gameController/entities/PlayerInventory.cpp
+	  gameController/entities/PlayerInventory.cpp \
+	  shared/services/ComponentCoordinator.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
