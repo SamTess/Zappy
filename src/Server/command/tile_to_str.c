@@ -17,7 +17,7 @@ static char *repeat_word(char *word, int nb)
         return strdup("");
     res = calloc(((strlen(word) * nb) + (nb + 1)), sizeof(char));
     if (!res)
-        server_err("Malloc failed for res repeat_word");
+        return NULL;
     res[0] = '\0';
     for (int i = 0; i < nb; ++i) {
         if (i > 0)
@@ -49,9 +49,28 @@ static char *format_str_resources(char *names,
 {
     char *temp = repeat_word(names, resources);
 
+    if (!temp)
+        return NULL;
     if (!first_resource)
         strcat(res, " ");
     return temp;
+}
+
+static int check_resources(char *names, int resources,
+    int first_resource, char *res)
+{
+    char *temp;
+
+    if (resources > 0) {
+        temp = format_str_resources(names, resources,
+            first_resource, res);
+        if (!temp)
+            return -1;
+        strcat(res, temp);
+        free(temp);
+        first_resource = 0;
+    }
+    return 0;
 }
 
 static char *add_resources(int *resources)
@@ -61,33 +80,34 @@ static char *add_resources(int *resources)
     size_t total_size = calculate_total_size(resources, names);
     char *res = malloc(total_size);
     int first_resource = 1;
-    char *temp;
 
     if (!res)
-        server_err("Malloc failed res add_resources");
+        return NULL;
     res[0] = '\0';
     for (int i = 0; i < COUNT; ++i) {
-        if (resources[i] > 0) {
-            temp = format_str_resources(names[i], resources[i],
-                first_resource, res);
-            strcat(res, temp);
-            free(temp);
-            first_resource = 0;
-        }
+        if (check_resources(names, resources, first_resource, res) == -1)
+            return NULL;
     }
     return res;
 }
 
-char *tile_to_str(tile_t *tile)
+static int check_null(tile_t *tile, char **player, char **resources)
 {
-    char *player = repeat_word("player", tile->player_count);
-    char *resources = add_resources(tile->resources);
-    int p_len = strlen(player);
-    int r_len = strlen(resources);
+    *player = repeat_word("player", tile->player_count);
+    if (!player)
+        return -1;
+    *resources = add_resources(tile->resources);
+    if (!resources)
+        return -1;
+    return 0;
+}
+
+static char *check_res(int p_len, int r_len, char *player, char *resources)
+{
     char *res = malloc(p_len + r_len + 2);
 
     if (!res)
-        server_err("Malloc failed res tile_to_str");
+        return NULL;
     res[0] = '\0';
     if (p_len)
         strcat(res, player);
@@ -95,7 +115,25 @@ char *tile_to_str(tile_t *tile)
         strcat(res, " ");
     if (r_len)
         strcat(res, resources);
+    return res;
+}
+
+char *tile_to_str(tile_t *tile)
+{
+    char *player;
+    char *resources;
+    int p_len;
+    int r_len;
+    char *res;
+
+    if (check_null(tile, &player, &resources) == -1)
+        return NULL;
+    p_len = strlen(player);
+    r_len = strlen(resources);
+    res = check_res(p_len, r_len, player, resources);
     free(player);
     free(resources);
+    if (!res)
+        return NULL;
     return res;
 }

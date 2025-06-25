@@ -246,10 +246,8 @@ void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     auto playerInfo = _gameState->getPlayerInfo(playerId);
     if (playerInfo) {
         teamName = playerInfo->getTeamName();
-        ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
-            playerInfo->getX(), playerInfo->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
 
-        Zappy::ParticleSystem::getInstance().createPlayerBroadcastEffect(playerWorldPos, teamName);
+        Zappy::ParticleSystem::getInstance().createPlayerBroadcastEffect(playerId, _gameState, teamName);
     } else {
         std::cout << "[DEBUG] Player " << playerId << " not found in game state - broadcast animation skipped" << std::endl;
     }

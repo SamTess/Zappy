@@ -14,6 +14,8 @@
 #include "../../Shared/IGraphicsLib.hpp"
 #include "../../Shared/Common.hpp"
 
+class GameState;
+
 namespace Zappy {
 
 struct Particle {
@@ -89,6 +91,7 @@ public:
     ~BroadcastEffect() override = default;
 
     void initialize(const ZappyTypes::Vector3& position, ParticleType type, int maxParticles = 30) override;
+    void initialize(int playerId, std::shared_ptr<const GameState> gameState, ParticleType type, int maxParticles = 30);
     void update(float deltaTime) override;
     void render(const std::shared_ptr<IGraphicsLib>& graphicsLib) override;
     bool isActive() const override;
@@ -101,6 +104,7 @@ private:
     void updatePulseParticle(Particle* particle, float deltaTime);
     void renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& center, float radius, float alpha);
     void renderParticle(const Particle& particle, const std::shared_ptr<IGraphicsLib>& graphicsLib);
+    ZappyTypes::Vector3 getCurrentPlayerPosition() const;
 
     float currentRadius;
     float maxRadius;
@@ -110,6 +114,9 @@ private:
     int ringCount;
     std::vector<float> ringRadii;
     std::vector<float> ringAlphas;
+    int followPlayerId;
+    std::shared_ptr<const GameState> gameState;
+    bool followPlayer;
 };
 
 class ParticleSystem {
@@ -121,11 +128,9 @@ public:
 
     void createPlayerEjectionEffect(const ZappyTypes::Vector3& position, const ZappyTypes::Vector3& direction);
 
-    void createPlayerBroadcastEffect(const ZappyTypes::Vector3& position, const std::string& teamName);
+    void createPlayerBroadcastEffect(int playerId, std::shared_ptr<const GameState> gameState, const std::string& teamName);
 
     void createEffect(ParticleType type, const ZappyTypes::Vector3& position, int intensity = 20);
-
-    void createBroadcastEffect(ParticleType type, const ZappyTypes::Vector3& position, int intensity = 20);
 
     void cleanup();
     void setMaxEffects(size_t max) { maxActiveEffects = max; }
