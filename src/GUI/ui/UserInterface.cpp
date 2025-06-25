@@ -56,10 +56,6 @@ void UserInterface::setSelectedPlayer(int playerId) {
     m_windowFactory->setSelectedPlayer(playerId);
 }
 
-void UserInterface::addBroadcast(const std::string& team, const std::string& message) {
-    m_windowFactory->addBroadcast(team, message);
-}
-
 void UserInterface::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
     m_windowFactory->setNetworkManager(networkManager);
 }

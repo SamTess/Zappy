@@ -32,7 +32,7 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     setShowWindowBox(false); // Désactive la boîte de fenêtre pour le menu
     m_defaultPositions[0] = {10, 810};   // TileInfo
     m_defaultPositions[1] = {10, 500};   // PlayerInfo
-    m_defaultPositions[2] = {1520, 540};  // Broadcasts
+    m_defaultPositions[2] = {1520, 540};  // map info
     m_defaultPositions[3] = {1520, 860};  // Controls
     m_defaultPositions[4] = {1450, 10};  // TimeInfo
 
@@ -40,7 +40,7 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     m_windows = {
         {"tileInfo", "Informations sur la case", 0},
         {"playerInfo", "Informations joueurs", 1},
-        {"broadcasts", "Broadcasts récents", 2},
+        {"mapInfo", "Informations sur la carte", 2},
         {"controls", "Contrôles", 3},
         {"timeInfo", "Informations temporelles", 4}
     };

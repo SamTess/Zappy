@@ -60,11 +60,13 @@ public:
     void setTeamNames(const std::vector<std::string>& teamNames);
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
-    std::map<int, std::shared_ptr<IPlayer>> getPlayers();
+    std::map<int, std::shared_ptr<IPlayer>> getPlayers() const;
 
     void addBroadcast(int playerId, const std::string& team, const std::string& message);
     void updateBroadcasts(float deltaTime);
     std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
+    size_t getPlayerCount() const;
+    std::vector<std::vector<std::shared_ptr<ITile>>> getTiles() const;
 
 private:
     bool isValidCoordinates(int x, int y) const;

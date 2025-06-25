@@ -33,6 +33,7 @@ public:
 
     void updateFromProtocol(const PlayerInventoryData& data) override;
     void setPosition(int x, int y) override;
+    int getResourceCount(int resourceType) const override;
 
 private:
     int _playerId;

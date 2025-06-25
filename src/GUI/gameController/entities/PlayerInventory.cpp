@@ -75,3 +75,10 @@ void PlayerInventory::setPosition(int x, int y) {
     _x = x;
     _y = y;
 }
+
+int PlayerInventory::getResourceCount(int resourceType) const {
+    if (resourceType < 0 || resourceType >= static_cast<int>(_resources.size())) {
+        return 0;
+    }
+    return _resources[resourceType];
+}

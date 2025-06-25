@@ -28,6 +28,7 @@ public:
     virtual int getThystame() const = 0;
     virtual void updateFromProtocol(const PlayerInventoryData& data) = 0;
     virtual void setPosition(int x, int y) = 0;
+    virtual int getResourceCount(int resourceType) const = 0;
 };
 
 #endif /* !IIENVENTORY_HPP_ */
