@@ -82,7 +82,7 @@ bool GameLoop::loadModels() {
 void GameLoop::setupComponents() {
     m_camera = std::make_shared<CameraController>();
     m_camera->init(m_graphics);
-    m_camera->setMapDimensions(20, 20);
+    // m_camera->setMapDimensions(20, 20);
     m_uiRenderer = std::make_shared<UIRenderer>();
     m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     m_modelManagerAdapter->setGraphicsLib(m_graphics);
@@ -162,7 +162,7 @@ void GameLoop::updateCameraForMapSize() {
         return;
     int mapWidth = gameState->getMapWidth();
     int mapHeight = gameState->getMapHeight();
-    m_camera->setMapDimensions(mapWidth, mapHeight);
+    // m_camera->setMapDimensions(mapWidth, mapHeight);
     float tileSize = 1.0f;
     float spacing = 0.1f;
     if (mapWidth > 20 || mapHeight > 20) {
@@ -178,7 +178,7 @@ void GameLoop::updateCameraForMapSize() {
     if (cameraDistance > 50.0f)
         cameraDistance = 50.0f;
     m_camera->reset();
-    m_camera->distance() = cameraDistance;
+    // m_camera->distance() = cameraDistance;
 }
 
 void GameLoop::setSkyboxTexture(const std::string& texturePath) {
