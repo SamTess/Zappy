@@ -182,10 +182,6 @@ bool GUI::PlayerInfoWindow::hasPlayerSelected() const {
     return m_hasSelectedPlayer;
 }
 
-void GUI::PlayerInfoWindow::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
-    m_networkManager = networkManager;
-}
-
 void GUI::PlayerInfoWindow::setCommandSender(std::shared_ptr<INetworkCommandSender> commandSender) {
     m_commandSender = commandSender;
 }

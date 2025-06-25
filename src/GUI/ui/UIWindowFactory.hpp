@@ -16,6 +16,7 @@
 #include "windows/IUIWindow.hpp"
 #include "../gameController/GameState.hpp"
 #include "../shared/commands/ICommand.hpp"
+#include "../shared/commands/ICommandExecutor.hpp"
 #include "../../Shared/IGuiLib.hpp"
 #include "../shared/commands/INetworkCommandSender.hpp"
 
@@ -40,6 +41,12 @@ public:
      * @param sender Interface pour envoyer des commandes réseau
      */
     void setCommandSender(std::shared_ptr<INetworkCommandSender> sender);
+
+    /**
+     * @brief Configure l'exécuteur de commandes pour le menu
+     * @param executor Interface pour exécuter des commandes via le ComponentCoordinator
+     */
+    void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
 
     /**
      * @brief Crée toutes les fenêtres nécessaires pour l'interface utilisateur
@@ -92,12 +99,6 @@ public:
      * @param message Message diffusé
      */
     void addBroadcast(const std::string& team, const std::string& message);
-
-    /**
-     * @brief Obtient le NetworkManager pour l'envoi de commandes
-     * @return Pointeur partagé vers le NetworkManager
-     */
-    std::shared_ptr<NetworkManager> getNetworkManager() const;
 
     /**
      * @brief Définit le mode de vue
@@ -169,6 +170,7 @@ private:
     // Bibliothèque GUI
     std::shared_ptr<IGuiLib> m_guiLib;
     std::shared_ptr<INetworkCommandSender> m_commandSender;
+    std::shared_ptr<ICommandExecutor> m_commandExecutor;
     std::unordered_map<std::string, std::shared_ptr<IUIWindow>> m_windows;
 
     // Données partagées

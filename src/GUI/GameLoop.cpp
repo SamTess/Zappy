@@ -33,7 +33,6 @@ bool GameLoop::init() {
     setupComponents();
     m_graphics->PlayMusic("assets/music/music.mp3");
     m_graphics->SetMusicVolume(0.5f);
-    // Vérification de sécurité avant d'appeler setGraphics
     if (m_gameController) {
         m_gameController->setGraphics(m_graphics);
     }
@@ -96,9 +95,6 @@ void GameLoop::setupComponents() {
     m_userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     if (m_coordinator)
         m_coordinator->setUINotifier(m_userInterface);
-    else
-        m_userInterface->setNetworkManager(m_networkManager);
-    m_userInterface->setNetworkManager(m_networkManager);
 }
 
 int GameLoop::run() {

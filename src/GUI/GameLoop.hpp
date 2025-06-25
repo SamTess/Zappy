@@ -69,7 +69,7 @@ private:
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> m_userInterface;
     std::shared_ptr<NetworkManager> m_networkManager;
-    std::shared_ptr<ComponentCoordinator> m_coordinator; // DÉCOUPLÉ
+    std::shared_ptr<ComponentCoordinator> m_coordinator;
     int m_mapWidth = 20;
     int m_mapHeight = 20;
     float m_gameTime = 0.0f;

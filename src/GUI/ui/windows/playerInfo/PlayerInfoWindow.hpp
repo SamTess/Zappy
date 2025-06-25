@@ -38,12 +38,6 @@ public:
     bool hasPlayerSelected() const;
 
     /**
-     * @brief Définit le NetworkManager pour permettre l'envoi de commandes (LEGACY)
-     * @param networkManager Pointeur vers le NetworkManager
-     */
-    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-
-    /**
      * @brief Configure l'envoyeur de commandes (DÉCOUPLÉ)
      * @param sender Interface pour envoyer des commandes réseau
      */
@@ -117,7 +111,6 @@ private:
 
     int m_selectedPlayerId;
     bool m_hasSelectedPlayer;
-    std::shared_ptr<NetworkManager> m_networkManager;  // LEGACY
     std::shared_ptr<INetworkCommandSender> m_commandSender;  // DÉCOUPLÉ
 };
 

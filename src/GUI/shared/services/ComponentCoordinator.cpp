@@ -41,6 +41,7 @@ void ComponentCoordinator::setupConnections() {
     if (auto ui = m_uiNotifier.lock()) {
         if (auto nm = m_networkManager.lock())
             ui->setCommandSender(nm);
+        ui->setCommandExecutor(shared_from_this());
     }
 }
 

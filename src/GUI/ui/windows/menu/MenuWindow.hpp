@@ -12,6 +12,9 @@
 #include <vector>
 #include "../AUIWindow.hpp"
 #include "../../UIWindowFactory.hpp"
+#include "../../../shared/commands/ICommand.hpp"
+#include "../../../shared/commands/ICommandExecutor.hpp"
+#include "ServerFrequencyCommand.hpp"
 
 namespace GUI {
 
@@ -25,6 +28,12 @@ public:
      * @param factory Pointeur vers la factory
      */
     void setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory);
+
+    /**
+     * @brief Définit la référence vers le coordinateur de composants
+     * @param coordinator Pointeur vers le coordinateur pour l'exécution des commandes
+     */
+    void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
 
 protected:
     void renderContent() override;
@@ -51,11 +60,9 @@ private:
     float m_gameSpeed;
     float m_uiTransparency;
 
-    // Factory pour les fenêtres
     std::shared_ptr<GUI::UIWindowFactory> m_windowFactory;
+    std::shared_ptr<ICommandExecutor> m_commandExecutor;
     ZappyTypes::Vector2 m_defaultPositions[6];
-
-    // Liste unifiée des informations sur les fenêtres
     std::vector<WindowInfo> m_windows;
 
     // Fonctions pour le dessin du menu principal

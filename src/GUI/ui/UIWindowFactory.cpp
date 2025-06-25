@@ -37,6 +37,14 @@ void UIWindowFactory::setCommandSender(std::shared_ptr<INetworkCommandSender> se
     }
 }
 
+void UIWindowFactory::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
+    m_commandExecutor = executor;
+    auto menuWindow = std::dynamic_pointer_cast<GUI::MenuWindow>(m_windows["menu"]);
+    if (menuWindow) {
+        menuWindow->setCommandExecutor(executor);
+    }
+}
+
 void UIWindowFactory::createAllWindows(int, int) {
     const struct WindowConfig {
         std::string id;
@@ -57,6 +65,9 @@ void UIWindowFactory::createAllWindows(int, int) {
     auto menuWindow = std::dynamic_pointer_cast<GUI::MenuWindow>(m_windows["menu"]);
     if (menuWindow) {
         menuWindow->setUIWindowFactory(shared_from_this());
+        if (m_commandExecutor) {
+            menuWindow->setCommandExecutor(m_commandExecutor);
+        }
     }
 }
 
@@ -101,6 +112,9 @@ void UIWindowFactory::renderMenuWindow() {
         menuWindow->setVisible(true);
         m_windows["menu"] = menuWindow;
         menuWindow->setUIWindowFactory(shared_from_this());
+        if (m_commandExecutor) {
+            menuWindow->setCommandExecutor(m_commandExecutor);
+        }
     }
 }
 

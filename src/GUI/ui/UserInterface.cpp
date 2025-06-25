@@ -137,4 +137,8 @@ void UserInterface::setCommandSender(std::shared_ptr<INetworkCommandSender> send
     m_windowFactory->setCommandSender(sender);
 }
 
+void UserInterface::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
+    m_windowFactory->setCommandExecutor(executor);
+}
+
 } // namespace GUI

@@ -11,7 +11,6 @@
 #include <string>
 #include <sstream>
 #include "MenuWindow.hpp"
-#include "../../../network/networkManager/NetworkManager.hpp"
 
 namespace GUI {
 
@@ -27,7 +26,8 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
       m_sfxVolume(0.7f),
       m_gameSpeed(1.0f),
       m_uiTransparency(0.9f),
-      m_windowFactory(nullptr) {
+      m_windowFactory(nullptr),
+      m_commandExecutor(nullptr) {
     m_visible = true;
     setShowWindowBox(false); // Désactive la boîte de fenêtre pour le menu
     m_defaultPositions[0] = {10, 810};   // TileInfo
@@ -309,11 +309,9 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
         submenuWidth - 60, 25,
         "Appliquer fréquence"
     )) {
-        if (m_windowFactory && m_windowFactory->getNetworkManager()) {
-            auto networkManager = m_windowFactory->getNetworkManager();
-            std::stringstream cmd;
-            cmd << "sst " << static_cast<int>(newFrequency);
-            networkManager->sendCommand(cmd.str());
+        if (m_commandExecutor) {
+            auto frequencyCommand = std::make_shared<ServerFrequencyCommand>(static_cast<int>(newFrequency));
+            m_commandExecutor->executeCommand(frequencyCommand);
         }
     }
 }
@@ -420,6 +418,10 @@ void MenuWindow::setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factor
             }
         }
     }
+}
+
+void MenuWindow::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
+    m_commandExecutor = executor;
 }
 
 } // namespace GUI
