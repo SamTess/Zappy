@@ -121,12 +121,23 @@ class JoinTeamMatesBehavior(Behavior):
       print("JoinTeamMatesBehavior: No other agents known.")
       return
 
-    max_id = max([int(agent_id) for agent_id in self.agent.other_agents.keys()])
-    if self.agent.id >= max_id:
-      return
+    try:
+      agent_ids = [int(agent_id) for agent_id in self.agent.other_agents.keys() if str(agent_id).isdigit()]
+      if not agent_ids:
+        print("JoinTeamMatesBehavior: No valid agent IDs found.")
+        return
 
-    print("Going on the way to the highest id agent:", max_id)
-    self.agent.other_agents[max_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[max_id]["direction"])
+      max_id = max(agent_ids)
+
+      if self.agent.id >= max_id:
+        print(f"JoinTeamMatesBehavior: Current agent ID ({self.agent.id}) is already highest or equal.")
+        return
+
+      self.agent.other_agents[max_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[max_id]["direction"])
+
+    except (ValueError, TypeError) as e:
+      print(f"JoinTeamMatesBehavior: Error processing agent IDs: {e}")
+      return
 
 
 class TakeEverythingHereBehavior(Behavior):
@@ -202,10 +213,6 @@ class FillTeamBehavior(Behavior):
 class ForkBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     self.agent.process_server_message()
-
-    if self.agent.stop_forking:
-      print("Fork command is stopped.")
-      return
 
     self.agent.send_command("Fork")
     print("Fork command sent.")

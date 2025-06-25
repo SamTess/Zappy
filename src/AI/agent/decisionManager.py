@@ -26,8 +26,8 @@ class DecisionManager:
 
 
     self.decisions = {
-      "reproducing": {"miner": ["FoodBigDyson", "Fork", "FillTeam"], "fighter": ["FoodBigDyson"]},
-      "collecting": {"miner": ["BigDyson"], "fighter": ["FoodDyson", "FillTeam"]},
+      "reproducing": {"miner": ["FoodDyson", "Fork", "FillTeam"], "fighter": ["FoodBigDyson"]},
+      "collecting": {"miner": ["FillTeam", "BigDyson"], "fighter": ["FoodDyson", "FillTeam"]},
       "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["JoinTeamMates"]},
       "setting": {"miner": ["DropEveryMinerals"], "fighter": ["DropAllFood"]},
       "upgrading": {"miner": ["Upgrade", "TakeOneFoodHere", "TakeOneFoodHere"], "fighter": ["FoodBigDyson"]}
