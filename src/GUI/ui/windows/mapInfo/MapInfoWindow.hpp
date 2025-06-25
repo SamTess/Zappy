@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 #include "../AUIWindow.hpp"
-#include "../../../network/networkManager/NetworkManager.hpp"
+#include "../../../shared/commands/INetworkCommandSender.hpp"
 
 namespace GUI {
 

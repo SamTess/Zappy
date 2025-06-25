@@ -11,22 +11,30 @@
 #include <algorithm>
 #include <vector>
 #include "MapInfoWindow.hpp"
-#include "../../../gameController/IRenderable.hpp"
 
 namespace GUI {
 
 MapInfoWindow::MapInfoWindow(std::shared_ptr<IGuiLib> guiLib)
-    : AUIWindow(guiLib, "mapInfo") {
+    : AUIWindow(guiLib, "Informations de la carte") {
 }
 
 void MapInfoWindow::renderContent() {
+    if (!_dataProvider) {
+        _guiLib->DrawLabel(_position.x + 10, _position.y + 40, _dimensions.x - 20,
+            30, "Données non disponibles");
+        return;
+    }
+    if (_dataProvider->getMapWidth() == 0 || _dataProvider->getMapHeight() == 0) {
+        _guiLib->DrawLabel(_position.x + 10, _position.y + 40, _dimensions.x - 20,
+            30, "Carte non initialisée");
+        return;
+    }
     const float lineHeight = 20.0f;
     const float panelWidth = _dimensions.x - 20;
     const float panelHeight = _dimensions.y - 40;
     const float contentWidth = panelWidth - 20;
     ZappyTypes::Rectangle view = {_position.x + 10, _position.y + 30, panelWidth, panelHeight};
     int startIndex = 0;
-
     renderMapInfo(view, startIndex, lineHeight, contentWidth);
 }
 
@@ -60,71 +68,57 @@ std::string GUI::MapInfoWindow::getFormattedResource(std::vector<int> totalResso
 
 void GUI::MapInfoWindow::renderMapInfoTeam(const ZappyTypes::Rectangle& view,
     int startIndex, float lineHeight, float contentWidth, int textY) {
-    auto teamname = _gameState->getTeamNames();
+    if (!_dataProvider)
+        return;
+    auto teamNames = _dataProvider->getTeamNames();
+    auto teamPlayerCounts = _dataProvider->getTeamPlayerCounts();
+    auto teamResourceTotals = _dataProvider->getTeamResourceTotals();
     std::string message;
-
     (void)startIndex;
-    for (const auto& team : _gameState->getTeamNames()) {
-        int totalAlivePlayers = 0;
+    for (const auto& team : teamNames) {
         textY += lineHeight + 5;
         message = "Team: " + team;
         _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-        std::vector<int> totalRessourceTeam = {0, 0 , 0, 0, 0, 0, 0};
-        for (const auto& player : _gameState->getPlayers()) {
-            if (player.second->isAlive() && player.second->getTeamName() == team) {
-                totalAlivePlayers++;
-                auto inventory = _gameState->getPlayerInventory(player.first);
-                std::string messageTmp = "pin #" + std::to_string(player.second->getId()) + "\n";
-                _networkManager->sendCommand(messageTmp);
-                if (!inventory)
-                    continue;
-                totalRessourceTeam[0] += inventory->getResourceCount(0);
-                totalRessourceTeam[1] += inventory->getResourceCount(1);
-                totalRessourceTeam[2] += inventory->getResourceCount(2);
-                totalRessourceTeam[3] += inventory->getResourceCount(3);
-                totalRessourceTeam[4] += inventory->getResourceCount(4);
-                totalRessourceTeam[5] += inventory->getResourceCount(5);
-                totalRessourceTeam[6] += inventory->getResourceCount(6);
-            }
-        }
-        textY += lineHeight + 5;
-        message = "Alive players: " + std::to_string(totalAlivePlayers);
+                textY += lineHeight + 5;
+        int alivePlayers = teamPlayerCounts.count(team) ? teamPlayerCounts.at(team) : 0;
+        message = "Alive players: " + std::to_string(alivePlayers);
         _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
         textY += lineHeight;
-        message = getFormattedResource(totalRessourceTeam);
-        _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+        if (teamResourceTotals.count(team)) {
+            message = getFormattedResource(teamResourceTotals.at(team));
+            _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+        }
+        if (_uiContext) {
+            auto playerIds = _dataProvider->getPlayerIds();
+            for (int playerId : playerIds) {
+                auto player = _dataProvider->getPlayerInfo(playerId);
+                if (player && player->getTeamName() == team) {
+                    std::string pinCommand = "pin #" + std::to_string(playerId) + "\n";
+                    _uiContext->executeNetworkCommand(pinCommand);
+                }
+            }
+        }
     }
 }
 
 void GUI::MapInfoWindow::renderMapInfo(const ZappyTypes::Rectangle& view,
     int startIndex, float lineHeight,
     float contentWidth) {
-
-    _dimensions.y = 120 + (_gameState->getTeamNames().size() * 90);
+    if (!_dataProvider)
+        return;
+    auto teamNames = _dataProvider->getTeamNames();
+    _dimensions.y = 120 + (teamNames.size() * 90);
     float textY = view.y + 10;
-    std::string message = "Map size: width " + std::to_string(_gameState->getMapWidth()) + ", height " + std::to_string(_gameState->getMapHeight());
-
+    std::string message = "Map size: width " + std::to_string(_dataProvider->getMapWidth()) +
+                         ", height " + std::to_string(_dataProvider->getMapHeight());
     _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-    size_t totalNbPlayers = _gameState->getPlayerCount();
     textY += lineHeight;
-    message = "Total players: " + std::to_string(totalNbPlayers);
+    auto playerIds = _dataProvider->getPlayerIds();
+    message = "Total players: " + std::to_string(playerIds.size());
     _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-
-    std::vector<int> totalRessource = {0, 0 , 0, 0, 0, 0, 0};
-    auto tiles = _gameState->getTiles();
-    for (const auto& row : tiles) {
-        for (const auto& tile : row) {
-            totalRessource[0] += tile->getResourceQuantity(ResourceType::FOOD);
-            totalRessource[1] += tile->getResourceQuantity(ResourceType::LINEMATE);
-            totalRessource[2] += tile->getResourceQuantity(ResourceType::DERAUMERE);
-            totalRessource[3] += tile->getResourceQuantity(ResourceType::SIBUR);
-            totalRessource[4] += tile->getResourceQuantity(ResourceType::MENDIANE);
-            totalRessource[5] += tile->getResourceQuantity(ResourceType::PHIRAS);
-            totalRessource[6] += tile->getResourceQuantity(ResourceType::THYSTAME);
-        }
-    }
     textY += lineHeight;
-    message = getFormattedResource(totalRessource);
+    auto totalResources = _dataProvider->calculateTotalResources();
+    message = getFormattedResource(totalResources);
     _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
     renderMapInfoTeam(view, startIndex, lineHeight, contentWidth, textY);
 }

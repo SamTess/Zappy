@@ -35,7 +35,7 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     _windows = {
         {"tileInfo", "Informations sur la case", 0},
         {"playerInfo", "Informations joueurs", 1},
-        {"broadcasts", "Broadcasts récents", 2},
+        {"mapInfo", "Informations sur la carte", 2},
         {"timeInfo", "Informations temporelles", 3}
     };
 }

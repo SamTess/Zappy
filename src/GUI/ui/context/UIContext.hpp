@@ -31,7 +31,6 @@ public:
     void requestWindowVisibilityChange(const std::string& windowId, bool visible) override;
     void notifyTileSelection(int x, int y) override;
     void notifyPlayerSelection(int playerId) override;
-    void notifyViewModeChange(int viewMode) override;
     void executeNetworkCommand(const std::string& command) override;
     void setCommandSender(std::shared_ptr<INetworkCommandSender> commandSender);
     void registerDataUpdateCallback(std::function<void()> callback) override;

@@ -67,11 +67,6 @@ void UIContext::notifyPlayerSelection(int playerId) {
         _windowFactory->setSelectedPlayer(playerId);
 }
 
-void UIContext::notifyViewModeChange(int viewMode) {
-    if (_windowFactory)
-        _windowFactory->setViewMode(viewMode);
-}
-
 void UIContext::executeNetworkCommand(const std::string& command) {
     if (!_commandSender) {
         logSecurityWarning("executeNetworkCommand", "No command sender available");
@@ -115,7 +110,7 @@ std::string UIContext::generateCallbackId() {
 
 bool UIContext::isValidWindowId(const std::string& windowId) const {
     static const std::vector<std::string> validWindowIds = {
-        "tileInfo", "playerInfo", "broadcasts", "controls", "timeInfo", "menu"
+        "tileInfo", "playerInfo", "timeInfo", "menu", "mapInfo"
     };
     return std::find(validWindowIds.begin(), validWindowIds.end(), windowId) != validWindowIds.end();
 }

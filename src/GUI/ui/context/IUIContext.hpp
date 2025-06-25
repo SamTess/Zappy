@@ -24,7 +24,6 @@ public:
     virtual void requestWindowVisibilityChange(const std::string& windowId, bool visible) = 0;
     virtual void notifyTileSelection(int x, int y) = 0;
     virtual void notifyPlayerSelection(int playerId) = 0;
-    virtual void notifyViewModeChange(int viewMode) = 0;
     virtual void executeNetworkCommand(const std::string& command) = 0;
     virtual void registerDataUpdateCallback(std::function<void()> callback) = 0;
     virtual void unregisterDataUpdateCallback(const std::string& callbackId) = 0;

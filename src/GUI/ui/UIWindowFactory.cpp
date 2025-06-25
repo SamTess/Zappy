@@ -33,21 +33,18 @@ UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
 void UIWindowFactory::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {
     _commandSender = sender;
     auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(_windows["playerInfo"]);
-    if (playerInfoWindow) {
+    if (playerInfoWindow)
         playerInfoWindow->setCommandSender(sender);
-    }
     auto mapInfoWindow = std::dynamic_pointer_cast<GUI::MapInfoWindow>(_windows["mapInfo"]);
-    if (mapInfoWindow) {
-        mapInfoWindow->setCommendSender(sender);
-    }
+    if (mapInfoWindow)
+        mapInfoWindow->setCommandSender(sender);
 }
 
 void UIWindowFactory::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
     _commandExecutor = executor;
     auto menuWindow = std::dynamic_pointer_cast<GUI::MenuWindow>(_windows["menu"]);
-    if (menuWindow) {
+    if (menuWindow)
         menuWindow->setCommandExecutor(executor);
-    }
 }
 
 void UIWindowFactory::createAllWindows(int, int,
@@ -190,7 +187,7 @@ void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vect
     static const std::unordered_map<std::string, std::function<std::shared_ptr<GUI::IUIWindow>(std::shared_ptr<IGuiLib>)>> windowCreators = {
         {"tileInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TileInfoWindow>(lib); }},
         {"playerInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::PlayerInfoWindow>(lib); }},
-        {"menuInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MapInfoWindow>(lib); }},
+        {"mapInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MapInfoWindow>(lib); }},
         {"timeInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TimeInfoWindow>(lib); }},
         {"menu", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MenuWindow>(lib); }}
     };
