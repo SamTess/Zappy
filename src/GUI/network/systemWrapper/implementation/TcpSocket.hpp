@@ -14,9 +14,6 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Implémentation concrète d'un socket TCP
- */
 class TcpSocket : public ISocket {
 private:
     int _fd;

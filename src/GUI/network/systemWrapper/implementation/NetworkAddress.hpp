@@ -15,9 +15,7 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Implémentation concrète d'une adresse réseau
- */
+
 class NetworkAddress : public INetworkAddress {
 private:
     std::string _host;
