@@ -43,7 +43,7 @@ static void pollin_pollout_client(client_t *temp,
     server_t *server, int temp_fd)
 {
     if (temp->client_poll->revents & POLLIN)
-                get_message(server, temp);
+        get_message(server, temp);
     if (find_client_by_socket(server, temp_fd) != NULL &&
         temp->client_poll->revents & POLLOUT && temp->need_write)
         flush_client_write_buffer(temp);
