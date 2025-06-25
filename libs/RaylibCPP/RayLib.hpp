@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <map>
+#include <vector>
 
 #include "../../src/Shared/IGraphicsLib.hpp"
 #include "window/Window.hpp"
@@ -18,7 +19,6 @@
 #include "texture/Texture.hpp"
 #include "font/Font.hpp"
 #include "input/Input.hpp"
-#include "audio/Audio.hpp"
 #include "audio/Audio.hpp"
 #include "camera/Camera.hpp"
 
@@ -105,7 +105,7 @@ public:
     ZappyTypes::Vector3 GetCameraTarget() override;
     ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) override;
     bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) override;
-    
+
     // Performance
     int GetFPS() override;
 
@@ -115,7 +115,7 @@ private:
     std::map<int, std::unique_ptr<raylibcpp::ModelWrap>> _models;
     int _nextModelId = 1;
     std::optional<raylibcpp::Font> _font;
-    std::optional<raylibcpp::SoundWrap> _sound;
+    std::vector<std::unique_ptr<raylibcpp::SoundWrap>> _sounds;
     std::optional<raylibcpp::MusicWrap> _music;
     std::optional<raylibcpp::Camera2DWrap> _camera2D;
     std::optional<raylibcpp::Camera3DWrap> _camera3D;

@@ -85,7 +85,7 @@ private:
     std::shared_ptr<NetworkManager> _networkManager;
     std::shared_ptr<IGraphicsLib> _graphics;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
-    std::map<int, std::chrono::steady_clock::time_point> _lastBroadcastTime;  // Player ID -> last broadcast time
+    std::map<int, std::chrono::steady_clock::time_point> _lastBroadcastTime;
     void initializeMessageHandlers();
 };
 

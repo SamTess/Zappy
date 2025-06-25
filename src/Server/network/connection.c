@@ -63,10 +63,10 @@ static client_t *init_new_client(int fd)
     client_t *new_c = calloc(1, sizeof(client_t));
 
     if (!new_c)
-        server_err("New client allocation failed");
+        return NULL;
     new_c->client_poll = calloc(1, sizeof(struct pollfd));
     if (!new_c->client_poll)
-        server_err("Poll fd struct allocation in new client struct failed");
+        return NULL;
     new_c->client_poll->fd = fd;
     new_c->client_poll->events = POLLIN;
     new_c->client_poll->revents = 0;
@@ -75,9 +75,9 @@ static client_t *init_new_client(int fd)
     new_c->client_add = NULL;
     new_c->client_id = -1;
     new_c->player = calloc(1, sizeof(player_t));
-    new_c->is_fully_connected = false;
     if (new_c->player == NULL)
-        server_err("Failed to allocate player");
+        return NULL;
+    new_c->is_fully_connected = false;
     init_struct(new_c);
     return new_c;
 }
@@ -89,10 +89,14 @@ void add_fd(server_t *server, int fd)
     client_t *current;
 
     if (server->client == NULL) {
+        if (new_c == NULL)
+            server_err("Server polling client init failed");
         server->client = new_c;
         new_c->client_id = -1;
         return;
     }
+    if (new_c == NULL)
+        return;
     current = server->client;
     while (current->next != NULL) {
         current = current->next;

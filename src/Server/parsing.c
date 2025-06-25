@@ -64,9 +64,8 @@ static char **parse_names(char **av, int i)
     }
     result[count] = NULL;
     for (int k = 0; k < count; k++) {
-        if (check_if_names_exist(result, result[k], k)) {
+        if (check_if_names_exist(result, result[k], k))
             server_err("Duplicate name found in -n argument");
-        }
     }
     return result;
 }

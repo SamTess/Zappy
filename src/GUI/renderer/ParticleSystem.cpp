@@ -13,6 +13,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include "../gameController/GameState.hpp"
+#include "EjectionAnimationManager.hpp"
 
 namespace Zappy {
 
@@ -208,7 +210,8 @@ void EjectionEffect::reset() {
 }
 
 BroadcastEffect::BroadcastEffect() : currentRadius(0.0f), maxRadius(12.0f), expansionSpeed(4.0f),
-                                   pulseInterval(0.5f), lastPulseTime(0.0f), ringCount(2) {
+                                   pulseInterval(0.5f), lastPulseTime(0.0f), ringCount(2),
+                                   followPlayerId(-1), followPlayer(false) {
     effectDuration = 2.5f;
     ringRadii.resize(ringCount, 0.0f);
     ringAlphas.resize(ringCount, 1.0f);
@@ -221,6 +224,30 @@ void BroadcastEffect::initialize(const ZappyTypes::Vector3& position, ParticleTy
     active = true;
     currentRadius = 0.0f;
     lastPulseTime = 0.0f;
+    followPlayer = false;
+    followPlayerId = -1;
+    gameState = nullptr;
+
+    for (int i = 0; i < ringCount; ++i) {
+        ringRadii[i] = 0.0f;
+        ringAlphas[i] = 1.0f;
+    }
+
+    particles.clear();
+    particles.reserve(maxParticles);
+}
+
+void BroadcastEffect::initialize(int playerId, std::shared_ptr<const GameState> gameStatePtr, ParticleType particleType, int maxParticles) {
+    followPlayerId = playerId;
+    gameState = gameStatePtr;
+    followPlayer = true;
+    type = particleType;
+    timeAlive = 0.0f;
+    active = true;
+    currentRadius = 0.0f;
+    lastPulseTime = 0.0f;
+
+    origin = getCurrentPlayerPosition();
 
     for (int i = 0; i < ringCount; ++i) {
         ringRadii[i] = 0.0f;
@@ -253,9 +280,11 @@ void BroadcastEffect::update(float deltaTime) {
 void BroadcastEffect::render(const std::shared_ptr<IGraphicsLib>& graphicsLib) {
     if (!active || !graphicsLib) return;
 
+    ZappyTypes::Vector3 currentPosition = followPlayer ? getCurrentPlayerPosition() : origin;
+
     for (int i = 0; i < ringCount; ++i) {
         if (ringRadii[i] > 0.0f && ringAlphas[i] > 0.0f)
-            renderRing(graphicsLib, origin, ringRadii[i], ringAlphas[i]);
+            renderRing(graphicsLib, currentPosition, ringRadii[i], ringAlphas[i]);
     }
 }
 
@@ -396,13 +425,13 @@ void BroadcastEffect::renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLi
 
         ZappyTypes::Vector3 point1 = {
             center.x + static_cast<float>(cos(angle1)) * radius,
-            center.y + 0.1f,
+            center.y + 0.2f,
             center.z + static_cast<float>(sin(angle1)) * radius
         };
 
         ZappyTypes::Vector3 point2 = {
             center.x + static_cast<float>(cos(angle2)) * radius,
-            center.y + 0.1f,
+            center.y + 0.2f,
             center.z + static_cast<float>(sin(angle2)) * radius
         };
 
@@ -414,6 +443,22 @@ void BroadcastEffect::renderParticle(const Particle& particle, const std::shared
     if (!particle.active) return;
 
     graphicsLib->DrawSphere(particle.position, particle.size, particle.color);
+}
+
+ZappyTypes::Vector3 BroadcastEffect::getCurrentPlayerPosition() const {
+    if (!gameState || !followPlayer || followPlayerId == -1)
+        return origin;
+
+    auto player = gameState->getPlayerInfo(followPlayerId);
+    if (player) {
+        ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
+            player->getX(), player->getY(), gameState->getMapWidth(), gameState->getMapHeight());
+
+        playerWorldPos.y = 1.0f;
+        return playerWorldPos;
+    }
+
+    return origin;
 }
 
 ParticleSystem& ParticleSystem::getInstance() {
@@ -471,13 +516,9 @@ void ParticleSystem::createEffect(ParticleType type, const ZappyTypes::Vector3& 
     activeEffects.push_back(std::move(effect));
 }
 
-void ParticleSystem::createPlayerBroadcastEffect(const ZappyTypes::Vector3& position, const std::string& teamName) {
+void ParticleSystem::createPlayerBroadcastEffect(int playerId, std::shared_ptr<const GameState> gameState, const std::string& teamName) {
     (void)teamName;
 
-    createBroadcastEffect(ParticleType::BROADCAST_RING, position, 6);
-}
-
-void ParticleSystem::createBroadcastEffect(ParticleType type, const ZappyTypes::Vector3& position, int intensity) {
     if (activeEffects.size() >= maxActiveEffects) {
         removeInactiveEffects();
         if (activeEffects.size() >= maxActiveEffects)
@@ -485,7 +526,7 @@ void ParticleSystem::createBroadcastEffect(ParticleType type, const ZappyTypes::
     }
 
     auto effect = std::make_unique<BroadcastEffect>();
-    effect->initialize(position, type, intensity);
+    effect->initialize(playerId, gameState, ParticleType::BROADCAST_RING, 6);
     activeEffects.push_back(std::move(effect));
 }
 
