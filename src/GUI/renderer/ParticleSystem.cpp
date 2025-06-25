@@ -425,13 +425,13 @@ void BroadcastEffect::renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLi
 
         ZappyTypes::Vector3 point1 = {
             center.x + static_cast<float>(cos(angle1)) * radius,
-            center.y + 0.2f,  // Slightly above player level
+            center.y + 0.2f,
             center.z + static_cast<float>(sin(angle1)) * radius
         };
 
         ZappyTypes::Vector3 point2 = {
             center.x + static_cast<float>(cos(angle2)) * radius,
-            center.y + 0.2f,  // Slightly above player level
+            center.y + 0.2f,
             center.z + static_cast<float>(sin(angle2)) * radius
         };
 
@@ -451,13 +451,10 @@ ZappyTypes::Vector3 BroadcastEffect::getCurrentPlayerPosition() const {
 
     auto player = gameState->getPlayerInfo(followPlayerId);
     if (player) {
-        // Use the same coordinate transformation as before
         ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
             player->getX(), player->getY(), gameState->getMapWidth(), gameState->getMapHeight());
-        
-        // Set the Y position to be at player level (not ground level)
-        playerWorldPos.y = 1.0f;  // Player height level
-        
+
+        playerWorldPos.y = 1.0f;
         return playerWorldPos;
     }
 
