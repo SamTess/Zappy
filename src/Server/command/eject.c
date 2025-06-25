@@ -84,7 +84,7 @@ static void push_single_client(server_t *server,
     tmp->player->pos_y = new_y;
     tile_add_player(&server->map[new_y][new_x], tmp->client_id);
     send_ppo_command(server, tmp->client_id);
-    write_command_output(tmp->client_fd, msg);
+    write_command_output_buffer(tmp, msg);
 }
 
 int push_client(server_t *server, client_t *client, float x, float y)
@@ -131,11 +131,11 @@ void eject(server_t *server, client_t *client, char **buffer)
     float y = 0;
 
     if (!client || !client->player || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     convert_rotation_to_vector(client, &x, &y);
     if (push_client(server, client, x, y) == 84)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     push_eggs(server, client->player->pos_x, client->player->pos_y);
     command_pex(server, client);
-    write_command_output(client->client_fd, "ok\n");
+    write_command_output_buffer(client, "ok\n");
 }

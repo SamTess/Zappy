@@ -14,7 +14,7 @@
 static void handle_incantation_failure(client_t *client)
 {
     client->player->incantation_leader_id = -1;
-    write_command_output(client->client_fd, "ko\n");
+    write_command_output_buffer(client, "ko\n");
 }
 
 static bool remove_resources(tile_t *tile, int level)
@@ -72,7 +72,7 @@ static void handle_incantation_success(client_t *client,
         remove_resources(tile, old_level + 1);
     client->player->incantation_leader_id = -1;
     sprintf(level_str, "Current level: %d\n", client->player->level);
-    write_command_output(client->client_fd, level_str);
+    write_command_output_buffer(client, level_str);
     free(level_str);
     if (client->player->level == 8)
         check_win(client, server);

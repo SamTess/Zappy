@@ -20,11 +20,11 @@ void command_pfk(server_t *server, client_t *client)
     size = snprintf(NULL, 0, "pfk #%d\n", client->client_id);
     buffer = malloc(size + 1);
     if (buffer == NULL)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     sprintf(buffer, "pfk #%d\n", client->client_id);
     graphical_client = server->graphical_clients;
     while (graphical_client != NULL) {
-        write_command_output(graphical_client->client->client_fd, buffer);
+        write_command_output_buffer(graphical_client->client, buffer);
         graphical_client = graphical_client->next;
     }
     free(buffer);

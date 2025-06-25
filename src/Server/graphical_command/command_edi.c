@@ -25,7 +25,7 @@ void send_edi_command(server_t *server, int egg_id)
     snprintf(buffer, size + 1, "edi #%d\n", egg_id);
     graphical_client = server->graphical_clients;
     while (graphical_client) {
-        write_command_output(graphical_client->client->client_fd, buffer);
+        write_command_output_buffer(graphical_client->client, buffer);
         graphical_client = graphical_client->next;
     }
     free(buffer);

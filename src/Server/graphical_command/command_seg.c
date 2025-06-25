@@ -27,7 +27,7 @@ void command_seg(server_t *server, const char *team_name)
     snprintf(buffer, size + 1, "seg %s\n", team_name);
     current = server->graphical_clients;
     while (current) {
-        write_command_output(current->client->client_fd, buffer);
+        write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);

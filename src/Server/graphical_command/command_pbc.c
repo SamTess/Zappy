@@ -28,7 +28,7 @@ void command_pbc(server_t *server, client_t *client, char *buffer)
     snprintf(msg, size + 1, "pbc #%d %s", client->client_id, buffer);
     graphical_client = server->graphical_clients;
     while (graphical_client) {
-        write_command_output(graphical_client->client->client_fd, msg);
+        write_command_output_buffer(graphical_client->client, msg);
         graphical_client = graphical_client->next;
     }
     free(msg);

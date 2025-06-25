@@ -88,13 +88,13 @@ static void send_info_new_client(server_t *server, client_t *user)
     tmp_string = malloc(len1 + 1);
     sprintf(tmp_string, "%d\n", connect_nbr_srv(server,
         user->player->team_name));
-    write_command_output(user->client_fd, tmp_string);
+    write_command_output_buffer(user, tmp_string);
     free(tmp_string);
     tmp_string = malloc(len2 + 1);
     sprintf(tmp_string, "%d %d\n",
         server->parsed_info->width,
         server->parsed_info->height);
-    write_command_output(user->client_fd, tmp_string);
+    write_command_output_buffer(user, tmp_string);
     free(tmp_string);
     send_pnw_command_to_all(server, user);
 }
@@ -114,9 +114,9 @@ void execute_com(server_t *server, client_t *user, char *buffer)
     }
     if (!find_and_execute(server, user, buffer)){
         if (user->is_fully_connected && user->type == GRAPHICAL)
-            return write_command_output(user->client_fd, "suc\n");
+            return write_command_output_buffer(user, "suc\n");
         if (user->is_fully_connected)
-            write_command_output(user->client_fd, "ko\n");
+            write_command_output_buffer(user, "ko\n");
     }
 }
 

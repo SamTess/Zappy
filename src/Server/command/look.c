@@ -117,14 +117,14 @@ void look(server_t *server, client_t *user, char **buffer)
     char *res;
 
     if (!server || !user || !user->player || arr_len(buffer) != 1)
-        return write_command_output(user->client_fd, "ko\n");
+        return write_command_output_buffer(user, "ko\n");
     total_len = get_total_size(&level_tiles, user, server);
     if (total_len == (size_t)-1 || !level_tiles)
-        return write_command_output(user->client_fd, "ko\n");
+        return write_command_output_buffer(user, "ko\n");
     res = format_look(total_len, level_tiles, user);
     if (!res)
-        return write_command_output(user->client_fd, "ko\n");
+        return write_command_output_buffer(user, "ko\n");
     free(level_tiles);
-    write_command_output(user->client_fd, res);
+    write_command_output_buffer(user, res);
     free(res);
 }

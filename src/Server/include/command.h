@@ -41,6 +41,7 @@ void broadcast(server_t *server, client_t *user, char **buffer);
 int connect_nbr_srv(server_t *server, char *team);
 bool can_connect(server_t *server, client_t *user, char *buffer);
 client_t *find_client_by_id(server_t *server, int id);
+void write_command_output_buffer(client_t *client, char *msg);
 
 // Death and starvation management functions
 void handle_player_death(server_t *server, client_t *client);

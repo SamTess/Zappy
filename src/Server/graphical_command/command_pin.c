@@ -59,7 +59,7 @@ void send_pin_command(server_t *server, client_t *client, client_t *recipient)
     (void)server;
     if (!buffer || !server->graphical_clients)
         return;
-    write_command_output(recipient->client_fd, buffer);
+    write_command_output_buffer(recipient, buffer);
     free(buffer);
 }
 
@@ -83,10 +83,10 @@ void command_pin(server_t *server, client_t *client, char **buffer)
     if (!server || !client || !server->graphical_clients ||
         arr_len(buffer) != 2 ||
         sscanf(buffer[1], "#%d\n", &id) != 1 || id < 0)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     recipient = find_client_by_id(server, id);
     if (!recipient || recipient->type != AI) {
-        write_command_output(client->client_fd, "sbp\n");
+        write_command_output_buffer(client, "sbp\n");
         return;
     }
     send_pin_command(server, recipient, client);

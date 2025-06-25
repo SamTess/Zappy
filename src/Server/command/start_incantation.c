@@ -109,13 +109,13 @@ bool can_start_incantation(server_t *server, client_t *client)
 void start_incantation(server_t *server, client_t *client, char **buffer)
 {
     if (!server || !client || !client->player || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     if (!can_start_incantation(server, client))
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     command_pic(server, client->player->pos_x, client->player->pos_y,
         client->player->level);
     set_busy_all(server, client, 300);
     client->player->is_in_incantation = true;
     client->player->incantation_leader_id = client->client_id;
-    write_command_output(client->client_fd, "Elevation underway\n");
+    write_command_output_buffer(client, "Elevation underway\n");
 }

@@ -30,7 +30,7 @@ void send_plv_command(server_t *server, client_t *client, client_t *recipient)
     snprintf(buffer, size + 1, "plv #%d %d\n",
             client->client_id,
             client->player->level);
-    write_command_output(recipient->client_fd, buffer);
+    write_command_output_buffer(recipient, buffer);
     free(buffer);
 }
 
@@ -56,10 +56,10 @@ void command_plv(server_t *server, client_t *client, char **buffer)
     if (!server || !client || !buffer ||
         !server->graphical_clients || arr_len(buffer) != 2 ||
         sscanf(buffer[1], "#%d\n", &id) != 1)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     recipient = find_client_by_id(server, id);
     if (!recipient || recipient->type != AI) {
-        write_command_output(client->client_fd, "sbp\n");
+        write_command_output_buffer(client, "sbp\n");
         return;
     }
     send_plv_command(server, recipient, client);

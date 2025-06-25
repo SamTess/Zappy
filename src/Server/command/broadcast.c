@@ -115,7 +115,7 @@ static int send_broadcast_to_client(server_t *server, client_t *sender,
         sender->player->pos_y, server->parsed_info->height);
     direction = calculate_direction(receiver, source_rel_x, source_rel_y);
     snprintf(response, res_size, "message %d, %s\n", direction, message);
-    write_command_output(receiver->client_fd, response);
+    write_command_output_buffer(receiver, response);
     free(response);
     return 0;
 }
@@ -171,10 +171,10 @@ void broadcast(server_t *server, client_t *user, char **buffer)
     client_t *current;
 
     if (!user || !user->player || !buffer || arr_len(buffer) < 2)
-        return write_command_output(user->client_fd, "ko\n");
+        return write_command_output_buffer(user, "ko\n");
     message = build_broadcast_message(buffer);
     if (!message)
-        return write_command_output(user->client_fd, "ko\n");
+        return write_command_output_buffer(user, "ko\n");
     current = server->client;
     if (current)
         current = current->next;
@@ -183,8 +183,8 @@ void broadcast(server_t *server, client_t *user, char **buffer)
         if (current->player && current != user && current->type != GRAPHICAL)
             temp = send_broadcast_to_client(server, user, current, message);
         if (temp == 84)
-            return write_command_output(user->client_fd, "ko\n");
+            return write_command_output_buffer(user, "ko\n");
     }
     free(message);
-    write_command_output(user->client_fd, "ok\n");
+    write_command_output_buffer(user, "ok\n");
 }
