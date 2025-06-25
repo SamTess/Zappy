@@ -17,7 +17,7 @@ class IUIWindow {
 public:
     virtual ~IUIWindow() = default;
     virtual void initialize(const ZappyTypes::Vector2& position,
-                           const ZappyTypes::Vector2& dimensions) = 0;
+        const ZappyTypes::Vector2& dimensions) = 0;
 
     virtual bool render() = 0;
     virtual void updateData(std::shared_ptr<IUIDataProvider> dataProvider) = 0;

@@ -44,9 +44,7 @@ public:
     int getTimeUnit() const;
     bool isGameEnded() const;
     const std::string& getWinningTeam() const;
-
     std::vector<int> getPlayerIds() const;
-
     void setMapSize(int width, int height);
     void updateTileResources(int x, int y, int food, int linemate, int deraumere,
                             int sibur, int mendiane, int phiras, int thystame);
@@ -61,10 +59,13 @@ public:
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
     std::map<int, std::shared_ptr<IPlayer>> getPlayers();
-
     void addBroadcast(int playerId, const std::string& team, const std::string& message);
     void updateBroadcasts(float deltaTime);
     std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
+    bool getSfxEnabled() const;
+    void setSfxEnabled(bool enabled);
+    float getMusicVolume() const;
+    void setMusicVolume(float volume);
 
 private:
     bool isValidCoordinates(int x, int y) const;
@@ -84,6 +85,8 @@ private:
     std::vector<std::string> _teamNames;
     int _timeUnit = 100;
     bool _gameEnded = false;
+    bool _sfxEnabled = true;
+    float _musicVolume = 0.8f;
     std::string _winningTeam;
     std::deque<std::shared_ptr<IBroadcast>> _broadcasts;
     const size_t _maxBroadcasts = 20;

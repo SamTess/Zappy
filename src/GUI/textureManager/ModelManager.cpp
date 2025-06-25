@@ -13,17 +13,17 @@
 #include "TextureManager.hpp"
 
 void ModelManager::setGraphicsLib(std::shared_ptr<IGraphicsLib> graphicsLib) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_graphicsLib = graphicsLib;
+    std::lock_guard<std::mutex> lock(_mutex);
+    _graphicsLib = graphicsLib;
 }
 
 int ModelManager::loadModel(const std::string& modelPath, const std::string& texturePath) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_pathToId.find(modelPath);
-    if (it != m_pathToId.end()) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    auto it = _pathToId.find(modelPath);
+    if (it != _pathToId.end()) {
         return it->second;
     }
-    if (!m_graphicsLib) {
+    if (!_graphicsLib) {
         std::cerr << "Erreur: GraphicsLib non initialisé dans ModelManager" << std::endl;
         return -1;
     }
@@ -31,9 +31,9 @@ int ModelManager::loadModel(const std::string& modelPath, const std::string& tex
     try {
         int modelId;
         if (!texturePath.empty())
-            modelId = m_graphicsLib->LoadModelWithTexture(modelPath, texturePath);
+            modelId = _graphicsLib->LoadModelWithTexture(modelPath, texturePath);
         else
-            modelId = m_graphicsLib->LoadModel3D(modelPath);
+            modelId = _graphicsLib->LoadModel3D(modelPath);
         if (modelId < 0) {
             std::cerr << "Erreur: Échec du chargement du modèle " << modelPath << std::endl;
             return -1;
@@ -53,7 +53,7 @@ int ModelManager::loadModel(const std::string& modelPath, const std::string& tex
 }
 
 int ModelManager::loadModelWithTextures(const std::string& modelPath, const std::vector<std::string>& texturePaths) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     int cachedModelId = checkModelCache(modelPath);
     if (cachedModelId != -1)
         return cachedModelId;
@@ -62,9 +62,9 @@ int ModelManager::loadModelWithTextures(const std::string& modelPath, const std:
     try {
         int modelId;
         if (!texturePaths.empty())
-            modelId = m_graphicsLib->LoadModelWithTexture(modelPath, texturePaths[0]);
+            modelId = _graphicsLib->LoadModelWithTexture(modelPath, texturePaths[0]);
         else
-            modelId = m_graphicsLib->LoadModel3D(modelPath);
+            modelId = _graphicsLib->LoadModel3D(modelPath);
         if (modelId < 0) {
             std::cerr << "Erreur: Échec du chargement du modèle " << modelPath << std::endl;
             return -1;
@@ -80,93 +80,93 @@ int ModelManager::loadModelWithTextures(const std::string& modelPath, const std:
 }
 
 void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     if (!validateModelForDrawing(modelId))
         return;
-    m_graphicsLib->DrawModel3D(modelId, position, 1.0f, color);
+    _graphicsLib->DrawModel3D(modelId, position, 1.0f, color);
 }
 
 void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     if (!validateModelForDrawing(modelId))
         return;
-    m_graphicsLib->DrawModel3D(modelId, position, scale, color);
+    _graphicsLib->DrawModel3D(modelId, position, scale, color);
 }
 
 void ModelManager::drawModelEx(int modelId, ZappyTypes::Vector3 position,
     ZappyTypes::Vector3 rotationAxis,
     float rotationAngle, float scale, ZappyTypes::Color color) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     if (!validateModelForDrawing(modelId))
         return;
-    m_graphicsLib->DrawModelEx(modelId, position, rotationAxis, rotationAngle, scale, color);
+    _graphicsLib->DrawModelEx(modelId, position, rotationAxis, rotationAngle, scale, color);
 }
 
 void ModelManager::unloadModel(int modelId) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto modelIt = m_models.find(modelId);
+    std::lock_guard<std::mutex> lock(_mutex);
+    auto modelIt = _models.find(modelId);
 
-    if (modelIt == m_models.end()) {
+    if (modelIt == _models.end()) {
         std::cerr << "Tentative de libération d'un modèle inexistant (ID: " << modelId << ")" << std::endl;
         return;
     }
     unloadModelTextures(modelIt->second);
     unloadModelFromGraphicsLib(modelId);
     removeModelPathReferences(modelId);
-    m_models.erase(modelIt);
+    _models.erase(modelIt);
 }
 
 void ModelManager::unloadAllModels() {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
-    for (const auto& [modelId, model] : m_models) {
+    for (const auto& [modelId, model] : _models) {
         unloadModelTextures(model);
         unloadModelFromGraphicsLib(modelId);
     }
-    m_models.clear();
-    m_pathToId.clear();
+    _models.clear();
+    _pathToId.clear();
 }
 
 bool ModelManager::hasModel(const std::string& modelPath) const {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_pathToId.find(modelPath) != m_pathToId.end();
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _pathToId.find(modelPath) != _pathToId.end();
 }
 
 int ModelManager::getModelId(const std::string& modelPath) const {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_pathToId.find(modelPath);
-    if (it != m_pathToId.end()) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    auto it = _pathToId.find(modelPath);
+    if (it != _pathToId.end()) {
         return it->second;
     }
     return -1;
 }
 
 size_t ModelManager::getModelCount() const {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_models.size();
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _models.size();
 }
 
 std::pair<ZappyTypes::Vector3, ZappyTypes::Vector3> ModelManager::getBoundingBox(int modelId) const {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
-    auto it = m_models.find(modelId);
-    if (it != m_models.end()) {
+    auto it = _models.find(modelId);
+    if (it != _models.end()) {
         return {it->second.boundingBoxMin, it->second.boundingBoxMax};
     }
     return {ZappyTypes::Vector3{0, 0, 0}, ZappyTypes::Vector3{0, 0, 0}};
 }
 
 int ModelManager::checkModelCache(const std::string& modelPath) {
-    auto it = m_pathToId.find(modelPath);
-    if (it != m_pathToId.end()) {
+    auto it = _pathToId.find(modelPath);
+    if (it != _pathToId.end()) {
         return it->second;
     }
     return -1;
 }
 
 bool ModelManager::checkGraphicsLibInitialized() {
-    if (!m_graphicsLib) {
+    if (!_graphicsLib) {
         std::cerr << "Erreur: GraphicsLib non initialisé dans ModelManager" << std::endl;
         return false;
     }
@@ -207,8 +207,8 @@ std::pair<bool, Model3D> ModelManager::loadTextureForModel(Model3D model, const 
 }
 
 void ModelManager::registerModel(const std::string& modelPath, int modelId, const Model3D& model) {
-    m_pathToId[modelPath] = modelId;
-    m_models[modelId] = model;
+    _pathToId[modelPath] = modelId;
+    _models[modelId] = model;
 }
 
 void ModelManager::unloadModelTextures(const Model3D& model) {
@@ -219,15 +219,15 @@ void ModelManager::unloadModelTextures(const Model3D& model) {
 }
 
 void ModelManager::unloadModelFromGraphicsLib(int modelId) {
-    if (m_graphicsLib) {
-        m_graphicsLib->UnloadModel3D(modelId);
+    if (_graphicsLib) {
+        _graphicsLib->UnloadModel3D(modelId);
     }
 }
 
 void ModelManager::removeModelPathReferences(int modelId) {
-    for (auto it = m_pathToId.begin(); it != m_pathToId.end(); ++it) {
+    for (auto it = _pathToId.begin(); it != _pathToId.end(); ++it) {
         if (it->second == modelId) {
-            it = m_pathToId.erase(it);
+            it = _pathToId.erase(it);
             return;
         }
     }
@@ -238,12 +238,12 @@ ModelManager::~ModelManager() {
 }
 
 bool ModelManager::validateModelForDrawing(int modelId) {
-    if (!m_graphicsLib) {
+    if (!_graphicsLib) {
         std::cerr << "Erreur: GraphicsLib non initialisé" << std::endl;
         return false;
     }
-    auto it = m_models.find(modelId);
-    if (it == m_models.end()) {
+    auto it = _models.find(modelId);
+    if (it == _models.end()) {
         std::cerr << "Erreur: Modèle ID " << modelId << " non trouvé" << std::endl;
         return false;
     }

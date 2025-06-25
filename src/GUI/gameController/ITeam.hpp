@@ -5,8 +5,8 @@
 ** ITeam - Interface pour les équipes
 */
 
-#ifndef ITEAM_HPP_
-#define ITEAM_HPP_
+#ifndef ITEA_HPP_
+#define ITEA_HPP_
 
 #include <string>
 
@@ -21,4 +21,4 @@ public:
     virtual void setRemainingSlots(int slots) = 0;
 };
 
-#endif /* !ITEAM_HPP_ */
+#endif /* !ITEA_HPP_ */

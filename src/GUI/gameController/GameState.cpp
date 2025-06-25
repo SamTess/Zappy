@@ -378,3 +378,23 @@ void GameState::removeEggFromTile(int eggId, int x, int y) {
 std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
     return _players;
 }
+
+bool GameState::getSfxEnabled() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _sfxEnabled;
+}
+
+void GameState::setSfxEnabled(bool enabled) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _sfxEnabled = enabled;
+}
+
+float GameState::getMusicVolume() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _musicVolume;
+}
+
+void GameState::setMusicVolume(float volume) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _musicVolume = volume;
+}

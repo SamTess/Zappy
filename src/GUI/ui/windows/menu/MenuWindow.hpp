@@ -19,6 +19,13 @@
 namespace GUI {
 
 class MenuWindow : public AUIWindow {
+
+typedef struct WindowInfo_s {
+    std::string id;
+    std::string name;
+    int positionIndex;
+} WindowInfo_t;
+
 public:
     explicit MenuWindow(std::shared_ptr<IGuiLib> guiLib);
     ~MenuWindow() = default;
@@ -30,34 +37,26 @@ protected:
     void renderContent() override;
 
 private:
-    struct WindowInfo {
-        std::string id;
-        std::string name;
-        int positionIndex;
-    };
-    bool m_showMenu;
-    bool m_showGraphicsSubmenu;
-    bool m_showAudioSubmenu;
-    bool m_showGameplaySubmenu;
-    bool m_showWindowsSubmenu;
-    float m_zoomLevel;
-    float m_musicVolume;
-    float m_sfxVolume;
-    float m_gameSpeed;
-    float m_uiTransparency;
-
-    std::shared_ptr<GUI::UIWindowFactory> m_windowFactory;
-    std::shared_ptr<ICommandExecutor> m_commandExecutor;
-    ZappyTypes::Vector2 m_defaultPositions[6];
-    std::vector<WindowInfo> m_windows;
+    bool _showMenu;
+    bool _showAudioSubmenu;
+    bool _showGameplaySubmenu;
+    bool _showWindowsSubmenu;
+    float _musicVolume;
+    float _sfxVolume;
+    float _gameSpeed;
+    float _uiTransparency;
+    int _frequency = 100;
+    bool _sfxEnabled = true;
+    std::shared_ptr<GUI::UIWindowFactory> _windowFactory;
+    std::shared_ptr<ICommandExecutor> _commandExecutor;
+    ZappyTypes::Vector2 _defaultPositions[6];
+    std::vector<WindowInfo_t> _windows;
     void drawMenuButton();
     void handleMenuButtonClick(bool mouseOnButton, bool mousePressed);
     void drawMainMenu(float menuItemWidth, float menuItemHeight, float startY);
     void handleMenuClickOutside(const ZappyTypes::Vector2& mousePosition, float menuItemWidth,
         float menuItemHeight, float startY, bool mousePressed);
     void handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY);
-    void renderGraphicsSubmenu();
-    void drawGraphicsSliders(float startX, float startY, float submenuWidth, float sliderHeight);
     void renderAudioSubmenu();
     void drawAudioSliders(float startX, float startY, float submenuWidth, float sliderHeight);
     void renderGameplaySubmenu();

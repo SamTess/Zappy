@@ -5,8 +5,8 @@
 ** TeamNameData
 */
 
-#ifndef TEAM_NAME_DATA_HPP_
-#define TEAM_NAME_DATA_HPP_
+#ifndef TEA_NAME_DATA_HPP_
+#define TEA_NAME_DATA_HPP_
 
 #include <string>
 #include <vector>
@@ -28,4 +28,4 @@ class TeamNameData : public IMessageData {
         std::vector<std::string> _names;
 };
 
-#endif /* !TEAM_NAME_DATA_HPP_ */
+#endif /* !TEA_NAME_DATA_HPP_ */

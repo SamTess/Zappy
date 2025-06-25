@@ -13,16 +13,16 @@
 
 class ServerFrequencyCommand : public ICommand {
 public:
-    explicit ServerFrequencyCommand(int frequency) : m_frequency(frequency) {}
+    explicit ServerFrequencyCommand(int frequency) : _frequency(frequency) {}
     void execute() override {}
     std::string getDescription() const override {
         std::stringstream ss;
-        ss << "sst " << m_frequency;
+        ss << "sst " << _frequency;
         return ss.str();
     }
 
 private:
-    int m_frequency;
+    int _frequency;
 };
 
 #endif /* !SERVER_FREQUENCY_COMMAND_HPP_ */

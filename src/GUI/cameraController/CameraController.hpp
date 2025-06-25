@@ -17,51 +17,46 @@ public:
     ~CameraController() = default;
 
     void init(std::shared_ptr<IGraphicsLib> graphics);
-    void update(std::shared_ptr<IGraphicsLib> graphics);
-    void update(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse);
     void update(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse, bool mouseOverUI);
     void reset();
 
-    void handleMouseInput(std::shared_ptr<IGraphicsLib> graphics);
-    void handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse);
     void handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, bool uiHandledMouse, bool mouseOverUI);
     void handleKeyboardInput(std::shared_ptr<IGraphicsLib> graphics);
     void updateCameraPosition(std::shared_ptr<IGraphicsLib> graphics);
 
-    bool isDragging() const { return m_isDragging; }
-    void setDragging(bool dragging) { m_isDragging = dragging; }
+    bool isDragging() const { return _isDragging; }
+    void setDragging(bool dragging) { _isDragging = dragging; }
     void setMousePosition(int x, int y);
 
-    ZappyTypes::Vector3& position() { return m_cameraPosition; }
-    ZappyTypes::Vector3& target() { return m_cameraTarget; }
-    ZappyTypes::Vector3& up() { return m_cameraUp; }
+    const ZappyTypes::Vector3& position() const { return _cameraPosition; }
+    const ZappyTypes::Vector3& target() const { return _cameraTarget; }
+    const ZappyTypes::Vector3& up() const { return _cameraUp; }
 
-    float& distance() { return m_cameraDistance; }
-    float& angleX() { return m_cameraAngleX; }
-    float& angleY() { return m_cameraAngleY; }
+    float distance() const { return _cameraDistance; }
+    float angleX() const { return _cameraAngleX; }
+    float angleY() const { return _cameraAngleY; }
 
-    // Définir les limites de la carte pour le mouvement de la caméra
     void setMapDimensions(int width, int height) {
-        m_mapWidth = width;
-        m_mapHeight = height;
+        _mapWidth = width;
+        _mapHeight = height;
     }
 
 private:
-    ZappyTypes::Vector3 m_cameraPosition;
-    ZappyTypes::Vector3 m_cameraTarget;
-    ZappyTypes::Vector3 m_cameraUp;
-    ZappyTypes::Vector3 m_initialCameraTarget;
+    ZappyTypes::Vector3 _cameraPosition;
+    ZappyTypes::Vector3 _cameraTarget;
+    ZappyTypes::Vector3 _cameraUp;
+    ZappyTypes::Vector3 _initialCameraTarget;
 
-    bool m_isDragging;
-    int m_lastMouseX;
-    int m_lastMouseY;
+    bool _isDragging;
+    int _lastMouseX;
+    int _lastMouseY;
 
-    float m_cameraDistance;
-    float m_cameraAngleY;
-    float m_cameraAngleX;
-    float m_mouseSensitivity;
-    float m_keyboardSpeed;
+    float _cameraDistance;
+    float _cameraAngleY;
+    float _cameraAngleX;
+    float _mouseSensitivity;
+    float _keyboardSpeed;
 
-    int m_mapWidth = 20;
-    int m_mapHeight = 20;
+    int _mapWidth = 20;
+    int _mapHeight = 20;
 };

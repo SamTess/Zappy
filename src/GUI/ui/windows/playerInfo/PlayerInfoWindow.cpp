@@ -17,12 +17,11 @@ namespace GUI {
 
 PlayerInfoWindow::PlayerInfoWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Informations sur le joueur"),
-      m_selectedPlayerId(-1),
-      m_hasSelectedPlayer(false) {
+      _selectedPlayerId(-1), _hasSelectedPlayer(false) {
 }
 
 void GUI::PlayerInfoWindow::renderContent() {
-    if (!m_hasSelectedPlayer) {
+    if (!_hasSelectedPlayer) {
         displayNoPlayerSelected();
         return;
     }
@@ -31,12 +30,12 @@ void GUI::PlayerInfoWindow::renderContent() {
         displayPlayerNotFound();
         return;
     }
-    if (m_uiContext) {
+    if (_uiContext) {
         std::stringstream pinCommand;
-        pinCommand << "pin #" << m_selectedPlayerId;
-        m_uiContext->executeNetworkCommand(pinCommand.str());
+        pinCommand << "pin #" << _selectedPlayerId;
+        _uiContext->executeNetworkCommand(pinCommand.str());
     }
-    float yOffset = m_position.y + 30;
+    float yOffset = _position.y + 30;
     yOffset = displayPlayerIdentity(selectedPlayer, yOffset);
     yOffset = displayPositionInfo(selectedPlayer, yOffset);
     yOffset = displayLevelInfo(selectedPlayer, yOffset);
@@ -44,52 +43,41 @@ void GUI::PlayerInfoWindow::renderContent() {
 }
 
 void GUI::PlayerInfoWindow::displayNoPlayerSelected() {
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        m_position.y + 40,
-        m_dimensions.x - 20,
-        30,
-        "Aucun joueur sélectionné"
-    );
+    _guiLib->DrawLabel(_position.x + 10, _position.y + 40, _dimensions.x - 20,
+        30, "Aucun joueur sélectionné");
 }
 
 std::shared_ptr<const IPlayer> GUI::PlayerInfoWindow::findSelectedPlayer() {
-    if (!m_dataProvider) {
+    if (!_dataProvider)
         return nullptr;
-    }
-    return m_dataProvider->getPlayerInfo(m_selectedPlayerId);
+    return _dataProvider->getPlayerInfo(_selectedPlayerId);
 }
 
 void GUI::PlayerInfoWindow::displayPlayerNotFound() {
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        m_position.y + 40,
-        m_dimensions.x - 20,
-        30,
-        "Joueur introuvable"
-    );
+    _guiLib->DrawLabel(_position.x + 10, _position.y + 40, _dimensions.x - 20,
+        30, "Joueur introuvable");
 }
 
 float GUI::PlayerInfoWindow::displayPlayerIdentity(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
     std::stringstream idTeam;
     idTeam << "ID: " << selectedPlayer->getId() << " | Équipe: " << selectedPlayer->getTeamName();
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        idTeam.str()
-    );
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, idTeam.str());
     return yOffset + 20;
 }
 
 std::string GUI::PlayerInfoWindow::getOrientationString(int orientation) {
     switch (orientation) {
-        case 1: return "Nord";
-        case 2: return "Est";
-        case 3: return "Sud";
-        case 4: return "Ouest";
-        default: return "Inconnue";
+        case 1:
+            return "Nord";
+        case 2:
+            return "Est";
+        case 3:
+            return "Sud";
+        case 4:
+            return "Ouest";
+        default:
+            return "Inconnue";
     }
 }
 
@@ -98,40 +86,25 @@ float GUI::PlayerInfoWindow::displayPositionInfo(std::shared_ptr<const IPlayer> 
     std::string orientationStr = getOrientationString(selectedPlayer->getOrientation());
     posInfo << "Position: (" << selectedPlayer->getX() << ", " << selectedPlayer->getY()
             << ") | Orientation: " << orientationStr;
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        posInfo.str()
-    );
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, posInfo.str());
     return yOffset + 20;
 }
 
 float GUI::PlayerInfoWindow::displayLevelInfo(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
     std::stringstream levelInfo;
     levelInfo << "Niveau: " << selectedPlayer->getLevel();
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        levelInfo.str()
-    );
+    _guiLib->DrawLabel(_position.x + 10, yOffset,
+        _dimensions.x - 20, 20, levelInfo.str());
     return yOffset + 30;
 }
 
 float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset) {
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        "Inventaire:"
-    );
+    _guiLib->DrawLabel( _position.x + 10, yOffset, _dimensions.x - 20,
+        20, "Inventaire:");
     float newYOffset = yOffset + 20;
-    if (m_dataProvider) {
-        auto inventory = m_dataProvider->getPlayerInventory(selectedPlayer->getId());
+    if (_dataProvider) {
+        auto inventory = _dataProvider->getPlayerInventory(selectedPlayer->getId());
         if (inventory) {
             const std::pair<std::string, int> resources[] = {
                 {"Nourriture", inventory->getFood()},
@@ -145,13 +118,8 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
             for (const auto& resource : resources) {
                 std::stringstream ss;
                 ss << resource.first << ": " << resource.second;
-                m_guiLib->DrawLabel(
-                    m_position.x + 10,
-                    newYOffset,
-                    m_dimensions.x - 20,
-                    20,
-                    ss.str()
-                );
+                _guiLib->DrawLabel(_position.x + 10, newYOffset,
+                    _dimensions.x - 20, 20, ss.str());
                 newYOffset += 20;
             }
         }
@@ -160,29 +128,28 @@ float GUI::PlayerInfoWindow::displayInventory(std::shared_ptr<const IPlayer> sel
 }
 
 bool GUI::PlayerInfoWindow::playerExistsInDataProvider() {
-    if (!m_dataProvider) {
+    if (!_dataProvider)
         return false;
-    }
-    auto player = m_dataProvider->getPlayerInfo(m_selectedPlayerId);
+    auto player = _dataProvider->getPlayerInfo(_selectedPlayerId);
     return player != nullptr;
 }
 
 void GUI::PlayerInfoWindow::setSelectedPlayer(int playerId) {
-    m_selectedPlayerId = playerId;
-    m_hasSelectedPlayer = true;
+    _selectedPlayerId = playerId;
+    _hasSelectedPlayer = true;
     setVisible(true);
 }
 
 int GUI::PlayerInfoWindow::getSelectedPlayer() const {
-    return m_selectedPlayerId;
+    return _selectedPlayerId;
 }
 
 bool GUI::PlayerInfoWindow::hasPlayerSelected() const {
-    return m_hasSelectedPlayer;
+    return _hasSelectedPlayer;
 }
 
 void GUI::PlayerInfoWindow::setCommandSender(std::shared_ptr<INetworkCommandSender> commandSender) {
-    m_commandSender = commandSender;
+    _commandSender = commandSender;
 }
 
 } // namespace GUI

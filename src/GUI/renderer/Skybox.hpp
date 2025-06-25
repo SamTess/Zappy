@@ -21,15 +21,15 @@ public:
     void cleanup(std::shared_ptr<IGraphicsLib> graphics);
 
     void setSkyboxTexture(const std::string& texturePath, std::shared_ptr<IGraphicsLib> graphics);
-    bool isLoaded() const { return m_textureId != -1; }
+    bool isLoaded() const { return _textureId != -1; }
     bool loadDefaultSkybox(std::shared_ptr<IGraphicsLib> graphics);
 
 private:
     void renderPNGSkybox(std::shared_ptr<IGraphicsLib> graphics);
 
-    int m_textureId = -1;
-    std::string m_texturePath = "assets/models/sky.jpg";
-    bool m_initialized = false;
-    int m_screenWidth = 1920;
-    int m_screenHeight = 1080;
+    int _textureId = -1;
+    std::string _texturePath = "assets/models/sky.jpg";
+    bool _initialized = false;
+    int _screenWidth = 1920;
+    int _screenHeight = 1080;
 };

@@ -39,11 +39,11 @@ public:
     void notifyDataUpdate();
 
 private:
-    std::shared_ptr<UIWindowFactory> m_windowFactory;
-    std::shared_ptr<INetworkCommandSender> m_commandSender;
-    std::shared_ptr<IUIDataProvider> m_dataProvider;
-    std::map<std::string, std::function<void()>> m_dataUpdateCallbacks;
-    int m_nextCallbackId;
+    std::shared_ptr<UIWindowFactory> _windowFactory;
+    std::shared_ptr<INetworkCommandSender> _commandSender;
+    std::shared_ptr<IUIDataProvider> _dataProvider;
+    std::map<std::string, std::function<void()>> _dataUpdateCallbacks;
+    int _nextCallbackId;
     std::string generateCallbackId();
     bool isValidWindowId(const std::string& windowId) const;
     void logSecurityWarning(const std::string& operation, const std::string& details) const;

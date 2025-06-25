@@ -67,7 +67,7 @@ public:
      * @brief Vérifie si la bibliothèque graphique a été initialisée
      * @return true si initialisée, false sinon
      */
-    bool hasModelLibSet() const { return m_graphicsLib != nullptr; }
+    bool hasModelLibSet() const { return _graphicsLib != nullptr; }
 
     /**
      * @brief Charge un modèle 3D à partir d'un chemin
@@ -159,7 +159,7 @@ public:
         getBoundingBox(int modelId) const;
 
 private:
-    ModelManager() : m_textureManager(TextureManager::getInstance()) {}
+    ModelManager() : _textureManager(TextureManager::getInstance()) {}
     ~ModelManager();
 
     // Empêcher la copie ou l'assignation
@@ -235,11 +235,11 @@ private:
      */
     bool validateModelForDrawing(int modelId);
 
-    TextureManager& m_textureManager;                // Instance de TextureManager pour gérer les textures associées
+    TextureManager& _textureManager;                // Instance de TextureManager pour gérer les textures associées
 
-    std::shared_ptr<IGraphicsLib> m_graphicsLib = nullptr;
-    std::map<std::string, int> m_pathToId;           // Associe les chemins aux IDs
-    std::map<int, Model3D> m_models;                 // Stocke les modèles avec leurs propriétés
-    int m_nextModelId = 1;                           // ID à attribuer au prochain modèle
-    mutable std::mutex m_mutex;                      // Mutex pour thread-safety
+    std::shared_ptr<IGraphicsLib> _graphicsLib = nullptr;
+    std::map<std::string, int> _pathToId;           // Associe les chemins aux IDs
+    std::map<int, Model3D> _models;                 // Stocke les modèles avec leurs propriétés
+    int _nextModelId = 1;                           // ID à attribuer au prochain modèle
+    mutable std::mutex _mutex;                      // Mutex pour thread-safety
 };

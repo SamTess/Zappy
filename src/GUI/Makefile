@@ -32,7 +32,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/Renderer.cpp \
 	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
-	  renderer/UIRenderer.cpp \
 	  renderer/ParticleSystem.cpp \
 	  renderer/EjectionAnimationManager.cpp \
 	  renderer/DeathAnimationManager.cpp \
@@ -49,7 +48,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/tileInfo/TileInfoWindow.cpp \
 	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
 	  ui/windows/broadcasts/BroadcastsWindow.cpp \
-	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp \
 	  ui/data/UIDataProvider.cpp \

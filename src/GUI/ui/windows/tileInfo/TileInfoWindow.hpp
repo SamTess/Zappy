@@ -19,7 +19,6 @@ public:
     ~TileInfoWindow() = default;
 
     void setSelectedTile(int x, int y);
-    std::pair<int, int> getSelectedTile() const;
     bool hasTileSelected() const;
 
 protected:
@@ -30,12 +29,9 @@ private:
     void renderTilePosition();
     float renderResourceInfo();
     void renderPlayerCount(float yOffset);
-
-    struct {
-        int x;
-        int y;
-        bool selected;
-    } m_selectedTile;
+    int _x;
+    int _y;
+    bool _isSelecting;
 };
 
 } // namespace GUI

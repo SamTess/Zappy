@@ -152,10 +152,8 @@ void GameController::handlePlayerInfo(std::shared_ptr<IMessageData> data) {
                 existingPlayer->getX(), existingPlayer->getY(), _gameState->getMapWidth(), _gameState->getMapHeight());
             Zappy::DeathAnimationManager::getInstance().startDeathAnimation(playerId, playerWorldPos, existingPlayer->getTeamName());
             _gameState->removePlayer(playerId);
-            // Protection contre segfault : vérifier que _graphics est initialisé
-            if (_graphics) {
+            if (_gameState->getSfxEnabled())
                 _graphics->PlaySound("assets/music/death.mp3");
-            }
             return;
         }
         int oldX = existingPlayer->getX();

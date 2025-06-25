@@ -16,11 +16,13 @@ namespace GUI {
 
 TileInfoWindow::TileInfoWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Informations sur la case") {
-    m_selectedTile = {0, 0, false};
+    _x = 0;
+    _y = 0;
+    _isSelecting = false;
 }
 
 void GUI::TileInfoWindow::renderContent() {
-    if (!m_selectedTile.selected) {
+    if (!_isSelecting) {
         renderNoTileSelected();
         return;
     }
@@ -30,31 +32,22 @@ void GUI::TileInfoWindow::renderContent() {
 }
 
 void GUI::TileInfoWindow::renderNoTileSelected() {
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        m_position.y + 40,
-        m_dimensions.x - 20,
-        30,
-        "Aucune case sélectionnée"
+    _guiLib->DrawLabel( _position.x + 10, _position.y + 40, _dimensions.x - 20,
+        30, "Aucune case sélectionnée"
     );
 }
 
 void GUI::TileInfoWindow::renderTilePosition() {
     std::stringstream tilePos;
-    tilePos << "Position: (" << m_selectedTile.x << ", " << m_selectedTile.y << ")";
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        m_position.y + 30,
-        m_dimensions.x - 20,
-        20,
-        tilePos.str()
-    );
+    tilePos << "Position: (" << _x << ", " << _y << ")";
+    _guiLib->DrawLabel(_position.x + 10, _position.y + 30, _dimensions.x - 20,
+        20, tilePos.str());
 }
 
 float GUI::TileInfoWindow::renderResourceInfo() {
     int resources[7] = {0};
-    if (m_dataProvider && m_dataProvider->isMapInitialized()) {
-        auto tile = m_dataProvider->getTile(m_selectedTile.x, m_selectedTile.y);
+    if (_dataProvider && _dataProvider->isMapInitialized()) {
+        auto tile = _dataProvider->getTile(_x, _y);
         if (tile) {
             const auto& tileResources = tile->getResources();
             for (int i = 0; i < 7; ++i) {
@@ -66,17 +59,12 @@ float GUI::TileInfoWindow::renderResourceInfo() {
         "Nourriture", "Linemate", "Deraumere", "Sibur",
         "Mendiane", "Phiras", "Thystame"
     };
-    float yOffset = m_position.y + 60;
+    float yOffset = _position.y + 60;
     for (int i = 0; i < 7; i++) {
         std::stringstream ss;
         ss << resourceNames[i] << ": " << resources[i];
-        m_guiLib->DrawLabel(
-            m_position.x + 10,
-            yOffset,
-            m_dimensions.x - 20,
-            20,
-            ss.str()
-        );
+        _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+            20, ss.str());
         yOffset += 20;
     }
     return yOffset;
@@ -84,34 +72,25 @@ float GUI::TileInfoWindow::renderResourceInfo() {
 
 void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     int playerCount = 0;
-    if (m_dataProvider && m_dataProvider->isMapInitialized()) {
-        auto playerIds = m_dataProvider->getPlayersOnTile(m_selectedTile.x, m_selectedTile.y);
+    if (_dataProvider && _dataProvider->isMapInitialized()) {
+        auto playerIds = _dataProvider->getPlayersOnTile(_x, _y);
         playerCount = static_cast<int>(playerIds.size());
     }
     std::stringstream playersTitle;
     playersTitle << "Joueurs sur cette case: " << playerCount;
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        playersTitle.str()
-    );
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, playersTitle.str());
 }
 
 void GUI::TileInfoWindow::setSelectedTile(int x, int y) {
-    m_selectedTile.x = x;
-    m_selectedTile.y = y;
-    m_selectedTile.selected = true;
+    _x = x;
+    _y = y;
+    _isSelecting = true;
     setVisible(true);
 }
 
-std::pair<int, int> GUI::TileInfoWindow::getSelectedTile() const {
-    return {m_selectedTile.x, m_selectedTile.y};
-}
-
 bool GUI::TileInfoWindow::hasTileSelected() const {
-    return m_selectedTile.selected;
+    return _isSelecting;
 }
 
 } // namespace GUI

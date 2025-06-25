@@ -18,17 +18,17 @@ namespace GUI {
 
 UIContext::UIContext(std::shared_ptr<UIWindowFactory> windowFactory,
                      std::shared_ptr<INetworkCommandSender> commandSender)
-    : m_windowFactory(windowFactory),
-      m_commandSender(commandSender),
-      m_nextCallbackId(0) {
+    : _windowFactory(windowFactory),
+      _commandSender(commandSender),
+      _nextCallbackId(0) {
 }
 
 std::shared_ptr<IUIDataProvider> UIContext::getDataProvider() const {
-    return m_dataProvider;
+    return _dataProvider;
 }
 
 void UIContext::setDataProvider(std::shared_ptr<IUIDataProvider> dataProvider) {
-    m_dataProvider = dataProvider;
+    _dataProvider = dataProvider;
     notifyDataUpdate();
 }
 
@@ -38,8 +38,8 @@ void UIContext::requestWindowClose(const std::string& windowId) {
         return;
     }
 
-    if (m_windowFactory) {
-        auto window = m_windowFactory->getWindow(windowId);
+    if (_windowFactory) {
+        auto window = _windowFactory->getWindow(windowId);
         if (window)
             window->setVisible(false);
     }
@@ -50,30 +50,30 @@ void UIContext::requestWindowVisibilityChange(const std::string& windowId, bool 
         logSecurityWarning("requestWindowVisibilityChange", "Invalid window ID: " + windowId);
         return;
     }
-    if (m_windowFactory) {
-        auto window = m_windowFactory->getWindow(windowId);
+    if (_windowFactory) {
+        auto window = _windowFactory->getWindow(windowId);
         if (window)
             window->setVisible(visible);
     }
 }
 
 void UIContext::notifyTileSelection(int x, int y) {
-    if (m_windowFactory)
-        m_windowFactory->setSelectedTile(x, y);
+    if (_windowFactory)
+        _windowFactory->setSelectedTile(x, y);
 }
 
 void UIContext::notifyPlayerSelection(int playerId) {
-    if (m_windowFactory)
-        m_windowFactory->setSelectedPlayer(playerId);
+    if (_windowFactory)
+        _windowFactory->setSelectedPlayer(playerId);
 }
 
 void UIContext::notifyViewModeChange(int viewMode) {
-    if (m_windowFactory)
-        m_windowFactory->setViewMode(viewMode);
+    if (_windowFactory)
+        _windowFactory->setViewMode(viewMode);
 }
 
 void UIContext::executeNetworkCommand(const std::string& command) {
-    if (!m_commandSender) {
+    if (!_commandSender) {
         logSecurityWarning("executeNetworkCommand", "No command sender available");
         return;
     }
@@ -81,24 +81,24 @@ void UIContext::executeNetworkCommand(const std::string& command) {
         logSecurityWarning("executeNetworkCommand", "Invalid command format");
         return;
     }
-    m_commandSender->sendCommand(command);
+    _commandSender->sendCommand(command);
 }
 
 void UIContext::setCommandSender(std::shared_ptr<INetworkCommandSender> commandSender) {
-    m_commandSender = commandSender;
+    _commandSender = commandSender;
 }
 
 void UIContext::registerDataUpdateCallback(std::function<void()> callback) {
     std::string callbackId = generateCallbackId();
-    m_dataUpdateCallbacks[callbackId] = callback;
+    _dataUpdateCallbacks[callbackId] = callback;
 }
 
 void UIContext::unregisterDataUpdateCallback(const std::string& callbackId) {
-    m_dataUpdateCallbacks.erase(callbackId);
+    _dataUpdateCallbacks.erase(callbackId);
 }
 
 void UIContext::notifyDataUpdate() {
-    for (const auto& pair : m_dataUpdateCallbacks) {
+    for (const auto& pair : _dataUpdateCallbacks) {
         try {
             pair.second();
         } catch (const std::exception& e) {
@@ -109,7 +109,7 @@ void UIContext::notifyDataUpdate() {
 
 std::string UIContext::generateCallbackId() {
     std::stringstream ss;
-    ss << "callback_" << (++m_nextCallbackId);
+    ss << "callback_" << (++_nextCallbackId);
     return ss.str();
 }
 

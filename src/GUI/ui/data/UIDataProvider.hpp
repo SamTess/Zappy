@@ -48,10 +48,10 @@ public:
     std::map<std::string, std::vector<int>> getTeamResourceTotals() const override;
 
 private:
-    std::shared_ptr<const GameState> m_gameState;
-    mutable float m_cachedGameTime = 0.0f;
-    mutable int m_cachedFrequency = 100;
-    mutable int m_cachedGameTick = 0;
+    std::shared_ptr<const GameState> _gameState;
+    mutable float _cachedGameTime = 0.0f;
+    mutable int _cachedFrequency = 100;
+    mutable int _cachedGameTick = 0;
     bool isValidGameState() const;
 };
 

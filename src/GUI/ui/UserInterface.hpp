@@ -23,17 +23,9 @@ public:
     ~UserInterface() = default;
     void initialize(int screenWidth, int screenHeight);
     void render();
-    void updateDataFromGameState(
-        std::shared_ptr<const GameState> gameState,
-        int mapWidth,
-        int mapHeight,
-        float gameTime,
-        int frequency,
-        int gameTick
-    );
+    void updateDataFromGameState(std::shared_ptr<const GameState> gameState);
     void setSelectedTile(int x, int y);
     void setSelectedPlayer(int playerId);
-    void addBroadcast(const std::string& team, const std::string& message);
     void notifyConnectionStatus(bool connected) override;
     void setCommandSender(std::shared_ptr<INetworkCommandSender> sender) override;
     void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
@@ -48,13 +40,13 @@ private:
     void handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition);
     void startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition);
     void handleDragEndIfNeeded();
-    std::shared_ptr<IGuiLib> m_guiLib;
-    std::shared_ptr<UIWindowFactory> m_windowFactory;
-    std::shared_ptr<INetworkCommandSender> m_commandSender;
-    int m_screenWidth;
-    int m_screenHeight;
-    bool m_isDragging;
-    bool m_mouseCapture;
+    std::shared_ptr<IGuiLib> _guiLib;
+    std::shared_ptr<UIWindowFactory> _windowFactory;
+    std::shared_ptr<INetworkCommandSender> _commandSender;
+    int _screenWidth;
+    int _screenHeight;
+    bool _isDragging;
+    bool _mouseCapture;
 };
 
 } // namespace GUI

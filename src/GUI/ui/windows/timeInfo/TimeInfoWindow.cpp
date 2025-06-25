@@ -18,66 +18,46 @@ TimeInfoWindow::TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib)
 
 float TimeInfoWindow::renderFpsInfo(float yOffset) {
     std::stringstream fpsInfo;
-    fpsInfo << "FPS: " << m_fps;
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        fpsInfo.str()
-    );
+    fpsInfo << "FPS: " << _fps;
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, fpsInfo.str());
     return yOffset + 25;
 }
 
 float TimeInfoWindow::renderTimeInfo(float yOffset) {
-    if (!m_dataProvider)
+    if (!_dataProvider)
         return yOffset;
     std::stringstream timeInfo;
-    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << m_dataProvider->getGameTime();
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        timeInfo.str()
-    );
+    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << _dataProvider->getGameTime();
+    _guiLib->DrawLabel( _position.x + 10, yOffset, _dimensions.x - 20,
+        20, timeInfo.str());
     return yOffset + 25;
 }
 
 float TimeInfoWindow::renderFrequencyInfo(float yOffset) {
-    if (!m_dataProvider)
+    if (!_dataProvider)
         return yOffset;
     std::stringstream freqInfo;
-    freqInfo << "Fréquence: " << m_dataProvider->getFrequency() << " Hz";
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        freqInfo.str()
-    );
+    freqInfo << "Fréquence: " << _dataProvider->getFrequency() << " /s";
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, freqInfo.str());
     return yOffset + 25;
 }
 
 float TimeInfoWindow::renderTickInfo(float yOffset) {
-    if (!m_dataProvider)
+    if (!_dataProvider)
         return yOffset;
     std::stringstream tickInfo;
-    tickInfo << "Tick: " << m_dataProvider->getGameTick();
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        tickInfo.str()
-    );
+    tickInfo << "Tick: " << _dataProvider->getGameTick();
+    _guiLib->DrawLabel( _position.x + 10, yOffset, _dimensions.x - 20,
+        20, tickInfo.str());
     return yOffset + 25;
 }
 
 void TimeInfoWindow::renderContent() {
-    float yOffset = m_position.y + 30;
+    float yOffset = _position.y + 30;
     yOffset = renderFpsInfo(yOffset);
-    if (m_dataProvider) {
+    if (_dataProvider) {
         yOffset = renderTimeInfo(yOffset);
         yOffset = renderFrequencyInfo(yOffset);
         yOffset = renderTickInfo(yOffset);

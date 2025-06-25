@@ -17,14 +17,14 @@ public:
     explicit TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib);
     ~TimeInfoWindow() = default;
 
-    void setFPS(int fps) { m_fps = fps; }
-    int getFPS() const { return m_fps; }
+    void setFPS(int fps) { _fps = fps; }
+    int getFPS() const { return _fps; }
 
 protected:
     void renderContent() override;
 
 private:
-    int m_fps = 60;
+    int _fps = 60;
     float renderFpsInfo(float yOffset);
     float renderTimeInfo(float yOffset);
     float renderFrequencyInfo(float yOffset);

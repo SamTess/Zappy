@@ -12,14 +12,14 @@
 
 class GameNetworkCommand : public ICommand {
 public:
-    explicit GameNetworkCommand(const std::string& command) : m_command(command) {}
+    explicit GameNetworkCommand(const std::string& command) : _command(command) {}
 
     void execute() override {};
-    std::string getDescription() const override { return m_command; }
-    const std::string& getCommand() const { return m_command; }
+    std::string getDescription() const override { return _command; }
+    const std::string& getCommand() const { return _command; }
 
 private:
-    std::string m_command;
+    std::string _command;
 };
 
 

@@ -40,9 +40,9 @@ private:
     float displayInventory(std::shared_ptr<const IPlayer> selectedPlayer, float yOffset);
     std::string getOrientationString(int orientation);
     bool playerExistsInDataProvider();
-    int m_selectedPlayerId;
-    bool m_hasSelectedPlayer;
-    std::shared_ptr<INetworkCommandSender> m_commandSender;
+    int _selectedPlayerId;
+    bool _hasSelectedPlayer;
+    std::shared_ptr<INetworkCommandSender> _commandSender;
 };
 
 } // namespace GUI

@@ -40,17 +40,16 @@ public:
 
 protected:
     virtual void renderContent() = 0;
-    std::shared_ptr<IGuiLib> m_guiLib;
-    std::shared_ptr<IUIContext> m_uiContext;
-    std::string m_title;
-    ZappyTypes::Vector2 m_position;
-    ZappyTypes::Vector2 m_dimensions;
-    ZappyTypes::Vector2 m_scrollPosition;
-    bool m_visible;
-    bool m_showWindowBox;
-    bool m_dragging;
-    ZappyTypes::Vector2 m_dragOffset;
-    std::shared_ptr<IUIDataProvider> m_dataProvider;
+    std::shared_ptr<IGuiLib> _guiLib;
+    std::shared_ptr<IUIContext> _uiContext;
+    std::string _title;
+    ZappyTypes::Vector2 _position;
+    ZappyTypes::Vector2 _dimensions;
+    bool _visible;
+    bool _showWindowBox;
+    bool _dragging;
+    ZappyTypes::Vector2 _dragOffset;
+    std::shared_ptr<IUIDataProvider> _dataProvider;
 };
 
 } // namespace GUI

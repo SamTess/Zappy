@@ -29,9 +29,9 @@ public:
     void setupConnections();
 
 private:
-    std::weak_ptr<NetworkManager> m_networkManager;
-    std::weak_ptr<GameController> m_gameController;
-    std::weak_ptr<IUINotifier> m_uiNotifier;
+    std::weak_ptr<NetworkManager> _networkManager;
+    std::weak_ptr<GameController> _gameController;
+    std::weak_ptr<IUINotifier> _uiNotifier;
 
     void onMessageReceived(const Message& message);
     void onConnectionStatusChanged(bool connected);

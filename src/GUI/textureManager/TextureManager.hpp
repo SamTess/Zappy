@@ -39,7 +39,7 @@ public:
      * @brief Vérifie si la bibliothèque graphique a été initialisée
      * @return true si initialisée, false sinon
      */
-    bool hasTextureLibSet() const { return m_graphicsLib != nullptr; }
+    bool hasTextureLibSet() const { return _graphicsLib != nullptr; }
 
     /**
      * @brief Charge une texture à partir d'un chemin
@@ -96,9 +96,9 @@ private:
     TextureManager(const TextureManager&) = delete;
     TextureManager& operator=(const TextureManager&) = delete;
 
-    std::shared_ptr<IGraphicsLib> m_graphicsLib = nullptr;
-    std::map<std::string, int> m_pathToId;       // Associe les chemins aux IDs
-    std::map<int, std::string> m_idToPath;       // Association inverse
-    int m_nextTextureId = 1;                     // ID à attribuer à la prochaine texture
-    mutable std::mutex m_mutex;                  // Mutex pour thread-safety
+    std::shared_ptr<IGraphicsLib> _graphicsLib = nullptr;
+    std::map<std::string, int> _pathToId;       // Associe les chemins aux IDs
+    std::map<int, std::string> _idToPath;       // Association inverse
+    int _nextTextureId = 1;                     // ID à attribuer à la prochaine texture
+    mutable std::mutex _mutex;                  // Mutex pour thread-safety
 };
