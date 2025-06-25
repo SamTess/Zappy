@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include "RayLib.hpp"
 #include "../TypeAdapter.hpp"
 #include "font/Text3D.hpp"
@@ -34,7 +35,7 @@ void RayLib::InitWindow(int width, int height, const std::string& title) {
 void RayLib::CloseWindow() {
     _texture3D.reset();
     _music.reset();
-    _sound.reset();
+    _sounds.clear();
     _font.reset();
     _models.clear();
     for (auto it = _textures.begin(); it != _textures.end(); ) {
@@ -44,11 +45,7 @@ void RayLib::CloseWindow() {
     _window.reset();
     _initialized = false;
     _textures.clear();
-    _models.clear();
-    _font.reset();
-    _sound.reset();
     _music.reset();
-    _texture3D.reset();
     _audio.reset();
 }
 
@@ -231,18 +228,27 @@ float RayLib::GetMouseWheelMove() {
 }
 
 void RayLib::PlaySound(const std::string& path) {
-    _sound.emplace(path);
-    _sound->play();
+    auto sound = std::make_unique<raylibcpp::SoundWrap>(path);
+    sound->play();
+
+    _sounds.push_back(std::move(sound));
+    if (_sounds.size() > 20)
+        _sounds.erase(_sounds.begin(), _sounds.begin() + (_sounds.size() - 20));
 }
 
 void RayLib::StopSound() {
-    if (_sound)
-        _sound->stop();
+    for (auto& sound : _sounds) {
+        if (sound)
+            sound->stop();
+    }
+    _sounds.clear();
 }
 
 void RayLib::SetSoundVolume(float volume) {
-    if (_sound)
-        _sound->setVolume(volume);
+    for (auto& sound : _sounds) {
+        if (sound)
+            sound->setVolume(volume);
+    }
 }
 
 void RayLib::PlayMusic(const std::string& path) {

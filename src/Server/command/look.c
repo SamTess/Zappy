@@ -18,11 +18,13 @@ static int get_total_size_tile(int i, char ***tiles,
 
     *tiles = malloc(num_tiles * sizeof(char *));
     if (!*tiles)
-        server_err("Malloc failed for tiles array");
+        return -1;
     for (int j = 0; j < num_tiles; j++) {
         (*tiles)[j] = check_rota_tiles(user, server, i, j);
         if (!(*tiles)[j])
             (*tiles)[j] = strdup("");
+        if (!(*tiles)[j])
+            return -1;
         total_len += strlen((*tiles)[j]);
         if (strlen((*tiles)[j]) > 0 && strchr((*tiles)[j], ' ') != NULL)
             total_len += 1;
@@ -37,7 +39,7 @@ static char *format_tile(size_t total_len, char **tiles, int num_tiles)
     char *res = malloc(sizeof(char) * total_len);
 
     if (!res)
-        server_err("Malloc failed for res formatting");
+        return NULL;
     res[0] = '\0';
     for (int j = 0; j < num_tiles; j++) {
         if (j > 0)
@@ -58,9 +60,13 @@ static char *look_tiles(client_t *user, server_t *server, int i)
     char *res;
 
     total_len = get_total_size_tile(i, &tiles, user, server);
+    if (total_len == (size_t)-1)
+        return NULL;
     if (!tiles)
         return strdup("");
     res = format_tile(total_len, tiles, num_tiles);
+    if (!res)
+        return NULL;
     free(tiles);
     return res;
 }
@@ -73,11 +79,13 @@ static int get_total_size(char ***level_tiles,
 
     *level_tiles = malloc(num_levels * sizeof(char *));
     if (!*level_tiles)
-        server_err("Malloc failed for tiles allocation");
+        return -1;
     for (int i = 0; i <= user->player->level; i++) {
         (*level_tiles)[i] = look_tiles(user, server, i);
         if (!(*level_tiles)[i])
             (*level_tiles)[i] = strdup("");
+        if (!(*level_tiles)[i])
+            return -1;
         total += strlen((*level_tiles)[i]);
         if (i > 0)
             total += 1;
@@ -90,7 +98,7 @@ static char *format_look(size_t total_len, char **level_tiles, client_t *user)
     char *res = malloc(sizeof(char) * total_len);
 
     if (!res)
-        server_err("Malloc failed for res final look");
+        return NULL;
     strcpy(res, "[");
     for (int i = 0; i <= user->player->level; i++) {
         if (i > 0)
@@ -111,9 +119,11 @@ void look(server_t *server, client_t *user, char **buffer)
     if (!server || !user || !user->player || arr_len(buffer) != 1)
         return write_command_output(user->client_fd, "ko\n");
     total_len = get_total_size(&level_tiles, user, server);
-    if (!level_tiles)
+    if (total_len == (size_t)-1 || !level_tiles)
         return write_command_output(user->client_fd, "ko\n");
     res = format_look(total_len, level_tiles, user);
+    if (!res)
+        return write_command_output(user->client_fd, "ko\n");
     free(level_tiles);
     write_command_output(user->client_fd, res);
     free(res);

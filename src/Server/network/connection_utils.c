@@ -33,13 +33,15 @@ static void create_server_egg(server_t *n_server, int egg_id, int i)
         n_server->parsed_info->names[i]);
 
     if (n_egg == NULL)
-        server_err("Error in egg creation");
+        return;
     add_egg(n_server, n_egg);
 }
 
 void init_struct(client_t *new_c)
 {
     init_player(new_c->player, NULL);
+    if (!new_c->player)
+        return;
     init_circular_buffer(&new_c->read_buffer);
 }
 

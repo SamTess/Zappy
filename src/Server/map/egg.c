@@ -23,7 +23,7 @@ egg_t *create_egg(int egg_id, int pos_x, int pos_y, char *team)
     new_egg->next = NULL;
     new_egg->team_name = strdup(team);
     if (new_egg->team_name == NULL)
-        server_err("Egg team allocation failed\n");
+        return NULL;
     return new_egg;
 }
 

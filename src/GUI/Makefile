@@ -21,7 +21,11 @@ SRC = parsing/ParsingCLI.cpp \
 	  network/networkThread/NetworkThread.cpp \
 	  network/protocol/Message.cpp \
 	  network/protocol/ProtocolParser.cpp \
-	  network/utils/SystemWrapper.cpp \
+	  network/systemWrapper/implementation/TcpSocket.cpp \
+	  network/systemWrapper/implementation/NetworkAddress.cpp \
+	  network/systemWrapper/implementation/SocketPoller.cpp \
+	  network/systemWrapper/implementation/Buffer.cpp \
+	  network/systemWrapper/factory/NetworkFactory.cpp \
 	  network/networkManager/NetworkManager.cpp \
 	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \
@@ -44,7 +48,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/AUIWindow.cpp \
 	  ui/windows/tileInfo/TileInfoWindow.cpp \
 	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
-	  ui/windows/broadcasts/BroadcastsWindow.cpp \
+	  ui/windows/mapInfo/MapInfoWindow.cpp \
 	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp \

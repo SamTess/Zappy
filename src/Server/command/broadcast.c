@@ -96,7 +96,7 @@ static int calculate_direction(client_t *receiver, int source_rel_x,
         + 8) % 8) + 1;
 }
 
-static void send_broadcast_to_client(server_t *server, client_t *sender,
+static int send_broadcast_to_client(server_t *server, client_t *sender,
     client_t *receiver, char *message)
 {
     int direction = 0;
@@ -106,9 +106,9 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     int source_rel_y;
 
     if (!receiver || !receiver->player || receiver == sender)
-        return;
+        return 84;
     if (response == NULL)
-        server_err("Malloc failed for allocating response for broadcast");
+        return 84;
     source_rel_x = calculate_shortest_distance_x(receiver->player->pos_x,
         sender->player->pos_x, server->parsed_info->width);
     source_rel_y = calculate_shortest_distance_y(receiver->player->pos_y,
@@ -117,6 +117,7 @@ static void send_broadcast_to_client(server_t *server, client_t *sender,
     snprintf(response, res_size, "message %d, %s\n", direction, message);
     write_command_output(receiver->client_fd, response);
     free(response);
+    return 0;
 }
 
 static int calculate_message_length(char **buffer, int arr_length)
@@ -178,10 +179,11 @@ void broadcast(server_t *server, client_t *user, char **buffer)
     if (current)
         current = current->next;
     command_pbc(server, user, message);
-    while (current) {
+    for (int temp = 0; current != NULL; current = current->next){
         if (current->player && current != user && current->type != GRAPHICAL)
-            send_broadcast_to_client(server, user, current, message);
-        current = current->next;
+            temp = send_broadcast_to_client(server, user, current, message);
+        if (temp == 84)
+            return write_command_output(user->client_fd, "ko\n");
     }
     free(message);
     write_command_output(user->client_fd, "ok\n");
