@@ -87,9 +87,9 @@ class BigDysonBehavior(Behavior):
     for _ in range(self.agent.map_size_x):
       AgentActionManager(self.agent).take_everything_here()
       self.agent.send_command("Forward")
-    self.agent.send_command(choice(["Right", "Left"]))
+    self.agent.send_command(choice(["Right", "Left", "Forward"]))
     self.agent.send_command("Forward")
-    self.agent.send_command(choice(["Right", "Left"]))
+    self.agent.send_command(choice(["Right", "Left", "Forward"]))
 
 
 class FoodBigDysonBehavior(Behavior):
@@ -97,9 +97,9 @@ class FoodBigDysonBehavior(Behavior):
     for _ in range(self.agent.map_size_x):
       self.agent.send_command("Forward")
       AgentActionManager(self.agent).take_all_of_item_here("food")
-    self.agent.send_command(choice(["Right", "Left"]))
+    self.agent.send_command(choice(["Right", "Left", "Forward"]))
     self.agent.send_command("Forward")
-    self.agent.send_command(choice(["Right", "Left"]))
+    self.agent.send_command(choice(["Right", "Left", "Forward"]))
 
 
 class GetFoodAndMineralsBehavior(Behavior):
