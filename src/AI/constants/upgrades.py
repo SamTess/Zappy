@@ -1,3 +1,6 @@
+
+minimum_players_for_upgrade = 6
+
 upgrades = {
     1 : {
         "name": "lvl 1 -> 2",

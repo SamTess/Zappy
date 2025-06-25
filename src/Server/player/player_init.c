@@ -57,37 +57,57 @@ void init_new_player_pos(server_t *server, client_t *new_client)
 static void init_pending(player_t *player)
 {
     player->pending_cmd = calloc(1, sizeof(pending_cmd_t));
+    if (!player->pending_cmd)
+        return;
     player->pending_cmd->args = NULL;
     player->pending_cmd->func = NULL;
 }
 
-static void init_player_team(player_t *player, char *player_team)
+static int init_player_team(player_t *player, char *player_team)
 {
     player->team_name = strdup(player_team);
     if (player->team_name == NULL){
         free(player->command_queue);
-        server_err("Strdup failed for player team name");
+        return -1;
     }
+    return 0;
+}
+
+static int check_command_queue(player_t *player)
+{
+    player->command_queue = calloc(10, sizeof(char *));
+    if (player->command_queue == NULL){
+        free(player);
+        player = NULL;
+        return -1;
+    }
+    init_pending(player);
+    if (!player->pending_cmd){
+        free(player->command_queue);
+        free(player);
+        player = NULL;
+        return -1;
+    }
+    return 0;
 }
 
 void init_player(player_t *player, char *player_team)
 {
     player->pos_x = 0;
     player->pos_y = 0;
-    player->rotation = UP;
+    player->rotation = rand() % 4 + 1;
     player->busy_until = 0;
     player->queue_size = 0;
-    player->command_queue = calloc(10, sizeof(char *));
-    if (player->command_queue == NULL)
-        server_err("Malloc failed for command queue");
+    if (check_command_queue(player) == -1)
+        return;
     player->level = 1;
     player->life = 126;
     if (player_team != NULL) {
-        init_player_team(player, player_team);
+        if (init_player_team(player, player_team) == -1)
+            player->team_name = NULL;
     } else
         player->team_name = NULL;
     init_inventory(player);
     player->is_in_incantation = false;
     player->incantation_leader_id = -1;
-    init_pending(player);
 }

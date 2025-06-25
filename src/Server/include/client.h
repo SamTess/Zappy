@@ -10,6 +10,7 @@
     #include <sys/poll.h>
     #include <netinet/in.h>
     #include "player.h"
+    #include "circular_buffer.h"
 
 enum client_type_e {
     GRAPHICAL,
@@ -26,6 +27,7 @@ typedef struct client_s {
     int client_fd;
     struct pollfd *client_poll;
     struct sockaddr_in *client_add;
+    circular_buffer_t read_buffer;
     player_t *player;
     struct client_s *next;
     bool is_fully_connected;

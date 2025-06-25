@@ -9,13 +9,13 @@
 #include <memory>
 #include <string>
 #include "ITileRenderStrategy.hpp"
-#include "../../graphicalContext/GraphicalContext.hpp"
+#include "../../gameController/GameState.hpp"
 
 namespace Zappy {
 
 class DetailedTileRenderStrategy : public ITileRenderStrategy {
 private:
-    const std::shared_ptr<GraphicalContext> context;
+    const std::shared_ptr<const GameState> gameState;
     void renderText3D(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         const std::string& text,
         ZappyTypes::Vector3 position,
@@ -26,17 +26,14 @@ private:
         ResourceType resourceType,
         int quantity,
         float tileSize);
-    void renderPlayerIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        ZappyTypes::Vector3 position,
-        int playerId,
-        float tileSize);
+
     void renderEggIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         ZappyTypes::Vector3 position,
         int eggId,
         float tileSize);
 
 public:
-    explicit DetailedTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx);
+    explicit DetailedTileRenderStrategy(const std::shared_ptr<const GameState>& gameState);
     void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         int x, int y,
         const ZappyTypes::Color& color,

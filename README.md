@@ -33,7 +33,8 @@
 
 - [Overview](#-overview)
 - [Architecture](#-architecture)
-- [Prerequisites](#-prerequisites)
+- [Interface utilisateur](#-interface-utilisateur)
+- [Prérequis](#-prérequis)
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Components](#-components)
@@ -72,7 +73,26 @@ The components communicate via TCP/IP network protocols:
 └────────┘                          └──────────┘
 ```
 
-## 🔧 Prerequisites
+## 💎 Interface Utilisateur
+
+L'interface utilisateur du GUI a été conçue selon les principes de conception orientée objet avancés :
+
+- **Pattern Factory** : Utilisation de `UIWindowFactory` pour la création et gestion des fenêtres
+- **Hiérarchie de classes** : Organisation autour de l'interface `IUIWindow` et la classe abstraite `AUIWindow`
+- **Modularité** : Chaque type de fenêtre est encapsulé dans sa propre classe spécialisée
+
+Types de fenêtres disponibles :
+- Journaux (`LogsWindow`) - affiche les messages système et événements
+- Informations sur les tuiles (`TileInfoWindow`) - détails sur les cases sélectionnées
+- Informations sur les joueurs (`PlayerInfoWindow`) - statistiques des joueurs
+- Diffusions (`BroadcastsWindow`) - messages entre les joueurs
+- Contrôles (`ControlsWindow`) - options de contrôle de la caméra et du jeu
+- Informations temporelles (`TimeInfoWindow`) - statistiques de temps et fréquence
+- Menu (`MenuWindow`) - paramètres globaux de l'application
+
+Documentation détaillée disponible dans [docs/ui_architecture.md](docs/ui_architecture.md).
+
+## 🔧 Prérequis
 
 To compile and run Zappy, you will need:
 
@@ -215,7 +235,6 @@ Autonomous bots developed in Python with a modular and scalable architecture.
 - Evolution and cooperation strategies
 - Advanced logging for debugging and analysis
 ./zappy_ai -p 4242 -n team1
-```
 
 ## 📦 Components
 

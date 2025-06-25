@@ -13,6 +13,7 @@ enum class MessageType {
     TileContent,
     PlayerInfo,
     PlayerInventory,
+    PlayerExpulsion,
     Broadcast,
     Incantation,
     IncantationEnd,

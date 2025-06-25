@@ -8,15 +8,15 @@
 #pragma once
 #include <memory>
 #include "ITileRenderStrategy.hpp"
-#include "../../graphicalContext/GraphicalContext.hpp"
+#include "../../gameController/GameState.hpp"
 
 namespace Zappy {
 
 class SimpleTileRenderStrategy : public ITileRenderStrategy {
 private:
-    const std::shared_ptr<GraphicalContext> context;
+    const std::shared_ptr<const GameState> gameState;
 public:
-    explicit SimpleTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx);
+    explicit SimpleTileRenderStrategy(const std::shared_ptr<const GameState>& gameState);
     void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         int x, int y,
         const ZappyTypes::Color& color,

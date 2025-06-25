@@ -20,7 +20,9 @@
 #include "../protocol/HeaderMessage.hpp"
 #include "../networkThread/NetworkThread.hpp"
 #include "../buffer/MessageQueue.hpp"
-#include "../../graphicalContext/GraphicalContext.hpp"
+#include "../buffer/CircularBuffer.hpp"
+
+class GameController;
 
 class NetworkManager {
     public:
@@ -33,13 +35,14 @@ class NetworkManager {
         void sendCommand(const std::string& command);
         void processIncomingMessages();
 
-        // Callback pour récupérer les messages
         using MessageCallback = std::function<void(const std::string&, const std::string&)>;
         void setMessageCallback(MessageCallback callback);
-        // Callback pour les changements de statut de connexion
         using ConnectionCallback = std::function<void(bool)>;
         void setConnectionCallback(ConnectionCallback callback);
         void networkThreadLoop();
+
+        std::shared_ptr<GameController> getGameController() const;
+        void setGameController(std::shared_ptr<GameController> controller);
 
     private:
         std::unique_ptr<TcpConnection> _connection;
@@ -47,8 +50,8 @@ class NetworkManager {
         std::unique_ptr<NetworkThread> _networkThread;
         std::unique_ptr<MessageQueue> _incomingQueue;
         std::unique_ptr<MessageQueue> _outgoingQueue;
-        std::string _receiveBuffer;
-        std::unique_ptr<GraphicalContext> _graphicalContext;
+        CircularBuffer _receiveBuffer;
+        std::shared_ptr<GameController> _gameController;
 
         bool _isConnected;
         std::mutex _logMutex;
@@ -58,7 +61,6 @@ class NetworkManager {
         MessageCallback _messageCallback;
         ConnectionCallback _connectionCallback;
 
-        // Méthodes de gestion du thread réseau
         bool tryReceiveInitialWelcome();
         bool processInitialWelcomeData();
         int receiveAndProcessData(int errorCount, int maxErrors);

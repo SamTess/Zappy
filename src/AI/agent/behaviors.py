@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 from time import sleep
-import utils.zappy as zappy
-import utils.encryption as encryption
 from agent.agentActionsService import AgentActionManager
-import constants.upgrades as upgrades
+import utils.zappy as zappy
 
 class Behavior(ABC):
   def __init__(self, agent):
@@ -11,6 +9,12 @@ class Behavior(ABC):
   @abstractmethod
   def execute(self, surroundings=None, inventory=None):
     pass
+
+
+class NoActionBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    sleep(0.1)
+    return
 
 
 class GetFoodBehavior(Behavior):
@@ -23,26 +27,6 @@ class UpgradeBehavior(Behavior):
     if not surroundings or not inventory:
       print("UpgradeBehavior: Surroundings or inventory is None.")
       return
-
-    inventory_dict = zappy.inventory_to_dict(inventory)
-    upgrade_info = upgrades.upgrades.get(self.agent.level, {})
-
-    if not upgrade_info:
-      print(f"UpgradeBehavior: No upgrade defined for level {self.agent.level}.")
-      return
-    if not inventory_dict:
-      print("UpgradeBehavior: Inventory is empty or not properly parsed.")
-      return
-
-    upgrade_cost = upgrade_info.get("cost", {})
-
-    for resource, amount in upgrade_cost.items():
-      if resource == "players":
-        if zappy.how_much_of_item_here(surroundings, "player") < amount:
-          return
-        continue
-      elif inventory_dict.get(resource, 0) < amount:
-        return
 
     self.agent.send_command("Incantation")
 
@@ -105,6 +89,17 @@ class BigDysonBehavior(Behavior):
     self.agent.send_command("Forward")
     self.agent.send_command("Left")
 
+
+class FoodBigDysonBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    for _ in range(self.agent.map_size_x):
+      self.agent.send_command("Forward")
+      AgentActionManager(self.agent).take_all_of_item_here("food")
+    self.agent.send_command("Right")
+    self.agent.send_command("Forward")
+    self.agent.send_command("Left")
+
+
 class GetFoodAndMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if not surroundings or not inventory:
@@ -123,14 +118,82 @@ class JoinTeamMatesBehavior(Behavior):
       print("JoinTeamMatesBehavior: Surroundings is None.")
       return
 
-    closest_player_distance = zappy.get_closest_of_item(surroundings, "player")
-    if closest_player_distance == -1:
-      print("No teammates found nearby.")
+    if not self.agent.other_agents:
+      print("JoinTeamMatesBehavior: No other agents known.")
       return
 
-    if closest_player_distance == 0:
-      print("Already at the same position as a teammate.")
+    lowest_id = min([int(agent_id) for agent_id in self.agent.other_agents.keys()])
+    if self.agent.id <= lowest_id:
       return
 
-    AgentActionManager(self.agent).go_to_pos_with_distance(closest_player_distance)
-    print(f"Moving towards teammate at distance {closest_player_distance}.")
+    self.agent.other_agents[lowest_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[lowest_id]["direction"])
+
+
+class TakeEverythingHereBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not surroundings:
+      print("TakeEverythingHereBehavior: Surroundings is None.")
+      return
+
+    AgentActionManager(self.agent).take_everything_here()
+
+
+class TakeAllFoodHereBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not surroundings:
+      print("TakeAllFoodHereBehavior: Surroundings is None.")
+      return
+
+    AgentActionManager(self.agent).take_all_of_item_here("food")
+
+
+class TakeOneFoodHereBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    self.agent.send_command("Take food")
+
+
+class DropEveryMineralsBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not inventory:
+      print("DropEveryMineralsBehavior: Inventory is None.")
+      return
+
+    inventory_dict = zappy.inventory_to_dict(inventory)
+    minerals = [item for item in inventory_dict if item != "food"]
+
+    for mineral in minerals:
+      amount = inventory_dict[mineral]
+      for _ in range(amount):
+        self.agent.send_command(f"Set {mineral}")
+
+
+class DropAllFoodBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not inventory:
+      print("DropAllFoodBehavior: Inventory is None.")
+      return
+
+    inventory_dict = zappy.inventory_to_dict(inventory)
+    if "food" in inventory_dict:
+      amount = inventory_dict["food"]
+      for _ in range(amount):
+        self.agent.send_command("Set food")
+
+
+class ForkBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    while True:
+      slots_available = self.agent.send_command("Connect_nbr")
+      if slots_available is None or "ko" in slots_available:
+        print(f"ForkAgentBehavior: Failed to get available slots. Response: {slots_available}")
+        return
+      try:
+        slots_available = int(slots_available)
+      except ValueError:
+        print(f"ForkAgentBehavior: Invalid slots_available value: {slots_available}")
+        return
+      if slots_available > 0:
+        from utils.mutliprocessing import fork_agent
+        fork_agent(self.agent.ip, self.agent.port, self.agent.team, 0, self.agent.performance_mode)
+      else:
+        return

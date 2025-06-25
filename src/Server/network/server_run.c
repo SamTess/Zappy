@@ -42,10 +42,8 @@ static void new_connection(server_t *server)
     memset(&client_addr, 0, sizeof(client_addr));
     client_fd = accept(server->s_fd, (struct sockaddr *)&client_addr,
         &addr_len);
-    if (client_fd < 0) {
-        perror("Accept failed");
-        exit(84);
-    }
+    if (client_fd < 0)
+        return;
     add_fd(server, client_fd);
     server->nfds += 1;
     new_client = find_client_by_socket(server, client_fd);
@@ -75,21 +73,22 @@ static void check_client_message(server_t *server)
     }
 }
 
-static void setup_poll_manager(poll_manager_t *poll_mana, int size)
+static int setup_poll_manager(poll_manager_t *poll_mana, int size)
 {
     if (!poll_mana->fds) {
         poll_mana->fds = malloc(size * sizeof(struct pollfd));
         if (!poll_mana->fds)
-            server_err("Poll_mana alloc failed\n");
+            return -1;
         poll_mana->capacity = size;
     }
     if (size > poll_mana->capacity) {
         poll_mana->fds = realloc(poll_mana->fds, size * sizeof(struct pollfd));
         if (!poll_mana->fds)
-            server_err("Poll_mana realloc failed\n");
+            return -1;
         poll_mana->capacity = size;
     }
     poll_mana->needs_rebuild = true;
+    return 0;
 }
 
 static void smart_polling(client_t *current, poll_manager_t *poll_mana,
@@ -154,8 +153,11 @@ static void handle_game_tick(server_t *server)
 void check_client(server_t *server)
 {
     int size = server->nfds + 1;
+    int temp = 0;
 
-    setup_poll_manager(server->poll_manager, size);
+    temp = setup_poll_manager(server->poll_manager, size);
+    if (temp == -1 || !server->poll_manager->fds)
+        return;
     handle_game_tick(server);
     if (server->poll_manager->needs_rebuild)
         fill_poll_array(server, server->poll_manager);

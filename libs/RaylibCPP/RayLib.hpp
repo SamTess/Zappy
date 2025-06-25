@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <map>
+#include <vector>
 
 #include "../../src/Shared/IGraphicsLib.hpp"
 #include "window/Window.hpp"
@@ -38,6 +39,7 @@ public:
     void DrawCircle(int centerX, int centerY, float radius, ZappyTypes::Color color) override;
 
     void DrawCube(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
+    void DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) override;
     void DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) override;
     void DrawPlane(ZappyTypes::Vector3 centerPos, ZappyTypes::Vector2 size, ZappyTypes::Color color) override;
     void DrawGrid(int slices, float spacing) override;
@@ -94,9 +96,18 @@ public:
     // Modèles 3D
     int LoadModel3D(const std::string& path) override;
     void DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) override;
-    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) override;
+    void DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color = ZappyTypes::Colors::Z_WHITE) override;
     void UnloadModel3D(int modelId) override;
     int LoadModelWithTexture(const std::string& modelPath, const std::string& texturePath) override;
+
+    // Ray casting pour la sélection 3D
+    ZappyTypes::Vector3 GetCameraPosition() override;
+    ZappyTypes::Vector3 GetCameraTarget() override;
+    ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) override;
+    bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) override;
+
+    // Performance
+    int GetFPS() override;
 
 private:
     std::unique_ptr<raylibcpp::Window> _window;
@@ -104,10 +115,11 @@ private:
     std::map<int, std::unique_ptr<raylibcpp::ModelWrap>> _models;
     int _nextModelId = 1;
     std::optional<raylibcpp::Font> _font;
-    std::optional<raylibcpp::SoundWrap> _sound;
+    std::vector<std::unique_ptr<raylibcpp::SoundWrap>> _sounds;
     std::optional<raylibcpp::MusicWrap> _music;
     std::optional<raylibcpp::Camera2DWrap> _camera2D;
     std::optional<raylibcpp::Camera3DWrap> _camera3D;
     std::optional<raylibcpp::Texture3DWrap> _texture3D;
+    std::optional<raylibcpp::Audio> _audio;
     bool _initialized = false;
 };

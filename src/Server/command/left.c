@@ -12,21 +12,21 @@
 static void change_rot(client_t *client)
 {
     switch (client->player->rotation) {
-    case UP:
-        client->player->rotation = LEFT;
-        break;
-    case DOWN:
-        client->player->rotation = RIGHT;
-        break;
-    case LEFT:
-        client->player->rotation = DOWN;
-        break;
-    case RIGHT:
-        client->player->rotation = UP;
-        break;
-    default:
-        break;
-    }
+        case RIGHT:
+            client->player->rotation = UP;
+            break;
+        case DOWN:
+            client->player->rotation = RIGHT;
+            break;
+        case LEFT:
+            client->player->rotation = DOWN;
+            break;
+        case UP:
+            client->player->rotation = LEFT;
+            break;
+        default:
+            break;
+        }
 }
 
 void left(server_t *server, client_t *client, char **buffer)
@@ -35,9 +35,9 @@ void left(server_t *server, client_t *client, char **buffer)
         return;
     if (!server || !client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
-    if (client->player->rotation != UP && client->player->rotation != DOWN
+    if (client->player->rotation != RIGHT && client->player->rotation != DOWN
         && client->player->rotation != LEFT
-        && client->player->rotation != RIGHT) {
+        && client->player->rotation != UP) {
         perror("Unexpected left rotation");
         return write_command_output(client->client_fd, "ko\n");
     }

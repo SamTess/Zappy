@@ -9,23 +9,22 @@
 #include <cmath>
 #include <memory>
 #include "SimpleTileRenderStrategy.hpp"
-#include "../../graphicalContext/GraphicalContext.hpp"
 
 namespace Zappy {
 
-SimpleTileRenderStrategy::SimpleTileRenderStrategy(const std::shared_ptr<GraphicalContext>& ctx)
-    : context(ctx) {}
+SimpleTileRenderStrategy::SimpleTileRenderStrategy(const std::shared_ptr<const GameState>& gameState)
+    : gameState(gameState) {}
 
 void SimpleTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     int x, int y,
     const ZappyTypes::Color& color,
     float tileSize,
     float spacing) {
-    float mapOffset = context->getMapWidth() / 2.0f;
+    float mapOffset = gameState->getMapWidth() / 2.0f;
     ZappyTypes::Vector3 position = {
         (x - mapOffset + 0.5f) * (tileSize + spacing),
         0.0f,
-        (y - mapOffset + 0.5f) * (tileSize + spacing)
+        (y - gameState->getMapHeight() / 2.0f + 0.5f) * (tileSize + spacing)
     };
     graphicsLib->DrawCube(position, tileSize, tileSize * 0.1f, tileSize, color);
     ZappyTypes::Color borderColor = {100, 100, 100, 255};

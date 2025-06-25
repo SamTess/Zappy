@@ -20,18 +20,12 @@ void handle_player_death(server_t *server, client_t *client)
         return;
     write_command_output(client->client_fd, "dead\n");
     command_pdi(server, client);
-    if (server->map && client->player->pos_y < server->parsed_info->height &&
+    if (server->map && client->player->pos_y >= 0 &&
+        client->player->pos_y < server->parsed_info->height &&
+        client->player->pos_x >= 0 &&
         client->player->pos_x < server->parsed_info->width) {
         tile = &server->map[client->player->pos_y][client->player->pos_x];
         tile_remove_player(tile, client->client_id);
-    }
-    if (client->player) {
-        free_inventory(client->player);
-        cleanup_player_queue(client->player);
-        cleanup_pending(client->player);
-        free(client->player->team_name);
-        free(client->player);
-        client->player = NULL;
     }
     remove_fd(server, client->client_fd);
 }

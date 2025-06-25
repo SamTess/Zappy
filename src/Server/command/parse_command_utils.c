@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <poll.h>
 
 void cleanup_pending(player_t *player)
 {
@@ -60,23 +61,89 @@ void cleanup_player_queue(player_t *player)
     player->queue_size = 0;
 }
 
-void cleanup_client(client_t *client)
+static int check_socket_ready(struct pollfd *pfd)
 {
-    if (!client)
-        return;
-    if (client->player) {
-        cleanup_player_queue(client->player);
-        cleanup_pending(client->player);
-        free(client->player);
-        client->player = NULL;
+    int poll_result;
+
+    pfd->revents = 0;
+    poll_result = poll(pfd, 1, 10);
+    if (poll_result == -1)
+        return -1;
+    if (poll_result == 0 || !(pfd->revents & POLLOUT))
+        return 0;
+    return 1;
+}
+
+static int handle_write_result(ssize_t bytes_written, int *retry_count)
+{
+    if (bytes_written == -1) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            (*retry_count)++;
+            return 0;
+        }
+        perror("Write failed");
+        return -1;
     }
+    if (bytes_written == 0) {
+        (*retry_count)++;
+        return 0;
+    }
+    *retry_count = 0;
+    return 1;
+}
+
+static int attempt_write(int client_fd, char *msg,
+    ssize_t *total_written, ssize_t msg_len)
+{
+    ssize_t bytes_written;
+
+    bytes_written = write(client_fd, msg + *total_written,
+        msg_len - *total_written);
+    if (bytes_written > 0)
+        *total_written += bytes_written;
+    return bytes_written;
+}
+
+static void write_with_poll(int client_fd, struct pollfd *pfd,
+    char *msg, ssize_t msg_len)
+{
+    ssize_t total_written = 0;
+    int retry_count = 0;
+    int socket_status;
+    int write_result;
+
+    while (total_written < msg_len && retry_count < MAX_RETRY) {
+        socket_status = check_socket_ready(pfd);
+        if (socket_status == -1)
+            return;
+        if (socket_status == 0) {
+            retry_count++;
+            continue;
+        }
+        write_result = attempt_write(client_fd, msg, &total_written, msg_len);
+        if (handle_write_result(write_result, &retry_count) == -1)
+            return;
+    }
+    if (total_written < msg_len)
+        perror("Failed to write full message");
+}
+
+static int validate_client_fd(int client_fd)
+{
+    if (fcntl(client_fd, F_GETFD) == -1) {
+        perror("FD isn't up anymore");
+        return 0;
+    }
+    return 1;
 }
 
 void write_command_output(int client_fd, char *msg)
 {
-    if (fcntl(client_fd, F_GETFD) == -1) {
-        perror("FD isn't up anymore\n");
-    } else {
-        write(client_fd, msg, strlen(msg));
-    }
+    struct pollfd pfd;
+
+    if (!validate_client_fd(client_fd))
+        return;
+    pfd.fd = client_fd;
+    pfd.events = POLLOUT;
+    write_with_poll(client_fd, &pfd, msg, strlen(msg));
 }

@@ -4,16 +4,23 @@
 ** File description:
 ** RayLib implementation
 */
+#include <raylib.h>
+#include <raymath.h>
 #include <stdexcept>
 #include <memory>
+#include <utility>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <cmath>
+#include <algorithm>
 #include "RayLib.hpp"
 #include "../TypeAdapter.hpp"
 #include "font/Text3D.hpp"
 
-RayLib::RayLib() {}
+RayLib::RayLib() {
+    _audio.emplace();
+}
 
 RayLib::~RayLib() {
     if (_initialized)
@@ -26,14 +33,20 @@ void RayLib::InitWindow(int width, int height, const std::string& title) {
 }
 
 void RayLib::CloseWindow() {
+    _texture3D.reset();
+    _music.reset();
+    _sounds.clear();
+    _font.reset();
+    _models.clear();
+    for (auto it = _textures.begin(); it != _textures.end(); ) {
+        auto current = it++;
+        _textures.erase(current);
+    }
     _window.reset();
     _initialized = false;
     _textures.clear();
-    _models.clear();
-    _font.reset();
-    _sound.reset();
     _music.reset();
-    _texture3D.reset();
+    _audio.reset();
 }
 
 bool RayLib::WindowShouldClose() {
@@ -71,6 +84,12 @@ void RayLib::DrawCube(ZappyTypes::Vector3 position, float width, float height, f
     raylibcpp::Shape::drawCube(TypeAdapter::ToRaylib(position), width, height, length, TypeAdapter::ToRaylib(color));
 }
 
+void RayLib::DrawCubeWires(ZappyTypes::Vector3 position, float width, float height, float length, ZappyTypes::Color color) {
+    Vector3 pos = TypeAdapter::ToRaylib(position);
+    Color col = TypeAdapter::ToRaylib(color);
+    ::DrawCubeWires(pos, width, height, length, col);
+}
+
 void RayLib::DrawSphere(ZappyTypes::Vector3 centerPos, float radius, ZappyTypes::Color color) {
     raylibcpp::Shape::drawSphere(TypeAdapter::ToRaylib(centerPos), radius, TypeAdapter::ToRaylib(color));
 }
@@ -95,7 +114,12 @@ void RayLib::DrawLine3D(ZappyTypes::Vector3 startPos, ZappyTypes::Vector3 endPos
 int RayLib::LoadTexture2D(const std::string& path) {
     try {
         int id = raylibcpp::Texture::getNextId();
-        _textures[id] = std::make_unique<raylibcpp::Texture>(path);
+        std::unique_ptr<raylibcpp::Texture> texture = std::make_unique<raylibcpp::Texture>(path);
+        if (!texture->isReady()) {
+            std::cerr << "Échec de chargement de la texture: " << path << std::endl;
+            return -1;
+        }
+        _textures[id] = std::move(texture);
         return id;
     } catch (const std::exception& e) {
         std::cerr << "Erreur de chargement de texture: " << e.what() << std::endl;
@@ -110,7 +134,11 @@ void RayLib::DrawTexture2D(int textureId, int x, int y) {
 }
 
 void RayLib::UnloadTexture2D(int textureId) {
-    _textures.erase(textureId);
+    auto it = _textures.find(textureId);
+    if (it != _textures.end()) {
+        std::unique_ptr<raylibcpp::Texture> texture = std::move(it->second);
+        _textures.erase(it);
+    }
 }
 
 bool RayLib::IsTextureReady(int textureId) const {
@@ -200,21 +228,32 @@ float RayLib::GetMouseWheelMove() {
 }
 
 void RayLib::PlaySound(const std::string& path) {
-    _sound.emplace(path);
-    _sound->play();
+    auto sound = std::make_unique<raylibcpp::SoundWrap>(path);
+    sound->play();
+
+    _sounds.push_back(std::move(sound));
+    if (_sounds.size() > 20)
+        _sounds.erase(_sounds.begin(), _sounds.begin() + (_sounds.size() - 20));
 }
 
 void RayLib::StopSound() {
-    if (_sound)
-        _sound->stop();
+    for (auto& sound : _sounds) {
+        if (sound)
+            sound->stop();
+    }
+    _sounds.clear();
 }
 
 void RayLib::SetSoundVolume(float volume) {
-    if (_sound)
-        _sound->setVolume(volume);
+    for (auto& sound : _sounds) {
+        if (sound)
+            sound->setVolume(volume);
+    }
 }
 
 void RayLib::PlayMusic(const std::string& path) {
+    if (path.empty())
+        return;
     _music.emplace(path);
     _music->play();
 }
@@ -307,7 +346,7 @@ void RayLib::DrawModel3D(int modelId, ZappyTypes::Vector3 position, float scale,
     }
 }
 
-void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale) {
+void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Vector3 rotationAxis, float rotationAngle, float scale, ZappyTypes::Color color) {
     auto it = _models.find(modelId);
     if (it != _models.end() && it->second) {
         ::DrawModelEx(
@@ -316,7 +355,7 @@ void RayLib::DrawModelEx(int modelId, ZappyTypes::Vector3 position, ZappyTypes::
             TypeAdapter::ToRaylib(rotationAxis),
             rotationAngle,
             Vector3{scale, scale, scale},
-            WHITE
+            TypeAdapter::ToRaylib(color)
         );
     } else {
         std::cerr << "Tentative de dessiner un modèle inexistant avec rotation (ID: " << modelId << ")" << std::endl;
@@ -358,4 +397,54 @@ extern "C" {
         static std::shared_ptr<RayLib> instance = std::make_shared<RayLib>();
         return instance;
     }
+}
+
+ZappyTypes::Vector3 RayLib::GetCameraPosition() {
+    if (_camera3D.has_value()) {
+        Vector3 pos = _camera3D->get().position;
+        return TypeAdapter::FromRaylib(pos);
+    }
+    return {0.0f, 0.0f, 0.0f};
+}
+
+ZappyTypes::Vector3 RayLib::GetCameraTarget() {
+    if (_camera3D.has_value()) {
+        Vector3 target = _camera3D->get().target;
+        return TypeAdapter::FromRaylib(target);
+    }
+    return {0.0f, 0.0f, 0.0f};
+}
+
+ZappyTypes::Vector3 RayLib::ScreenToWorldRay(ZappyTypes::Vector2 screenPos) {
+    if (_camera3D.has_value()) {
+        Vector2 rayPos = TypeAdapter::ToRaylib(screenPos);
+        Ray ray = GetMouseRay(rayPos, _camera3D->get());
+        return TypeAdapter::FromRaylib(ray.direction);
+    }
+    return {0.0f, 0.0f, -1.0f};
+}
+
+bool RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection,
+    ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal,
+    ZappyTypes::Vector3& intersectionPoint) {
+    Vector3 origin = TypeAdapter::ToRaylib(rayOrigin);
+    Vector3 direction = TypeAdapter::ToRaylib(rayDirection);
+    Vector3 point = TypeAdapter::ToRaylib(planePoint);
+    Vector3 normal = TypeAdapter::ToRaylib(planeNormal);
+    direction = Vector3Normalize(direction);
+    normal = Vector3Normalize(normal);
+    float denominator = Vector3DotProduct(direction, normal);
+    if (fabsf(denominator) < 0.0001f)
+        return false;
+    Vector3 pointToOrigin = Vector3Subtract(point, origin);
+    float t = Vector3DotProduct(pointToOrigin, normal) / denominator;
+    if (t < 0)
+        return false;
+    Vector3 intersection = Vector3Add(origin, Vector3Scale(direction, t));
+    intersectionPoint = TypeAdapter::FromRaylib(intersection);
+    return true;
+}
+
+int RayLib::GetFPS() {
+    return ::GetFPS();
 }

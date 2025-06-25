@@ -15,19 +15,6 @@
 #include <string.h>
 #include <stdio.h>
 
-static int check_disconnect(int bytes_read, client_t *user, server_t *server)
-{
-    if (bytes_read <= 0) {
-        if (bytes_read == 0) {
-            cleanup_client(user);
-            remove_fd(server, user->client_poll->fd);
-            return 1;
-        }
-        return 1;
-    }
-    return 0;
-}
-
 command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
@@ -126,44 +113,55 @@ void execute_com(server_t *server, client_t *user, char *buffer)
             return send_info_new_client(server, user);
     }
     if (!find_and_execute(server, user, buffer)){
-        if (user->type == GRAPHICAL)
+        if (user->is_fully_connected && user->type == GRAPHICAL)
             return write_command_output(user->client_fd, "suc\n");
-        write_command_output(user->client_fd, "ko\n");
+        if (user->is_fully_connected)
+            write_command_output(user->client_fd, "ko\n");
     }
 }
 
-static void check_command(circular_buffer_t *temp_buffer, int cmd_length,
+static void check_command(circular_buffer_t *user_buffer, int cmd_length,
     server_t *server, client_t *user)
 {
-    char *command;
+    char *command_str;
 
-    command = extract_command(temp_buffer, cmd_length);
-    if (command) {
-        execute_com(server, user, command);
-        free(command);
+    if (cmd_length > MAX_STORABLE_CMD_LENGTH) {
+        command_str = extract_command(user_buffer, cmd_length);
+        if (command_str)
+            free(command_str);
+        return;
     }
+    command_str = extract_command(user_buffer, cmd_length);
+    if (command_str) {
+        execute_com(server, user, command_str);
+        free(command_str);
+    }
+}
+
+static void process_commands_in_buffer(server_t *server, client_t *user)
+{
+    int cmd_length;
+
+    while (true) {
+        cmd_length = find_command_end(&user->read_buffer);
+        if (cmd_length > 0)
+            check_command(&user->read_buffer, cmd_length, server, user);
+        else
+            break;
+    }
+}
+
+static void check_and_clear_clogged_buffer(client_t *user)
+{
+    if (user->read_buffer.count >= BUFFER_SIZE - 1 &&
+        find_command_end(&user->read_buffer) == -1)
+        init_circular_buffer(&user->read_buffer);
 }
 
 void get_message(server_t *server, client_t *user)
 {
-    circular_buffer_t temp_buffer;
-    char byte;
-    int bytes_read;
-    int cmd_length;
-
-    init_circular_buffer(&temp_buffer);
-    while (1) {
-        bytes_read = read(user->client_poll->fd, &byte, 1);
-        if (check_disconnect(bytes_read, user, server) == 1)
-            return;
-        if (add_to_circular_buffer(&temp_buffer, byte) == -1) {
-            write_command_output(user->client_fd, "ko\n");
-            return;
-        }
-        cmd_length = find_command_end(&temp_buffer);
-        if (cmd_length > 0) {
-            check_command(&temp_buffer, cmd_length, server, user);
-            break;
-        }
-    }
+    if (!handle_socket_read(user, server))
+        return;
+    process_commands_in_buffer(server, user);
+    check_and_clear_clogged_buffer(user);
 }

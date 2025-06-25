@@ -25,20 +25,6 @@ static int count_team_eggs(server_t *server, char *team_name)
     return count;
 }
 
-static int count_team_players(server_t *server, char *team_name)
-{
-    client_t *current = server->client;
-    int count = 0;
-
-    while (current) {
-        if (current->player && current->player->team_name &&
-            strcmp(current->player->team_name, team_name) == 0)
-            count++;
-        current = current->next;
-    }
-    return count;
-}
-
 static void format_response(int available_slots, client_t *client)
 {
     size_t res_size = snprintf(NULL, 0, "%d\n", available_slots) + 1;
@@ -52,9 +38,7 @@ static void format_response(int available_slots, client_t *client)
 int connect_nbr_srv(server_t *server, char *team)
 {
     int team_eggs = count_team_eggs(server, team);
-    int team_players = count_team_players(server, team);
-    int max_clients = server->parsed_info->client_nb;
-    int available_slots = max_clients - (team_players + team_eggs);
+    int available_slots = team_eggs;
 
     if (available_slots < 0)
         available_slots = 0;

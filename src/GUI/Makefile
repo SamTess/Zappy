@@ -11,28 +11,53 @@ BUILD_DIR = ../../build/GUI
 
 MAIN = main.cpp
 # Source files
-SRC = graphicalContext/GraphicalContext.cpp \
-	  parsing/ParsingCLI.cpp \
+SRC = parsing/ParsingCLI.cpp \
+      gameController/GameController.cpp \
+	  gameController/GameState.cpp \
 	  shared/exception/AException.cpp \
 	  network/buffer/MessageQueue.cpp \
+	  network/buffer/CircularBuffer.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \
 	  network/protocol/Message.cpp \
 	  network/protocol/ProtocolParser.cpp \
-	  network/utils/SystemWrapper.cpp \
+	  network/systemWrapper/implementation/TcpSocket.cpp \
+	  network/systemWrapper/implementation/NetworkAddress.cpp \
+	  network/systemWrapper/implementation/SocketPoller.cpp \
+	  network/systemWrapper/implementation/Buffer.cpp \
+	  network/systemWrapper/factory/NetworkFactory.cpp \
 	  network/networkManager/NetworkManager.cpp \
 	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
+	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
-	  renderer/MapRendererObserver.cpp \
 	  renderer/UIRenderer.cpp \
+	  renderer/ParticleSystem.cpp \
+	  renderer/EjectionAnimationManager.cpp \
+	  renderer/DeathAnimationManager.cpp \
 	  renderer/strategies/DetailedTileRenderStrategy.cpp \
 	  renderer/strategies/ModelTileRenderStrategy.cpp \
 	  renderer/strategies/SimpleTileRenderStrategy.cpp \
 	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
-	  GameLoop.cpp
+	  GameLoop.cpp \
+	  GameLoopUI.cpp \
+	  ui/UserInterface.cpp \
+	  ui/UIWindowFactory.cpp \
+	  ui/windows/AUIWindow.cpp \
+	  ui/windows/tileInfo/TileInfoWindow.cpp \
+	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
+	  ui/windows/mapInfo/MapInfoWindow.cpp \
+	  ui/windows/controls/ControlsWindow.cpp \
+	  ui/windows/timeInfo/TimeInfoWindow.cpp \
+	  ui/windows/menu/MenuWindow.cpp \
+	  gameController/EntityFactory.cpp \
+	  gameController/entities/Player.cpp \
+	  gameController/entities/Egg.cpp \
+	  gameController/entities/Resource.cpp \
+	  gameController/entities/Tile.cpp \
+	  gameController/entities/PlayerInventory.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
@@ -79,7 +104,6 @@ all: setup_dirs display_banner $(NAME)
 
 # Create the necessary build directories
 setup_dirs:
-	@mkdir -p $(BUILD_DIR)/graphicalContext
 	@mkdir -p $(BUILD_DIR)/parsing
 	@mkdir -p $(BUILD_DIR)/shared/exception
 	@mkdir -p $(BUILD_DIR)/network/buffer
@@ -88,6 +112,13 @@ setup_dirs:
 	@mkdir -p $(BUILD_DIR)/network/protocol
 	@mkdir -p $(BUILD_DIR)/network/utils
 	@mkdir -p $(BUILD_DIR)/network/networkManager
+	@mkdir -p $(BUILD_DIR)/ui/windows/logs
+	@mkdir -p $(BUILD_DIR)/ui/windows/tileInfo
+	@mkdir -p $(BUILD_DIR)/ui/windows/playerInfo
+	@mkdir -p $(BUILD_DIR)/ui/windows/broadcasts
+	@mkdir -p $(BUILD_DIR)/ui/windows/controls
+	@mkdir -p $(BUILD_DIR)/ui/windows/timeInfo
+	@mkdir -p $(BUILD_DIR)/ui/windows/menu
 	@mkdir -p ../../build
 
 # Display a fancy banner for the build process
@@ -200,5 +231,5 @@ re: fclean all
 -include $(DEP)
 -include $(MAIN_DEP)
 
-.PHONY: all clean fclean re debug coverage test_dlloader \
+.PHONY: all clean fclean re debug coverage test_dlloader test_gui \
 compile_animation setup_dirs

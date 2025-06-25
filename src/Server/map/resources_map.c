@@ -26,51 +26,57 @@ static void shuffle_indices(int *indices, int total_tiles)
     }
 }
 
-static void distribute_one_resource(resource_dist_t *dist, int res,
-    int total, server_t *server)
+static void distribute_one_resource(resource_dist_t *dist, int res, int total,
+    server_t *server)
 {
     int idx;
     int y;
     int x;
+    int total_tiles = dist->width * dist->height;
 
-    shuffle_indices(dist->tile_indices, dist->width * dist->height);
     for (int i = 0; i < total; ++i) {
-        idx = dist->tile_indices[i];
+        idx = dist->tile_indices[dist->tile_idx % total_tiles];
         y = idx / dist->width;
         x = idx % dist->width;
         dist->map[y][x].resources[res]++;
         send_bct_to_all_graphical_clients(server, x, y);
+        dist->tile_idx++;
     }
 }
 
-static void init_resource_dist(int width, int height,
+static int init_resource_dist(int width, int height,
     tile_t **map, resource_dist_t *dist)
 {
     int total_tiles = width * height;
 
     dist->tile_indices = malloc(sizeof(int) * total_tiles);
     if (dist->tile_indices == NULL)
-        exit(84);
+        return -1;
     for (int i = 0; i < total_tiles; ++i)
         dist->tile_indices[i] = i;
     dist->map = map;
     dist->width = width;
     dist->height = height;
+    dist->tile_idx = 0;
+    return 0;
 }
 
 void distribute_resources(tile_t **map, server_t *server,
     int *total_resources, int *current_resources)
 {
-    int total;
     resource_dist_t dist;
+    int total = 0;
+    int total_tiles = server->parsed_info->width * server->parsed_info->height;
     static double resource_densities[COUNT] = {FOOD_D, LINEMATE_D, DERAUMERE_D,
         SIBUR_D, MENDIANE_D, PHIRAS_D, THYSTAME_D};
 
-    init_resource_dist(server->parsed_info->width,
+    total = init_resource_dist(server->parsed_info->width,
         server->parsed_info->height, map, &dist);
+    if (total == -1)
+        return;
+    shuffle_indices(dist.tile_indices, total_tiles);
     for (int res = 0; res < COUNT; ++res) {
-        total = (int)(server->parsed_info->width *
-            server->parsed_info->height * resource_densities[res] + 0.5);
+        total = (int)(total_tiles * resource_densities[res] + 0.5);
         if (total < 1)
             total = 1;
         total_resources[res] = total;
@@ -84,10 +90,14 @@ void respawn_resources(tile_t **map, server_t *server,
     int *total_resources, int *current_resources)
 {
     resource_dist_t dist;
-    int missing;
+    int missing = 0;
+    int total_tiles = server->parsed_info->width * server->parsed_info->height;
 
-    init_resource_dist(server->parsed_info->width,
+    missing = init_resource_dist(server->parsed_info->width,
         server->parsed_info->height, map, &dist);
+    if (missing == -1)
+        return;
+    shuffle_indices(dist.tile_indices, total_tiles);
     for (int res = 0; res < COUNT; ++res) {
         missing = total_resources[res] - current_resources[res];
         if (missing > 0) {

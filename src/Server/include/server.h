@@ -172,4 +172,6 @@ void free_all(server_t *server, parsing_info_t *parsed_info);
  */
 int count_team(server_t *n_server);
 
+void init_struct(client_t *new_c);
+
 #endif /* !SERVER_H_ */

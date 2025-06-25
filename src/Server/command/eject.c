@@ -65,20 +65,21 @@ static char *get_string_to_send(float x, float y)
     char *string_to_send = malloc(sizeof(char) * 10);
 
     if (!string_to_send)
-        server_err("Malloc failed in get_string_to_send");
+        return NULL;
     sprintf(string_to_send, "eject: %d\n", direction_push(x, y));
     return string_to_send;
 }
 
-static void push_single_client(server_t *server, client_t *client,
-    client_t *tmp, char *msg)
+static void push_single_client(server_t *server,
+    client_t *tmp, char *msg, float *direction)
 {
-    int new_x = client->player->pos_x +
-        (int)(tmp->player->pos_x == client->player->pos_x);
-    int new_y = client->player->pos_y +
-        (int)(tmp->player->pos_y == client->player->pos_y);
+    int old_x = tmp->player->pos_x;
+    int old_y = tmp->player->pos_y;
+    int new_x = tmp->player->pos_x + (int)direction[0];
+    int new_y = tmp->player->pos_y + (int)direction[1];
 
     wrap_position(server, &new_x, &new_y);
+    tile_remove_player(&server->map[old_y][old_x], tmp->client_id);
     tmp->player->pos_x = new_x;
     tmp->player->pos_y = new_y;
     tile_add_player(&server->map[new_y][new_x], tmp->client_id);
@@ -86,23 +87,26 @@ static void push_single_client(server_t *server, client_t *client,
     write_command_output(tmp->client_fd, msg);
 }
 
-static void push_client(server_t *server, client_t *client, float x, float y)
+int push_client(server_t *server, client_t *client, float x, float y)
 {
     client_t *tmp = server->client->next;
     int old_x = client->player->pos_x;
     int old_y = client->player->pos_y;
     char *msg = get_string_to_send(x, y);
 
+    if (msg == NULL)
+        return 84;
     while (tmp) {
         if (tmp->client_id == client->client_id || tmp->type == GRAPHICAL) {
             tmp = tmp->next;
             continue;
         }
         if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y)
-            push_single_client(server, client, tmp, msg);
+            push_single_client(server, tmp, msg, (float[]){x, y});
         tmp = tmp->next;
     }
     free(msg);
+    return 0;
 }
 
 static void push_eggs(server_t *server, int old_x, int old_y)
@@ -131,7 +135,8 @@ void eject(server_t *server, client_t *client, char **buffer)
     if (!client->player || arr_len(buffer) != 1)
         return write_command_output(client->client_fd, "ko\n");
     convert_rotation_to_vector(client, &x, &y);
-    push_client(server, client, x, y);
+    if (push_client(server, client, x, y) == 84)
+        return write_command_output(client->client_fd, "ko\n");
     push_eggs(server, client->player->pos_x, client->player->pos_y);
     command_pex(server, client);
     write_command_output(client->client_fd, "ok\n");

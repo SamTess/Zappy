@@ -42,6 +42,7 @@ typedef struct resource_dist_s {
     int width;
     int height;
     int *tile_indices;
+    int tile_idx;
 } resource_dist_t;
 
 void tile_init(tile_t *tile);

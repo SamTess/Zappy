@@ -13,6 +13,43 @@
 #include <stdlib.h>
 #include <math.h>
 
+static int adapt_rota_player(enum rotation_e rota_player)
+{
+    switch (rota_player) {
+        case UP:
+            return 0;
+        case LEFT:
+            return 1;
+        case DOWN:
+            return 2;
+        case RIGHT:
+            return 3;
+        default:
+            return -1;
+    }
+}
+
+static int get_tile_for_north_orientation(int source_rel_x, int source_rel_y)
+{
+    if (source_rel_x == 0 && source_rel_y < 0)
+        return 1;
+    if (source_rel_x < 0 && source_rel_y < 0)
+        return 2;
+    if (source_rel_x < 0 && source_rel_y == 0)
+        return 3;
+    if (source_rel_x < 0 && source_rel_y > 0)
+        return 4;
+    if (source_rel_x == 0 && source_rel_y > 0)
+        return 5;
+    if (source_rel_x > 0 && source_rel_y > 0)
+        return 6;
+    if (source_rel_x > 0 && source_rel_y == 0)
+        return 7;
+    if (source_rel_x > 0 && source_rel_y < 0)
+        return 8;
+    return 0;
+}
+
 static int calculate_shortest_distance_x(int sender_x,
     int receiver_x, int width)
 {
@@ -43,62 +80,44 @@ static int calculate_shortest_distance_y(int sender_y,
     return wrap_distance_up;
 }
 
-static int get_base_direction(int dx, int dy)
+static int calculate_direction(client_t *receiver, int source_rel_x,
+    int source_rel_y)
 {
-    if (dx == 0 && dy == 0)
+    int base_tile_for_north;
+    int new_rota = adapt_rota_player(receiver->player->rotation);
+
+    if (source_rel_x == 0 && source_rel_y == 0)
         return 0;
-    if (dx > 0 && dy == 0)
-        return 1;
-    if (dx > 0 && dy < 0)
-        return 2;
-    if (dx == 0 && dy < 0)
-        return 3;
-    if (dx < 0 && dy < 0)
-        return 4;
-    if (dx < 0 && dy == 0)
-        return 5;
-    if (dx < 0 && dy > 0)
-        return 6;
-    if (dx == 0 && dy > 0)
-        return 7;
-    if (dx > 0 && dy > 0)
-        return 8;
-    return 8;
+    base_tile_for_north = get_tile_for_north_orientation(source_rel_x,
+        source_rel_y);
+    if (base_tile_for_north == 0)
+        return 0;
+    return ((base_tile_for_north - 1 + (2 * new_rota)
+        + 8) % 8) + 1;
 }
 
-static int calculate_direction(client_t *receiver, int dx, int dy)
-{
-    int base_direction;
-
-    if (dx == 0 && dy == 0)
-        return 0;
-    base_direction = get_base_direction(dx, dy);
-    if (base_direction == 0)
-        return 0;
-    return ((base_direction - 1 + 2 * receiver->player->rotation) % 8) + 1;
-}
-
-static void send_broadcast_to_client(server_t *server, client_t *sender,
+static int send_broadcast_to_client(server_t *server, client_t *sender,
     client_t *receiver, char *message)
 {
-    int dx = 0;
-    int dy = 0;
     int direction = 0;
     size_t res_size = snprintf(NULL, 0, "message %d, %s\n", 0, message) + 1;
     char *response = calloc(res_size, sizeof(char));
+    int source_rel_x;
+    int source_rel_y;
 
     if (!receiver || !receiver->player || receiver == sender)
-        return;
+        return 84;
     if (response == NULL)
-        server_err("Malloc failed for allocating response for broadcast");
-    dx = calculate_shortest_distance_x(sender->player->pos_x,
-        receiver->player->pos_x, server->parsed_info->width);
-    dy = calculate_shortest_distance_y(sender->player->pos_y,
-        receiver->player->pos_y, server->parsed_info->height);
-    direction = calculate_direction(receiver, dx, dy);
+        return 84;
+    source_rel_x = calculate_shortest_distance_x(receiver->player->pos_x,
+        sender->player->pos_x, server->parsed_info->width);
+    source_rel_y = calculate_shortest_distance_y(receiver->player->pos_y,
+        sender->player->pos_y, server->parsed_info->height);
+    direction = calculate_direction(receiver, source_rel_x, source_rel_y);
     snprintf(response, res_size, "message %d, %s\n", direction, message);
     write_command_output(receiver->client_fd, response);
     free(response);
+    return 0;
 }
 
 static int calculate_message_length(char **buffer, int arr_length)
@@ -160,10 +179,11 @@ void broadcast(server_t *server, client_t *user, char **buffer)
     if (current)
         current = current->next;
     command_pbc(server, user, message);
-    while (current) {
+    for (int temp = 0; current != NULL; current = current->next){
         if (current->player && current != user && current->type != GRAPHICAL)
-            send_broadcast_to_client(server, user, current, message);
-        current = current->next;
+            temp = send_broadcast_to_client(server, user, current, message);
+        if (temp == 84)
+            return write_command_output(user->client_fd, "ko\n");
     }
     free(message);
     write_command_output(user->client_fd, "ok\n");

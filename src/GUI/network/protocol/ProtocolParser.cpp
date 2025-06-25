@@ -7,6 +7,7 @@
 
 #include "ProtocolParser.hpp"
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -124,7 +125,11 @@ std::string ProtocolParser::extractCommandParameter(const std::string &message) 
 
 int ProtocolParser::parseIntParameter(const std::string &param) {
     try {
-        return std::stoi(param);
+        std::string cleanParam = param;
+        if (!cleanParam.empty() && cleanParam[0] == '#') {
+            cleanParam = cleanParam.substr(1);
+        }
+        return std::stoi(cleanParam);
     } catch (const std::exception &e) {
         throw ProtocolParserException("Failed to parse integer parameter: " + param);
     }
@@ -140,7 +145,7 @@ Message ProtocolParser::parseMapSize(const std::string &message) {
 
 Message ProtocolParser::parseTileContent(const std::string &message) {
     std::vector<std::string> params = extractMessageParameters(message);
-    if (params.size() < 8)
+    if (params.size() < 9)
         throw ProtocolParserException("Invalid tile content parameters: " + message);
     int x = parseIntParameter(params[0]);
     int y = parseIntParameter(params[1]);
@@ -206,7 +211,7 @@ Message ProtocolParser::parsePlayerLevel(const std::string &message) {
     int id = parseIntParameter(params[0]);
     int level = parseIntParameter(params[1]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, level);
+    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, -1, level);
     return Message(PLV_HEADER, extractCommandParameter(message), playerInfoData);
 }
 
@@ -235,8 +240,8 @@ Message ProtocolParser::parsePlayerExpulsion(const std::string &message) {
         throw ProtocolParserException("Invalid player expulsion parameters: " + message);
     int id = parseIntParameter(params[0]);
 
-    auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
-    return Message(PEX_HEADER, extractCommandParameter(message), playerInfoData);
+    auto playerExpulsionData = std::make_shared<PlayerExpulsionData>(id);
+    return Message(PEX_HEADER, extractCommandParameter(message), playerExpulsionData);
 }
 
 Message ProtocolParser::parsePlayerBroadcast(const std::string &message) {
@@ -257,6 +262,7 @@ Message ProtocolParser::parsePlayerDeath(const std::string &message) {
     int id = parseIntParameter(params[0]);
 
     auto playerInfoData = std::make_shared<PlayerInfoData>(id, 0, 0, 0, 0);
+    playerInfoData->setIsAlive(false);
     return Message(PDI_HEADER, extractCommandParameter(message), playerInfoData);
 }
 
