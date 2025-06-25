@@ -39,7 +39,7 @@ class MenuWindow : public AUIWindow {
         std::shared_ptr<GUI::UIWindowFactory> _windowFactory;
         ZappyTypes::Vector2 _defaultPositions[6];
         std::vector<WindowInfo_t> _windows;
-        bool _sfxEnabled;
+        bool _sfxEnabled = true;
 
         void renderContent() override;
         void drawMenuButton();
