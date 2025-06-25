@@ -85,7 +85,7 @@ static char *add_resources(int *resources)
         return NULL;
     res[0] = '\0';
     for (int i = 0; i < COUNT; ++i) {
-        if (check_resources(names, resources, first_resource, res) == -1)
+        if (check_resources(names[i], resources[i], first_resource, res) == -1)
             return NULL;
     }
     return res;
