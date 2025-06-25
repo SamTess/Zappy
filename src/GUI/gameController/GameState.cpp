@@ -48,11 +48,8 @@ bool GameState::isMapInitialized() const {
 
 std::shared_ptr<const ITile> GameState::getTile(int x, int y) const {
     std::lock_guard<std::mutex> lock(_mutex);
-
     if (!isValidCoordinates(x, y))
         return nullptr;
-
-    // Vérification supplémentaire pour s'assurer que les tiles sont initialisées
     if (y >= static_cast<int>(_tiles.size()) || x >= static_cast<int>(_tiles[y].size()))
         return nullptr;
 
@@ -61,14 +58,10 @@ std::shared_ptr<const ITile> GameState::getTile(int x, int y) const {
 
 std::shared_ptr<ITile> GameState::getTileMutable(int x, int y) {
     std::lock_guard<std::mutex> lock(_mutex);
-
     if (!isValidCoordinates(x, y))
         return nullptr;
-
-    // Vérification supplémentaire pour s'assurer que les tiles sont initialisées
     if (y >= static_cast<int>(_tiles.size()) || x >= static_cast<int>(_tiles[y].size()))
         return nullptr;
-
     return _tiles[y][x];
 }
 
@@ -121,11 +114,9 @@ std::vector<int> GameState::getPlayersOnTile(int x, int y) const {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!isValidCoordinates(x, y))
         return {};
-
-    // Vérification supplémentaire pour s'assurer que les tiles sont initialisées
-    if (y >= static_cast<int>(_tiles.size()) || x >= static_cast<int>(_tiles[y].size()))
+    if (y >= static_cast<int>(_tiles.size())
+    || x >= static_cast<int>(_tiles[y].size()))
         return {};
-
     auto tile = _tiles[y][x];
     return tile ? tile->getPlayerIds() : std::vector<int>{};
 }
@@ -170,9 +161,8 @@ std::vector<int> GameState::getPlayerIds() const {
     std::lock_guard<std::mutex> lock(_mutex);
     std::vector<int> playerIds;
     playerIds.reserve(_players.size());
-    for (const auto& pair : _players) {
+    for (const auto& pair : _players)
         playerIds.push_back(pair.first);
-    }
     return playerIds;
 }
 
@@ -186,13 +176,10 @@ void GameState::setMapSize(int width, int height) {
     _tiles.resize(_mapHeight, std::vector<std::shared_ptr<ITile>>(_mapWidth));
     for (int y = 0; y < _mapHeight; ++y) {
         for (int x = 0; x < _mapWidth; ++x) {
-            // Vérification de sécurité pour _entityFactory
-            if (_entityFactory) {
+            if (_entityFactory)
                 _tiles[y][x] = _entityFactory->getFactory().createTile(x, y);
-            } else {
-                // Fallback au cas où _entityFactory serait null
+            else
                 _tiles[y][x] = std::make_shared<Tile>(x, y);
-            }
         }
     }
     _isMapInitialized = true;
@@ -236,13 +223,10 @@ void GameState::addOrUpdatePlayer(const PlayerInfoData& playerData) {
             addPlayerToTile(playerId, playerData.getX(), playerData.getY());
         }
     } else {
-        // Vérification de sécurité pour _entityFactory
-        if (_entityFactory) {
+        if (_entityFactory)
             _players[playerId] = _entityFactory->getFactory().createPlayer(playerData);
-        } else {
-            // Fallback au cas où _entityFactory serait null
+        else
             _players[playerId] = std::make_shared<Player>(playerData);
-        }
         addPlayerToTile(playerId, playerData.getX(), playerData.getY());
     }
 }
