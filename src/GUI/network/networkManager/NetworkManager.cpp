@@ -286,7 +286,6 @@ void NetworkManager::handleWelcomeMessage(const std::string& message) {
     NetworkLogger::get().log(std::string("Message de bienvenue reçu: ") + message);
     NetworkLogger::get().log("Envoi automatique de la commande GRAPHIC suite au WELCOME");
     sendCommand("GRAPHIC");
-    // Plus de callback - le welcome sera géré par le handler s'il est configuré
 }
 
 void NetworkManager::handleRegularMessage(const std::string& message) {
@@ -294,8 +293,6 @@ void NetworkManager::handleRegularMessage(const std::string& message) {
     try {
         Message parsedMessage = _protocolParser->parseMessage(message);
         std::cout << "[NetworkManager] Message parsed successfully, sending to handler" << std::endl;
-
-        // DÉCOUPLÉ: Utilisation du handler au lieu d'appel direct
         if (_messageHandler)
             _messageHandler(parsedMessage);
     } catch (const std::exception& e) {
@@ -306,7 +303,6 @@ void NetworkManager::handleRegularMessage(const std::string& message) {
 
 void NetworkManager::handleInvalidMessage(const std::string& /*message*/, const std::exception& e) {
     NetworkLogger::get().log(std::string("[ERROR] Error processing message: ") + e.what());
-    // Plus de callback legacy - les erreurs sont maintenant loggées seulement
 }
 
 void NetworkManager::setMessageHandler(MessageHandler handler) {

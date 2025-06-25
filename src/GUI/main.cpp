@@ -30,7 +30,6 @@ int main(int argc, char** argv) {
         std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
         auto networkManager = std::make_shared<NetworkManager>();
         auto entityFactory = std::make_shared<EntityFactoryManager>();
-        // Créer le GameController AVEC l'EntityFactory pour éviter la recréation
         auto gameController = std::make_shared<GameController>(nullptr, entityFactory);
         auto coordinator = std::make_shared<ComponentCoordinator>();
         coordinator->setNetworkManager(networkManager);

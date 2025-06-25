@@ -55,7 +55,6 @@ class NetworkManager : public INetworkCommandSender {
         mutable std::mutex _mutex;
         std::condition_variable _cv;
 
-        // DÉCOUPLÉ: Handler au lieu de référence directe
         MessageHandler _messageHandler;
         ConnectionCallback _connectionCallback;
 
