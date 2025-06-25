@@ -41,7 +41,7 @@ bool GameLoop::loadLibraries() {
     auto& libraryManager = LibraryManager::getInstance();
     if (!libraryManager.loadGraphicsLib("plugins/libraylibcpp.so")) {
         std::cerr << "Erreur de chargement de la bibliothèque graphique: " << libraryManager.getLastError() << std::endl;
-        return false;    m_graphics->SetMusicVolume(0.5f);
+        return false;
     }
     if (!libraryManager.loadGuiLib("plugins/libraygui.so")) {
         std::cerr << "Erreur de chargement de la bibliothèque GUI: " << libraryManager.getLastError() << std::endl;
@@ -155,7 +155,6 @@ void GameLoop::updateCameraForMapSize() {
         return;
     int mapWidth = gameState->getMapWidth();
     int mapHeight = gameState->getMapHeight();
-    // m_camera->setMapDimensions(mapWidth, mapHeight);
     float tileSize = 1.0f;
     float spacing = 0.1f;
     if (mapWidth > 20 || mapHeight > 20) {
@@ -172,7 +171,6 @@ void GameLoop::updateCameraForMapSize() {
         cameraDistance = 50.0f;
     m_camera->reset();
     m_graphics->SetMusicVolume(m_gameController->getGameState()->getMusicVolume());
-    // m_camera->distance() = cameraDistance;
 }
 
 void GameLoop::setSkyboxTexture(const std::string& texturePath) {
