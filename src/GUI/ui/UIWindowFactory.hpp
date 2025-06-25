@@ -41,7 +41,6 @@ public:
     void updateAllWindows(std::shared_ptr<const GameState> gameState);
     void setSelectedTile(int x, int y);
     void setSelectedPlayer(int playerId);
-    void addBroadcast(const std::string& team, const std::string& message);
     bool handleWindowDragging(const ZappyTypes::Vector2& mousePosition);
     void updateWindowDragging(const ZappyTypes::Vector2& mousePosition);
     void stopWindowDragging();

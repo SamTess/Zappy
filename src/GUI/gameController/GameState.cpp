@@ -280,7 +280,7 @@ void GameState::removeEgg(int eggId) {
 
 void GameState::setTeamNames(const std::vector<std::string>& teamNames) {
     std::lock_guard<std::mutex> lock(_mutex);
-    _teamNames = teamNames;
+    _teamNames.insert(_teamNames.end(), teamNames.begin(), teamNames.end());
 }
 
 void GameState::setTimeUnit(int timeUnit) {
@@ -368,7 +368,7 @@ void GameState::removeEggFromTile(int eggId, int x, int y) {
     }
 }
 
-std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
+std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() const {
     return _players;
 }
 

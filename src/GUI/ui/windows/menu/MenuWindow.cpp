@@ -16,6 +16,7 @@ namespace GUI {
 
 GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Menu"),
+<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
       _showMenu(false),
       _showAudioSubmenu(false),
       _showGameplaySubmenu(false),
@@ -37,6 +38,34 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
         {"playerInfo", "Informations joueurs", 1},
         {"mapInfo", "Informations sur la carte", 2},
         {"timeInfo", "Informations temporelles", 3}
+=======
+      m_showMenu(false),
+      m_showGraphicsSubmenu(false),
+      m_showAudioSubmenu(false),
+      m_showGameplaySubmenu(false),
+      m_showWindowsSubmenu(false),
+      m_zoomLevel(1.0f),
+      m_musicVolume(0.8f),
+      m_sfxVolume(0.7f),
+      m_gameSpeed(1.0f),
+      m_uiTransparency(0.9f),
+      m_windowFactory(nullptr) {
+    m_visible = true;
+    setShowWindowBox(false); // Désactive la boîte de fenêtre pour le menu
+    m_defaultPositions[0] = {10, 810};   // TileInfo
+    m_defaultPositions[1] = {10, 500};   // PlayerInfo
+    m_defaultPositions[2] = {1520, 540};  // map info
+    m_defaultPositions[3] = {1520, 860};  // Controls
+    m_defaultPositions[4] = {1450, 10};  // TimeInfo
+
+    // Initialisation de la liste unifiée des fenêtres
+    m_windows = {
+        {"tileInfo", "Informations sur la case", 0},
+        {"playerInfo", "Informations joueurs", 1},
+        {"mapInfo", "Informations sur la carte", 2},
+        {"controls", "Contrôles", 3},
+        {"timeInfo", "Informations temporelles", 4}
+>>>>>>> main
     };
 }
 

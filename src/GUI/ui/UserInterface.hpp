@@ -29,7 +29,6 @@ public:
     void notifyConnectionStatus(bool connected) override;
     void setCommandSender(std::shared_ptr<INetworkCommandSender> sender) override;
     void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
-    void setViewMode(int mode);
     bool toggleWindowVisibility(const std::string& windowId, bool visible);
     bool handleMouseEvents();
     bool isMouseOverUI() const;
