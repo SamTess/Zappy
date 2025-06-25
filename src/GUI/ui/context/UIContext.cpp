@@ -9,6 +9,8 @@
 #include <sstream>
 #include <algorithm>
 #include <vector>
+#include <memory>
+#include <string>
 #include "UIContext.hpp"
 #include "../UIWindowFactory.hpp"
 
@@ -115,7 +117,6 @@ bool UIContext::isValidWindowId(const std::string& windowId) const {
     static const std::vector<std::string> validWindowIds = {
         "tileInfo", "playerInfo", "broadcasts", "controls", "timeInfo", "menu"
     };
-    
     return std::find(validWindowIds.begin(), validWindowIds.end(), windowId) != validWindowIds.end();
 }
 

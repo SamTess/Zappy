@@ -2,13 +2,14 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** Interface for UI Context - Advanced abstraction layer for UI operations
+** Interface for UI Context
 */
 
 #pragma once
 
 #include <memory>
 #include <functional>
+#include <string>
 #include "../data/IUIDataProvider.hpp"
 
 namespace GUI {

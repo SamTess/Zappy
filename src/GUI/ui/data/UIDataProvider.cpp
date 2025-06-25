@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <map>
 #include <vector>
 #include "UIDataProvider.hpp"
 
