@@ -21,44 +21,12 @@ void TimeInfoWindow::renderContent() {
 
     std::stringstream fpsInfo;
     fpsInfo << "FPS: " << _fps;
-    _guiLib->DrawLabel(
-        _position.x + 10,
-        yOffset,
-        _dimensions.x - 20,
-        20,
-        fpsInfo.str()
-    );
-    yOffset += 25;
-
-    std::stringstream timeInfo;
-    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << _gameTime;
-    _guiLib->DrawLabel(
-        _position.x + 10,
-        yOffset,
-        _dimensions.x - 20,
-        20,
-        timeInfo.str()
-    );
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20, 20, fpsInfo.str());
     yOffset += 25;
     std::stringstream freqInfo;
-    freqInfo << "Fréquence: " << _frequency << " Hz";
-    _guiLib->DrawLabel(
-        _position.x + 10,
-        yOffset,
-        _dimensions.x - 20,
-        20,
-        freqInfo.str()
-    );
-    yOffset += 25;
-    std::stringstream tickInfo;
-    tickInfo << "Tick: " << _gameTick;
-    _guiLib->DrawLabel(
-        _position.x + 10,
-        yOffset,
-        _dimensions.x - 20,
-        20,
-        tickInfo.str()
-    );
+    _frequency = _gameState->getTimeUnit();
+    freqInfo << "Fréquence: " << _frequency << "/s";
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20, 20, freqInfo.str());
 }
 
 } // namespace GUI

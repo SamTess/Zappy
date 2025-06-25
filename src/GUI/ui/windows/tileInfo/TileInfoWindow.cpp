@@ -16,11 +16,13 @@ namespace GUI {
 
 TileInfoWindow::TileInfoWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Informations sur la case") {
-    _selectedTile = {0, 0, false};
+    _x = 0;
+    _y = 0;
+    _isSelecting = false;
 }
 
 void GUI::TileInfoWindow::renderContent() {
-    if (!_selectedTile.selected) {
+    if (!_isSelecting) {
         renderNoTileSelected();
         return;
     }
@@ -35,14 +37,14 @@ void GUI::TileInfoWindow::renderNoTileSelected() {
 
 void GUI::TileInfoWindow::renderTilePosition() {
     std::stringstream tilePos;
-    tilePos << "Position: (" << _selectedTile.x << ", " << _selectedTile.y << ")";
+    tilePos << "Position: (" << _x << ", " << _y << ")";
     _guiLib->DrawLabel(_position.x + 10, _position.y + 30, _dimensions.x - 20, 20, tilePos.str() );
 }
 
 float GUI::TileInfoWindow::renderResourceInfo() {
     int resources[7] = {0};
     if (_gameState && _gameState->isMapInitialized()) {
-        auto tile = _gameState->getTile(_selectedTile.x, _selectedTile.y);
+        auto tile = _gameState->getTile(_x, _y);
         if (tile) {
             const auto& tileResources = tile->getResources();
             for (int i = 0; i < 7; ++i) {
@@ -72,7 +74,7 @@ void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
     int playerCount = 0;
 
     if (_gameState && _gameState->isMapInitialized()) {
-        auto playerIds = _gameState->getPlayersOnTile(_selectedTile.x, _selectedTile.y);
+        auto playerIds = _gameState->getPlayersOnTile(_x, _y);
         playerCount = static_cast<int>(playerIds.size());
     }
     std::stringstream playersTitle;
@@ -81,18 +83,14 @@ void GUI::TileInfoWindow::renderPlayerCount(float yOffset) {
 }
 
 void GUI::TileInfoWindow::setSelectedTile(int x, int y) {
-    _selectedTile.x = x;
-    _selectedTile.y = y;
-    _selectedTile.selected = true;
+    _x = x;
+    _y = y;
+    _isSelecting = true;
     setVisible(true);
 }
 
-std::pair<int, int> GUI::TileInfoWindow::getSelectedTile() const {
-    return {_selectedTile.x, _selectedTile.y};
-}
-
 bool GUI::TileInfoWindow::hasTileSelected() const {
-    return _selectedTile.selected;
+    return _isSelecting;
 }
 
 } // namespace GUI

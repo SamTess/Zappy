@@ -24,7 +24,9 @@ namespace GUI {
 
 UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
     : _guiLib(guiLib), _currentViewMode(0) {
-    _selectedTile = {0, 0, false};
+    _x = 0;
+    _y = 0;
+    _isSelecting = false;
     _viewModes = {"Vue standard", "Vue aérienne", "Vue wireframe", "Vue ressources"};
 }
 
@@ -40,13 +42,14 @@ void UIWindowFactory::setNetworkManager(std::shared_ptr<NetworkManager> networkM
     }
 }
 
-void UIWindowFactory::createAllWindows(int, int) {
+void UIWindowFactory::createAllWindows(int, int, std::shared_ptr<UIWindowFactory> self) {
     const struct WindowConfig {
         std::string id;
         ZappyTypes::Vector2 position;
         ZappyTypes::Vector2 dimensions;
         bool initiallyVisible;
-    } windowConfigs[] = {
+    }
+    windowConfigs[] = {
         {"tileInfo", {10, 810}, {400, 300}, false},
         {"playerInfo", {10, 500}, {400, 300}, false},
         {"mapInfo", {1520, 540}, {400, 300}, false},
@@ -59,7 +62,7 @@ void UIWindowFactory::createAllWindows(int, int) {
     }
     auto menuWindow = std::dynamic_pointer_cast<GUI::MenuWindow>(_windows["menu"]);
     if (menuWindow) {
-        menuWindow->setUIWindowFactory(shared_from_this());
+        menuWindow->setUIWindowFactory(self);
     }
 }
 
@@ -71,9 +74,9 @@ std::shared_ptr<GUI::IUIWindow> UIWindowFactory::getWindow(const std::string& wi
     return nullptr;
 }
 
-void UIWindowFactory::renderAllWindows() {
+void UIWindowFactory::renderAllWindows(std::shared_ptr<UIWindowFactory> self) {
     renderRegularWindows();
-    renderMenuWindow();
+    renderMenuWindow(self);
 }
 
 void UIWindowFactory::renderRegularWindows() {
@@ -87,7 +90,7 @@ void UIWindowFactory::renderRegularWindows() {
     }
 }
 
-void UIWindowFactory::renderMenuWindow() {
+void UIWindowFactory::renderMenuWindow(std::shared_ptr<UIWindowFactory> self) {
     auto menuIt = _windows.find("menu");
     if (menuIt != _windows.end()) {
         if (!menuIt->second->isVisible())
@@ -103,23 +106,24 @@ void UIWindowFactory::renderMenuWindow() {
         menuWindow->initialize(menuPos, menuDimensions);
         menuWindow->setVisible(true);
         _windows["menu"] = menuWindow;
-        menuWindow->setUIWindowFactory(shared_from_this());
+        menuWindow->setUIWindowFactory(self);
     }
 }
 
-void UIWindowFactory::updateAllWindows(std::shared_ptr<const GameState> gameState,
-    int mapWidth, int mapHeight, float gameTime, int frequency, int gameTick) {
+void UIWindowFactory::updateAllWindows(std::shared_ptr<const GameState> gameState) {
     for (auto& pair : _windows) {
         pair.second->updateData(gameState);
     }
 }
 
 void UIWindowFactory::setSelectedTile(int x, int y) {
-    _selectedTile = {x, y, true};
     auto tileInfoWindow = std::dynamic_pointer_cast<GUI::TileInfoWindow>(_windows["tileInfo"]);
-    if (tileInfoWindow) {
+
+    _x = x;
+    _y = y;
+    _isSelecting = true;
+    if (tileInfoWindow)
         tileInfoWindow->setSelectedTile(x, y);
-    }
 }
 
 void UIWindowFactory::setSelectedPlayer(int playerId) {
@@ -131,15 +135,6 @@ void UIWindowFactory::setSelectedPlayer(int playerId) {
 
 std::shared_ptr<NetworkManager> UIWindowFactory::getNetworkManager() const {
     return _networkManager;
-}
-
-void UIWindowFactory::setViewMode(int mode) {
-    if (mode >= 0 && mode < static_cast<int>(_viewModes.size())) {
-        _currentViewMode = mode;
-        //auto controlsWindow = std::dynamic_pointer_cast<GUI::ControlsWindow>(_windows["controls"]);
-        //if (controlsWindow)
-        //    controlsWindow->setViewMode(mode);
-    }
 }
 
 bool UIWindowFactory::handleWindowDragging(const ZappyTypes::Vector2& mousePosition) {
@@ -183,7 +178,7 @@ void UIWindowFactory::stopWindowDragging() {
 }
 
 void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vector2& position,
-                                 const ZappyTypes::Vector2& dimensions, bool visible) {
+    const ZappyTypes::Vector2& dimensions, bool visible) {
     static const std::unordered_map<std::string, std::function<std::shared_ptr<GUI::IUIWindow>(std::shared_ptr<IGuiLib>)>> windowCreators = {
         {"tileInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TileInfoWindow>(lib); }},
         {"playerInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::PlayerInfoWindow>(lib); }},

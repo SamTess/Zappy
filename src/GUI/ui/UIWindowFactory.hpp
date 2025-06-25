@@ -26,18 +26,15 @@ public:
     explicit UIWindowFactory(std::shared_ptr<IGuiLib> guiLib);
     ~UIWindowFactory() = default;
     void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-    void createAllWindows(int screenWidth, int screenHeight);
+    void createAllWindows(int screenWidth, int screenHeight, std::shared_ptr<UIWindowFactory> self);
     std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
-    void renderAllWindows();
-    void updateAllWindows(std::shared_ptr<const GameState> gameState,
-        int mapWidth, int mapHeight, float gameTime, int frequency, int gameTick);
+    void renderAllWindows(std::shared_ptr<UIWindowFactory> self);
+    void updateAllWindows(std::shared_ptr<const GameState> gameState);
     void setSelectedTile(int x, int y);
     void setSelectedPlayer(int playerId);
 
 
     std::shared_ptr<NetworkManager> getNetworkManager() const;
-
-    void setViewMode(int mode);
 
     bool handleWindowDragging(const ZappyTypes::Vector2& mousePosition);
     void updateWindowDragging(const ZappyTypes::Vector2& mousePosition);
@@ -48,7 +45,7 @@ private:
     void createWindow(const std::string& id, const ZappyTypes::Vector2& position,
         const ZappyTypes::Vector2& dimensions, bool visible);
     void renderRegularWindows();
-    void renderMenuWindow();
+    void renderMenuWindow(std::shared_ptr<UIWindowFactory> self);
     std::vector<std::pair<std::string, std::shared_ptr<IUIWindow>>> getWindowsInZOrder();
     bool tryStartDraggingWindowInZOrder(const std::vector<std::pair<std::string, std::shared_ptr<IUIWindow>>>& windows,
         const ZappyTypes::Vector2& mousePosition);
@@ -56,12 +53,10 @@ private:
     std::shared_ptr<IGuiLib> _guiLib;
         std::shared_ptr<NetworkManager> _networkManager;
     std::unordered_map<std::string, std::shared_ptr<IUIWindow>> _windows;
-    struct {
-        int x;
-        int y;
-        bool selected;
-    } _selectedTile;
 
+    int _x;
+    int _y;
+    bool _isSelecting;
     int _currentViewMode;
     std::vector<std::string> _viewModes;
 };

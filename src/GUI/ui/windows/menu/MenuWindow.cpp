@@ -18,7 +18,6 @@ namespace GUI {
 GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Menu"),
       _showMenu(false),
-      _showGraphicsSubmenu(false),
       _showAudioSubmenu(false),
       _showGameplaySubmenu(false),
       _showWindowsSubmenu(false),
@@ -30,14 +29,13 @@ GUI::MenuWindow::MenuWindow(std::shared_ptr<IGuiLib> guiLib)
     setShowWindowBox(false);
     _defaultPositions[0] = {10, 810};   // TileInfo
     _defaultPositions[1] = {10, 500};   // PlayerInfo
-    _defaultPositions[2] = {1520, 540};  // Broadcasts
+    _defaultPositions[2] = {1520, 540};  // MapInfo
     _defaultPositions[4] = {1450, 10};  // TimeInfo
 
-    // Initialisation de la liste unifiée des fenêtres
     _windows = {
         {"tileInfo", "Informations sur la case", 0},
         {"playerInfo", "Informations joueurs", 1},
-        {"broadcasts", "Broadcasts récents", 2},
+        {"mapInfo", "Informations sur la carte", 2},
         {"timeInfo", "Informations temporelles", 4}
     };
 }
@@ -58,15 +56,12 @@ void GUI::MenuWindow::handleMenuButtonClick(bool mouseOnButton, bool mousePresse
 }
 
 void GUI::MenuWindow::resetAllSubmenus() {
-    _showGraphicsSubmenu = false;
     _showAudioSubmenu = false;
     _showGameplaySubmenu = false;
     _showWindowsSubmenu = false;
 }
 
 float GUI::MenuWindow::getSubmenuHeight() const {
-    if (_showGraphicsSubmenu)
-        return 150;
     if (_showAudioSubmenu)
         return 150;
     if (_showGameplaySubmenu)
@@ -97,13 +92,10 @@ void GUI::MenuWindow::handleMenuClickOutside(const ZappyTypes::Vector2& mousePos
 float GUI::MenuWindow::showSubmenu(bool submenu) {
     bool newValue = !submenu;
     if (newValue) {
-        _showGraphicsSubmenu = false;
         _showAudioSubmenu = false;
         _showGameplaySubmenu = false;
         _showWindowsSubmenu = false;
-        if (&submenu == &_showGraphicsSubmenu)
-            _showGraphicsSubmenu = true;
-        else if (&submenu == &_showAudioSubmenu)
+        if (&submenu == &_showAudioSubmenu)
             _showAudioSubmenu = true;
         else if (&submenu == &_showGameplaySubmenu)
             _showGameplaySubmenu = true;
@@ -114,8 +106,7 @@ float GUI::MenuWindow::showSubmenu(bool submenu) {
 }
 
 void GUI::MenuWindow::handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY) {
-    if (_guiLib->ButtonPressed(_position.x, startY, menuItemWidth, menuItemHeight, "Graphiques"))
-        _showGraphicsSubmenu = showSubmenu(_showGraphicsSubmenu);
+
     if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight, menuItemWidth, menuItemHeight, "Audio"))
         _showAudioSubmenu = showSubmenu(_showAudioSubmenu);
     if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight * 2, menuItemWidth, menuItemHeight, "Gameplay"))
@@ -142,9 +133,8 @@ void GUI::MenuWindow::renderContent() {
         drawMainMenu(menuItemWidth, menuItemHeight, startY);
         handleMenuClickOutside(mousePosition, menuItemWidth, menuItemHeight, startY, mousePressed);
         handleSubmenuButtons(menuItemWidth, menuItemHeight, startY);
-        if (_showGraphicsSubmenu) {
-            renderGraphicsSubmenu();
-        } else if (_showAudioSubmenu) {
+
+        if (_showAudioSubmenu) {
             renderAudioSubmenu();
         } else if (_showGameplaySubmenu) {
             renderGameplaySubmenu();
@@ -154,29 +144,10 @@ void GUI::MenuWindow::renderContent() {
     }
 }
 
-//! fonction surement inutiliser
-void GUI::MenuWindow::drawGraphicsSliders(float startX, float startY, float submenuWidth, float sliderHeight) {
-    (void)sliderHeight;
-    (void)submenuWidth;
-    (void)startX;
-    (void)startY;
-}
-
-// fonction inutile
-void GUI::MenuWindow::renderGraphicsSubmenu() {
-    float submenuWidth = 300;
-    float submenuHeight = 150;
-    float sliderHeight = 30;
-    float startX = _position.x + _dimensions.x + 160;
-    float startY = _position.y + _dimensions.y;
-    _guiLib->DrawPanel(startX, startY, submenuWidth, submenuHeight);
-    _guiLib->DrawLabel(startX + 30, startY + 5, submenuWidth - 60, 20, "Paramètres graphiques");
-    drawGraphicsSliders(startX, startY, submenuWidth, sliderHeight);
-}
-
 void GUI::MenuWindow::drawAudioSliders(float startX, float startY, float submenuWidth, float sliderHeight) {
     _guiLib->DrawLabel(startX + 30, startY + 30, submenuWidth - 60, 20, "Volume musique:");
     _musicVolume = _guiLib->DrawSlider(startX + 30, startY + 50, submenuWidth - 60, sliderHeight, "0%", "100%", _musicVolume, 0.0f, 1.0f);
+    // _gameState->setMusicVolume(_musicVolume);
 }
 
 void GUI::MenuWindow::renderAudioSubmenu() {
@@ -188,6 +159,12 @@ void GUI::MenuWindow::renderAudioSubmenu() {
     _guiLib->DrawPanel(startX, startY, submenuWidth, submenuHeight);
     _guiLib->DrawLabel(startX + 30, startY + 5, submenuWidth - 60, 20, "Paramètres audio");
     drawAudioSliders(startX, startY, submenuWidth, sliderHeight);
+
+    bool newState = _guiLib->DrawCheckBox(startX + 30, startY + 90, 25, 25, "Activer SFX", _sfxEnabled);
+    if (newState != _sfxEnabled) {
+        _sfxEnabled = newState;
+        //_gameState->setSfxEnabled(_sfxEnabled);
+    }
 }
 
 void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWidth, float sliderHeight) {
@@ -196,6 +173,7 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
         submenuWidth - 60, 20,
         "Fréquence du serveur:"
     );
+    _frequency = _gameState->getTimeUnit();
     int currentFrequency = _frequency;
     std::stringstream freqSs;
     freqSs << "Actuelle: " << currentFrequency << " ticks/seconde";
@@ -237,10 +215,8 @@ void MenuWindow::renderGameplaySubmenu() {
 
 void MenuWindow::drawWindowsList(float startX, float startY, float submenuWidth, float buttonHeight) {
     float yPos = startY + 30;
-    if (!_windowFactory) {
-        _guiLib->DrawLabel(startX + 10, yPos, submenuWidth - 20, buttonHeight * 2, "La factory de fenêtres n'est pas disponible.\nVeuillez l'initialiser d'abord.");
+    if (!_windowFactory)
         return;
-    }
     for (const auto& window : _windows) {
         auto windowPtr = _windowFactory->getWindow(window.id);
         if (windowPtr) {

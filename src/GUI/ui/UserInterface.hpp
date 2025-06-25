@@ -23,11 +23,10 @@ class UserInterface {
         ~UserInterface() = default;
         void initialize(int screenWidth, int screenHeight);
         void render();
-        void updateDataFromGameState(std::shared_ptr<const GameState> gameState, int mapWidth, int mapHeight, float gameTime, int frequency, int gameTick);
+        void updateDataFromGameState(std::shared_ptr<const GameState> gameState);
         void setSelectedTile(int x, int y);
         void setSelectedPlayer(int playerId);
         void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-        void setViewMode(int mode);
         bool toggleWindowVisibility(const std::string& windowId, bool visible);
         bool handleMouseEvents();
         bool isMouseOverUI() const;

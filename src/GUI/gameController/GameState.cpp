@@ -373,3 +373,23 @@ size_t GameState::getPlayerCount() const {
 std::vector<std::vector<std::shared_ptr<ITile>>> GameState::getTiles() const {
     return _tiles;
 }
+
+bool GameState::getSfxEnabled() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _sfxEnabled;
+}
+
+void GameState::setSfxEnabled(bool enabled) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _sfxEnabled = enabled;
+}
+
+float GameState::getMusicVolume() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _musicVolume;
+}
+
+void GameState::setMusicVolume(float volume) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _musicVolume = volume;
+}

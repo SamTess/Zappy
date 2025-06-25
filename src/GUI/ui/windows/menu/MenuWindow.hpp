@@ -27,7 +27,6 @@ class MenuWindow : public AUIWindow {
         int positionIndex;
     };
         bool _showMenu;
-        bool _showGraphicsSubmenu;
         bool _showAudioSubmenu;
         bool _showGameplaySubmenu;
         bool _showWindowsSubmenu;
@@ -38,6 +37,7 @@ class MenuWindow : public AUIWindow {
         std::shared_ptr<GUI::UIWindowFactory> _windowFactory;
         ZappyTypes::Vector2 _defaultPositions[6];
         std::vector<WindowInfo> _windows;
+        bool _sfxEnabled;
 
         void renderContent() override;
         void drawMenuButton();
@@ -47,8 +47,6 @@ class MenuWindow : public AUIWindow {
             float menuItemHeight, float startY, bool mousePressed);
         void handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY);
 
-        void renderGraphicsSubmenu();
-        void drawGraphicsSliders(float startX, float startY, float submenuWidth, float sliderHeight);
         void renderAudioSubmenu();
         void drawAudioSliders(float startX, float startY, float submenuWidth, float sliderHeight);
         void renderGameplaySubmenu();

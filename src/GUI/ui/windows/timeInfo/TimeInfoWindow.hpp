@@ -22,8 +22,6 @@ class TimeInfoWindow : public AUIWindow {
         void renderContent() override;
         int _fps = 60;
         int _frequency = 100;
-        float _gameTime = 0.0f;
-        int _gameTick = 0;
 
 };
 

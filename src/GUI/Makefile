@@ -49,7 +49,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/tileInfo/TileInfoWindow.cpp \
 	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
 	  ui/windows/mapInfo/MapInfoWindow.cpp \
-	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp \
 	  gameController/EntityFactory.cpp \

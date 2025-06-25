@@ -37,7 +37,6 @@ class AUIWindow : public IUIWindow {
         bool getShowWindowBox() const;
 
     protected:
-
         virtual void renderContent() = 0;
         std::shared_ptr<IGuiLib> _guiLib;
         std::string _title;

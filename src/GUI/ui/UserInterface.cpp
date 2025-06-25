@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** User Interface implementation using the factory pattern
+** UserInterface
 */
 
 #include <algorithm>
@@ -18,27 +18,24 @@
 namespace GUI {
 
 UserInterface::UserInterface(std::shared_ptr<IGuiLib> guiLib)
-    : _guiLib(guiLib),
-      _screenWidth(1920),
-      _screenHeight(1080),
-      _isDragging(false),
-      _mouseCapture(false) {
+    : _guiLib(guiLib), _screenWidth(1920), _screenHeight(1080),
+     _isDragging(false), _mouseCapture(false) {
     _windowFactory = std::make_shared<UIWindowFactory>(guiLib);
 }
 
 void UserInterface::initialize(int screenWidth, int screenHeight) {
     _screenWidth = screenWidth;
     _screenHeight = screenHeight;
-    _windowFactory->createAllWindows(screenWidth, screenHeight);
+    _windowFactory->createAllWindows(screenWidth, screenHeight, _windowFactory);
     _isDragging = false;
 }
 
 void UserInterface::render() {
-    _windowFactory->renderAllWindows();
+    _windowFactory->renderAllWindows(_windowFactory);
 }
 
-void UserInterface::updateDataFromGameState(std::shared_ptr<const GameState> gameState, int mapWidth, int mapHeight, float gameTime, int frequency, int gameTick) {
-    _windowFactory->updateAllWindows(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
+void UserInterface::updateDataFromGameState(std::shared_ptr<const GameState> gameState) {
+    _windowFactory->updateAllWindows(gameState);
 }
 
 void UserInterface::setSelectedTile(int x, int y) {
@@ -51,10 +48,6 @@ void UserInterface::setSelectedPlayer(int playerId) {
 
 void UserInterface::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
     _windowFactory->setNetworkManager(networkManager);
-}
-
-void UserInterface::setViewMode(int mode) {
-    _windowFactory->setViewMode(mode);
 }
 
 bool UserInterface::toggleWindowVisibility(const std::string& windowId, bool visible) {
@@ -93,9 +86,8 @@ void UserInterface::handleUIMouseInteraction(const ZappyTypes::Vector2& mousePos
 
 void UserInterface::startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition) {
     bool startedDragging = _windowFactory->handleWindowDragging(mousePosition);
-    if (startedDragging) {
+    if (startedDragging)
         _isDragging = true;
-    }
 }
 
 void UserInterface::handleDragEndIfNeeded() {

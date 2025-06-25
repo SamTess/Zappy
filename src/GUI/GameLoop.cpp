@@ -41,7 +41,7 @@ bool GameLoop::loadLibraries() {
     auto& libraryManager = LibraryManager::getInstance();
     if (!libraryManager.loadGraphicsLib("plugins/libraylibcpp.so")) {
         std::cerr << "Erreur de chargement de la bibliothèque graphique: " << libraryManager.getLastError() << std::endl;
-        return false;
+        return false;    m_graphics->SetMusicVolume(0.5f);
     }
     if (!libraryManager.loadGuiLib("plugins/libraygui.so")) {
         std::cerr << "Erreur de chargement de la bibliothèque GUI: " << libraryManager.getLastError() << std::endl;
@@ -117,8 +117,7 @@ int GameLoop::run() {
         updateGameData();
         if (m_gameController) {
             auto gameState = m_gameController->getGameState();
-            m_userInterface->updateDataFromGameState(gameState, m_mapWidth, m_mapHeight,
-                m_gameTime, m_frequency, m_gameTick);
+            m_userInterface->updateDataFromGameState(gameState);
         }
         m_userInterface->render();
         m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
@@ -178,6 +177,7 @@ void GameLoop::updateCameraForMapSize() {
     if (cameraDistance > 50.0f)
         cameraDistance = 50.0f;
     m_camera->reset();
+    m_graphics->SetMusicVolume(m_gameController->getGameState()->getMusicVolume());
     // m_camera->distance() = cameraDistance;
 }
 

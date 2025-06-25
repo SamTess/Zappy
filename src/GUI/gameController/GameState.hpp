@@ -67,6 +67,10 @@ public:
     std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
     size_t getPlayerCount() const;
     std::vector<std::vector<std::shared_ptr<ITile>>> getTiles() const;
+    bool getSfxEnabled() const;
+    void setSfxEnabled(bool enabled) ;
+    float getMusicVolume() const;
+    void setMusicVolume(float volume);
 
 private:
     bool isValidCoordinates(int x, int y) const;
@@ -90,6 +94,8 @@ private:
     std::deque<std::shared_ptr<IBroadcast>> _broadcasts;
     const size_t _maxBroadcasts = 20;
     std::shared_ptr<EntityFactoryManager> _entityFactory;
+    bool _sfxEnabled = true;
+    float _musicVolume = 0.8f;
 };
 
 #endif /* !GAME_STATE_HPP_ */

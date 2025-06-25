@@ -20,7 +20,6 @@ class TileInfoWindow : public AUIWindow {
 
         void setSelectedTile(int x, int y);
 
-        std::pair<int, int> getSelectedTile() const;
         bool hasTileSelected() const;
     private:
         void renderContent() override;
@@ -28,11 +27,9 @@ class TileInfoWindow : public AUIWindow {
         void renderTilePosition();
         float renderResourceInfo();
         void renderPlayerCount(float yOffset);
-        struct {
-            int x;
-            int y;
-            bool selected;
-        } _selectedTile;
+        int _x;
+        int _y;
+        bool _isSelecting;
 };
 
 } // namespace GUI
