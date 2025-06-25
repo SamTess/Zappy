@@ -28,10 +28,12 @@ typedef struct client_s {
     struct pollfd *client_poll;
     struct sockaddr_in *client_add;
     circular_buffer_t read_buffer;
+    circular_buffer_t write_buffer;
     player_t *player;
-    struct client_s *next;
     bool is_fully_connected;
     enum client_type_e type;
+    bool need_write;
+    struct client_s *next;
 } client_t;
 
 void send_message_to_all_graphic(server_t *server, char *message);

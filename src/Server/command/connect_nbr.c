@@ -31,7 +31,7 @@ static void format_response(int available_slots, client_t *client)
     char *response = malloc(sizeof(char) * res_size);
 
     snprintf(response, res_size, "%d\n", available_slots);
-    write_command_output(client->client_fd, response);
+    write_command_output_buffer(client, response);
     free(response);
 }
 
@@ -51,7 +51,7 @@ void connect_nbr(server_t *server, client_t *client, char **buffer)
 
     if (!client || !client->player || !client->player->team_name ||
         arr_len(buffer) != 1) {
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output_buffer(client, "ko\n");
         return;
     }
     available_slots = connect_nbr_srv(server, client->player->team_name);

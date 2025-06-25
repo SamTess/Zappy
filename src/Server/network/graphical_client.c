@@ -76,7 +76,7 @@ void send_message_to_all_graphic(server_t *server, char *message)
 
     while (current) {
         if (current->client && current->client->client_fd != -1)
-            write_command_output(current->client->client_fd, message);
+            write_command_output_buffer(current->client, message);
         current = current->next;
     }
 }

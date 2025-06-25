@@ -147,3 +147,12 @@ void write_command_output(int client_fd, char *msg)
     pfd.events = POLLOUT;
     write_with_poll(client_fd, &pfd, msg, strlen(msg));
 }
+
+void write_command_output_buffer(client_t *client, char *msg)
+{
+    if (!client || !validate_client_fd(client->client_fd))
+        return;
+    if (add_string_to_write_buffer(&client->write_buffer, msg) == -1)
+        return write_command_output(client->client_fd, msg);
+    client->need_write = true;
+}

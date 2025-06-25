@@ -38,7 +38,7 @@ void send_enw_command(server_t *server, client_t *client, int egg_id)
         return;
     graphical_client = server->graphical_clients;
     while (graphical_client) {
-        write_command_output(graphical_client->client->client_fd, buffer);
+        write_command_output_buffer(graphical_client->client, buffer);
         graphical_client = graphical_client->next;
     }
     free(buffer);
@@ -52,7 +52,7 @@ static void send_enw_command_to_client(client_t *client,
     buffer = get_buffer_for_enw(egg->egg_id, -1,
         egg->pos_x, egg->pos_y);
     if (buffer) {
-        write_command_output(client->client_fd, buffer);
+        write_command_output_buffer(client, buffer);
         free(buffer);
     }
 }

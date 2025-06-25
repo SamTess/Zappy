@@ -28,7 +28,7 @@ void send_smg_command(server_t *server, const char *msg)
     snprintf(buffer, size + 1, "smg %s\n", msg);
     current = server->graphical_clients;
     while (current) {
-        write_command_output(current->client->client_fd, buffer);
+        write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);

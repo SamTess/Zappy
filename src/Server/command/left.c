@@ -32,14 +32,14 @@ static void change_rot(client_t *client)
 void left(server_t *server, client_t *client, char **buffer)
 {
     if (!server || !client || !client->player || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     if (client->player->rotation != RIGHT && client->player->rotation != DOWN
         && client->player->rotation != LEFT
         && client->player->rotation != UP) {
         perror("Unexpected left rotation");
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     }
     change_rot(client);
     send_ppo_command(server, client->client_id);
-    write_command_output(client->client_fd, "ok\n");
+    write_command_output_buffer(client, "ok\n");
 }

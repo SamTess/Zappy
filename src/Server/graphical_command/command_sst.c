@@ -42,15 +42,15 @@ void command_sst(server_t *server, client_t *client, char **buffer)
 
     if (!buffer || client->type != GRAPHICAL || !server->graphical_clients ||
         arr_len(buffer) != 2)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     time = get_time_from_buffer(buffer[1]);
     if (time <= 0)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     tmp_buffer = get_buffer_sst(time);
     server->parsed_info->frequence = time;
     graphical_client = server->graphical_clients;
     while (graphical_client) {
-        write_command_output(graphical_client->client->client_fd,
+        write_command_output_buffer(graphical_client->client,
             tmp_buffer);
         graphical_client = graphical_client->next;
     }

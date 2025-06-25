@@ -30,17 +30,17 @@ void fork_c(server_t *server, client_t *client, char **buffer)
     int egg_id;
 
     if (!client || !client->player || arr_len(buffer) != 1) {
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output_buffer(client, "ko\n");
         return;
     }
     egg_id = get_next_egg_id(server);
     new_egg = create_egg(egg_id, client->player->pos_x, client->player->pos_y,
         client->player->team_name);
     if (!new_egg) {
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output_buffer(client, "ko\n");
         return;
     }
     add_egg(server, new_egg);
     send_enw_command(server, client, egg_id);
-    write_command_output(client->client_fd, "ok\n");
+    write_command_output_buffer(client, "ok\n");
 }

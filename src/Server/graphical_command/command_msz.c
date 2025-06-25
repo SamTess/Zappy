@@ -28,7 +28,7 @@ void send_msz_command(server_t *server, client_t *client)
         return;
     snprintf(buffer, size + 1, "msz %d %d\n",
             server->parsed_info->width, server->parsed_info->height);
-    write_command_output(client->client_fd, buffer);
+    write_command_output_buffer(client, buffer);
     free(buffer);
 }
 
@@ -36,6 +36,6 @@ void command_msz(server_t *server, client_t *client, char **buffer)
 {
     if (!server || !client || !server->graphical_clients ||
         arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     send_msz_command(server, client);
 }

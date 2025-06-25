@@ -56,10 +56,10 @@ bool send_ppo_command(server_t *server, int id)
     if (!tmp || !tmp->player)
         return false;
     buffer = get_ppo_buffer(tmp);
-    for (client_t *cur = server->client; cur != NULL; cur = cur->next) {
-        if (cur->type == GRAPHICAL && cur->is_fully_connected) {
-            write_command_output(cur->client_fd, buffer);
-        }
+    for (client_t *current = server->client;
+            current != NULL; current = current->next) {
+        if (current->type == GRAPHICAL && current->is_fully_connected)
+            write_command_output_buffer(current, buffer);
     }
     free(buffer);
     return true;
@@ -73,6 +73,6 @@ void command_ppo(server_t *server, client_t *client, char **buffer)
         arr_len(buffer) != 2 || sscanf(buffer[1], "#%d\n", &id) != 1 ||
         id < 0 || !find_client_by_id(server, id) ||
         !send_ppo_command(server, id)) {
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     }
 }

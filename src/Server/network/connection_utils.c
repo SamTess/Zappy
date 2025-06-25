@@ -37,12 +37,27 @@ static void create_server_egg(server_t *n_server, int egg_id, int i)
     add_egg(n_server, n_egg);
 }
 
+client_t *find_client_by_socket(server_t *server, int socket_fd)
+{
+    client_t *temp = server->client;
+
+    if (temp && temp->client_fd == server->s_fd)
+        temp = temp->next;
+    while (temp) {
+        if (temp->client_fd == socket_fd)
+            return temp;
+        temp = temp->next;
+    }
+    return NULL;
+}
+
 void init_struct(client_t *new_c)
 {
     init_player(new_c->player, NULL);
     if (!new_c->player)
         return;
     init_circular_buffer(&new_c->read_buffer);
+    init_circular_buffer(&new_c->write_buffer);
 }
 
 void init_server_eggs(server_t *n_server)

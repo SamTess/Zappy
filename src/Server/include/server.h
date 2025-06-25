@@ -165,5 +165,8 @@ void free_all(server_t *server, parsing_info_t *parsed_info);
 int count_team(server_t *n_server);
 
 void init_struct(client_t *new_c);
+int add_string_to_write_buffer(circular_buffer_t *cb, char *msg);
+void flush_client_write_buffer(client_t *client);
+client_t *find_client_by_socket(server_t *server, int socket_fd);
 
 #endif /* !SERVER_H_ */
