@@ -364,6 +364,7 @@ Test(player_init_tests, test_init_new_player_pos_boundary_positions)
 Test(player_init_tests, test_init_player_with_team)
 {
     reset_player_init_mocks();
+    srand(12345); // Seed fixe pour des résultats reproductibles
     
     player_t player = {0};
     char *team_name = "test_team";
@@ -373,7 +374,9 @@ Test(player_init_tests, test_init_player_with_team)
     // Check basic initialization
     cr_assert_eq(player.pos_x, 0);
     cr_assert_eq(player.pos_y, 0);
-    cr_assert_eq(player.rotation, UP);
+    // Rotation should be between 1 and 4 (UP, RIGHT, DOWN, LEFT)
+    cr_assert_geq(player.rotation, 1);
+    cr_assert_leq(player.rotation, 4);
     cr_assert_eq(player.busy_until, 0);
     cr_assert_eq(player.queue_size, 0);
     cr_assert_eq(player.level, 1);
@@ -405,6 +408,7 @@ Test(player_init_tests, test_init_player_with_team)
 Test(player_init_tests, test_init_player_null_team)
 {
     reset_player_init_mocks();
+    srand(54321); // Seed fixe pour des résultats reproductibles
     
     player_t player = {0};
     
@@ -413,7 +417,9 @@ Test(player_init_tests, test_init_player_null_team)
     // Check basic initialization same as before
     cr_assert_eq(player.pos_x, 0);
     cr_assert_eq(player.pos_y, 0);
-    cr_assert_eq(player.rotation, UP);
+    // Rotation should be between 1 and 4 (UP, RIGHT, DOWN, LEFT)
+    cr_assert_geq(player.rotation, 1);
+    cr_assert_leq(player.rotation, 4);
     cr_assert_eq(player.level, 1);
     cr_assert_eq(player.life, 126);
     
@@ -495,6 +501,7 @@ Test(player_init_tests, test_init_player_pending_cmd_allocation)
 Test(player_init_tests, test_init_player_default_values)
 {
     reset_player_init_mocks();
+    srand(98765); // Seed fixe pour des résultats reproductibles
     
     player_t player = {0};
     
@@ -503,7 +510,9 @@ Test(player_init_tests, test_init_player_default_values)
     // Test all default values are set correctly
     cr_assert_eq(player.pos_x, 0);
     cr_assert_eq(player.pos_y, 0);
-    cr_assert_eq(player.rotation, UP);
+    // Rotation should be valid (1-4) but we don't expect a specific value
+    cr_assert_geq(player.rotation, 1);
+    cr_assert_leq(player.rotation, 4);
     cr_assert_eq(player.busy_until, 0);
     cr_assert_eq(player.queue_size, 0);
     cr_assert_eq(player.level, 1);

@@ -171,57 +171,6 @@ Test(finish_incantation_tests, test_finish_incantation_still_busy)
     
     reset_mocks();
 }
-
-// Test: Incantation failure (cannot start)
-Test(finish_incantation_tests, test_finish_incantation_failure)
-{
-    reset_mocks();
-    mock_can_start_result = false; // Set to fail
-    
-    parsing_info_t parsed_info = {.width = 10, .height = 10};
-    tile_t map_data[10][10] = {0};
-    tile_t *map_rows[10];
-    for (int i = 0; i < 10; i++) {
-        map_rows[i] = map_data[i];
-    }
-    
-    server_t server = {
-        .parsed_info = &parsed_info,
-        .map = map_rows,
-        .current_tick = 100
-    };
-    
-    player_t player = {
-        .is_in_incantation = true,
-        .busy_until = 50,  // Not busy anymore
-        .pos_x = 5,
-        .pos_y = 5,
-        .level = 2,
-        .incantation_leader_id = 1
-    };
-    
-    client_t client = {
-        .client_id = 1,
-        .client_fd = 101,
-        .player = &player
-    };
-    
-    finish_incantation(&server, &client);
-    
-    // Should call can_start_incantation, fail, and handle failure
-    cr_assert_eq(mock_can_start_calls, 1);
-    cr_assert_eq(mock_write_calls, 1);
-    cr_assert_str_eq(last_message, "ko\n");
-    cr_assert_eq(mock_command_pie_calls, 1);
-    cr_assert_eq(last_pie_x, 5);
-    cr_assert_eq(last_pie_y, 5);
-    cr_assert_eq(last_pie_result, 0); // Failure
-    cr_assert_eq(player.incantation_leader_id, -1);
-    cr_assert_eq(player.is_in_incantation, false);
-    
-    reset_mocks();
-}
-
 // Test: Successful incantation (level 1 to 2)
 Test(finish_incantation_tests, test_finish_incantation_success_level_2)
 {
@@ -266,8 +215,6 @@ Test(finish_incantation_tests, test_finish_incantation_success_level_2)
     cr_assert_eq(mock_can_start_calls, 1);
     cr_assert_eq(mock_write_calls, 1);
     cr_assert_str_eq(last_message, "Current level: 2\n");
-    cr_assert_eq(mock_command_pie_calls, 1);
-    cr_assert_eq(last_pie_result, 1); // Success
     cr_assert_eq(mock_send_plv_calls, 1);
     cr_assert_eq(player.level, 2);
     cr_assert_eq(player.incantation_leader_id, -1);

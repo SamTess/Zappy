@@ -584,15 +584,18 @@ Test(parsing_tests, test_large_numbers_valid)
 {
     reset_parsing_mocks();
     
-    const char *args[] = {"zappy_server", "-c", "999999", "-f", "999999"};
+    // Use large but valid numbers according to the parsing constraints
+    // frequence must be <= 10000 and string length <= 9
+    // client_nb has no upper limit but should be reasonable
+    const char *args[] = {"zappy_server", "-c", "50000", "-f", "9999"};
     char **argv = create_test_argv(args, 5);
     parsing_info_t parsed_info = {0};
     
     parse_args(5, argv, &parsed_info);
     
     // Large valid numbers should be accepted
-    cr_assert_eq(parsed_info.client_nb, 999999);
-    cr_assert_eq(parsed_info.frequence, 999999);
+    cr_assert_eq(parsed_info.client_nb, 50000);
+    cr_assert_eq(parsed_info.frequence, 9999); // Within the 1-10000 limit
     cr_assert_eq(mock_parsing_error_calls, 0);
     
     free_test_argv(argv, 5);

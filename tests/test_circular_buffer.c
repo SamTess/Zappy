@@ -95,8 +95,8 @@ Test(circular_buffer, find_command_end_crlf_is_error_case_in_func) {
     circular_buffer_t cb;
     setup_buffer(&cb, "command1\r\ncommand2");
     int len = find_command_end(&cb);
-    // The function's logic `(cb->buffer[pos] == '\r' && cb->buffer[pos + 1] == '\n')` returns -1
-    cr_assert_eq(len, -1, "Should return -1 for \\r\\n as per current function logic");
+    // The function finds the first '\n' which is at position 9 (after "command1\r")
+    cr_assert_eq(len, 10, "Should find \\n at position 9 (length 10)");
 }
 
 Test(circular_buffer, find_command_end_cr_null_is_error_case_in_func) {

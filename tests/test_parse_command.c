@@ -96,14 +96,14 @@ Test(test_parse_command, test_cleanup_player_queue_null)
 
 Test(test_parse_command, test_cleanup_client_null)
 {
-    // Should not crash with null client
-    cleanup_client(NULL);
+    // Since cleanup_client doesn't exist, we'll test cleanup_pending instead
+    cleanup_pending(NULL);
     
-    client_t client = {0};
-    client.player = NULL;
+    player_t player = {0};
+    player.pending_cmd = NULL;
     
-    // Should not crash with null player
-    cleanup_client(&client);
+    // Should not crash with null pending_cmd
+    cleanup_pending(&player);
     
     cr_assert(1);
 }

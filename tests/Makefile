@@ -29,18 +29,13 @@ TEST_CFLAGS = $(CFLAGS_COMMON) --coverage -I$(SERVER_INCLUDE_DIR) $(shell pkg-co
 TEST_LDFLAGS = --coverage $(shell pkg-config --libs criterion) \
 	-Wl,--wrap=write_command_output \
 	-Wl,--wrap=send_ppo_command \
-	-Wl,--wrap=command_pex \
 	-Wl,--wrap=send_edi_command \
 	-Wl,--wrap=tile_add_player \
 	-Wl,--wrap=tile_remove_player \
 	-Wl,--wrap=remove_egg \
-	-Wl,--wrap=command_pie \
 	-Wl,--wrap=send_plv_to_all \
 	-Wl,--wrap=can_start_incantation \
-	-Wl,--wrap=command_pic \
 	-Wl,--wrap=send_enw_command \
-	-Wl,--wrap=command_pgt \
-	-Wl,--wrap=command_pdr \
 	-Wl,--wrap=arr_len \
 	-Wl,--wrap=can_connect \
 	-Wl,--wrap=send_pnw_command_to_all \
@@ -48,11 +43,9 @@ TEST_LDFLAGS = --coverage $(shell pkg-config --libs criterion) \
 	-Wl,--wrap=command_msz \
 	-Wl,--wrap=command_bct \
 	-Wl,--wrap=command_mtc \
-	-Wl,--wrap=command_tna \
 	-Wl,--wrap=command_ppo \
 	-Wl,--wrap=command_plv \
 	-Wl,--wrap=command_pin \
-	-Wl,--wrap=command_sst \
 	-Wl,--wrap=start_incantation \
 	-Wl,--wrap=broadcast \
 	-Wl,--wrap=right \
@@ -66,13 +59,10 @@ TEST_LDFLAGS = --coverage $(shell pkg-config --libs criterion) \
 	-Wl,--wrap=send_ebo_command \
 	-Wl,--wrap=init_inventory \
 	-Wl,--wrap=command_pdi \
-	-Wl,--wrap=remove_fd \
 	-Wl,--wrap=how_many_in_inventory \
 	-Wl,--wrap=remove_item_from_inventory \
 	-Wl,--wrap=accept \
-	-Wl,--wrap=add_fd \
 	-Wl,--wrap=get_message \
-	-Wl,--wrap=update_game_tick \
 	-Wl,--wrap=poll \
 	-Wl,--wrap=gettimeofday \
 	-Wl,--wrap=perror \
@@ -93,6 +83,7 @@ RAW_SRC = \
 	$(SERVER_SRC_DIR)/command/right.c \
 	$(SERVER_SRC_DIR)/command/set_object.c \
 	$(SERVER_SRC_DIR)/command/start_incantation.c \
+	$(SERVER_SRC_DIR)/graphical_command/command_pdi.c \
 	./test_raw_functions_simple.c
 
 TESTS_SRC = $(SERVER_SRC_DIR)/buffer/circular_buffer.c \
@@ -242,6 +233,15 @@ TESTS_SRC = $(SERVER_SRC_DIR)/buffer/circular_buffer.c \
 	./test_low_coverage_functions.c \
 	./test_zero_coverage_targeted.c \
 	./test_error_handling_comprehensive.c \
+	./test_fork_complete_coverage.c \
+	./test_tick_update_complete_coverage.c \
+	./test_command_pbc_complete_coverage.c \
+	./test_command_sst_complete_coverage.c \
+	./test_command_pdr_pex_simple.c \
+	./test_command_pic_pie_pgt_simple.c \
+	./test_command_smg_sst_tna_simple.c \
+	./test_tick_update_simple.c \
+	./test_connection_simple.c
 
 all: tests_run
 

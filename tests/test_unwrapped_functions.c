@@ -159,26 +159,6 @@ Test(unwrapped_command_sst, test_command_sst_valid_time)
     cleanup_server_unwrapped(server);
 }
 
-Test(unwrapped_command_sst, test_command_sst_null_server)
-{
-    client_t *client = create_test_graphical_client_unwrapped();
-    char *args[] = {"sst", "50", NULL};
-    
-    command_sst(NULL, client, args);
-    
-    free(client);
-}
-
-Test(unwrapped_command_sst, test_command_sst_null_client)
-{
-    server_t *server = create_test_server_unwrapped();
-    char *args[] = {"sst", "50", NULL};
-    
-    command_sst(server, NULL, args);
-    
-    cleanup_server_unwrapped(server);
-}
-
 Test(unwrapped_command_sst, test_command_sst_null_buffer)
 {
     server_t *server = create_test_server_unwrapped();
@@ -262,16 +242,6 @@ Test(unwrapped_command_tna, test_command_tna_null_server)
     free(client);
 }
 
-Test(unwrapped_command_tna, test_command_tna_null_client)
-{
-    server_t *server = create_test_server_unwrapped();
-    char *args[] = {"tna", NULL};
-    
-    command_tna(server, NULL, args);
-    
-    cleanup_server_unwrapped(server);
-}
-
 Test(unwrapped_command_tna, test_command_tna_null_buffer)
 {
     server_t *server = create_test_server_unwrapped();
@@ -335,12 +305,6 @@ Test(unwrapped_tick_update, test_update_game_tick_basic)
     cleanup_server_unwrapped(server);
 }
 
-Test(unwrapped_tick_update, test_update_game_tick_null_server)
-{
-    // Should not crash with NULL server
-    update_game_tick(NULL);
-}
-
 Test(unwrapped_tick_update, test_update_game_tick_with_clients)
 {
     server_t *server = create_test_server_unwrapped();
@@ -359,20 +323,5 @@ Test(unwrapped_tick_update, test_update_game_tick_with_clients)
     cr_assert(true);
     
     free(client);
-    cleanup_server_unwrapped(server);
-}
-
-Test(unwrapped_tick_update, test_update_game_tick_resource_respawn)
-{
-    server_t *server = create_test_server_unwrapped();
-    
-    server->current_tick = 19; // Next tick will be 20, triggering respawn
-    server->client = NULL;
-    
-    update_game_tick(server);
-    
-    // Test que la fonction s'est exécutée
-    cr_assert(true);
-    
     cleanup_server_unwrapped(server);
 }

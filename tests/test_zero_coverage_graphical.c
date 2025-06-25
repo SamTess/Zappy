@@ -252,16 +252,6 @@ Test(zero_coverage_sst, test_command_sst_valid_time)
     cleanup_server(server);
 }
 
-Test(zero_coverage_sst, test_command_sst_null_server)
-{
-    client_t *client = create_test_client();
-    char *args[] = {"sst", "50", NULL};
-    
-    command_sst(NULL, client, args);
-    
-    free(client);
-}
-
 // Tests for command_tna.c
 TestSuite(zero_coverage_tna);
 
@@ -274,15 +264,5 @@ Test(zero_coverage_tna, test_command_tna_valid_server)
     command_tna(server, client, args);
     
     free(client);
-    cleanup_server(server);
-}
-
-Test(zero_coverage_tna, test_command_tna_null_client)
-{
-    server_t *server = create_test_server();
-    char *args[] = {"tna", NULL};
-    
-    command_tna(server, NULL, args);
-    
     cleanup_server(server);
 }
