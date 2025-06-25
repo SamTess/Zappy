@@ -23,10 +23,6 @@ private:
     std::string _host;
     int _port;
     sockaddr_in _addr;
-    friend class TcpSocket;
-
-    const sockaddr* getSockAddr() const;
-    socklen_t getAddrSize() const;
     void resolveAddress();
 
 public:
@@ -35,6 +31,8 @@ public:
     std::string getHost() const override;
     int getPort() const override;
     std::string toString() const override;
+    const sockaddr* getSockAddr() const;
+    socklen_t getAddrSize() const;
 };
 
 } // namespace implementation
