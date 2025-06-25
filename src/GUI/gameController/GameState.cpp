@@ -368,7 +368,8 @@ void GameState::removeEggFromTile(int eggId, int x, int y) {
     }
 }
 
-std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() const {
+std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
+    std::lock_guard<std::mutex> lock(_mutex);
     return _players;
 }
 

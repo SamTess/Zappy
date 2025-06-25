@@ -58,7 +58,6 @@ public:
     void setTeamNames(const std::vector<std::string>& teamNames);
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
     std::map<int, std::shared_ptr<IPlayer>> getPlayers();
     void addBroadcast(int playerId, const std::string& team, const std::string& message);
     void updateBroadcasts(float deltaTime);
@@ -67,15 +66,7 @@ public:
     void setSfxEnabled(bool enabled);
     float getMusicVolume() const;
     void setMusicVolume(float volume);
-=======
-    std::map<int, std::shared_ptr<IPlayer>> getPlayers() const;
-
-    void addBroadcast(int playerId, const std::string& team, const std::string& message);
-    void updateBroadcasts(float deltaTime);
-    std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
-    size_t getPlayerCount() const;
-    std::vector<std::vector<std::shared_ptr<ITile>>> getTiles() const;
->>>>>>> main
+    std::map<int, std::shared_ptr<IPlayer>> getPlayers();
 
 private:
     bool isValidCoordinates(int x, int y) const;

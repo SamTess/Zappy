@@ -18,10 +18,6 @@
 #include "windows/tileInfo/TileInfoWindow.hpp"
 #include "windows/playerInfo/PlayerInfoWindow.hpp"
 #include "windows/mapInfo/MapInfoWindow.hpp"
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
-=======
-#include "windows/controls/ControlsWindow.hpp"
->>>>>>> main
 #include "windows/timeInfo/TimeInfoWindow.hpp"
 #include "windows/menu/MenuWindow.hpp"
 
@@ -34,7 +30,6 @@ UIWindowFactory::UIWindowFactory(std::shared_ptr<IGuiLib> guiLib)
     _isSelecting = false;
 }
 
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
 void UIWindowFactory::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {
     _commandSender = sender;
     auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(_windows["playerInfo"]);
@@ -50,18 +45,6 @@ void UIWindowFactory::setCommandExecutor(std::shared_ptr<ICommandExecutor> execu
     auto menuWindow = std::dynamic_pointer_cast<GUI::MenuWindow>(_windows["menu"]);
     if (menuWindow)
         menuWindow->setCommandExecutor(executor);
-=======
-void UIWindowFactory::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
-    m_networkManager = networkManager;
-    auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(m_windows["playerInfo"]);
-    if (playerInfoWindow) {
-        playerInfoWindow->setNetworkManager(networkManager);
-    }
-    auto mapInfoWindow = std::dynamic_pointer_cast<GUI::MapInfoWindow>(m_windows["mapInfo"]);
-    if (mapInfoWindow) {
-        mapInfoWindow->setNetworkManager(networkManager);
-    }
->>>>>>> main
 }
 
 void UIWindowFactory::createAllWindows(int, int,
@@ -76,10 +59,6 @@ void UIWindowFactory::createAllWindows(int, int,
         {"tileInfo", {10, 810}, {400, 300}, false},
         {"playerInfo", {10, 500}, {400, 300}, false},
         {"mapInfo", {1520, 540}, {400, 300}, false},
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
-=======
-        {"controls", {1520, 860}, {400, 200}, false},
->>>>>>> main
         {"timeInfo", {1450, 10}, {250, 150}, false},
         {"menu", {10, 10}, {40, 40}, true}
     };
@@ -163,23 +142,6 @@ void UIWindowFactory::setSelectedPlayer(int playerId) {
     auto playerInfoWindow = std::dynamic_pointer_cast<GUI::PlayerInfoWindow>(_windows["playerInfo"]);
     if (playerInfoWindow)
         playerInfoWindow->setSelectedPlayer(playerId);
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
-=======
-    }
-}
-
-std::shared_ptr<NetworkManager> UIWindowFactory::getNetworkManager() const {
-    return m_networkManager;
-}
-
-void UIWindowFactory::setViewMode(int mode) {
-    if (mode >= 0 && mode < static_cast<int>(m_viewModes.size())) {
-        m_currentViewMode = mode;
-        auto controlsWindow = std::dynamic_pointer_cast<GUI::ControlsWindow>(m_windows["controls"]);
-        if (controlsWindow)
-            controlsWindow->setViewMode(mode);
-    }
->>>>>>> main
 }
 
 bool UIWindowFactory::handleWindowDragging(const ZappyTypes::Vector2& mousePosition) {
@@ -226,10 +188,6 @@ void UIWindowFactory::createWindow(const std::string& id, const ZappyTypes::Vect
         {"tileInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TileInfoWindow>(lib); }},
         {"playerInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::PlayerInfoWindow>(lib); }},
         {"mapInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MapInfoWindow>(lib); }},
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
-=======
-        {"controls", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::ControlsWindow>(lib); }},
->>>>>>> main
         {"timeInfo", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::TimeInfoWindow>(lib); }},
         {"menu", [](std::shared_ptr<IGuiLib> lib) { return std::make_shared<GUI::MenuWindow>(lib); }}
     };

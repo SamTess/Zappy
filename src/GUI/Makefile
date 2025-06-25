@@ -47,11 +47,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/AUIWindow.cpp \
 	  ui/windows/tileInfo/TileInfoWindow.cpp \
 	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
-<<<<<<< 246-infra-bien-tout-separer-logique-gui-de-logique-network
-=======
-	  ui/windows/mapInfo/MapInfoWindow.cpp \
-	  ui/windows/controls/ControlsWindow.cpp \
->>>>>>> main
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp \
 	  ui/windows/mapInfo/MapInfoWindow.cpp \
