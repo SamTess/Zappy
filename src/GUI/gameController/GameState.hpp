@@ -68,7 +68,7 @@ public:
     size_t getPlayerCount() const;
     std::vector<std::vector<std::shared_ptr<ITile>>> getTiles() const;
     bool getSfxEnabled() const;
-    void setSfxEnabled(bool enabled) ;
+    void setSfxEnabled(bool enabled);
     float getMusicVolume() const;
     void setMusicVolume(float volume);
 

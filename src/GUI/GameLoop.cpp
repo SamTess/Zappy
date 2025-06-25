@@ -82,8 +82,6 @@ bool GameLoop::loadModels() {
 void GameLoop::setupComponents() {
     m_camera = std::make_shared<CameraController>();
     m_camera->init(m_graphics);
-    // m_camera->setMapDimensions(20, 20);
-    m_uiRenderer = std::make_shared<UIRenderer>();
     m_modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     m_modelManagerAdapter->setGraphicsLib(m_graphics);
     m_mapRenderer = std::make_shared<Zappy::MapRenderer>(m_graphics, m_gameController->getGameState(), m_modelManagerAdapter);
@@ -93,7 +91,7 @@ void GameLoop::setupComponents() {
 }
 
 int GameLoop::run() {
-    if (!m_graphics || !m_gui || !m_renderer || !m_camera || !m_uiRenderer)
+    if (!m_graphics || !m_gui || !m_renderer || !m_camera)
         return 84;
     while (!m_graphics->WindowShouldClose()) {
         bool uiHandledMouse = m_userInterface->handleMouseEvents();
@@ -120,13 +118,9 @@ int GameLoop::run() {
             m_userInterface->updateDataFromGameState(gameState);
         }
         m_userInterface->render();
-        m_uiRenderer->renderUI(m_graphics, m_gui, m_camera);
         if (m_userInterface) {
             auto timeInfoWindow = std::dynamic_pointer_cast<GUI::TimeInfoWindow>(
                 m_userInterface->getWindow("timeInfo"));
-            if (timeInfoWindow) {
-                timeInfoWindow->setFPS(m_uiRenderer->getFPS());
-            }
         }
         m_graphics->EndDrawing();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));

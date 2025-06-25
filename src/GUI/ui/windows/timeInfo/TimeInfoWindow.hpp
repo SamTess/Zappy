@@ -22,7 +22,6 @@ class TimeInfoWindow : public AUIWindow {
         void renderContent() override;
         int _fps = 60;
         int _frequency = 100;
-
 };
 
 } // namespace GUI

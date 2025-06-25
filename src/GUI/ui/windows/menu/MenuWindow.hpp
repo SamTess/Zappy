@@ -15,17 +15,19 @@
 
 namespace GUI {
 
+typedef struct WindowInfo_s {
+    std::string id;
+    std::string name;
+    int positionIndex;
+} WindowInfo_t;
+
 class MenuWindow : public AUIWindow {
     public:
         explicit MenuWindow(std::shared_ptr<IGuiLib> guiLib);
         ~MenuWindow() = default;
         void setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory);
+
     private:
-    struct WindowInfo {
-        std::string id;
-        std::string name;
-        int positionIndex;
-    };
         bool _showMenu;
         bool _showAudioSubmenu;
         bool _showGameplaySubmenu;
@@ -36,7 +38,7 @@ class MenuWindow : public AUIWindow {
         int _frequency = 100;
         std::shared_ptr<GUI::UIWindowFactory> _windowFactory;
         ZappyTypes::Vector2 _defaultPositions[6];
-        std::vector<WindowInfo> _windows;
+        std::vector<WindowInfo_t> _windows;
         bool _sfxEnabled;
 
         void renderContent() override;

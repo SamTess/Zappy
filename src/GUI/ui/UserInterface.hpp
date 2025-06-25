@@ -18,7 +18,6 @@ namespace GUI {
 
 class UserInterface {
     public:
-
         explicit UserInterface(std::shared_ptr<IGuiLib> guiLib);
         ~UserInterface() = default;
         void initialize(int screenWidth, int screenHeight);

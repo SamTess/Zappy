@@ -16,9 +16,7 @@
 #include "../Constants.hpp"
 
 Renderer::Renderer()
-    : m_mapWidth(20),
-      m_mapHeight(20),
-      m_skybox(std::make_unique<Skybox>()) {
+    : m_mapWidth(20), m_mapHeight(20), m_skybox(std::make_unique<Skybox>()) {
 }
 
 void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
@@ -29,10 +27,7 @@ void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
     }
 }
 
-void Renderer::render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
-    std::shared_ptr<CameraController> camera,
-    std::shared_ptr<UIRenderer> uiRenderer) {
-
+void Renderer::render(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->BeginDrawing();
     renderSkybox(graphics);
     renderBackground(graphics);
@@ -40,7 +35,6 @@ void Renderer::render(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IG
     renderGrid(graphics);
     renderScene(graphics);
     graphics->EndCamera3D();
-    renderUI(graphics, gui, camera, uiRenderer);
     graphics->EndDrawing();
 }
 
@@ -59,11 +53,6 @@ void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
     Zappy::ParticleSystem::getInstance().render(graphics);
     Zappy::EjectionAnimationManager::getInstance().render(graphics);
     // TODO(Sam): Implement scene rendering logic
-}
-
-void Renderer::renderUI(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<IGuiLib> gui,
-                       std::shared_ptr<CameraController> camera, std::shared_ptr<UIRenderer> uiRenderer) {
-    uiRenderer->renderUI(graphics, gui, camera);
 }
 
 void Renderer::renderSprite2D(int textureId, int x, int y) {

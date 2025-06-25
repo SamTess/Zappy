@@ -32,7 +32,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/Renderer.cpp \
 	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
-	  renderer/UIRenderer.cpp \
 	  renderer/ParticleSystem.cpp \
 	  renderer/EjectionAnimationManager.cpp \
 	  renderer/DeathAnimationManager.cpp \

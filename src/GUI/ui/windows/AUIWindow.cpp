@@ -40,7 +40,6 @@ bool AUIWindow::render() {
 
 void AUIWindow::updateData(std::shared_ptr<const GameState> gameState) {
     _gameState = gameState;
-
 }
 
 void AUIWindow::setPosition(const ZappyTypes::Vector2& position) {

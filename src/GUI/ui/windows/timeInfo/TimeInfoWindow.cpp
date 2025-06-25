@@ -28,5 +28,4 @@ void TimeInfoWindow::renderContent() {
     freqInfo << "Fréquence: " << _frequency << "/s";
     _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20, 20, freqInfo.str());
 }
-
 } // namespace GUI

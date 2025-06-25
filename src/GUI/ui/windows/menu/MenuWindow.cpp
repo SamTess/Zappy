@@ -106,7 +106,6 @@ float GUI::MenuWindow::showSubmenu(bool submenu) {
 }
 
 void GUI::MenuWindow::handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY) {
-
     if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight, menuItemWidth, menuItemHeight, "Audio"))
         _showAudioSubmenu = showSubmenu(_showAudioSubmenu);
     if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight * 2, menuItemWidth, menuItemHeight, "Gameplay"))

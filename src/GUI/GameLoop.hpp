@@ -13,7 +13,6 @@
 #include "../Shared/IGraphicsLib.hpp"
 #include "../Shared/IGuiLib.hpp"
 #include "cameraController/CameraController.hpp"
-#include "renderer/UIRenderer.hpp"
 #include "renderer/Renderer.hpp"
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
@@ -61,7 +60,6 @@ private:
     std::shared_ptr<IGuiLib> m_gui;
     std::shared_ptr<Renderer> m_renderer;
     std::shared_ptr<CameraController> m_camera;
-    std::shared_ptr<UIRenderer> m_uiRenderer;
     std::shared_ptr<GameController> m_gameController;
     std::shared_ptr<Zappy::MapRenderer> m_mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> m_modelManagerAdapter;
