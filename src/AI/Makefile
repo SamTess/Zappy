@@ -68,9 +68,7 @@ $(NAME): check_python
 		sleep 0.05; \
 	done
 	@echo ""
-	@cd build_zipapp && python3 build_zipapp.py
-	@mkdir -p ../../build
-	@cp -r . ../../build/AI/src
+	ln -sf ./src/AI/main.py ../../zappy_ai
 	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Client \
 	AI compilé avec succès : $(NAME)$(RESET)"
 	@sleep 0.2
