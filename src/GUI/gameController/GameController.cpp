@@ -9,7 +9,6 @@
 #include <string>
 #include <algorithm>
 #include <memory>
-#include <thread>
 #include <chrono>
 #include "GameController.hpp"
 #include "../renderer/EjectionAnimationManager.hpp"

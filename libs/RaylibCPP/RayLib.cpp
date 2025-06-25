@@ -45,11 +45,7 @@ void RayLib::CloseWindow() {
     _window.reset();
     _initialized = false;
     _textures.clear();
-    _models.clear();
-    _font.reset();
-    _sounds.clear();
     _music.reset();
-    _texture3D.reset();
     _audio.reset();
 }
 

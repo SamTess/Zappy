@@ -94,10 +94,10 @@ static char *add_resources(int *resources)
 static int check_null(tile_t *tile, char **player, char **resources)
 {
     *player = repeat_word("player", tile->player_count);
-    if (!player)
+    if (!*player)
         return -1;
     *resources = add_resources(tile->resources);
-    if (!resources)
+    if (!*resources)
         return -1;
     return 0;
 }
