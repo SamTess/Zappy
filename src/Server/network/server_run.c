@@ -16,9 +16,8 @@
 
 client_t *find_client_by_socket(server_t *server, int socket_fd)
 {
-    
     client_t *temp;
-    
+
     if (!server || !server->client)
         return NULL;
     temp = server->client;
