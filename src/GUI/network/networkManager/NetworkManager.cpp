@@ -20,9 +20,8 @@ NetworkManager::NetworkManager()
     : _connection(std::make_unique<TcpConnection>()),
       _protocolParser(std::make_unique<ProtocolParser>()),
       _networkThread(std::make_unique<NetworkThread>()),
-      _incomingQueue(std::make_unique<MessageQueue>()),
-      _outgoingQueue(std::make_unique<MessageQueue>()),
       _receiveBuffer(4096),
+      _sendBuffer(4096),
       _isConnected(false) {
     NetworkLogger::get().setEnabled(true);
 }
@@ -71,6 +70,8 @@ void NetworkManager::disconnect() {
 }
 
 bool NetworkManager::isConnected() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_isConnected && _connection->isConnected())
         return true;
     return false;
@@ -81,7 +82,7 @@ void NetworkManager::sendCommand(const std::string& command) {
         return;
     std::string finalCommand = formatCommand(command);
     NetworkLogger::get().log(std::string("[SEND] ") + finalCommand);
-    queueCommandForSending(finalCommand);
+    _sendBuffer.write(finalCommand);
 }
 
 bool NetworkManager::validateConnectionForSending() {
@@ -101,10 +102,6 @@ std::string NetworkManager::formatCommand(const std::string& command) {
     return finalCommand;
 }
 
-void NetworkManager::queueCommandForSending(const std::string& formattedCommand) {
-    _outgoingQueue->enqueue(formattedCommand);
-}
-
 void NetworkManager::networkThreadLoop() {
     int errorCount = 0;
     const int maxErrors = 3;
@@ -121,7 +118,6 @@ void NetworkManager::networkThreadLoop() {
         }
         try {
             errorCount = receiveAndProcessData(errorCount, maxErrors);
-            processIncomingMessages();
             errorCount = processPendingOutgoingMessages(errorCount, maxErrors);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         } catch (const std::exception& e) {
@@ -141,10 +137,8 @@ bool NetworkManager::processInitialWelcomeData() {
         NetworkLogger::get().log(std::string("Initial message extracted: ") + message);
         if (message.find("WELCOME") != std::string::npos) {
             NetworkLogger::get().log("WELCOME message received during initialization");
-            handleWelcomeMessage(message);
+            sendCommand("GRAPHIC");
             return true;
-        } else {
-            _incomingQueue->enqueue(message);
         }
     }
     return false;
@@ -153,14 +147,14 @@ bool NetworkManager::processInitialWelcomeData() {
 bool NetworkManager::tryReceiveInitialWelcome() {
     try {
         for (int i = 0; i < 30 && _networkThread->isRunning(); ++i) {
-        std::string data = _connection->receive();
-        if (!data.empty()) {
-            _receiveBuffer.write(data);
-            if (processInitialWelcomeData()) {
-                processPendingOutgoingMessages(0, 3);
-                return true;
+            std::string data = _connection->receive();
+            if (!data.empty()) {
+                _receiveBuffer.write(data);
+                if (processInitialWelcomeData()) {
+                    processPendingOutgoingMessages(0, 3);
+                    return true;
+                }
             }
-        }
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         NetworkLogger::get().log("[ERROR] Timeout waiting for WELCOME message");
@@ -193,17 +187,17 @@ void NetworkManager::extractCompleteMessages() {
         if (!message.empty()) {
             message += "\n";
             NetworkLogger::get().log(std::string("Message extracted: ") + message);
-            _incomingQueue->enqueue(message);
+            processIncomingMessage(message);
         }
     }
 }
 
 int NetworkManager::handleReceiveError(int errorCount, int maxErrors, const std::exception& e) {
     const std::string errorMsg = e.what();
+    std::lock_guard<std::mutex> lock(_mutex);
 
     if (errorMsg.find("Connection closed") != std::string::npos) {
         NetworkLogger::get().log(std::string("[ERROR] Server closed connection: ") + errorMsg);
-        std::lock_guard<std::mutex> lock(_mutex);
         _isConnected = false;
         return maxErrors;
     } else if (errorMsg.find("Timeout") == std::string::npos) {
@@ -211,7 +205,6 @@ int NetworkManager::handleReceiveError(int errorCount, int maxErrors, const std:
         NetworkLogger::get().log(std::string("[ERROR] Error receiving data: ") + errorMsg + " (error " + std::to_string(errorCount) + "/" + std::to_string(maxErrors) + ")");
         if (errorCount >= maxErrors) {
             NetworkLogger::get().log("[ERROR] Too many receive errors, disconnecting");
-            std::lock_guard<std::mutex> lock(_mutex);
             _isConnected = false;
         }
     }
@@ -219,9 +212,11 @@ int NetworkManager::handleReceiveError(int errorCount, int maxErrors, const std:
 }
 
 int NetworkManager::processPendingOutgoingMessages(int errorCount, int maxErrors) {
-    if (_outgoingQueue->isEmpty())
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    if (!_sendBuffer.hasLine())
         return errorCount;
-    std::string message = _outgoingQueue->dequeue();
+    std::string message = _sendBuffer.readLine();
     if (message.empty())
         return errorCount;
     try {
@@ -233,7 +228,6 @@ int NetworkManager::processPendingOutgoingMessages(int errorCount, int maxErrors
         errorCount++;
         if (errorCount >= maxErrors) {
             NetworkLogger::get().log("[ERROR] Too many send errors, disconnecting");
-            std::lock_guard<std::mutex> lock(_mutex);
             _isConnected = false;
         }
         return errorCount;
@@ -241,23 +235,15 @@ int NetworkManager::processPendingOutgoingMessages(int errorCount, int maxErrors
 }
 
 int NetworkManager::handleNetworkThreadError(int errorCount, int maxErrors, const std::exception& e) {
-    NetworkLogger::get().log(std::string("[ERROR] Network thread error: ") + e.what());
+    std::lock_guard<std::mutex> lock(_mutex);
+
     errorCount++;
+    NetworkLogger::get().log(std::string("[ERROR] Network thread error: ") + e.what());
     if (errorCount >= maxErrors) {
         NetworkLogger::get().log("[ERROR] Too many network thread errors, disconnecting");
-        std::lock_guard<std::mutex> lock(_mutex);
         _isConnected = false;
     }
     return errorCount;
-}
-
-void NetworkManager::processIncomingMessages() {
-    std::string message;
-
-    while (!(message = _incomingQueue->dequeue()).empty()) {
-        NetworkLogger::get().log(std::string("Processing incoming message: ") + message);
-        processIncomingMessage(message);
-    }
 }
 
 void NetworkManager::processIncomingMessage(const std::string& message) {
@@ -267,12 +253,6 @@ void NetworkManager::processIncomingMessage(const std::string& message) {
     } catch (const std::exception& e) {
         NetworkLogger::get().log(std::string("[ERROR] Error processing message: ") + e.what());
     }
-}
-
-void NetworkManager::handleWelcomeMessage(const std::string& message) {
-    NetworkLogger::get().log(std::string("Message de bienvenue reçu: ") + message);
-    NetworkLogger::get().log("Envoi automatique de la commande GRAPHIC suite au WELCOME");
-    sendCommand("GRAPHIC");
 }
 
 void NetworkManager::handleRegularMessage(const std::string& message) {
