@@ -293,7 +293,7 @@ void GameState::removeEggFromTile(int eggId, int x, int y) {
         tile->removeEgg(eggId);
 }
 
-std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
+const std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() const {
     return _players;
 }
 

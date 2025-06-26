@@ -57,8 +57,7 @@ public:
     void setTeamNames(const std::vector<std::string>& teamNames);
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
-    std::map<int, std::shared_ptr<IPlayer>> getPlayers();
-    const std::map<int, std::shared_ptr<IPlayer>>& getPlayers() const;
+    const std::map<int, std::shared_ptr<IPlayer>> getPlayers() const;
     bool getSfxEnabled() const;
     void setSfxEnabled(bool enabled);
     float getMusicVolume() const;
