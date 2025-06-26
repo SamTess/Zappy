@@ -14,12 +14,16 @@
 #include "../../textureManager/ModelManager.hpp"
 
 Player::Player() : _id(0), _x(0), _y(0), _orientation(0), _level(1), _teamName(""), _isAlive(true),
-    _lastRotation(180.0f), _currentRotation(0.0f) {}
+    _lastRotation(180.0f), _currentRotation(0.0f), _startX(0.0f), _startY(0.0f), 
+    _targetX(0.0f), _targetY(0.0f), _movementProgress(1.0f), _movementDuration(0.5f), _isMoving(false) {}
 
 Player::Player(const PlayerInfoData& data)
     : _id(data.getId()), _x(data.getX()), _y(data.getY()),
     _orientation(data.getOrientation()), _level(data.getLevel()),
-    _teamName(data.getTeamName()), _isAlive(data.isAlive()) {
+    _teamName(data.getTeamName()), _isAlive(data.isAlive()),
+    _startX(static_cast<float>(data.getX())), _startY(static_cast<float>(data.getY())),
+    _targetX(static_cast<float>(data.getX())), _targetY(static_cast<float>(data.getY())),
+    _movementProgress(1.0f), _movementDuration(0.5f), _isMoving(false) {
     _currentRotation = orientationToRotationDegrees(_orientation);
     _lastRotation = _currentRotation;
 }
@@ -59,8 +63,16 @@ bool Player::isAlive() const {
 
 void Player::updateFromProtocol(const PlayerInfoData& data) {
     _id = data.getId();
-    _x = data.getX();
-    _y = data.getY();
+
+    int newX = data.getX();
+    int newY = data.getY();
+    if (newX != _x || newY != _y) {
+        startMovement(newX, newY);
+    }
+    
+    _x = newX;
+    _y = newY;
+    
     int newOrientation = data.getOrientation();
     if (newOrientation != _orientation) {
         _lastRotation = _currentRotation;
@@ -161,4 +173,44 @@ ZappyTypes::Color Player::generateTeamColor() const {
             static_cast<unsigned char>(green),
             static_cast<unsigned char>(blue),
             255};
+}
+
+void Player::updateAnimation(float deltaTime) {
+    if (_isMoving) {
+        _movementProgress += deltaTime / _movementDuration;
+        if (_movementProgress >= 1.0f) {
+            _movementProgress = 1.0f;
+            _isMoving = false;
+        }
+    }
+}
+
+ZappyTypes::Vector3 Player::getInterpolatedPosition() const {
+    if (!_isMoving) {
+        return {static_cast<float>(_x), 0.0f, static_cast<float>(_y)};
+    }
+    float t = _movementProgress;
+    t = 1.0f - (1.0f - t) * (1.0f - t);
+    float interpolatedX = _startX + ((_targetX - _startX) * t);
+    float interpolatedY = _startY + ((_targetY - _startY) * t);
+    return {interpolatedX, 0.0f, interpolatedY};
+}
+
+bool Player::isMoving() const {
+    return _isMoving;
+}
+
+void Player::startMovement(int newX, int newY) {
+    if (!_isMoving) {
+        _startX = static_cast<float>(_x);
+        _startY = static_cast<float>(_y);
+    } else {
+        ZappyTypes::Vector3 currentPos = getInterpolatedPosition();
+        _startX = currentPos.x;
+        _startY = currentPos.z;
+    }
+    _targetX = static_cast<float>(newX);
+    _targetY = static_cast<float>(newY);
+    _movementProgress = 0.0f;
+    _isMoving = true;
 }
