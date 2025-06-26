@@ -30,6 +30,7 @@ class MenuWindow : public AUIWindow {
 
         void setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factory);
         void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
+        void updateData(std::shared_ptr<IUIDataProvider> dataProvider) override;
 
     protected:
         void renderContent() override;
@@ -38,7 +39,6 @@ class MenuWindow : public AUIWindow {
         bool _showMenu;
         bool _showAudioSubmenu;
         bool _showGameplaySubmenu;
-        bool _showWindowsSubmenu;
         float _musicVolume;
         float _sfxVolume;
         float _gameSpeed;
@@ -49,6 +49,7 @@ class MenuWindow : public AUIWindow {
         std::shared_ptr<ICommandExecutor> _commandExecutor;
         ZappyTypes::Vector2 _defaultPositions[6];
         std::vector<WindowInfo_t> _windows;
+
         void drawMenuButton();
         void handleMenuButtonClick(bool mouseOnButton, bool mousePressed);
         void drawMainMenu(float menuItemWidth, float menuItemHeight, float startY);
@@ -65,6 +66,9 @@ class MenuWindow : public AUIWindow {
         void resetAllSubmenus();
         float showSubmenu(bool submenu);
         float getSubmenuHeight() const;
+        void updateSettingsFromGameState();
+        void applyMusicVolumeChange(float newVolume);
+        void applySfxEnabledChange(bool enabled);
 };
 
 } // namespace GUI

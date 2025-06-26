@@ -124,6 +124,7 @@ int GameLoop::run() {
         Zappy::DeathAnimationManager::getInstance().render(_graphics);
         _graphics->EndCamera3D();
         updateGameData();
+        updateAudioSettings(); // Appliquer les changements audio
         if (_gameController)
             auto gameState = _gameController->getGameState();
         _userInterface->render();
@@ -182,7 +183,16 @@ void GameLoop::updateCameraForMapSize() {
     if (cameraDistance > 50.0f)
         cameraDistance = 50.0f;
     _camera->reset();
-    _graphics->SetMusicVolume(_gameController->getGameState()->getMusicVolume());
+    updateAudioSettings();
+}
+
+void GameLoop::updateAudioSettings() {
+    if (!_gameController || !_graphics)
+        return;
+    auto gameState = _gameController->getGameState();
+    if (!gameState)
+        return;
+    _graphics->SetMusicVolume(gameState->getMusicVolume());
 }
 
 void GameLoop::setSkyboxTexture(const std::string& texturePath) {

@@ -27,7 +27,7 @@ GameController::GameController(
 void GameController::initializeManagers() {
     _graphicsManager = std::make_shared<GraphicsManager>(nullptr);
     _animationManager = std::make_shared<AnimationManager>(_gameState);
-    _soundManager = std::make_shared<SoundManager>(_graphicsManager->getGraphics(), _gameState);
+    _soundManager = std::make_shared<SoundManager>(nullptr, _gameState);
     _networkManager = std::make_shared<NetworkCommandManager>(nullptr);
     _playerValidator = std::make_shared<PlayerValidationManager>(_gameState, _networkManager);
     _messageRegistry = std::make_shared<MessageHandlerRegistry>();
@@ -62,7 +62,9 @@ void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> fact
 
 void GameController::setGraphics(std::shared_ptr<IGraphicsLib> graphics) {
     _graphicsManager->setGraphics(graphics);
-    _soundManager = std::make_shared<SoundManager>(graphics, _gameState);
+    if (_soundManager) {
+        _soundManager->setGraphics(graphics);
+    }
 }
 
 void GameController::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {

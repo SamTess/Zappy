@@ -39,6 +39,7 @@ class UIWindowFactory{
         std::shared_ptr<IUIWindow> getWindow(const std::string& windowId);
         void renderAllWindows(std::shared_ptr<UIWindowFactory> self);
         void updateAllWindows(std::shared_ptr<const GameState> gameState);
+        void updateTimeData(float gameTime, int frequency, int gameTick);
         void setSelectedTile(int x, int y);
         void setSelectedPlayer(int playerId);
         bool handleWindowDragging(const ZappyTypes::Vector2& mousePosition);
@@ -66,6 +67,9 @@ class UIWindowFactory{
         bool _isSelecting;
         int _currentViewMode;
         std::shared_ptr<IUIContext> _uiContext;
+        float _cachedGameTime = 0.0f;
+        int _cachedFrequency = 100;
+        int _cachedGameTick = 0;
 };
 
 } // namespace GUI

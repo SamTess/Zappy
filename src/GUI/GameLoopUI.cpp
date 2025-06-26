@@ -35,8 +35,10 @@ void GameLoop::updateGameData() {
             _mapHeight = gameState->getMapHeight();
             _frequency = gameState->getTimeUnit();
         }
-        if (_userInterface)
+        if (_userInterface) {
             _userInterface->updateDataFromGameState(gameState);
+            _userInterface->updateTimeData(_gameTime, _frequency, _gameTick);
+        }
     }
     if (_userInterface && _graphics &&
         !_userInterface->hasHandledMouseEvent() &&

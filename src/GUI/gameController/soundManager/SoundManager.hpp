@@ -22,6 +22,7 @@ class SoundManager {
         void playBroadcastSound();
         void playSound(const std::string& soundPath);
         bool isSfxEnabled() const;
+        void setGraphics(std::shared_ptr<IGraphicsLib> graphics);
 
     private:
         std::shared_ptr<IGraphicsLib> _graphics;

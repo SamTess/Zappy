@@ -55,6 +55,7 @@ class GameLoop {
         void setupComponents();
         bool loadModels();
         void updateCameraForMapSize();
+        void updateAudioSettings();
         void updateGameData();
         void handleTileSelection(int x, int y);
         void handleViewModeChange(int mode);
@@ -66,7 +67,6 @@ class GameLoop {
         void handlePlayerSelection(int playerId);
         float calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 point);
         ZappyTypes::Vector3 calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers);
-
         std::string _host;
         int _port;
         std::shared_ptr<IGraphicsLib> _graphics;

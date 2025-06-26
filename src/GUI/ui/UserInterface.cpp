@@ -14,6 +14,7 @@
 #include <chrono>
 #include "UserInterface.hpp"
 #include "context/UIContext.hpp"
+#include "windows/timeInfo/TimeInfoWindow.hpp"
 #include "../gameController/GameState.hpp"
 
 namespace GUI {
@@ -39,6 +40,11 @@ void UserInterface::render() {
 
 void UserInterface::updateDataFromGameState(std::shared_ptr<const GameState> gameState) {
     _windowFactory->updateAllWindows(gameState);
+}
+
+void UserInterface::updateTimeData(float gameTime, int frequency, int gameTick) {
+    if (auto timeInfoWindow = std::dynamic_pointer_cast<GUI::TimeInfoWindow>(getWindow("timeInfo"))) {}
+    _windowFactory->updateTimeData(gameTime, frequency, gameTick);
 }
 
 void UserInterface::setSelectedTile(int x, int y) {

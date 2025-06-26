@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-YEP-400
+** Zappy
 ** File description:
 ** UIWindowFactory
 */
@@ -123,10 +123,17 @@ void UIWindowFactory::renderMenuWindow(std::shared_ptr<UIWindowFactory> self) {
 
 void UIWindowFactory::updateAllWindows(std::shared_ptr<const GameState> gameState) {
     auto dataProvider = std::make_shared<UIDataProvider>(gameState);
+    dataProvider->updateTimeData(_cachedGameTime, _cachedFrequency, _cachedGameTick);
     if (_uiContext)
         _uiContext->setDataProvider(dataProvider);
     for (auto& pair : _windows)
         pair.second->updateData(dataProvider);
+}
+
+void UIWindowFactory::updateTimeData(float gameTime, int frequency, int gameTick) {
+    _cachedGameTime = gameTime;
+    _cachedFrequency = frequency;
+    _cachedGameTick = gameTick;
 }
 
 void UIWindowFactory::setSelectedTile(int x, int y) {

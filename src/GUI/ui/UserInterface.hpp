@@ -24,6 +24,7 @@ class UserInterface : public IUINotifier {
         void initialize(int screenWidth, int screenHeight);
         void render();
         void updateDataFromGameState(std::shared_ptr<const GameState> gameState);
+        void updateTimeData(float gameTime, int frequency, int gameTick);
         void setSelectedTile(int x, int y);
         void setSelectedPlayer(int playerId);
         void notifyConnectionStatus(bool connected) override;

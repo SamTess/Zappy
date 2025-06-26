@@ -13,11 +13,12 @@
     #include <string>
     #include <map>
     #include "IUIDataProvider.hpp"
+    #include "IUISettingsProvider.hpp"
     #include "../../gameController/GameState.hpp"
 
 namespace GUI {
 
-class UIDataProvider : public IUIDataProvider {
+class UIDataProvider : public IUIDataProvider, public IUISettingsProvider {
 public:
     explicit UIDataProvider(std::shared_ptr<const GameState> gameState);
     virtual ~UIDataProvider() = default;
@@ -44,6 +45,12 @@ public:
     std::vector<int> calculateTotalResources() const override;
     std::map<std::string, int> getTeamPlayerCounts() const override;
     std::map<std::string, std::vector<int>> getTeamResourceTotals() const override;
+
+    // IUISettingsProvider interface
+    bool getSfxEnabled() const override;
+    void setSfxEnabled(bool enabled) override;
+    float getMusicVolume() const override;
+    void setMusicVolume(float volume) override;
 
 private:
     std::shared_ptr<const GameState> _gameState;

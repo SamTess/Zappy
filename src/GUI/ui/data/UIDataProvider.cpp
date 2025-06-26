@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <iostream>
 #include "UIDataProvider.hpp"
 
 namespace GUI {
@@ -190,6 +191,40 @@ std::map<std::string, std::vector<int>> UIDataProvider::getTeamResourceTotals() 
         }
     }
     return teamResources;
+}
+
+bool UIDataProvider::getSfxEnabled() const {
+    if (!isValidGameState())
+        return true;
+    return _gameState->getSfxEnabled();
+}
+
+void UIDataProvider::setSfxEnabled(bool enabled) {
+    if (!isValidGameState())
+        return;
+    auto mutableGameState = std::const_pointer_cast<GameState>(_gameState);
+    if (mutableGameState) {
+        mutableGameState->setSfxEnabled(enabled);
+        std::cout << "DEBUG: SFX mis à " << (enabled ? "activé" : "désactivé") << std::endl;
+    } else {
+        std::cout << "DEBUG: Échec du cast vers GameState mutable" << std::endl;
+    }
+}
+
+float UIDataProvider::getMusicVolume() const {
+    if (!isValidGameState())
+        return 0.8f; // valeur par défaut
+    return _gameState->getMusicVolume();
+}
+
+void UIDataProvider::setMusicVolume(float volume) {
+    if (!isValidGameState())
+        return;
+    // Cast away const pour permettre la modification
+    auto mutableGameState = std::const_pointer_cast<GameState>(_gameState);
+    if (mutableGameState) {
+        mutableGameState->setMusicVolume(volume);
+    }
 }
 
 } // namespace GUI

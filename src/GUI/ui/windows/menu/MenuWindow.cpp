@@ -144,7 +144,11 @@ void GUI::MenuWindow::renderContent() {
 
 void GUI::MenuWindow::drawAudioSliders(float startX, float startY, float submenuWidth, float sliderHeight) {
     _guiLib->DrawLabel(startX + 30, startY + 30, submenuWidth - 60, 20, "Volume musique:");
-    _musicVolume = _guiLib->DrawSlider(startX + 30, startY + 50, submenuWidth - 60, sliderHeight, "0%", "100%", _musicVolume, 0.0f, 1.0f);
+    float newVolume = _guiLib->DrawSlider(startX + 30, startY + 50, submenuWidth - 60, sliderHeight, "0%", "100%", _musicVolume, 0.0f, 1.0f);
+    if (newVolume != _musicVolume) {
+        _musicVolume = newVolume;
+        applyMusicVolumeChange(newVolume);
+    }
 }
 
 void GUI::MenuWindow::renderAudioSubmenu() {
@@ -159,7 +163,7 @@ void GUI::MenuWindow::renderAudioSubmenu() {
     bool newState = _guiLib->DrawCheckBox(startX + 30, startY + 90, 25, 25, "Activer SFX", _sfxEnabled);
     if (newState != _sfxEnabled) {
         _sfxEnabled = newState;
-        //_gameState->setSfxEnabled(_sfxEnabled);
+        applySfxEnabledChange(newState);
     }
 }
 
@@ -170,6 +174,11 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
     freqSs << "Actuelle: " << currentFrequency << " ticks/seconde";
     _guiLib->DrawLabel( startX + 30, startY + 50, submenuWidth - 60, 20, freqSs.str());
     static float newFrequency = static_cast<float>(currentFrequency);
+    static int lastKnownFrequency = -1;
+    if (lastKnownFrequency != currentFrequency) {
+        newFrequency = static_cast<float>(currentFrequency);
+        lastKnownFrequency = currentFrequency;
+    }
     newFrequency = _guiLib->DrawSlider( startX + 30, startY + 75, submenuWidth - 60,
         sliderHeight, "1", "2000", newFrequency, 1.0f, 2000.0f);
     std::stringstream newFreqSs;
@@ -179,6 +188,7 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
         if (_commandExecutor) {
             auto frequencyCommand = std::make_shared<ServerFrequencyCommand>(static_cast<int>(newFrequency));
             _commandExecutor->executeCommand(frequencyCommand);
+            currentFrequency = static_cast<int>(newFrequency);
         }
     }
 }
@@ -263,6 +273,45 @@ void MenuWindow::setUIWindowFactory(std::shared_ptr<GUI::UIWindowFactory> factor
 
 void MenuWindow::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
     _commandExecutor = executor;
+}
+
+void MenuWindow::updateData(std::shared_ptr<IUIDataProvider> dataProvider) {
+    AUIWindow::updateData(dataProvider);
+    updateSettingsFromGameState();
+}
+
+void MenuWindow::updateSettingsFromGameState() {
+    if (!_dataProvider)
+        return;
+
+    auto settingsProvider = std::dynamic_pointer_cast<GUI::IUISettingsProvider>(_dataProvider);
+    if (settingsProvider) {
+        float gameStateMusicVolume = settingsProvider->getMusicVolume();
+        bool gameStateSfxEnabled = settingsProvider->getSfxEnabled();
+        _musicVolume = gameStateMusicVolume;
+        _sfxEnabled = gameStateSfxEnabled;
+    }
+}
+
+void MenuWindow::applyMusicVolumeChange(float newVolume) {
+    if (!_dataProvider)
+        return;
+    auto settingsProvider = std::dynamic_pointer_cast<GUI::IUISettingsProvider>(_dataProvider);
+    if (settingsProvider)
+        settingsProvider->setMusicVolume(newVolume);
+}
+
+void MenuWindow::applySfxEnabledChange(bool enabled) {
+    std::cout << "DEBUG MenuWindow: applySfxEnabledChange(" << (enabled ? "true" : "false") << ") called" << std::endl;
+    if (!_dataProvider)
+        return;
+    auto settingsProvider = std::dynamic_pointer_cast<GUI::IUISettingsProvider>(_dataProvider);
+    if (settingsProvider) {
+        settingsProvider->setSfxEnabled(enabled);
+        std::cout << "DEBUG MenuWindow: SFX setting applied to GameState" << std::endl;
+    } else {
+        std::cout << "DEBUG MenuWindow: Failed to cast to IUISettingsProvider" << std::endl;
+    }
 }
 
 } // namespace GUI
