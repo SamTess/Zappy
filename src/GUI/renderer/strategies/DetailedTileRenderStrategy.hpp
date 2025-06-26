@@ -14,31 +14,27 @@
 namespace Zappy {
 
 class DetailedTileRenderStrategy : public ITileRenderStrategy {
-private:
-    const std::shared_ptr<const GameState> gameState;
-    void renderText3D(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        const std::string& text,
-        ZappyTypes::Vector3 position,
-        float fontSize,
-        ZappyTypes::Color color);
-    void renderResourceIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        ZappyTypes::Vector3 position,
-        ResourceType resourceType,
-        int quantity,
-        float tileSize);
+    private:
+        const std::shared_ptr<const GameState> gameState;
+        void renderText3D(const std::shared_ptr<IGraphicsLib>& graphicsLib,
+            const std::string& text,
+            ZappyTypes::Vector3 position,
+            float fontSize,
+            ZappyTypes::Color color);
+        void renderResourceIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
+            ZappyTypes::Vector3 position,
+            ResourceType resourceType,
+            int quantity,
+            float tileSize);
+        void renderEggIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
+            ZappyTypes::Vector3 position,
+            int eggId,
+            float tileSize);
 
-    void renderEggIndicator(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        ZappyTypes::Vector3 position,
-        int eggId,
-        float tileSize);
-
-public:
-    explicit DetailedTileRenderStrategy(const std::shared_ptr<const GameState>& gameState);
-    void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        int x, int y,
-        const ZappyTypes::Color& color,
-        float tileSize,
-        float spacing) override;
+    public:
+        explicit DetailedTileRenderStrategy(const std::shared_ptr<const GameState>& gameState);
+        void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
+            int x, int y, float tileSize, float spacing) override;
 };
 
 } // namespace Zappy

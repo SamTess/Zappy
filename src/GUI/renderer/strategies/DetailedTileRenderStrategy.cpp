@@ -24,10 +24,7 @@ DetailedTileRenderStrategy::DetailedTileRenderStrategy(const std::shared_ptr<con
     : gameState(gameState) {}
 
 void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-    int x, int y,
-    const ZappyTypes::Color& color,
-    float tileSize,
-    float spacing) {
+    int x, int y, float tileSize, float spacing) {
     ZappyTypes::Vector3 position = {
         (x - gameState->getMapWidth() / 2.0f + 0.5f) * (tileSize + spacing),
         0.0f,
@@ -35,7 +32,6 @@ void DetailedTileRenderStrategy::renderTile(const std::shared_ptr<IGraphicsLib>&
     };
 
     auto tile = gameState->getTile(x, y);
-    (void)color;
     tile->render(graphicsLib, position, tileSize);
     if (tile) {
         const auto& resources = tile->getResources();
@@ -157,14 +153,14 @@ void DetailedTileRenderStrategy::renderEggIndicator(const std::shared_ptr<IGraph
     graphicsLib->DrawSphere(eggPos, eggSize, eggColor);
     float offset = eggSize * 0.7f;
     graphicsLib->DrawLine3D({eggPos.x - offset, eggPos.y, eggPos.z},
-                           {eggPos.x + offset, eggPos.y, eggPos.z},
-                           borderColor);
+        {eggPos.x + offset, eggPos.y, eggPos.z},
+        borderColor);
     graphicsLib->DrawLine3D({eggPos.x, eggPos.y - offset, eggPos.z},
-                           {eggPos.x, eggPos.y + offset, eggPos.z},
-                           borderColor);
+        {eggPos.x, eggPos.y + offset, eggPos.z},
+        borderColor);
     graphicsLib->DrawLine3D({eggPos.x, eggPos.y, eggPos.z - offset},
-                           {eggPos.x, eggPos.y, eggPos.z + offset},
-                           borderColor);
+        {eggPos.x, eggPos.y, eggPos.z + offset},
+        borderColor);
     const int numSegments = 8;
     for (int i = 0; i < numSegments; ++i) {
         float angle1 = 2 * M_PI * i / numSegments;

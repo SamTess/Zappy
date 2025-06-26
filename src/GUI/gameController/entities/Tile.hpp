@@ -27,7 +27,6 @@ public:
     const std::array<int, 7>& getResources() const override;
     int getResourceQuantity(ResourceType type) const override;
     void setResourceQuantity(ResourceType type, int quantity) override;
-    ResourceType getDominantResourceType() const override;
 
     const std::vector<int>& getPlayerIds() const override;
     const std::vector<int>& getEggIds() const override;

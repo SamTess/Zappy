@@ -22,7 +22,6 @@ public:
     virtual const std::array<int, 7>& getResources() const = 0;
     virtual int getResourceQuantity(ResourceType type) const = 0;
     virtual void setResourceQuantity(ResourceType type, int quantity) = 0;
-    virtual ResourceType getDominantResourceType() const = 0;
     virtual const std::vector<int>& getPlayerIds() const = 0;
     virtual const std::vector<int>& getEggIds() const = 0;
     virtual bool isIncantating() const = 0;

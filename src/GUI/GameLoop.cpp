@@ -86,7 +86,7 @@ void GameLoop::setupComponents() {
     _modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     _modelManagerAdapter->setGraphicsLib(_graphics);
     if (_gameController)
-        _mapRenderer = std::make_shared<Zappy::MapRenderer>(_graphics, _gameController->getGameState(), _modelManagerAdapter);
+        _mapRenderer = std::make_shared<Zappy::MapRenderer>(_graphics, _gameController->getGameState());
     _userInterface = std::make_shared<GUI::UserInterface>(_gui);
     _userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     if (_coordinator)
@@ -151,7 +151,7 @@ void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
     if (_gameController && _graphics && _modelManagerAdapter) {
         auto gameState = _gameController->getGameState();
         if (gameState) {
-            _mapRenderer = std::make_shared<Zappy::MapRenderer>(_graphics, gameState, _modelManagerAdapter);
+            _mapRenderer = std::make_shared<Zappy::MapRenderer>(_graphics, gameState);
             _mapRenderer->initialize();
             if (gameState->isMapInitialized())
                 updateCameraForMapSize();
@@ -167,7 +167,6 @@ void GameLoop::updateCameraForMapSize() {
         return;
     int mapWidth = gameState->getMapWidth();
     int mapHeight = gameState->getMapHeight();
-    _camera->setMapDimensions(mapWidth, mapHeight);
     float tileSize = 1.0f;
     float spacing = 0.1f;
     if (mapWidth > 20 || mapHeight > 20) {

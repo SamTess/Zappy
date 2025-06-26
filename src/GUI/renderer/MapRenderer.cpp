@@ -11,23 +11,18 @@
 #include <string>
 #include <vector>
 #include "MapRenderer.hpp"
-#include "strategies/TileRenderStrategyFactory.hpp"
+#include "strategies/DetailedTileRenderStrategy.hpp"
 #include "../gameController/GameState.hpp"
 
 namespace Zappy {
 
 MapRenderer::MapRenderer(const std::shared_ptr<IGraphicsLib>& graphics,
-    const std::shared_ptr<const GameState>& state,
-    const std::shared_ptr<ModelManagerAdapter>& modelManagerAdapter)
+    const std::shared_ptr<const GameState>& state)
     : graphicsLib(graphics),
       gameState(state),
-      strategyFactory(modelManagerAdapter),
       tileSize(1.0f),
-      tileSpacing(1.5f),
-      zoomLevel(1.0f),
-      detailThreshold(2.0f) {
-    tileRenderStrategy = strategyFactory.createSimpleTileStrategy(gameState);
-    detailedTileStrategy = strategyFactory.createDetailedTileStrategy(gameState);
+      tileSpacing(1.5f) {
+    tileRenderStrategy = std::make_shared<DetailedTileRenderStrategy>(gameState);
 }
 
 void MapRenderer::initialize() {
@@ -58,9 +53,7 @@ void MapRenderer::renderWithSelection(int selectedTileX, int selectedTileY, int 
         firstRender = false;
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {
-            ResourceType dominantResource = gameState->getDominantResourceType(x, y);
-            int resourceIndex = static_cast<int>(dominantResource);
-            renderTile(x, y, resourceIndex);
+            renderTile(x, y);
         }
     }
     if (selectedTileX >= 0 && selectedTileY >= 0 &&
@@ -111,15 +104,7 @@ void MapRenderer::renderVictoryScreen() {
     }
 }
 
-void MapRenderer::setTileRenderStrategy(std::shared_ptr<ITileRenderStrategy> strategy) {
-    if (strategy)
-        tileRenderStrategy = strategy;
-}
 
-void MapRenderer::setResourceRenderStrategy(int resourceType, std::shared_ptr<ITileRenderStrategy> strategy) {
-    if (strategy)
-        resourceRenderStrategies[resourceType] = strategy;
-}
 
 void MapRenderer::setTileSize(float size) {
     tileSize = std::max(0.1f, size);
@@ -133,17 +118,8 @@ void MapRenderer::setResourceColor(int resourceType, const ZappyTypes::Color& co
     resourceColors[resourceType] = color;
 }
 
-void MapRenderer::setZoomLevel(float zoom) {
-    zoomLevel = std::max(0.1f, zoom);
-}
-
-void MapRenderer::setDetailThreshold(float threshold) {
-    detailThreshold = threshold;
-}
-
 void MapRenderer::renderTile(int x, int y) {
-    ZappyTypes::Color tileColor = calculateTileColor(x, y);
-    detailedTileStrategy->renderTile(graphicsLib, x, y, tileColor, tileSize, tileSpacing);
+    tileRenderStrategy->renderTile(graphicsLib, x, y, tileSize, tileSpacing);
 }
 
 void MapRenderer::renderTileSelectionEffect(int x, int y) {

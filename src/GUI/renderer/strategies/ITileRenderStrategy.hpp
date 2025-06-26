@@ -14,9 +14,7 @@ class ITileRenderStrategy {
 public:
     virtual ~ITileRenderStrategy() = default;
     virtual void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        int x, int y,
-        const ZappyTypes::Color& color,
-        float tileSize,
+        int x, int y, float tileSize,
         float spacing) = 0;
 };
 } // namespace Zappy

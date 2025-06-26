@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-YEP-400
+** Zappy
 ** File description:
-** UIDataProvider implementation
+** UIDataProvider
 */
 
 #include <algorithm>
@@ -82,11 +82,6 @@ int UIDataProvider::getResourceQuantity(int x, int y, ResourceType resourceType)
     return _gameState->getResourceQuantity(x, y, resourceType);
 }
 
-ResourceType UIDataProvider::getDominantResourceType(int x, int y) const {
-    if (!isValidGameState()) return ResourceType::FOOD;
-    return _gameState->getDominantResourceType(x, y);
-}
-
 std::vector<int> UIDataProvider::getPlayersOnTile(int x, int y) const {
     if (!isValidGameState()) return {};
     return _gameState->getPlayersOnTile(x, y);
@@ -123,13 +118,6 @@ const std::vector<std::string>& UIDataProvider::getTeamNames() const {
         return empty;
     }
     return _gameState->getTeamNames();
-}
-
-std::vector<std::shared_ptr<const IBroadcast>> UIDataProvider::getBroadcasts() const {
-    if (!isValidGameState()) {
-        return {};
-    }
-    return _gameState->getBroadcasts();
 }
 
 std::vector<int> UIDataProvider::calculateTotalResources() const {

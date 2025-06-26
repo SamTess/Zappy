@@ -41,18 +41,6 @@ void Tile::setResourceQuantity(ResourceType type, int quantity) {
     }
 }
 
-ResourceType Tile::getDominantResourceType() const {
-    int maxQuantity = 0;
-    ResourceType dominantType = ResourceType::FOOD;
-    for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
-        if (_resources[i] > maxQuantity) {
-            maxQuantity = _resources[i];
-            dominantType = static_cast<ResourceType>(i);
-        }
-    }
-    return dominantType;
-}
-
 const std::vector<int>& Tile::getPlayerIds() const {
     return _playerIds;
 }

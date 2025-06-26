@@ -36,9 +36,6 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/EjectionAnimationManager.cpp \
 	  renderer/DeathAnimationManager.cpp \
 	  renderer/strategies/DetailedTileRenderStrategy.cpp \
-	  renderer/strategies/ModelTileRenderStrategy.cpp \
-	  renderer/strategies/SimpleTileRenderStrategy.cpp \
-	  renderer/strategies/TileRenderStrategyFactory.cpp \
 	  cameraController/CameraController.cpp \
 	  GameLoop.cpp \
 	  GameLoopUI.cpp \

@@ -34,7 +34,6 @@ public:
     const std::string& getWinningTeam() const override;
     std::shared_ptr<const ITile> getTile(int x, int y) const override;
     int getResourceQuantity(int x, int y, ResourceType resourceType) const override;
-    ResourceType getDominantResourceType(int x, int y) const override;
     std::vector<int> getPlayersOnTile(int x, int y) const override;
     std::vector<int> getEggsOnTile(int x, int y) const override;
     std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const override;
@@ -42,7 +41,6 @@ public:
     bool isPlayerOnTile(int x, int y, int playerId) const override;
     std::vector<int> getPlayerIds() const override;
     const std::vector<std::string>& getTeamNames() const override;
-    std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const override;
     std::vector<int> calculateTotalResources() const override;
     std::map<std::string, int> getTeamPlayerCounts() const override;
     std::map<std::string, std::vector<int>> getTeamResourceTotals() const override;

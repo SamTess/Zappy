@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-YEP-400 Zappy
+** Zappy
 ** File description:
-** UI data provider Interface
+** IUIDataProvider
 */
 
 #ifndef IUI_DATA_PROVIDER_HPP_
@@ -33,7 +33,6 @@ public:
 
     virtual std::shared_ptr<const ITile> getTile(int x, int y) const = 0;
     virtual int getResourceQuantity(int x, int y, ResourceType resourceType) const = 0;
-    virtual ResourceType getDominantResourceType(int x, int y) const = 0;
     virtual std::vector<int> getPlayersOnTile(int x, int y) const = 0;
     virtual std::vector<int> getEggsOnTile(int x, int y) const = 0;
 
@@ -44,7 +43,6 @@ public:
 
     virtual const std::vector<std::string>& getTeamNames() const = 0;
 
-    virtual std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const = 0;
 
     virtual std::vector<int> calculateTotalResources() const = 0;
     virtual std::map<std::string, int> getTeamPlayerCounts() const = 0;

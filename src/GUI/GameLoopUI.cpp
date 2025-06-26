@@ -28,7 +28,6 @@ void GameLoop::updateGameData() {
     _gameTime += deltaTime;
     _gameTick++;
     if (_gameController) {
-        _gameController->updateBroadcasts(deltaTime);
         _gameController->updateAnimations(deltaTime);
         auto gameState = _gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
