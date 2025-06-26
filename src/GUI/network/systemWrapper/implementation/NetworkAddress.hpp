@@ -16,20 +16,21 @@ namespace Network {
 namespace Implementation {
 
 class NetworkAddress : public INetworkAddress {
-private:
-    std::string _host;
-    int _port;
-    sockaddr_in _addr;
-    void resolveAddress();
+    public:
+        NetworkAddress(const std::string& host, int port);
 
-public:
-    NetworkAddress(const std::string& host, int port);
+        std::string getHost() const override;
+        int getPort() const override;
+        std::string toString() const override;
+        const sockaddr* getSockAddr() const;
+        socklen_t getAddrSize() const;
 
-    std::string getHost() const override;
-    int getPort() const override;
-    std::string toString() const override;
-    const sockaddr* getSockAddr() const;
-    socklen_t getAddrSize() const;
+    private:
+        std::string _host;
+        sockaddr_in _addr;
+        int _port;
+        void resolveAddress();
+
 };
 
 } // namespace implementation

@@ -24,10 +24,6 @@ std::unique_ptr<IPoller> NetworkFactory::createPoller() {
     return std::make_unique<SocketPoller>();
 }
 
-std::unique_ptr<IBuffer> NetworkFactory::createBuffer(size_t size) {
-    return std::make_unique<Buffer>(size);
-}
-
 std::unique_ptr<INetworkFactory> createNetworkFactory() {
     return std::make_unique<NetworkFactory>();
 }
