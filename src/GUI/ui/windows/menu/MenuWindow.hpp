@@ -39,6 +39,7 @@ class MenuWindow : public AUIWindow {
         bool _showMenu;
         bool _showAudioSubmenu;
         bool _showGameplaySubmenu;
+        bool _showWindowsSubmenu;
         float _musicVolume;
         float _sfxVolume;
         float _gameSpeed;

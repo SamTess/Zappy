@@ -106,16 +106,16 @@ float GUI::MenuWindow::showSubmenu(bool submenu) {
 }
 
 void GUI::MenuWindow::handleSubmenuButtons(float menuItemWidth, float menuItemHeight, float startY) {
-    if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight, menuItemWidth, menuItemHeight, "Audio"))
+    if (_guiLib->ButtonPressed(_position.x, startY, menuItemWidth, menuItemHeight, "Audio"))
         _showAudioSubmenu = showSubmenu(_showAudioSubmenu);
-    if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight * 2, menuItemWidth, menuItemHeight, "Gameplay"))
+    if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight, menuItemWidth, menuItemHeight, "Gameplay"))
         _showGameplaySubmenu = showSubmenu(_showGameplaySubmenu);
-    if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight * 3, menuItemWidth, menuItemHeight, "Fenêtres"))
+    if (_guiLib->ButtonPressed(_position.x, startY + menuItemHeight * 2, menuItemWidth, menuItemHeight, "Fenêtres"))
         _showWindowsSubmenu = showSubmenu(_showWindowsSubmenu);
 }
 
 void GUI::MenuWindow::drawMainMenu(float menuItemWidth, float menuItemHeight, float startY) {
-    _guiLib->DrawPanel(_position.x, startY, menuItemWidth, menuItemHeight * 4);
+    _guiLib->DrawPanel(_position.x, startY, menuItemWidth, menuItemHeight * 3);
 }
 
 void GUI::MenuWindow::renderContent() {

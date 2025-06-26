@@ -173,8 +173,7 @@ ZappyTypes::Vector3 MapRenderer::calculateBasePosition(int x, int y) {
     float mapCenterX = gameState->getMapWidth() / 2.0f;
     float mapCenterY = gameState->getMapHeight() / 2.0f;
     return {
-        (x - mapCenterX + 0.5f) * (tileSize + tileSpacing),
-        0.0f,
+        (x - mapCenterX + 0.5f) * (tileSize + tileSpacing), 0.0f,
         (y - mapCenterY + 0.5f) * (tileSize + tileSpacing)
     };
 }
