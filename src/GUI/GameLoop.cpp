@@ -144,7 +144,7 @@ void GameLoop::setServerInfo(const std::string& host, int port) {
     _port = port;
 }
 
-void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
+void GameLoop::setGameController(std::shared_ptr<IGameController> controller) {
     _gameController = controller;
     if (_gameController && _graphics)
         _gameController->setGraphics(_graphics);

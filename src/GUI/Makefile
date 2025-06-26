@@ -12,9 +12,8 @@ BUILD_DIR = ../../build/GUI
 MAIN = main.cpp
 # Source files
 SRC = parsing/ParsingCLI.cpp \
-      gameController/GameController.cpp \
-	  gameController/GameState.cpp \
 	  shared/exception/AException.cpp \
+	  network/buffer/MessageQueue.cpp \
 	  network/buffer/CircularBuffer.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \
@@ -48,12 +47,27 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/mapInfo/MapInfoWindow.cpp \
 	  ui/data/UIDataProvider.cpp \
 	  ui/context/UIContext.cpp \
+	  gameController/GameState.cpp \
+	  gameController/GameController.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
 	  gameController/entities/Egg.cpp \
 	  gameController/entities/Resource.cpp \
 	  gameController/entities/Tile.cpp \
 	  gameController/entities/PlayerInventory.cpp \
+	  gameController/animationManager/AnimationManager.cpp \
+	  gameController/graphicsManager/GraphicsManager.cpp \
+	  gameController/messageHandlers/BroadcastMessageHandler.cpp \
+	  gameController/messageHandlers/MapSizeMessageHandler.cpp \
+	  gameController/messageHandlers/TileContentMessageHandler.cpp \
+	  gameController/messageHandlers/PlayerInfoMessageHandler.cpp \
+	  gameController/messageHandlers/PlayerExpulsionMessageHandler.cpp \
+	  gameController/messageHandlers/PlayerInventoryMessageHandler.cpp \
+	  gameController/messageHandlers/TeamNameMessageHandler.cpp \
+	  gameController/messageHandlers/MessageHandlerRegistry.cpp \
+	  gameController/networkCommandManager/NetworkCommandManager.cpp \
+	  gameController/playerValidationManager/PlayerValidationManager.cpp \
+	  gameController/soundManager/SoundManager.cpp \
 	  shared/services/ComponentCoordinator.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))

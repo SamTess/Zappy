@@ -15,15 +15,7 @@ PlayerValidator::PlayerValidator(std::shared_ptr<GameState> gameState,
 
 bool PlayerValidator::isPlayerKnown(int playerId) {
     const auto &players = _gameState->getPlayers();
-    if (players.empty()) {
-        std::cerr << "[PlayerValidator] No players known in the game state" << std::endl;
-        return false;
-    }
-    if (players.find(playerId) == players.end()) {
-        std::cerr << "[PlayerValidator] Player ID " << playerId << " is not known" << std::endl;
-        return false;
-    }
-    return true;
+    return !players.empty() && players.find(playerId) != players.end();
 }
 
 bool PlayerValidator::validateAndRequestPlayerData(int playerId) {

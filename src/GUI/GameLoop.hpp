@@ -16,7 +16,7 @@
 #include "renderer/Renderer.hpp"
 #include "renderer/MapRenderer.hpp"
 #include "textureManager/TextureManager.hpp"
-#include "gameController/GameController.hpp"
+#include "gameController/IGameController.hpp"
 #include "gameController/GameState.hpp"
 #include "ui/UserInterface.hpp"
 #include "./network/networkManager/NetworkManager.hpp"
@@ -45,7 +45,7 @@ public:
     bool init();
     int run();
     void setServerInfo(const std::string& host, int port);
-    void setGameController(std::shared_ptr<GameController> controller);
+    void setGameController(std::shared_ptr<IGameController> controller);
     void setSkyboxTexture(const std::string& texturePath);
     bool isSkyboxLoaded() const;
     void setComponentCoordinator(std::shared_ptr<ComponentCoordinator> coordinator);
@@ -73,7 +73,7 @@ private:
     std::shared_ptr<IGuiLib> _gui;
     std::shared_ptr<Renderer> _renderer;
     std::shared_ptr<CameraController> _camera;
-    std::shared_ptr<GameController> _gameController;
+    std::shared_ptr<IGameController> _gameController;
     std::shared_ptr<Zappy::MapRenderer> _mapRenderer;
     std::shared_ptr<Zappy::ModelManagerAdapter> _modelManagerAdapter;
     std::shared_ptr<GUI::UserInterface> _userInterface;

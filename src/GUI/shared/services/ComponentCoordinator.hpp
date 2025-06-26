@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <functional>
-#include "../../gameController/GameController.hpp"
+#include "../../gameController/IGameController.hpp"
 #include "../../network/networkManager/NetworkManager.hpp"
 #include "../commands/ICommand.hpp"
 #include "../commands/ICommandExecutor.hpp"
@@ -23,14 +23,14 @@ public:
     ~ComponentCoordinator() = default;
 
     void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-    void setGameController(std::shared_ptr<GameController> gameController);
+    void setGameController(std::shared_ptr<IGameController> gameController);
     void setUINotifier(std::shared_ptr<IUINotifier> uiNotifier);
     void executeCommand(std::shared_ptr<ICommand> command);
     void setupConnections();
 
 private:
     std::weak_ptr<NetworkManager> _networkManager;
-    std::weak_ptr<GameController> _gameController;
+    std::weak_ptr<IGameController> _gameController;
     std::weak_ptr<IUINotifier> _uiNotifier;
 
     void onMessageReceived(const Message& message);

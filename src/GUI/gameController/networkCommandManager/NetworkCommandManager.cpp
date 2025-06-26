@@ -46,6 +46,7 @@ void NetworkCommandManager::executeCommand(const std::string& command) {
         std::cerr << "[NetworkCommandManager] No command executor set" << std::endl;
         return;
     }
+
     auto networkCommand = std::make_shared<GameNetworkCommand>(command);
     _commandExecutor->executeCommand(networkCommand);
 }

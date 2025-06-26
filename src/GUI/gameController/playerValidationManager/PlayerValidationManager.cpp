@@ -17,14 +17,10 @@ bool PlayerValidationManager::isPlayerKnown(int playerId) const {
     if (!_gameState)
         return false;
     const auto& players = _gameState->getPlayers();
-    if (players.empty()) {
-        std::cerr << "[PlayerValidationManager] No players known in the game state" << std::endl;
+    if (players.empty())
         return false;
-    }
-    if (players.find(playerId) == players.end()) {
-        std::cerr << "[PlayerValidationManager] Player ID " << playerId << " is not known" << std::endl;
+    if (players.find(playerId) == players.end())
         return false;
-    }
     return true;
 }
 

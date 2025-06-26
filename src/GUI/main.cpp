@@ -12,6 +12,7 @@
 #include "GameLoop.hpp"
 #include "network/networkManager/NetworkManager.hpp"
 #include "gameController/EntityFactory.hpp"
+#include "gameController/GameController.hpp"
 #include "shared/services/ComponentCoordinator.hpp"
 
 void displayHelp() {

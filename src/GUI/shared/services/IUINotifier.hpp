@@ -9,7 +9,7 @@
     #define IUINOTIFIER_HPP_
     #include <memory>
     #include <functional>
-    #include "../../gameController/GameController.hpp"
+    #include "../../gameController/IGameController.hpp"
     #include "../../network/networkManager/NetworkManager.hpp"
     #include "../commands/ICommand.hpp"
     #include "../commands/ICommandExecutor.hpp"

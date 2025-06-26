@@ -12,7 +12,7 @@ void ComponentCoordinator::setNetworkManager(std::shared_ptr<NetworkManager> net
     _networkManager = networkManager;
 }
 
-void ComponentCoordinator::setGameController(std::shared_ptr<GameController> gameController) {
+void ComponentCoordinator::setGameController(std::shared_ptr<IGameController> gameController) {
     _gameController = gameController;
 }
 
