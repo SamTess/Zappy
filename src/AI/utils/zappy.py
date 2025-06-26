@@ -103,3 +103,14 @@ def how_much_of_item_here(surroundings, item):
     if item_here.strip() == item:
       count += 1
   return count
+
+
+def get_inventory_value(inventory):
+    total_value = 0
+
+    for item, quantity in inventory.items():
+        if item in resources:
+            item_rarity = resources[item]
+            total_value += item_rarity * quantity
+
+    return total_value

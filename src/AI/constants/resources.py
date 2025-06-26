@@ -1,4 +1,3 @@
-
 resources = {
     "food": 0,
     "linemate": 1,

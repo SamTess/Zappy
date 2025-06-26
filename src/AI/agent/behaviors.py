@@ -122,18 +122,24 @@ class JoinTeamMatesBehavior(Behavior):
       return
 
     try:
-      agent_ids = [int(agent_id) for agent_id in self.agent.other_agents.keys() if str(agent_id).isdigit()]
-      if not agent_ids:
-        print("JoinTeamMatesBehavior: No valid agent IDs found.")
+      #? On définit le chef en fonction de celui qui a l'inventaire le plus fourni
+      better_inv_id = None
+
+      for agent_id, agent_info in self.agent.other_agents.items():
+        inv_dict = zappy.inventory_to_dict(agent_info["inventory"])
+        if inv_dict is None:
+          print(f"JoinTeamMatesBehavior: Inventory for agent {agent_id} is None.")
+          continue
+        inv_value = zappy.get_inventory_value(inv_dict)
+        if better_inv_id is None or inv_value > zappy.get_inventory_value(zappy.inventory_to_dict(self.agent.other_agents[better_inv_id]["inventory"])):
+          better_inv_id = agent_id
+
+
+      if better_inv_id is None:
+        print("JoinTeamMatesBehavior: No suitable agent found with a valid inventory.")
         return
 
-      max_id = max(agent_ids)
-
-      if self.agent.id >= max_id:
-        print(f"Agent {self.agent.id}: is the master, not moving.")
-        return
-      print(f"Agent {self.agent.id}: joining the agent {max_id}.")
-      self.agent.other_agents[max_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[max_id]["direction"])
+      self.agent.other_agents[better_inv_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[better_inv_id]["direction"])
 
     except (ValueError, TypeError) as e:
       print(f"JoinTeamMatesBehavior: Error processing agent IDs: {e}")
