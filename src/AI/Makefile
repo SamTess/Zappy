@@ -69,6 +69,7 @@ $(NAME): check_python
 	done
 	@echo ""
 	@ln -sf ./src/AI/main.py ../../zappy_ai
+	@chmod 777 ../../zappy_ai
 	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Client \
 	AI compilé avec succès : $(NAME)$(RESET)"
 	@sleep 0.2
