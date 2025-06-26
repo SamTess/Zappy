@@ -68,8 +68,8 @@ $(NAME): check_python
 		sleep 0.05; \
 	done
 	@echo ""
+	@chmod +x ./main.py
 	@ln -sf ./src/AI/main.py ../../zappy_ai
-	@chmod 777 ../../zappy_ai
 	@echo "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET) $(BOLD)Client \
 	AI compilé avec succès : $(NAME)$(RESET)"
 	@sleep 0.2
