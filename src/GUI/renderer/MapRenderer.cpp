@@ -141,24 +141,9 @@ void MapRenderer::setDetailThreshold(float threshold) {
     detailThreshold = threshold;
 }
 
-void MapRenderer::renderTile(int x, int y, int /*resourceType*/) {
+void MapRenderer::renderTile(int x, int y) {
     ZappyTypes::Color tileColor = calculateTileColor(x, y);
     detailedTileStrategy->renderTile(graphicsLib, x, y, tileColor, tileSize, tileSpacing);
-}
-
-ZappyTypes::Color MapRenderer::calculateTileColor(int x, int y) {
-    if (resourceColors.find(-1) == resourceColors.end())
-        return {150, 150, 150, 255};
-    auto tile = gameState->getTile(x, y);
-    if (tile && tile->isIncantating()) {
-        return {50, 50, 255, 200};
-    }
-    ResourceType dominantType = gameState->getDominantResourceType(x, y);
-    int resourceIndex = static_cast<int>(dominantType);
-    if (dominantType == ResourceType::COUNT || resourceColors.find(resourceIndex) == resourceColors.end()) {
-        return resourceColors[-1];
-    }
-    return resourceColors[resourceIndex];
 }
 
 void MapRenderer::renderTileSelectionEffect(int x, int y) {

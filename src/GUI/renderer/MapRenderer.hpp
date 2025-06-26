@@ -103,86 +103,16 @@ public:
     void setDetailThreshold(float threshold);
 
 private:
-    /**
-     * @brief Dessine une tuile individuelle
-     * @param x Position X de la tuile
-     * @param y Position Y de la tuile
-     * @param resourceType Type de ressource principal sur la tuile
-     */
-    void renderTile(int x, int y, int resourceType);
 
-    /**
-     * @brief Calcule la couleur d'une tuile en fonction de ses ressources
-     * @param x Position X de la tuile
-     * @param y Position Y de la tuile
-     * @return La couleur calculée
-     */
-    ZappyTypes::Color calculateTileColor(int x, int y);
-
-    /**
-     * @brief Rend l'effet de sélection pour une tuile
-     * @param x Position X de la tuile
-     * @param y Position Y de la tuile
-     */
+    void renderTile(int x, int y);
     void renderTileSelectionEffect(int x, int y);
-
-    /**
-     * @brief Rend l'effet de sélection pour un joueur
-     * @param playerId ID du joueur sélectionné
-     */
     void renderPlayerSelectionEffect(int playerId);
-
-    /**
-     * @brief Calcule la position de base d'une tuile
-     * @param x Position X de la tuile
-     * @param y Position Y de la tuile
-     * @return La position de base calculée
-     */
     ZappyTypes::Vector3 calculateBasePosition(int x, int y);
-
-    /**
-     * @brief Calcule la position visuelle d'un joueur
-     * @param playerId ID du joueur
-     * @param x Position X de la tuile
-     * @param y Position Y de la tuile
-     * @param basePosition Position de base de la tuile
-     * @return La position visuelle calculée
-     */
     ZappyTypes::Vector3 calculatePlayerVisualPosition(int playerId, int x, int y, const ZappyTypes::Vector3& basePosition);
-
-    /**
-     * @brief Rend le wireframe de sélection du joueur
-     * @param position Position du joueur
-     * @param time Temps actuel pour l'animation
-     * @param pulseIntensity Intensité de l'effet de pulsation
-     */
     void renderPlayerWireframe(const ZappyTypes::Vector3& position, float time, float pulseIntensity);
-
-    /**
-     * @brief Rend le cylindre de sélection autour du joueur
-     * @param position Position du joueur
-     * @param pulseIntensity Intensité de l'effet de pulsation
-     */
     void renderSelectionCylinder(const ZappyTypes::Vector3& position, float pulseIntensity);
-
-    /**
-     * @brief Rend l'anneau de sélection autour de la tuile
-     * @param basePosition Position de base de la tuile
-     * @param time Temps actuel pour l'animation
-     * @param pulseIntensity Intensité de l'effet de pulsation
-     */
     void renderSelectionRing(const ZappyTypes::Vector3& basePosition, float time, float pulseIntensity);
-
-    /**
-     * @brief Rend les particules de sélection autour du joueur
-     * @param position Position du joueur
-     * @param time Temps actuel pour l'animation
-     */
     void renderSelectionParticles(const ZappyTypes::Vector3& position, float time);
-
-    /**
-     * @brief Rend l'écran de victoire si le jeu est terminé
-     */
     void renderVictoryScreen();
 };
 

@@ -28,25 +28,17 @@ NetworkManager::NetworkManager()
 }
 
 NetworkManager::~NetworkManager() {
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        _isConnected = false;
-    }
-    if (_networkThread && _networkThread->isRunning()) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    _isConnected = false;
+    if (_networkThread && _networkThread->isRunning())
         _networkThread->stop();
-    }
-    if (_connection) {
+    if (_connection)
         _connection->close();
-    }
 }
 
 bool NetworkManager::connect(const std::string& host, int port) {
     std::lock_guard<std::mutex> lock(_mutex);
-
-    if (_isConnected) {
-        NetworkLogger::get().log(std::string("[INFO] Already connected to ") + host + ":" + std::to_string(port));
-        return true;
-    }
 
     try {
         _connection->connect(host, port);
@@ -66,12 +58,11 @@ bool NetworkManager::connect(const std::string& host, int port) {
 }
 
 void NetworkManager::disconnect() {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     bool wasConnected = false;
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        wasConnected = _isConnected;
-        _isConnected = false;
-    }
+    wasConnected = _isConnected;
+    _isConnected = false;
     if (wasConnected) {
         _networkThread->stop();
         _connection->close();
@@ -80,25 +71,23 @@ void NetworkManager::disconnect() {
 }
 
 bool NetworkManager::isConnected() const {
-    return _isConnected && _connection->isConnected();
+    if (_isConnected && _connection->isConnected())
+        return true;
+    return false;
 }
 
 void NetworkManager::sendCommand(const std::string& command) {
-    if (!validateConnectionForSending()) {
+    if (!validateConnectionForSending())
         return;
-    }
     std::string finalCommand = formatCommand(command);
     NetworkLogger::get().log(std::string("[SEND] ") + finalCommand);
     queueCommandForSending(finalCommand);
 }
 
 bool NetworkManager::validateConnectionForSending() {
-    bool connected;
-    {
-        std::lock_guard<std::mutex> lock(_mutex);
-        connected = _isConnected;
-    }
-    if (!connected) {
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    if (!_isConnected) {
         NetworkLogger::get().log("[ERROR] Cannot send command: not connected");
         return false;
     }
@@ -107,14 +96,9 @@ bool NetworkManager::validateConnectionForSending() {
 
 std::string NetworkManager::formatCommand(const std::string& command) {
     std::string finalCommand = command;
-    if (finalCommand.empty() || finalCommand.back() != '\n') {
+    if (finalCommand.empty() || finalCommand.back() != '\n')
         finalCommand += '\n';
-    }
     return finalCommand;
-}
-
-void NetworkManager::logOutgoingCommand(const std::string& formattedCommand) {
-    NetworkLogger::get().log(std::string("[SEND] ") + formattedCommand);
 }
 
 void NetworkManager::queueCommandForSending(const std::string& formattedCommand) {
@@ -125,6 +109,7 @@ void NetworkManager::networkThreadLoop() {
     int errorCount = 0;
     const int maxErrors = 3;
     NetworkLogger::get().log("Network thread started");
+
     if (!tryReceiveInitialWelcome()) {
         NetworkLogger::get().log("Failed to receive WELCOME message, exiting network thread");
         return;
@@ -215,6 +200,7 @@ void NetworkManager::extractCompleteMessages() {
 
 int NetworkManager::handleReceiveError(int errorCount, int maxErrors, const std::exception& e) {
     const std::string errorMsg = e.what();
+
     if (errorMsg.find("Connection closed") != std::string::npos) {
         NetworkLogger::get().log(std::string("[ERROR] Server closed connection: ") + errorMsg);
         std::lock_guard<std::mutex> lock(_mutex);
@@ -267,6 +253,7 @@ int NetworkManager::handleNetworkThreadError(int errorCount, int maxErrors, cons
 
 void NetworkManager::processIncomingMessages() {
     std::string message;
+
     while (!(message = _incomingQueue->dequeue()).empty()) {
         NetworkLogger::get().log(std::string("Processing incoming message: ") + message);
         processIncomingMessage(message);
@@ -278,7 +265,7 @@ void NetworkManager::processIncomingMessage(const std::string& message) {
     try {
         handleRegularMessage(message);
     } catch (const std::exception& e) {
-        handleInvalidMessage(message, e);
+        NetworkLogger::get().log(std::string("[ERROR] Error processing message: ") + e.what());
     }
 }
 
@@ -299,10 +286,6 @@ void NetworkManager::handleRegularMessage(const std::string& message) {
         std::cout << "[NetworkManager] Failed to parse message: " << e.what() << std::endl;
         std::cout << "[NetworkManager] Problem message was: " << message << std::endl;
     }
-}
-
-void NetworkManager::handleInvalidMessage(const std::string& /*message*/, const std::exception& e) {
-    NetworkLogger::get().log(std::string("[ERROR] Error processing message: ") + e.what());
 }
 
 void NetworkManager::setMessageHandler(MessageHandler handler) {

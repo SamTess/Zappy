@@ -47,7 +47,7 @@ void ComponentCoordinator::setupConnections() {
 
 void ComponentCoordinator::onMessageReceived(const Message& message) {
     if (auto gc = _gameController.lock())
-        gc->onMessageReceived(message);
+        gc->processMessage(message);
 }
 
 void ComponentCoordinator::onConnectionStatusChanged(bool connected) {

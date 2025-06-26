@@ -5,8 +5,8 @@
 ** Team - Implémentation concrète d'une équipe
 */
 
-#ifndef TEA_HPP_
-#define TEA_HPP_
+#ifndef TEAM_HPP_
+#define TEAM_HPP_
 
 #include <string>
 #include "../ITeam.hpp"
@@ -28,4 +28,4 @@ private:
     int _remainingSlots = 0;
 };
 
-#endif /* !TEA_HPP_ */
+#endif /* !TEAM_HPP_ */

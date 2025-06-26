@@ -53,7 +53,6 @@ class NetworkManager : public INetworkCommandSender {
         bool _isConnected;
         std::mutex _logMutex;
         mutable std::mutex _mutex;
-        std::condition_variable _cv;
 
         MessageHandler _messageHandler;
         ConnectionCallback _connectionCallback;
@@ -69,11 +68,9 @@ class NetworkManager : public INetworkCommandSender {
         void processIncomingMessage(const std::string& message);
         void handleWelcomeMessage(const std::string& message);
         void handleRegularMessage(const std::string& message);
-        void handleInvalidMessage(const std::string& message, const std::exception& e);
 
         bool validateConnectionForSending();
         std::string formatCommand(const std::string& command);
-        void logOutgoingCommand(const std::string& formattedCommand);
         void queueCommandForSending(const std::string& formattedCommand);
 };
 

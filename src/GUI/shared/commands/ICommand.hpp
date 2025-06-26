@@ -2,19 +2,20 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Command Interface for decoupling actions
+** ICommand
 */
 
 #ifndef ICOMMAND_HPP_
-    #define ICOMMAND_HPP_
-    #include <memory>
-    #include <string>
+#define ICOMMAND_HPP_
+
+#include <memory>
+#include <string>
 
 class ICommand {
-public:
-    virtual ~ICommand() = default;
-    virtual void execute() = 0;
-    virtual std::string getDescription() const = 0;
+    public:
+        virtual ~ICommand() = default;
+        virtual void execute() = 0;
+        virtual std::string getDescription() const = 0;
 };
 
 #endif /* !ICOMMAND_HPP_ */

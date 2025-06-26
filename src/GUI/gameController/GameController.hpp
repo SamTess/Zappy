@@ -29,26 +29,14 @@ public:
     GameController();
     GameController(std::shared_ptr<ICommandExecutor> commandExecutor, std::shared_ptr<EntityFactoryManager> entityFactory);
     ~GameController() = default;
-    void onMessageReceived(const Message& message);
     std::shared_ptr<const GameState> getGameState() const { return _gameState; }
     void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory);
     void setGraphics(std::shared_ptr<IGraphicsLib> graphics) { _graphics = graphics; }
     void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
-
-    /**
-     * @brief Met à jour les minuteurs de broadcasts
-     * @param deltaTime Temps écoulé depuis la dernière mise à jour
-     */
-    void updateBroadcasts(float deltaTime);
-
-    /**
-     * @brief Met à jour les animations et effets visuels
-     * @param deltaTime Temps écoulé depuis la dernière mise à jour
-     */
     void updateAnimations(float deltaTime);
+    void processMessage(const Message& message);
 
 private:
-    void processMessage(const Message& message);
     void handleMapSize(std::shared_ptr<IMessageData> data);
     void handleTileContent(std::shared_ptr<IMessageData> data);
     void handleTeamName(std::shared_ptr<IMessageData> data);
@@ -68,13 +56,13 @@ private:
     void handleEndGame(std::shared_ptr<IMessageData> data);
     void handleServerMessage(std::shared_ptr<IMessageData> data);
     bool unknownPlayerId(int playerID);
+    void initializeMessageHandlers();
 
     std::shared_ptr<GameState> _gameState;
     std::shared_ptr<ICommandExecutor> _commandExecutor;
     std::shared_ptr<IGraphicsLib> _graphics;
     std::map<MessageType, std::function<void(std::shared_ptr<IMessageData>)>> _messageHandlers;
     std::map<int, std::chrono::steady_clock::time_point> _lastBroadcastTime;
-    void initializeMessageHandlers();
 };
 
 #endif /* !GAME_CONTROLLER_HPP_ */

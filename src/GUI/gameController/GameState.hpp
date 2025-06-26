@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameState - Store passif des données de jeu
+** GameState
 */
 
 #ifndef GAME_STATE_HPP_
@@ -17,7 +17,7 @@
 #include <deque>
 #include "IBroadcast.hpp"
 #include "IGameEntity.hpp"
-#include "GameEntitiesAll.hpp"
+#include "EntitiesAll.hpp"
 #include "EntityFactory.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 
@@ -33,7 +33,6 @@ public:
     std::shared_ptr<const ITile> getTile(int x, int y) const;
     std::shared_ptr<ITile> getTileMutable(int x, int y);
     int getResourceQuantity(int x, int y, ResourceType resourceType) const;
-    ResourceType getDominantResourceType(int x, int y) const;
     std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const;
     std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const;
     bool isPlayerOnTile(int x, int y, int playerId) const;
@@ -59,9 +58,6 @@ public:
     void setTimeUnit(int timeUnit);
     void setGameEnded(bool ended, const std::string& winningTeam = "");
     std::map<int, std::shared_ptr<IPlayer>> getPlayers();
-    void addBroadcast(int playerId, const std::string& team, const std::string& message);
-    void updateBroadcasts(float deltaTime);
-    std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
     bool getSfxEnabled() const;
     void setSfxEnabled(bool enabled);
     float getMusicVolume() const;
@@ -74,7 +70,6 @@ private:
     void addEggToTile(int eggId, int x, int y);
     void removeEggFromTile(int eggId, int x, int y);
 
-    mutable std::mutex _mutex;
     int _mapWidth = 0;
     int _mapHeight = 0;
     bool _isMapInitialized = false;
@@ -88,8 +83,6 @@ private:
     bool _sfxEnabled = true;
     float _musicVolume = 0.8f;
     std::string _winningTeam;
-    std::deque<std::shared_ptr<IBroadcast>> _broadcasts;
-    const size_t _maxBroadcasts = 20;
     std::shared_ptr<EntityFactoryManager> _entityFactory;
 };
 

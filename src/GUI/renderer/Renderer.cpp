@@ -30,64 +30,52 @@ void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
 void Renderer::render(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->BeginDrawing();
     renderSkybox(graphics);
-    renderBackground(graphics);
+    // pas sur que ca serve encore renderBackground(graphics);
     graphics->BeginCamera3D();
-    renderGrid(graphics);
-    renderScene(graphics);
+    // renderScene(graphics);
+    Zappy::ParticleSystem::getInstance().render(graphics);
+    Zappy::EjectionAnimationManager::getInstance().render(graphics);
     graphics->EndCamera3D();
     graphics->EndDrawing();
 }
 
-void Renderer::renderBackground(std::shared_ptr<IGraphicsLib> graphics) {
-    graphics->ClearBackground({32, 32, 64, 255});
-}
+// void Renderer::renderBackground(std::shared_ptr<IGraphicsLib> graphics) {
+//     graphics->ClearBackground({32, 32, 64, 255});
+// }
 
-void Renderer::renderGrid(std::shared_ptr<IGraphicsLib> graphics) {
-    graphics->DrawPlane({10.0f, 0.0f, 10.0f}, {20.0f, 20.0f}, {200, 200, 200, 255});
-}
+// void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
+    // Zappy::ParticleSystem::getInstance().render(graphics);
+    // Zappy::EjectionAnimationManager::getInstance().render(graphics);
+// }
 
-void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
-    auto& modelManager = ModelManager::getInstance();
-    (void)modelManager;
+// void Renderer::renderModelFromManager(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color) {
+//     if (auto graphics = _graphicsLib.lock())
+//         graphics->DrawModel3D(modelId, position, 1.0f, color);
+// }
 
-    Zappy::ParticleSystem::getInstance().render(graphics);
-    Zappy::EjectionAnimationManager::getInstance().render(graphics);
-}
+// int Renderer::loadResourceTexture(const std::string& resourceName, const std::string& texturePath) {
+//     auto it = _resourceTextures.find(resourceName);
+//     if (it != _resourceTextures.end()) {
+//         return it->second;
+//     }
+//     if (auto graphics = _graphicsLib.lock()) {
+//         int textureId = graphics->LoadTexture2D(texturePath);
+//         if (textureId != -1)
+//             _resourceTextures[resourceName] = textureId;
+//         else
+//             std::cerr << "Échec du chargement de la texture de ressource: " << texturePath << std::endl;
+//         return textureId;
+//     }
+//     return -1;
+// }
 
-void Renderer::renderSprite2D(int textureId, int x, int y) {
-    if (auto graphics = _graphicsLib.lock()) {
-        graphics->DrawTexture2D(textureId, x, y);
-    }
-}
-
-void Renderer::renderModelFromManager(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color) {
-    if (auto graphics = _graphicsLib.lock())
-        graphics->DrawModel3D(modelId, position, 1.0f, color);
-}
-
-int Renderer::loadResourceTexture(const std::string& resourceName, const std::string& texturePath) {
-    auto it = _resourceTextures.find(resourceName);
-    if (it != _resourceTextures.end()) {
-        return it->second;
-    }
-    if (auto graphics = _graphicsLib.lock()) {
-        int textureId = graphics->LoadTexture2D(texturePath);
-        if (textureId != -1)
-            _resourceTextures[resourceName] = textureId;
-        else
-            std::cerr << "Échec du chargement de la texture de ressource: " << texturePath << std::endl;
-        return textureId;
-    }
-    return -1;
-}
-
-int Renderer::getResourceTextureId(const std::string& resourceName) const {
-    auto it = _resourceTextures.find(resourceName);
-    if (it != _resourceTextures.end()) {
-        return it->second;
-    }
-    return -1;
-}
+// int Renderer::getResourceTextureId(const std::string& resourceName) const {
+//     auto it = _resourceTextures.find(resourceName);
+//     if (it != _resourceTextures.end()) {
+//         return it->second;
+//     }
+//     return -1;
+// }
 
 void Renderer::renderSkybox(std::shared_ptr<IGraphicsLib> graphics) {
     if (_skybox) {

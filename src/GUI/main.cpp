@@ -21,13 +21,12 @@ void displayHelp() {
 }
 
 int main(int argc, char** argv) {
+    if (argc == 2 && std::string(argv[1]) == "--help") {
+        displayHelp();
+        return 0;
+    }
     try {
-        if (argc == 2 && std::string(argv[1]) == "--help") {
-            displayHelp();
-            return 0;
-        }
         ParsingCLI parser(argc, argv);
-        std::cout << "Connecting to " << parser.getMachine() << " on port " << parser.getPort() << std::endl;
         auto networkManager = std::make_shared<NetworkManager>();
         auto entityFactory = std::make_shared<EntityFactoryManager>();
         auto gameController = std::make_shared<GameController>(nullptr, entityFactory);

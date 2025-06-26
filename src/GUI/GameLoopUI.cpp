@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameLoop UI Implementation
+** GameLoopUI
 */
 
 #include <iostream>
@@ -50,9 +50,8 @@ void GameLoop::updateGameData() {
         } else {
             auto tileX = std::make_shared<int>(0);
             auto tileY = std::make_shared<int>(0);
-            if (performTileSelection(mousePos, tileX, tileY)) {
+            if (performTileSelection(mousePos, tileX, tileY))
                 handleTileSelection(*tileX, *tileY);
-            }
         }
     }
 }
@@ -96,7 +95,9 @@ bool GameLoop::worldToTileCoordinates(ZappyTypes::Vector3 worldPos, std::shared_
     float y = (worldPos.z / (tileSize + spacing)) + mapCenterY - 0.5f;
     *tileX = static_cast<int>(std::round(x));
     *tileY = static_cast<int>(std::round(y));
-    return (*tileX >= 0 && *tileX < _mapWidth && *tileY >= 0 && *tileY < _mapHeight);
+    if (*tileX >= 0 && *tileX < _mapWidth && *tileY >= 0 && *tileY < _mapHeight)
+        return true;
+    return false;
 }
 
 bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY) {
@@ -114,39 +115,24 @@ bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_p
 }
 
 float GameLoop::calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 point) {
-    ZappyTypes::Vector3 rayToPoint = {
-        point.x - rayOrigin.x,
-        point.y - rayOrigin.y,
-        point.z - rayOrigin.z
-    };
+    ZappyTypes::Vector3 rayToPoint = {point.x - rayOrigin.x, point.y - rayOrigin.y, point.z - rayOrigin.z};
     float dotProduct = rayToPoint.x * rayDirection.x + rayToPoint.y * rayDirection.y + rayToPoint.z * rayDirection.z;
-    ZappyTypes::Vector3 closestPointOnRay = {
-        rayOrigin.x + dotProduct * rayDirection.x,
-        rayOrigin.y + dotProduct * rayDirection.y,
-        rayOrigin.z + dotProduct * rayDirection.z
-    };
-    ZappyTypes::Vector3 diff = {
-        point.x - closestPointOnRay.x,
-        point.y - closestPointOnRay.y,
-        point.z - closestPointOnRay.z
-    };
+    ZappyTypes::Vector3 closestPointOnRay = {rayOrigin.x + dotProduct * rayDirection.x, rayOrigin.y + dotProduct * rayDirection.y, rayOrigin.z + dotProduct * rayDirection.z};
+    ZappyTypes::Vector3 diff = {point.x - closestPointOnRay.x, point.y - closestPointOnRay.y, point.z - closestPointOnRay.z};
     return std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 }
 
 ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers) {
     float tileSize = 1.0f;
     float spacing = 1.5f;
+
     if (_mapWidth > 20 || _mapHeight > 20) {
         tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
         spacing = tileSize * 0.1f;
     }
     float mapCenterX = _mapWidth / 2.0f;
     float mapCenterY = _mapHeight / 2.0f;
-    ZappyTypes::Vector3 playerPos = {
-        (playerX - mapCenterX + 0.5f) * (tileSize + spacing),
-        0.55f,
-        (playerY - mapCenterY + 0.5f) * (tileSize + spacing)
-    };
+    ZappyTypes::Vector3 playerPos = {(playerX - mapCenterX + 0.5f) * (tileSize + spacing), 0.55f, (playerY - mapCenterY + 0.5f) * (tileSize + spacing)};
     if (totalPlayers > 1) {
         float stackHeight = 1.1f;
         playerPos.y += playerIndex * stackHeight;
@@ -197,20 +183,12 @@ void GameLoop::onMapSizeChanged(int width, int height) {
 }
 
 void GameLoop::onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile) {
-    if (_gameController && tile) {
-        auto gameState = _gameController->getGameState();
-        if (gameState && gameState->isMapInitialized()) {
-            auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
-            const auto& resources = tile->getResources();
-            mutableGameState->updateTileResources(x, y,
-                resources[0],  // food
-                resources[1],  // linemate
-                resources[2],  // deraumere
-                resources[3],  // sibur
-                resources[4],  // mendiane
-                resources[5],  // phiras
-                resources[6]   // thystame
-            );
-        }
+    if (!_gameController || !tile)
+        return;
+    auto gameState = _gameController->getGameState();
+    if (gameState && gameState->isMapInitialized()) {
+        auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
+        const auto& res = tile->getResources();
+        mutableGameState->updateTileResources(x, y, res[0], res[1], res[2], res[3], res[4], res[5], res[6]);
     }
 }

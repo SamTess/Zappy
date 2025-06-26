@@ -36,11 +36,6 @@ public:
     float angleX() const { return _cameraAngleX; }
     float angleY() const { return _cameraAngleY; }
 
-    void setMapDimensions(int width, int height) {
-        _mapWidth = width;
-        _mapHeight = height;
-    }
-
 private:
     ZappyTypes::Vector3 _cameraPosition;
     ZappyTypes::Vector3 _cameraTarget;
@@ -56,7 +51,4 @@ private:
     float _cameraAngleX;
     float _mouseSensitivity;
     float _keyboardSpeed;
-
-    int _mapWidth = 20;
-    int _mapHeight = 20;
 };

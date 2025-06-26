@@ -58,20 +58,15 @@ void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, 
         _lastMouseX = graphics->GetMouseX();
         _lastMouseY = graphics->GetMouseY();
     }
-
-    if (graphics->IsMouseButtonReleased(0)) {
+    if (graphics->IsMouseButtonReleased(0))
         _isDragging = false;
-    }
-
     if (_isDragging) {
         int currentMouseX = graphics->GetMouseX();
         int currentMouseY = graphics->GetMouseY();
         float deltaX = static_cast<float>(currentMouseX - _lastMouseX);
         float deltaY = static_cast<float>(currentMouseY - _lastMouseY);
-
         _cameraAngleY += deltaX * _mouseSensitivity;
         _cameraAngleX -= deltaY * _mouseSensitivity;
-
         if (_cameraAngleX > 1.5f)
             _cameraAngleX = 1.5f;
         if (_cameraAngleX < -1.5f)
@@ -79,7 +74,6 @@ void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, 
         _lastMouseX = currentMouseX;
         _lastMouseY = currentMouseY;
     }
-
     float wheelMovement = graphics->GetMouseWheelMove();
     if (wheelMovement != 0) {
         float zoomSpeed = _cameraDistance * 0.1f;
@@ -98,11 +92,7 @@ void CameraController::handleMouseInput(std::shared_ptr<IGraphicsLib> graphics, 
 void CameraController::handleKeyboardInput(std::shared_ptr<IGraphicsLib> graphics) {
     if (graphics->IsKeyPressed(KEY_R))
         reset();
-    ZappyTypes::Vector3 forward = {
-        std::cos(_cameraAngleY),
-        0.0f,
-        std::sin(_cameraAngleY)
-    };
+    ZappyTypes::Vector3 forward = {std::cos(_cameraAngleY), 0.0f, std::sin(_cameraAngleY)};
     float forwardLength = std::sqrt(forward.x * forward.x + forward.z * forward.z);
     if (forwardLength > 0.0001f) {
         forward.x /= forwardLength;

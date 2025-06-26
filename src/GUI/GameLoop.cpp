@@ -33,14 +33,14 @@ bool GameLoop::init() {
     setupComponents();
     _graphics->PlayMusic("assets/music/music.mp3");
     _graphics->SetMusicVolume(0.5f);
-    if (_gameController) {
+    if (_gameController)
         _gameController->setGraphics(_graphics);
-    }
     return true;
 }
 
 bool GameLoop::loadLibraries() {
     auto& libraryManager = LibraryManager::getInstance();
+
     if (!libraryManager.loadGraphicsLib("plugins/libraylibcpp.so")) {
         std::cerr << "Erreur de chargement de la bibliothèque graphique: " << libraryManager.getLastError() << std::endl;
         return false;
@@ -55,12 +55,11 @@ bool GameLoop::loadLibraries() {
 }
 
 void GameLoop::initializeManagers() {
-    auto& textureManager = TextureManager::getInstance();
-    textureManager.setGraphicsLib(_graphics);
-
+    // auto& textureManager = TextureManager::getInstance();
     auto& modelManager = ModelManager::getInstance();
-    modelManager.setGraphicsLib(_graphics);
 
+    // textureManager.setGraphicsLib(_graphics);
+    modelManager.setGraphicsLib(_graphics);
     _renderer = std::make_shared<Renderer>();
     _renderer->init(_graphics);
 }
@@ -86,9 +85,8 @@ void GameLoop::setupComponents() {
     _camera->init(_graphics);
     _modelManagerAdapter = Zappy::ModelManagerAdapter::createShared();
     _modelManagerAdapter->setGraphicsLib(_graphics);
-    if (_gameController) {
+    if (_gameController)
         _mapRenderer = std::make_shared<Zappy::MapRenderer>(_graphics, _gameController->getGameState(), _modelManagerAdapter);
-    }
     _userInterface = std::make_shared<GUI::UserInterface>(_gui);
     _userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     if (_coordinator)
@@ -101,6 +99,9 @@ int GameLoop::run() {
     while (!_graphics->WindowShouldClose()) {
         bool uiHandledMouse = _userInterface->handleMouseEvents();
         bool mouseOverUI = _userInterface->isMouseOverUI();
+        int selectedTileX = -1;
+        int selectedTileY = -1;
+        int selectedPlayerId = -1;
         _camera->update(_graphics, uiHandledMouse, mouseOverUI);
         _graphics->BeginDrawing();
         if (_renderer)
@@ -108,9 +109,12 @@ int GameLoop::run() {
         _graphics->ClearBackground({32, 32, 64, 255});
         _graphics->UpdateMusic();
         _graphics->BeginCamera3D();
-        int selectedTileX = _selectedTile.selected ? _selectedTile.x : -1;
-        int selectedTileY = _selectedTile.selected ? _selectedTile.y : -1;
-        int selectedPlayerId = _selectedPlayer.selected ? _selectedPlayer.playerId : -1;
+        if (_selectedTile.selected) {
+            selectedTileX = _selectedTile.x;
+            selectedTileY = _selectedTile.y;
+        }
+        if (_selectedPlayer.selected)
+            selectedPlayerId = _selectedPlayer.playerId;
         if (_mapRenderer) {
             _mapRenderer->renderWithSelection(selectedTileX, selectedTileY, selectedPlayerId);
             _mapRenderer->render();
@@ -142,9 +146,8 @@ void GameLoop::setServerInfo(const std::string& host, int port) {
 
 void GameLoop::setGameController(std::shared_ptr<GameController> controller) {
     _gameController = controller;
-    if (_gameController && _graphics) {
+    if (_gameController && _graphics)
         _gameController->setGraphics(_graphics);
-    }
     if (_gameController && _graphics && _modelManagerAdapter) {
         auto gameState = _gameController->getGameState();
         if (gameState) {
@@ -160,7 +163,7 @@ void GameLoop::updateCameraForMapSize() {
     if (!_gameController || !_camera)
         return;
     auto gameState = _gameController->getGameState();
-    if (!gameState->isMapInitialized())
+    if (!gameState || !gameState->isMapInitialized())
         return;
     int mapWidth = gameState->getMapWidth();
     int mapHeight = gameState->getMapHeight();
@@ -184,13 +187,14 @@ void GameLoop::updateCameraForMapSize() {
 }
 
 void GameLoop::setSkyboxTexture(const std::string& texturePath) {
-    if (_renderer) {
+    if (_renderer)
         _renderer->setSkyboxTexture(texturePath);
-    }
 }
 
 bool GameLoop::isSkyboxLoaded() const {
-    return _renderer && _renderer->isSkyboxLoaded();
+    if (!_renderer)
+        return false;
+    return _renderer->isSkyboxLoaded();
 }
 
 void GameLoop::setComponentCoordinator(std::shared_ptr<ComponentCoordinator> coordinator) {

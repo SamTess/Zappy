@@ -27,6 +27,17 @@ namespace Zappy {
     class ModelManagerAdapter;
 }
 
+typedef struct _selectedTile_t {
+    int x;
+    int y;
+    bool selected;
+} SelectedTile_s;
+
+typedef struct _selectedPlayer_t {
+    int playerId;
+    bool selected;
+} SelectedPlayer_s;
+
 class GameLoop {
 public:
     explicit GameLoop(std::shared_ptr<NetworkManager> networkManager);
@@ -73,13 +84,6 @@ private:
     float _gameTime = 0.0f;
     int _frequency = 100;
     int _gameTick = 0;
-    struct {
-        int x = 0;
-        int y = 0;
-        bool selected = false;
-    } _selectedTile;
-    struct {
-        int playerId = -1;
-        bool selected = false;
-    } _selectedPlayer;
+    SelectedTile_s _selectedTile;
+    SelectedPlayer_s _selectedPlayer;
 };

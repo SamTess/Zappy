@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameController implementation
+** GameController
 */
 
 #include <iostream>
@@ -30,6 +30,7 @@ GameController::GameController(std::shared_ptr<ICommandExecutor> commandExecutor
 
 bool GameController::unknownPlayerId(int playerID) {
     const auto &players = _gameState->getPlayers();
+
     if (players.empty() || (!players.empty() && players.find(playerID) == players.end())) {
         if (!_commandExecutor) {
             std::cerr << "[GameController] No command executor set - cannot request player info" << std::endl;
@@ -86,10 +87,6 @@ void GameController::initializeMessageHandlers() {
     _messageHandlers[MessageType::Egg] = [this](std::shared_ptr<IMessageData> data) {
         handleEggDrop(data);
     };
-}
-
-void GameController::onMessageReceived(const Message& message) {
-    processMessage(message);
 }
 
 void GameController::processMessage(const Message& message) {
@@ -265,7 +262,6 @@ void GameController::handlePlayerBroadcast(std::shared_ptr<IMessageData> data) {
     } else {
         std::cout << "[DEBUG] Player " << playerId << " not found in game state - broadcast animation skipped" << std::endl;
     }
-    _gameState->addBroadcast(playerId, teamName, message);
 }
 
 void GameController::handleResourceDrop(std::shared_ptr<IMessageData> data) {
@@ -354,10 +350,6 @@ void GameController::handleEndGame(std::shared_ptr<IMessageData> data) {
 
 void GameController::handleServerMessage(std::shared_ptr<IMessageData> data) {
     auto serverData = std::static_pointer_cast<ServerMessageData>(data);
-}
-
-void GameController::updateBroadcasts(float deltaTime) {
-    _gameState->updateBroadcasts(deltaTime);
 }
 
 void GameController::updateAnimations(float deltaTime) {
