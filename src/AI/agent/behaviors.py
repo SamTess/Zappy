@@ -130,9 +130,9 @@ class JoinTeamMatesBehavior(Behavior):
       max_id = max(agent_ids)
 
       if self.agent.id >= max_id:
-        print(f"JoinTeamMatesBehavior: Current agent ID ({self.agent.id}) is already highest or equal.")
+        print(f"Agent {self.agent.id}: is the master, not moving.")
         return
-
+      print(f"Agent {self.agent.id}: joining the agent {max_id}.")
       self.agent.other_agents[max_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[max_id]["direction"])
 
     except (ValueError, TypeError) as e:

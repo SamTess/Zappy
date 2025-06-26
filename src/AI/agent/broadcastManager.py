@@ -3,7 +3,7 @@ import utils.encryption as encryption
 ####! BROADCAST SYSTEM:
 #? message format: "message <emitter_direction>, <encrypted_message>"
 #? encrypted_message format: "<message_type>-<sender_id>-<message>
-#? message_type: "I" for inventory
+#? message_type: "I" for inventory, "F" for fork query, "U" for ID change
 
 class BroadcastManager:
   def __init__(self, agent):
@@ -58,10 +58,12 @@ class BroadcastManager:
         print(f"Invalid channel_id or sender_agent_id in decrypted message: {decrypted_message}")
         return
 
-      if msg_type == 'I':
+      if msg_type == "I":
         self._handle_inventory_message(sender_agent_id, sender_agent_direction, payload)
       elif msg_type == "F":
         self._handle_fork_query_message(sender_agent_id, sender_agent_direction, payload)
+      elif msg_type == "U":
+        self._handle_id_change_message(sender_agent_id, sender_agent_direction, payload)
       else:
         print(f"Unknown message type: {msg_type} in decrypted message: {decrypted_message}")
 
@@ -90,6 +92,20 @@ class BroadcastManager:
       self.agent.update_agent_info(sender_agent_id, sender_agent_direction, message)
     except Exception as e:
       print(f"Error updating agent info: {e}")
+      return
+
+
+  def _handle_id_change_message(self, sender_agent_id, sender_agent_direction, message):
+    if not hasattr(self.agent, 'update_agent_id'):
+        print("Agent is missing 'update_agent_id' method for handling ID change messages.")
+        return
+    try:
+      self.agent.update_agent_id(sender_agent_id, sender_agent_direction, int(message))
+    except ValueError:
+      print(f"Invalid agent ID in message: {message}")
+      return
+    except Exception as e:
+      print(f"Error updating agent ID: {e}")
       return
 
 

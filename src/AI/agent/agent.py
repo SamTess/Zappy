@@ -4,6 +4,7 @@ from agent.decisionManager import DecisionManager
 from agent.broadcastManager import BroadcastManager
 from logger.logger import Logger
 from constants.upgrades import get_total_upgrade_resources, minimum_players_for_upgrade
+from random import randint
 import utils.encryption as encryption
 import utils.zappy as zappy
 import socket
@@ -73,9 +74,7 @@ class Agent:
     self.map_size_x = int(map_size.split()[0])
     self.map_size_y = int(map_size.split()[1])
 
-    print(f"Welcome message {welcome_msg}")
-    print(f"Joined team {self.team} successfully, {team_slots} slots left in the team.")
-    print(f"Map size: {map_size}")
+    print(f"Agent {self.id}: Joined team {self.team} successfully.")
 
     self.running = True
     self._run()
@@ -145,6 +144,15 @@ class Agent:
 
 
   def _update_self_state(self):
+
+
+    #? On modifie son propre id si un autre agent a le même
+    if self.id in self.other_agents:
+      print(f"Agent {self.id}: Updating own ID to avoid conflict with other agents.")
+      new_id = max(self.other_agents.keys()) + randint(1, 100)  #? On change l'id pour éviter les conflits
+      self.broadcastManager.send_broadcast("U", str(new_id))
+      self.id = new_id
+
     #? On détermine le rôle de l'agent en fonction de son id
     agent_ids = list(self.other_agents.keys())
     agent_ids.append(self.id)
@@ -156,15 +164,15 @@ class Agent:
 
     # #? L'agent "originel" regarde si il y a assez de monde pour upgrade, sinon il fork et appelle les autres à fork aussi
     # #? L'agent originel est celui qui a l'id le plus élevé
-    # if len(self.other_agents) < minimum_players_for_upgrade * 2:
-    #   if self.id >= max(agent_ids):
-    #     #? plus de place dans l'équipe, on fork
-    #     if self.id == 0:
-    #       self.fork()
-    #       self.fill_team()
-    #     #? sinon on demande aux autres de fork
-    #     else:
-    #       self.fill_team()
+    if len(self.other_agents) < minimum_players_for_upgrade * 2:
+      if self.id >= max(agent_ids):
+        #? plus de place dans l'équipe, on fork
+        if self.id == 0:
+          self.fork()
+          self.fill_team()
+        #? sinon on demande aux autres de fork
+        else:
+          self.fill_team()
 
     #? On retire les agents qui n'ont pas envoyé de message depuis trop longtemps
     agents_to_remove = []
@@ -196,11 +204,10 @@ class Agent:
           have_enough_resources = False
 
       if have_enough_resources:
-        print("All required resources for upgrade are available.")
-        print(f"Enough agents for upgrade. Current count: {len(self.other_agents)}")
+        print(f"Agent {self.id}: required resources for upgrade are available. Enough players: {len(self.other_agents)}")
         self.current_phase = "rallying"
       else:
-        print("Not all required resources for upgrade are available.")
+        print(f"Agent {self.id}: Not all required resources for upgrade are available.")
 
     elif self.current_phase == "reproducing":
       self.current_phase = "rallying"
@@ -215,33 +222,32 @@ class Agent:
       i = 0
       for agent_info in self.other_agents.items():
         if agent_info[1]['direction'] is None or agent_info[1]['direction'] != 0:
-          print(f"Agent {agent_info[0]} direction: {agent_info[1]['direction']}")
-          print("Waiting for all agents to be ready for setting.")
+          print(f"Agent {self.id}: Waiting for all agents to be ready for setting.")
           return
         if i >= minimum_players_for_upgrade:
           break
-      print("All agents are ready for setting.")
+      print(f"Agent {self.id}: All agents are ready for setting.")
       self.current_phase = "setting"
 
     #? On check si assez de ressources ont été lachées pour passer à l'upgrade
     elif self.current_phase == "setting":
       last_surroundings = self.last_known_surroundings
       if last_surroundings is None or "ko" in last_surroundings:
-        print("Failed to retrieve surroundings for setting phase.")
+        print(f"Agent {self.id}: Failed to retrieve surroundings for setting phase.")
         return
 
       required_total_amount_of_resources = get_total_upgrade_resources()
       for key, value in required_total_amount_of_resources.items():
           distance_to_item, amount_found = zappy.get_closest_of_item(last_surroundings, key)
           if distance_to_item == -1 or amount_found < value:
-              print(f"Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
+              print(f"Agent {self.id}: Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
               return
       distance_to_players,  amount_of_players = zappy.get_closest_of_item(last_surroundings, "player")
       #? Si des agents sont morts entre temps, on retourne collecter (et fork aussi)
       if distance_to_players == -1 or amount_of_players < minimum_players_for_upgrade:
         self.current_phase = "collecting"
       else:
-        print("All required resources for upgrading are available.")
+        print(f"Agent {self.id}: All required resources for upgrading are available.")
         self.current_phase = "upgrading"
 
 
@@ -273,6 +279,18 @@ class Agent:
         "last_ping": self.tick
     }
 
+  def update_agent_id(self, agent_id, direction, new_id):
+    if agent_id is None or new_id is None:
+      return
+
+    if agent_id in self.other_agents:
+      self.other_agents[new_id] = self.other_agents[agent_id]
+      del self.other_agents[agent_id]
+      self.other_agents[new_id]['direction'] = direction
+      self.other_agents[new_id]['last_ping'] = self.tick
+      print(f"Agent {self.id}: Updated agent ID from {agent_id} to {new_id}.")
+    else:
+      print(f"Agent {self.id}: Agent ID {agent_id} not found for update.")
 
   def fork(self):
     fork_res = self.send_command("Fork")
