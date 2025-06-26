@@ -13,7 +13,7 @@
 #include "EntityFactory.hpp"
 #include "IGameController.hpp"
 #include "../shared/commands/ICommand.hpp"
-#include "../Shared/IGraphicsLib.hpp"
+#include "../GUI/shared/IGraphicsLib.hpp"
 #include "../shared/Message.hpp"
 #include "../shared/commands/ICommandExecutor.hpp"
 

@@ -11,7 +11,7 @@
 #include <string>
 #include <memory>
 #include "../IGameEntity.hpp"
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../../GUI/shared/IGraphicsLib.hpp"
 #include "../IResource.hpp"
 
 class Resource : public IResource {

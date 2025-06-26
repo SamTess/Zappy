@@ -14,8 +14,8 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include "../../../src/Shared/IGraphicsLib.hpp"
-#include "../../../src/Shared/Common.hpp"
+#include "../../../src/GUI/shared/IGraphicsLib.hpp"
+#include "../../../src/GUI/shared/Common.hpp"
 
 struct Model3D {
     int modelId;

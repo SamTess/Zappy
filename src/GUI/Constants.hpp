@@ -9,7 +9,7 @@
 
 #include <string>
 #include <vector>
-#include "../Shared/Common.hpp"
+#include "../GUI/shared/Common.hpp"
 
 const int DEFAULT_WIDTH = 1920;
 const int DEFAULT_HEIGHT = 1080;

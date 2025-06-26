@@ -15,7 +15,7 @@
 #include "../IGameEntity.hpp"
 #include "../ITile.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../../GUI/shared/IGraphicsLib.hpp"
 
 class Tile : public ITile {
 public:

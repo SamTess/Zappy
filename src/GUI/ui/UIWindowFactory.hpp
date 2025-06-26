@@ -18,7 +18,7 @@
 #include "../gameController/GameState.hpp"
 #include "../shared/commands/ICommand.hpp"
 #include "../shared/commands/ICommandExecutor.hpp"
-#include "../../Shared/IGuiLib.hpp"
+#include "../shared/IGuiLib.hpp"
 #include "../shared/commands/INetworkCommandSender.hpp"
 
 class NetworkManager;

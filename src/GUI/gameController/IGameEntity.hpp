@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <vector>
 #include "IRenderable.hpp"
-#include "../../Shared/Common.hpp"
+#include "../../GUI/shared/Common.hpp"
 
 class IGameEntity : public IRenderable {
     public:

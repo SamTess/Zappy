@@ -11,7 +11,7 @@
 #include <memory>
 #include "../shared/Message.hpp"
 #include "../shared/commands/ICommandExecutor.hpp"
-#include "../Shared/IGraphicsLib.hpp"
+#include "../GUI/shared/IGraphicsLib.hpp"
 #include "GameState.hpp"
 #include "EntityFactory.hpp"
 

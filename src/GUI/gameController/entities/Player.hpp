@@ -12,7 +12,7 @@
 #include <memory>
 #include "../IGameEntity.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../../GUI/shared/IGraphicsLib.hpp"
 #include "../IPlayer.hpp"
 
 class Player : public IPlayer {

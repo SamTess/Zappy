@@ -11,8 +11,8 @@
 #include <memory>
 #include <chrono>
 #include <string>
-#include "../../Shared/IGraphicsLib.hpp"
-#include "../../Shared/Common.hpp"
+#include "../../GUI/shared/IGraphicsLib.hpp"
+#include "../../GUI/shared/Common.hpp"
 
 class GameState;
 

@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include "../gameController/GameState.hpp"
-#include "../../Shared/IGraphicsLib.hpp"
+#include "../../GUI/shared/IGraphicsLib.hpp"
 #include "TileRender.hpp"
 
 namespace Zappy {

@@ -9,7 +9,7 @@
 #define GRAPHICS_MANAGER_HPP_
 
 #include <memory>
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../../GUI/shared/IGraphicsLib.hpp"
 
 class GraphicsManager {
 public:

@@ -11,7 +11,7 @@
 #include <map>
 #include <chrono>
 #include "ParticleSystem.hpp"
-#include "../../Shared/Common.hpp"
+#include "../../GUI/shared/Common.hpp"
 
 namespace Zappy {
 

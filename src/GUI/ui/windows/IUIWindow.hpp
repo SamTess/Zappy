@@ -8,7 +8,7 @@
 #pragma once
 
 #include <memory>
-#include "../../../Shared/IGuiLib.hpp"
+#include "../../../GUI/shared/IGuiLib.hpp"
 #include "../data/IUIDataProvider.hpp"
 
 namespace GUI {

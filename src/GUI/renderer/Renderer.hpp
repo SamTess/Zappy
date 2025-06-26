@@ -10,8 +10,8 @@
 #include <memory>
 #include <map>
 #include <string>
-#include "../../Shared/IGraphicsLib.hpp"
-#include "../../Shared/IGuiLib.hpp"
+#include "../../GUI/shared/IGraphicsLib.hpp"
+#include "../../GUI/shared/IGuiLib.hpp"
 #include "../cameraController/CameraController.hpp"
 #include "../textureManager/ModelManager.hpp"
 #include "Skybox.hpp"

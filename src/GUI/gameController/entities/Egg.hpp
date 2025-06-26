@@ -11,7 +11,7 @@
 #include <memory>
 #include "../IGameEntity.hpp"
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../../GUI/shared/IGraphicsLib.hpp"
 #include "../IEgg.hpp"
 
 class Egg : public IEgg {

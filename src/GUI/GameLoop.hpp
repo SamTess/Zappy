@@ -9,9 +9,9 @@
 
 #include <memory>
 #include <string>
-#include "../Shared/LibraryManager.hpp"
-#include "../Shared/IGraphicsLib.hpp"
-#include "../Shared/IGuiLib.hpp"
+#include "shared/LibraryManager.hpp"
+#include "shared/IGraphicsLib.hpp"
+#include "shared/IGuiLib.hpp"
 #include "cameraController/CameraController.hpp"
 #include "renderer/Renderer.hpp"
 #include "renderer/MapRenderer.hpp"

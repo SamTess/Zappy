@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <string>
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../../GUI/shared/IGraphicsLib.hpp"
 #include "../GameState.hpp"
 
 class SoundManager {

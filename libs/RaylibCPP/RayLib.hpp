@@ -13,7 +13,7 @@
 #include <map>
 #include <vector>
 
-#include "../../src/Shared/IGraphicsLib.hpp"
+#include "../../src/GUI/shared/IGraphicsLib.hpp"
 #include "window/Window.hpp"
 #include "shape/Shape.hpp"
 #include "texture/Texture.hpp"

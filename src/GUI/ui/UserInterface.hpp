@@ -13,7 +13,7 @@
 #include "UIWindowFactory.hpp"
 #include "../gameController/GameState.hpp"
 #include "../shared/services/ComponentCoordinator.hpp"
-#include "../../Shared/IGuiLib.hpp"
+#include "../shared/IGuiLib.hpp"
 
 namespace GUI {
 

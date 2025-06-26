@@ -9,7 +9,7 @@
 #define IRENDERABLE_HPP_
 
 #include <memory>
-#include "../../Shared/Common.hpp"
+#include "../../GUI/shared/Common.hpp"
 
 class IGraphicsLib;
 
