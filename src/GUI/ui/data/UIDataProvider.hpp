@@ -47,9 +47,9 @@ public:
 
 private:
     std::shared_ptr<const GameState> _gameState;
-    mutable float _cachedGameTime = 0.0f;
-    mutable int _cachedFrequency = 100;
-    mutable int _cachedGameTick = 0;
+    float _cachedGameTime = 0.0f;
+    int _cachedFrequency = 100;
+    int _cachedGameTick = 0;
     bool isValidGameState() const;
 };
 

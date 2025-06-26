@@ -33,12 +33,14 @@ bool UIDataProvider::isValidGameState() const {
 }
 
 int UIDataProvider::getMapWidth() const {
-    if (!isValidGameState()) return 0;
+    if (!isValidGameState())
+        return 0;
     return _gameState->getMapWidth();
 }
 
 int UIDataProvider::getMapHeight() const {
-    if (!isValidGameState()) return 0;
+    if (!isValidGameState())
+        return 0;
     return _gameState->getMapHeight();
 }
 
@@ -55,12 +57,14 @@ int UIDataProvider::getGameTick() const {
 }
 
 bool UIDataProvider::isMapInitialized() const {
-    if (!isValidGameState()) return false;
+    if (!isValidGameState())
+        return false;
     return _gameState->isMapInitialized();
 }
 
 bool UIDataProvider::isGameEnded() const {
-    if (!isValidGameState()) return false;
+    if (!isValidGameState())
+        return false;
     return _gameState->isGameEnded();
 }
 
@@ -73,42 +77,50 @@ const std::string& UIDataProvider::getWinningTeam() const {
 }
 
 std::shared_ptr<const ITile> UIDataProvider::getTile(int x, int y) const {
-    if (!isValidGameState()) return nullptr;
+    if (!isValidGameState())
+        return nullptr;
     return _gameState->getTile(x, y);
 }
 
 int UIDataProvider::getResourceQuantity(int x, int y, ResourceType resourceType) const {
-    if (!isValidGameState()) return 0;
+    if (!isValidGameState())
+        return 0;
     return _gameState->getResourceQuantity(x, y, resourceType);
 }
 
 std::vector<int> UIDataProvider::getPlayersOnTile(int x, int y) const {
-    if (!isValidGameState()) return {};
+    if (!isValidGameState())
+        return {};
     return _gameState->getPlayersOnTile(x, y);
 }
 
 std::vector<int> UIDataProvider::getEggsOnTile(int x, int y) const {
-    if (!isValidGameState()) return {};
+    if (!isValidGameState())
+        return {};
     return _gameState->getEggsOnTile(x, y);
 }
 
 std::shared_ptr<const IPlayer> UIDataProvider::getPlayerInfo(int playerId) const {
-    if (!isValidGameState()) return nullptr;
+    if (!isValidGameState())
+        return nullptr;
     return _gameState->getPlayerInfo(playerId);
 }
 
 std::shared_ptr<const IPlayerInventory> UIDataProvider::getPlayerInventory(int playerId) const {
-    if (!isValidGameState()) return nullptr;
+    if (!isValidGameState())
+        return nullptr;
     return _gameState->getPlayerInventory(playerId);
 }
 
 bool UIDataProvider::isPlayerOnTile(int x, int y, int playerId) const {
-    if (!isValidGameState()) return false;
+    if (!isValidGameState())
+        return false;
     return _gameState->isPlayerOnTile(x, y, playerId);
 }
 
 std::vector<int> UIDataProvider::getPlayerIds() const {
-    if (!isValidGameState()) return {};
+    if (!isValidGameState())
+        return {};
     return _gameState->getPlayerIds();
 }
 

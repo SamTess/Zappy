@@ -31,32 +31,32 @@ struct EjectionAnimation {
 };
 
 class EjectionAnimationManager {
-public:
-    static EjectionAnimationManager& getInstance();
-    void startEjectionAnimation(int playerId, const ZappyTypes::Vector3& fromPosition,
-        const ZappyTypes::Vector3& toPosition);
-    void update(float deltaTime);
-    void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
-    bool isPlayerBeingEjected(int playerId) const;
-    ZappyTypes::Vector3 getPlayerAnimationPosition(int playerId) const;
-    ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
-    void cleanup();
-    void setAnimationDuration(float duration) { defaultAnimationDuration = duration; }
-    void setParticleIntensity(int intensity) { particleIntensity = intensity; }
+    public:
+        static EjectionAnimationManager& getInstance();
+        void startEjectionAnimation(int playerId, const ZappyTypes::Vector3& fromPosition,
+            const ZappyTypes::Vector3& toPosition);
+        void update(float deltaTime);
+        void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
+        bool isPlayerBeingEjected(int playerId) const;
+        ZappyTypes::Vector3 getPlayerAnimationPosition(int playerId) const;
+        ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
+        void cleanup();
+        void setAnimationDuration(float duration) { defaultAnimationDuration = duration; }
+        void setParticleIntensity(int intensity) { particleIntensity = intensity; }
 
-private:
-    EjectionAnimationManager() : defaultAnimationDuration(1.2f), particleIntensity(20) {}
-    ~EjectionAnimationManager() = default;
-    EjectionAnimationManager(const EjectionAnimationManager&) = delete;
-    EjectionAnimationManager& operator=(const EjectionAnimationManager&) = delete;
-    void removeCompletedAnimations();
-    ZappyTypes::Vector3 calculateDirection(const ZappyTypes::Vector3& from, const ZappyTypes::Vector3& to);
-    ZappyTypes::Vector3 interpolatePosition(const ZappyTypes::Vector3& start, const ZappyTypes::Vector3& end, float t) const;
-    float easeOutQuad(float t) const;
+    private:
+        EjectionAnimationManager() : defaultAnimationDuration(1.2f), particleIntensity(20) {}
+        ~EjectionAnimationManager() = default;
+        EjectionAnimationManager(const EjectionAnimationManager&) = delete;
+        EjectionAnimationManager& operator=(const EjectionAnimationManager&) = delete;
+        void removeCompletedAnimations();
+        ZappyTypes::Vector3 calculateDirection(const ZappyTypes::Vector3& from, const ZappyTypes::Vector3& to);
+        ZappyTypes::Vector3 interpolatePosition(const ZappyTypes::Vector3& start, const ZappyTypes::Vector3& end, float t) const;
+        float easeOutQuad(float t) const;
 
-    std::map<int, EjectionAnimation> activeAnimations;
-    float defaultAnimationDuration;
-    int particleIntensity;
+        std::map<int, EjectionAnimation> activeAnimations;
+        float defaultAnimationDuration;
+        int particleIntensity;
 };
 
 }  // namespace Zappy

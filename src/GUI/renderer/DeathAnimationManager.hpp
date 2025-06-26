@@ -36,34 +36,30 @@ struct DeathAnimation {
 };
 
 class DeathAnimationManager {
-public:
-    static DeathAnimationManager& getInstance();
+    public:
+        static DeathAnimationManager& getInstance();
 
-    void startDeathAnimation(int playerId, const ZappyTypes::Vector3& position);
-    void startDeathAnimation(int playerId, const ZappyTypes::Vector3& position, const std::string& teamName);
-    void update(float deltaTime);
-    void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
-    bool isPlayerInDeathAnimation(int playerId) const;
-    ZappyTypes::Vector3 getPlayerDeathPosition(int playerId) const;
-    ZappyTypes::Vector3 getPlayerDeathRotation(int playerId) const;
-    void cleanup();
-    ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
+        void startDeathAnimation(int playerId, const ZappyTypes::Vector3& position);
+        void startDeathAnimation(int playerId, const ZappyTypes::Vector3& position, const std::string& teamName);
+        void update(float deltaTime);
+        void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
+        bool isPlayerInDeathAnimation(int playerId) const;
+        void cleanup();
+        ZappyTypes::Vector3 getPlayerDeathPosition(int playerId) const;
+        ZappyTypes::Vector3 getPlayerDeathRotation(int playerId) const;
+        ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
 
-private:
-    DeathAnimationManager() = default;
-    ~DeathAnimationManager() = default;
-    DeathAnimationManager(const DeathAnimationManager&) = delete;
-    DeathAnimationManager& operator=(const DeathAnimationManager&) = delete;
+    private:
+        DeathAnimationManager() = default;
+        ~DeathAnimationManager() = default;
+        void updateDeathAnimation(std::shared_ptr<DeathAnimation> animation, float deltaTime);
+        void removeFinishedAnimations();
 
-    void updateDeathAnimation(std::shared_ptr<DeathAnimation> animation, float deltaTime);
-    void removeFinishedAnimations();
-
-    std::map<int, std::shared_ptr<DeathAnimation>> activeAnimations;
-
-    const float gravity = -15.0f;
-    const float bounceReduction = 0.3f;
-    const float groundFriction = 0.9f;
-    const float rotationDamping = 0.95f;
+        const float gravity = -15.0f;
+        const float bounceReduction = 0.3f;
+        const float groundFriction = 0.9f;
+        const float rotationDamping = 0.95f;
+        std::map<int, std::shared_ptr<DeathAnimation>> activeAnimations;
 };
 
 }  // namespace Zappy
