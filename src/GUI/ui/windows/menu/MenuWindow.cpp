@@ -175,8 +175,7 @@ void MenuWindow::drawGameplaySliders(float startX, float startY, float submenuWi
     std::stringstream newFreqSs;
     newFreqSs << "Nouvelle: " << static_cast<int>(newFrequency) << " ticks/sec";
     _guiLib->DrawLabel( startX + 30, startY + 105, submenuWidth - 60, 20, newFreqSs.str());
-    if (_guiLib->ButtonPressed( startX + 30, startY + 130, submenuWidth - 60,
-        25, "Appliquer fréquence")) {
+    if (_guiLib->ButtonPressed( startX + 30, startY + 130, submenuWidth - 60, 25, "Appliquer fréquence")) {
         if (_commandExecutor) {
             auto frequencyCommand = std::make_shared<ServerFrequencyCommand>(static_cast<int>(newFrequency));
             _commandExecutor->executeCommand(frequencyCommand);
