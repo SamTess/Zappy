@@ -30,52 +30,12 @@ void Renderer::init(std::shared_ptr<IGraphicsLib> graphics) {
 void Renderer::render(std::shared_ptr<IGraphicsLib> graphics) {
     graphics->BeginDrawing();
     renderSkybox(graphics);
-    // pas sur que ca serve encore renderBackground(graphics);
     graphics->BeginCamera3D();
-    // renderScene(graphics);
     Zappy::ParticleSystem::getInstance().render(graphics);
     Zappy::EjectionAnimationManager::getInstance().render(graphics);
     graphics->EndCamera3D();
     graphics->EndDrawing();
 }
-
-// void Renderer::renderBackground(std::shared_ptr<IGraphicsLib> graphics) {
-//     graphics->ClearBackground({32, 32, 64, 255});
-// }
-
-// void Renderer::renderScene(std::shared_ptr<IGraphicsLib> graphics) {
-    // Zappy::ParticleSystem::getInstance().render(graphics);
-    // Zappy::EjectionAnimationManager::getInstance().render(graphics);
-// }
-
-// void Renderer::renderModelFromManager(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color) {
-//     if (auto graphics = _graphicsLib.lock())
-//         graphics->DrawModel3D(modelId, position, 1.0f, color);
-// }
-
-// int Renderer::loadResourceTexture(const std::string& resourceName, const std::string& texturePath) {
-//     auto it = _resourceTextures.find(resourceName);
-//     if (it != _resourceTextures.end()) {
-//         return it->second;
-//     }
-//     if (auto graphics = _graphicsLib.lock()) {
-//         int textureId = graphics->LoadTexture2D(texturePath);
-//         if (textureId != -1)
-//             _resourceTextures[resourceName] = textureId;
-//         else
-//             std::cerr << "Échec du chargement de la texture de ressource: " << texturePath << std::endl;
-//         return textureId;
-//     }
-//     return -1;
-// }
-
-// int Renderer::getResourceTextureId(const std::string& resourceName) const {
-//     auto it = _resourceTextures.find(resourceName);
-//     if (it != _resourceTextures.end()) {
-//         return it->second;
-//     }
-//     return -1;
-// }
 
 void Renderer::renderSkybox(std::shared_ptr<IGraphicsLib> graphics) {
     if (_skybox) {

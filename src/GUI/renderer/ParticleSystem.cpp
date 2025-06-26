@@ -147,21 +147,16 @@ void EjectionEffect::updateParticle(Particle* particle, float deltaTime) {
         particle->active = false;
         return;
     }
-
     particle->velocity.x += particle->acceleration.x * deltaTime;
     particle->velocity.y += particle->acceleration.y * deltaTime;
     particle->velocity.z += particle->acceleration.z * deltaTime;
-
     particle->velocity.x *= airResistance;
     particle->velocity.z *= airResistance;
-
     particle->position.x += particle->velocity.x * deltaTime;
     particle->position.y += particle->velocity.y * deltaTime;
     particle->position.z += particle->velocity.z * deltaTime;
-
     float lifeRatio = particle->life / particle->maxLife;
     particle->color.a = static_cast<unsigned char>(255 * lifeRatio);
-
     if (particle->position.y <= 0.0f) {
         particle->position.y = 0.0f;
         particle->velocity.y *= -0.3f;
@@ -210,8 +205,8 @@ void EjectionEffect::reset() {
 }
 
 BroadcastEffect::BroadcastEffect() : currentRadius(0.0f), maxRadius(12.0f), expansionSpeed(4.0f),
-                                   pulseInterval(0.5f), lastPulseTime(0.0f), ringCount(2),
-                                   followPlayerId(-1), followPlayer(false) {
+    pulseInterval(0.5f), lastPulseTime(0.0f), ringCount(2),
+    followPlayerId(-1), followPlayer(false) {
     effectDuration = 2.5f;
     ringRadii.resize(ringCount, 0.0f);
     ringAlphas.resize(ringCount, 1.0f);
@@ -246,14 +241,11 @@ void BroadcastEffect::initialize(int playerId, std::shared_ptr<const GameState> 
     active = true;
     currentRadius = 0.0f;
     lastPulseTime = 0.0f;
-
     origin = getCurrentPlayerPosition();
-
     for (int i = 0; i < ringCount; ++i) {
         ringRadii[i] = 0.0f;
         ringAlphas[i] = 1.0f;
     }
-
     particles.clear();
     particles.reserve(maxParticles);
 }
@@ -266,7 +258,6 @@ void BroadcastEffect::update(float deltaTime) {
         active = false;
         return;
     }
-
     for (int i = 0; i < ringCount; ++i) {
         float startTime = i * pulseInterval;
         if (timeAlive >= startTime) {
@@ -278,10 +269,14 @@ void BroadcastEffect::update(float deltaTime) {
 }
 
 void BroadcastEffect::render(const std::shared_ptr<IGraphicsLib>& graphicsLib) {
-    if (!active || !graphicsLib) return;
+    if (!active || !graphicsLib)
+        return;
 
-    ZappyTypes::Vector3 currentPosition = followPlayer ? getCurrentPlayerPosition() : origin;
-
+    ZappyTypes::Vector3 currentPosition;
+    if (followPlayer)
+        currentPosition = getCurrentPlayerPosition();
+    else
+        currentPosition = origin;
     for (int i = 0; i < ringCount; ++i) {
         if (ringRadii[i] > 0.0f && ringAlphas[i] > 0.0f)
             renderRing(graphicsLib, currentPosition, ringRadii[i], ringAlphas[i]);
@@ -309,23 +304,19 @@ void BroadcastEffect::createRingParticles(const ZappyTypes::Vector3& position, f
     for (int i = 0; i < count; ++i) {
         Particle particle;
         float angle = angleDist(gen);
-
         particle.position = position;
         particle.position.x += static_cast<float>(cos(angle)) * radius;
         particle.position.z += static_cast<float>(sin(angle)) * radius;
         particle.position.y += 0.2f;
-
         particle.velocity.x = static_cast<float>(cos(angle)) * 2.0f;
         particle.velocity.z = static_cast<float>(sin(angle)) * 2.0f;
         particle.velocity.y = 0.5f;
-
         particle.acceleration = {0.0f, -1.0f, 0.0f};
         particle.color = {100, 255, 255, 255};
         particle.life = lifeDist(gen);
         particle.maxLife = particle.life;
         particle.size = sizeDist(gen) * 3.0f;
         particle.active = true;
-
         particles.push_back(particle);
     }
 }
@@ -342,122 +333,98 @@ void BroadcastEffect::createPulseParticles(const ZappyTypes::Vector3& position, 
         Particle particle;
         float angle = angleDist(gen);
         float speed = speedDist(gen);
-
         particle.position = position;
         particle.position.y += 1.0f;
-
         particle.velocity.x = static_cast<float>(cos(angle)) * speed;
         particle.velocity.z = static_cast<float>(sin(angle)) * speed;
         particle.velocity.y = 2.0f;
-
         particle.acceleration = {0.0f, -2.0f, 0.0f};
         particle.color = {255, 255, 0, 255};
         particle.life = lifeDist(gen);
         particle.maxLife = particle.life;
         particle.size = sizeDist(gen) * 4.0f;
         particle.active = true;
-
         particles.push_back(particle);
     }
 }
 
 void BroadcastEffect::updateRingParticle(Particle* particle, float deltaTime) {
-    if (!particle || !particle->active) return;
+    if (!particle || !particle->active)
+        return;
 
     particle->position.x += particle->velocity.x * deltaTime;
     particle->position.y += particle->velocity.y * deltaTime;
     particle->position.z += particle->velocity.z * deltaTime;
-
     particle->velocity.x += particle->acceleration.x * deltaTime;
     particle->velocity.y += particle->acceleration.y * deltaTime;
     particle->velocity.z += particle->acceleration.z * deltaTime;
-
     particle->velocity.x *= 0.95f;
     particle->velocity.z *= 0.95f;
-
     particle->life -= deltaTime;
     if (particle->life <= 0.0f) {
         particle->active = false;
         return;
     }
-
     float lifeRatio = particle->life / particle->maxLife;
     particle->color.a = static_cast<unsigned char>(255 * lifeRatio);
 }
 
 void BroadcastEffect::updatePulseParticle(Particle* particle, float deltaTime) {
-    if (!particle || !particle->active) return;
+    if (!particle || !particle->active)
+        return;
 
     particle->position.x += particle->velocity.x * deltaTime;
     particle->position.y += particle->velocity.y * deltaTime;
     particle->position.z += particle->velocity.z * deltaTime;
-
     particle->velocity.x += particle->acceleration.x * deltaTime;
     particle->velocity.y += particle->acceleration.y * deltaTime;
     particle->velocity.z += particle->acceleration.z * deltaTime;
-
     particle->life -= deltaTime;
     if (particle->life <= 0.0f) {
         particle->active = false;
         return;
     }
-
     float pulseFreq = 8.0f;
     float pulse = (sin(timeAlive * pulseFreq) + 1.0f) * 0.5f;
     float lifeRatio = particle->life / particle->maxLife;
-
     particle->size = 0.1f + pulse * 0.1f;
     particle->color.a = static_cast<unsigned char>(255 * lifeRatio * (0.7f + pulse * 0.3f));
 }
 
 void BroadcastEffect::renderRing(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     const ZappyTypes::Vector3& center, float radius, float alpha) {
-    if (radius <= 0.0f || alpha <= 0.0f) return;
+    if (radius <= 0.0f || alpha <= 0.0f)
+        return;
 
     int segments = 32;
     float angleStep = 2.0f * M_PI / segments;
 
-    ZappyTypes::Color ringColor = {255, 100, 255, static_cast<unsigned char>(alpha * 255)};  // Bright magenta rings
-
+    ZappyTypes::Color ringColor = {255, 100, 255, static_cast<unsigned char>(alpha * 255)};
     for (int i = 0; i < segments; ++i) {
         float angle1 = i * angleStep;
         float angle2 = (i + 1) * angleStep;
-
-        ZappyTypes::Vector3 point1 = {
-            center.x + static_cast<float>(cos(angle1)) * radius,
-            center.y + 0.2f,
-            center.z + static_cast<float>(sin(angle1)) * radius
-        };
-
-        ZappyTypes::Vector3 point2 = {
-            center.x + static_cast<float>(cos(angle2)) * radius,
-            center.y + 0.2f,
-            center.z + static_cast<float>(sin(angle2)) * radius
-        };
-
+        ZappyTypes::Vector3 point1 = {center.x + static_cast<float>(cos(angle1)) * radius, center.y + 0.2f, center.z + static_cast<float>(sin(angle1)) * radius};
+        ZappyTypes::Vector3 point2 = {center.x + static_cast<float>(cos(angle2)) * radius, center.y + 0.2f, center.z + static_cast<float>(sin(angle2)) * radius};
         graphicsLib->DrawLine3D(point1, point2, ringColor);
     }
 }
 
 void BroadcastEffect::renderParticle(const Particle& particle, const std::shared_ptr<IGraphicsLib>& graphicsLib) {
-    if (!particle.active) return;
-
+    if (!particle.active)
+        return;
     graphicsLib->DrawSphere(particle.position, particle.size, particle.color);
 }
 
 ZappyTypes::Vector3 BroadcastEffect::getCurrentPlayerPosition() const {
     if (!gameState || !followPlayer || followPlayerId == -1)
         return origin;
-
     auto player = gameState->getPlayerInfo(followPlayerId);
     if (player) {
         ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance().convertTileToWorldPosition(
             player->getX(), player->getY(), gameState->getMapWidth(), gameState->getMapHeight());
-
         playerWorldPos.y = 1.0f;
         return playerWorldPos;
     }
-
     return origin;
 }
 
@@ -471,13 +438,12 @@ void ParticleSystem::update(float deltaTime) {
         if (effect)
             effect->update(deltaTime);
     }
-
     removeInactiveEffects();
 }
 
 void ParticleSystem::render(const std::shared_ptr<IGraphicsLib>& graphicsLib) {
-    if (!graphicsLib) return;
-
+    if (!graphicsLib)
+        return;
     for (const auto& effect : activeEffects) {
         if (effect && effect->isActive())
             effect->render(graphicsLib);
@@ -499,26 +465,21 @@ void ParticleSystem::createEffect(ParticleType type, const ZappyTypes::Vector3& 
         if (activeEffects.size() >= maxActiveEffects)
             return;
     }
-
     std::unique_ptr<ParticleEffect> effect;
-
     if (type == ParticleType::EJECTION_BURST || type == ParticleType::EJECTION_TRAIL ||
         type == ParticleType::SPARK || type == ParticleType::DUST_CLOUD) {
         effect = std::make_unique<EjectionEffect>();
     } else if (type == ParticleType::BROADCAST_RING || type == ParticleType::BROADCAST_PULSE ||
-               type == ParticleType::COMMUNICATION_WAVE) {
+        type == ParticleType::COMMUNICATION_WAVE) {
         effect = std::make_unique<BroadcastEffect>();
     } else {
         effect = std::make_unique<EjectionEffect>();
     }
-
     effect->initialize(position, type, intensity);
     activeEffects.push_back(std::move(effect));
 }
 
-void ParticleSystem::createPlayerBroadcastEffect(int playerId, std::shared_ptr<const GameState> gameState, const std::string& teamName) {
-    (void)teamName;
-
+void ParticleSystem::createPlayerBroadcastEffect(int playerId, std::shared_ptr<const GameState> gameState) {
     if (activeEffects.size() >= maxActiveEffects) {
         removeInactiveEffects();
         if (activeEffects.size() >= maxActiveEffects)
@@ -537,9 +498,9 @@ void ParticleSystem::cleanup() {
 void ParticleSystem::removeInactiveEffects() {
     activeEffects.erase(
         std::remove_if(activeEffects.begin(), activeEffects.end(),
-                      [](const std::unique_ptr<ParticleEffect>& effect) {
-                          return !effect || !effect->isActive();
-                      }),
+            [](const std::unique_ptr<ParticleEffect>& effect) {
+                return !effect || !effect->isActive();
+        }),
         activeEffects.end()
     );
 }

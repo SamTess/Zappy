@@ -36,33 +36,28 @@ void EjectionAnimationManager::startEjectionAnimation(int playerId, const ZappyT
 void EjectionAnimationManager::update(float deltaTime) {
     for (auto& pair : activeAnimations) {
         EjectionAnimation& animation = pair.second;
-
-        if (!animation.active) continue;
-
+        if (!animation.active)
+            continue;
         animation.timeElapsed += deltaTime;
-
         if (!animation.particlesCreated) {
             ParticleSystem::getInstance().createPlayerEjectionEffect(
                 animation.startPosition, animation.direction);
             animation.particlesCreated = true;
         }
-
-        if (animation.timeElapsed >= animation.duration) {
+        if (animation.timeElapsed >= animation.duration)
             animation.active = false;
-        }
     }
-
     removeCompletedAnimations();
 }
 
 void EjectionAnimationManager::render(const std::shared_ptr<IGraphicsLib>& graphicsLib) {
-    if (!graphicsLib) return;
+    if (!graphicsLib)
+        return;
 
     for (const auto& pair : activeAnimations) {
         const EjectionAnimation& animation = pair.second;
-
-        if (!animation.active) continue;
-
+        if (!animation.active)
+            continue;
         float progress = animation.timeElapsed / animation.duration;
         if (progress < 0.5f) {
             ZappyTypes::Color lineColor = {255, 100, 100, static_cast<unsigned char>(255 * (1.0f - progress * 2.0f))};
@@ -70,7 +65,6 @@ void EjectionAnimationManager::render(const std::shared_ptr<IGraphicsLib>& graph
             lineEnd.x += animation.direction.x * 2.0f;
             lineEnd.z += animation.direction.z * 2.0f;
             lineEnd.y += 0.1f;
-
             graphicsLib->DrawLine3D(animation.startPosition, lineEnd, lineColor);
         }
     }
@@ -78,7 +72,9 @@ void EjectionAnimationManager::render(const std::shared_ptr<IGraphicsLib>& graph
 
 bool EjectionAnimationManager::isPlayerBeingEjected(int playerId) const {
     auto it = activeAnimations.find(playerId);
-    return it != activeAnimations.end() && it->second.active;
+    if (it == activeAnimations.end() || !it->second.active)
+        return false;
+    return true;
 }
 
 ZappyTypes::Vector3 EjectionAnimationManager::getPlayerAnimationPosition(int playerId) const {
@@ -89,9 +85,7 @@ ZappyTypes::Vector3 EjectionAnimationManager::getPlayerAnimationPosition(int pla
     const EjectionAnimation& animation = it->second;
     float progress = animation.timeElapsed / animation.duration;
     progress = std::min(1.0f, progress);
-
     float easedProgress = easeOutQuad(progress);
-
     return interpolatePosition(animation.startPosition, animation.endPosition, easedProgress);
 }
 
@@ -99,16 +93,8 @@ ZappyTypes::Vector3 EjectionAnimationManager::convertTileToWorldPosition(int til
     float tileSize = 1.0f;
     float spacing = 1.5f;
 
-    ZappyTypes::Vector3 result = {
-        (static_cast<float>(tileX) - mapWidth / 2.0f + 0.5f) * (tileSize + spacing),
-        0.5f,
-        (static_cast<float>(tileY) - mapHeight / 2.0f + 0.5f) * (tileSize + spacing)
-    };
-
-    std::cout << "[DEBUG] convertTileToWorldPosition: tile(" << tileX << "," << tileY
-              << ") -> world(" << result.x << "," << result.y << "," << result.z << ")"
-              << " [map:" << mapWidth << "x" << mapHeight << "]" << std::endl;
-
+    ZappyTypes::Vector3 result = {(static_cast<float>(tileX) - mapWidth / 2.0f + 0.5f) * (tileSize + spacing), 0.5f,
+        (static_cast<float>(tileY) - mapHeight / 2.0f + 0.5f) * (tileSize + spacing)};
     return result;
 }
 
@@ -118,11 +104,10 @@ void EjectionAnimationManager::cleanup() {
 
 void EjectionAnimationManager::removeCompletedAnimations() {
     for (auto it = activeAnimations.begin(); it != activeAnimations.end();) {
-        if (!it->second.active) {
+        if (!it->second.active)
             it = activeAnimations.erase(it);
-        } else {
+        else
             ++it;
-        }
     }
 }
 
@@ -131,13 +116,12 @@ ZappyTypes::Vector3 EjectionAnimationManager::calculateDirection(const ZappyType
     direction.x = to.x - from.x;
     direction.y = 0.0f;
     direction.z = to.z - from.z;
-
     float length = std::sqrt(direction.x * direction.x + direction.z * direction.z);
+
     if (length > 0.0f) {
         direction.x /= length;
         direction.z /= length;
     }
-
     return direction;
 }
 

@@ -26,29 +26,21 @@ struct EjectionAnimation {
     bool particlesCreated;
 
     EjectionAnimation() : playerId(-1), startPosition{0, 0, 0}, endPosition{0, 0, 0},
-                         direction{0, 0, 0}, duration(1.0f), timeElapsed(0.0f),
-                         active(false), particlesCreated(false) {}
+        direction{0, 0, 0}, duration(1.0f), timeElapsed(0.0f),
+        active(false), particlesCreated(false) {}
 };
 
 class EjectionAnimationManager {
 public:
     static EjectionAnimationManager& getInstance();
-
     void startEjectionAnimation(int playerId, const ZappyTypes::Vector3& fromPosition,
         const ZappyTypes::Vector3& toPosition);
-
     void update(float deltaTime);
-
     void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
-
     bool isPlayerBeingEjected(int playerId) const;
-
     ZappyTypes::Vector3 getPlayerAnimationPosition(int playerId) const;
-
     ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
-
     void cleanup();
-
     void setAnimationDuration(float duration) { defaultAnimationDuration = duration; }
     void setParticleIntensity(int intensity) { particleIntensity = intensity; }
 
@@ -57,7 +49,6 @@ private:
     ~EjectionAnimationManager() = default;
     EjectionAnimationManager(const EjectionAnimationManager&) = delete;
     EjectionAnimationManager& operator=(const EjectionAnimationManager&) = delete;
-
     void removeCompletedAnimations();
     ZappyTypes::Vector3 calculateDirection(const ZappyTypes::Vector3& from, const ZappyTypes::Vector3& to);
     ZappyTypes::Vector3 interpolatePosition(const ZappyTypes::Vector3& start, const ZappyTypes::Vector3& end, float t) const;

@@ -31,8 +31,8 @@ struct DeathAnimation {
     bool hasHitGround;
 
     DeathAnimation() : playerId(-1), teamName(""), startPosition{0, 0, 0}, currentPosition{0, 0, 0},
-                      velocity{0, 0, 0}, rotation{0, 0, 0}, rotationVelocity{0, 0, 0},
-                      scale(0.4f), timeAlive(0.0f), duration(6.0f), active(false), hasHitGround(false) {}
+        velocity{0, 0, 0}, rotation{0, 0, 0}, rotationVelocity{0, 0, 0},
+        scale(0.4f), timeAlive(0.0f), duration(6.0f), active(false), hasHitGround(false) {}
 };
 
 class DeathAnimationManager {
@@ -43,13 +43,10 @@ public:
     void startDeathAnimation(int playerId, const ZappyTypes::Vector3& position, const std::string& teamName);
     void update(float deltaTime);
     void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
-
     bool isPlayerInDeathAnimation(int playerId) const;
     ZappyTypes::Vector3 getPlayerDeathPosition(int playerId) const;
     ZappyTypes::Vector3 getPlayerDeathRotation(int playerId) const;
-
     void cleanup();
-
     ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
 
 private:

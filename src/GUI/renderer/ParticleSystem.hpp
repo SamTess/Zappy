@@ -125,13 +125,9 @@ public:
 
     void update(float deltaTime);
     void render(const std::shared_ptr<IGraphicsLib>& graphicsLib);
-
     void createPlayerEjectionEffect(const ZappyTypes::Vector3& position, const ZappyTypes::Vector3& direction);
-
-    void createPlayerBroadcastEffect(int playerId, std::shared_ptr<const GameState> gameState, const std::string& teamName);
-
+    void createPlayerBroadcastEffect(int playerId, std::shared_ptr<const GameState> gameState);
     void createEffect(ParticleType type, const ZappyTypes::Vector3& position, int intensity = 20);
-
     void cleanup();
     void setMaxEffects(size_t max) { maxActiveEffects = max; }
 

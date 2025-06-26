@@ -24,7 +24,8 @@ DetailedTileRenderStrategy::DetailedTileRenderStrategy(const std::shared_ptr<con
     : gameState(gameState) {}
 
 
-void DetailedTileRenderStrategy::renderAllResources(std::shared_ptr<const ITile> tile, const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& position, float tileSize) {
+void DetailedTileRenderStrategy::renderAllResources(std::shared_ptr<const ITile> tile,
+    const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& position, float tileSize) {
     const auto& resources = tile->getResources();
 
     for (int i = 0; i < static_cast<int>(ResourceType::COUNT); ++i) {
@@ -36,7 +37,8 @@ void DetailedTileRenderStrategy::renderAllResources(std::shared_ptr<const ITile>
     }
 }
 
-void DetailedTileRenderStrategy::renderAllPlayers(std::shared_ptr<const ITile> tile, const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& position, float tileSize) {
+void DetailedTileRenderStrategy::renderAllPlayers(std::shared_ptr<const ITile> tile,
+    const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& position, float tileSize) {
     const auto& playerIds = tile->getPlayerIds();
 
     for (size_t i = 0; i < playerIds.size(); ++i) {
@@ -54,15 +56,15 @@ void DetailedTileRenderStrategy::renderAllPlayers(std::shared_ptr<const ITile> t
     }
 }
 
-void DetailedTileRenderStrategy::renderAllEggs(std::shared_ptr<const ITile> tile, const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& position, float tileSize) {
+void DetailedTileRenderStrategy::renderAllEggs(std::shared_ptr<const ITile> tile,
+    const std::shared_ptr<IGraphicsLib>& graphicsLib, const ZappyTypes::Vector3& position, float tileSize) {
     const auto& eggIds = tile->getEggIds();
 
     for (size_t i = 0; i < eggIds.size(); ++i) {
         int eggId = eggIds[i];
         auto eggInfo = gameState->getEggInfo(eggId);
-        if (eggInfo) {
+        if (eggInfo)
             eggInfo->renderEgg(graphicsLib, position, tileSize, i);
-        }
     }
 }
 
