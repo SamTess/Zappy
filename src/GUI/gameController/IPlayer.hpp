@@ -29,10 +29,6 @@ public:
     virtual float getCurrentRotation() const = 0;
     virtual float getLastRotation() const = 0;
 
-    virtual void updateAnimation(float deltaTime) = 0;
-    virtual ZappyTypes::Vector3 getInterpolatedPosition() const = 0;
-    virtual bool isMoving() const = 0;
-
     virtual void renderPlayer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         const ZappyTypes::Vector3& position,
         float tileSize,

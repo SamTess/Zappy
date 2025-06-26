@@ -39,10 +39,6 @@ public:
     float getCurrentRotation() const override;
     float getLastRotation() const override;
 
-    void updateAnimation(float deltaTime);
-    ZappyTypes::Vector3 getInterpolatedPosition() const;
-    bool isMoving() const;
-
     // Implémentation IRenderable
     void render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
                 const ZappyTypes::Vector3& position,
@@ -57,7 +53,6 @@ public:
 private:
     ZappyTypes::Color generateTeamColor() const;
     float orientationToRotationDegrees(int orientation) const;
-    void startMovement(int newX, int newY);
 
     int _id;
     int _x;
@@ -68,12 +63,6 @@ private:
     bool _isAlive;
     float _lastRotation;
     float _currentRotation;
-
-    float _startX, _startY;
-    float _targetX, _targetY;
-    float _movementProgress;
-    float _movementDuration;
-    bool _isMoving;
 };
 
 #endif /* !PLAYER_HPP_ */

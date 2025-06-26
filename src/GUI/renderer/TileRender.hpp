@@ -18,7 +18,6 @@ class DetailedTileRenderStrategy : public ITileRenderStrategy {
         explicit DetailedTileRenderStrategy(const std::shared_ptr<const GameState>& gameState);
         void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
             int x, int y, float tileSize, float spacing) override;
-        void renderAllMovingPlayers(const std::shared_ptr<IGraphicsLib>& graphicsLib, float tileSize, float spacing);
 
     private:
         void renderAllResources(std::shared_ptr<const ITile> tile,
