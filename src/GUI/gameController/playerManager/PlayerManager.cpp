@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 #include <utility>
+#include <map>
+#include <memory>
 #include "PlayerManager.hpp"
 #include "../mapManager/IMapManager.hpp"
 

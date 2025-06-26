@@ -14,7 +14,7 @@
 #include "../../textureManager/ModelManager.hpp"
 
 Player::Player() : _id(0), _x(0), _y(0), _orientation(0), _level(1), _teamName(""), _isAlive(true),
-_lastRotation(180.0f), _currentRotation(0.0f), _startX(0.0f), _startY(0.0f), 
+    _lastRotation(180.0f), _currentRotation(0.0f), _startX(0.0f), _startY(0.0f),
     _targetX(0.0f), _targetY(0.0f), _movementProgress(1.0f), _movementDuration(0.5f), _isMoving(false) {}
 
 Player::Player(const PlayerInfoData& data)

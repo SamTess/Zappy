@@ -6,6 +6,10 @@
 */
 
 #include <utility>
+#include <vector>
+#include <memory>
+#include <map>
+#include <string>
 #include "GameStateManager.hpp"
 
 GameStateManager::GameStateManager()

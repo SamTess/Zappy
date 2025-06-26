@@ -5,6 +5,11 @@
 ** GameStateAdapter
 */
 
+#include <utility>
+#include <map>
+#include <vector>
+#include <string>
+#include <memory>
 #include "GameStateAdapter.hpp"
 
 GameStateAdapter::GameStateAdapter(std::shared_ptr<IGameStateManager> gameStateManager)

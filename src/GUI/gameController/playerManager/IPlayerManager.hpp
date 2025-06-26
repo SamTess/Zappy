@@ -14,7 +14,7 @@
 #include "../IPlayer.hpp"
 #include "../IPlayerInventory.hpp"
 #include "../IEgg.hpp"
-#include "../network/protocol/messageData/MessageDataAll.hpp"
+#include "../../network/protocol/messageData/MessageDataAll.hpp"
 
 class IPlayerManager {
 public:

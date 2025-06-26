@@ -50,10 +50,11 @@ void DetailedTileRenderStrategy::renderAllPlayers(std::shared_ptr<const ITile> t
                 ZappyTypes::Vector3 animPos = EjectionAnimationManager::getInstance().getPlayerAnimationPosition(playerId);
                 if (animPos.x != 0 || animPos.y != 0 || animPos.z != 0)
                     renderPosition = animPos;
-            } else if (!playerInfo->isMoving())
+            } else if (!playerInfo->isMoving()) {
                 renderPosition = position;
-            else
+            } else {
                 continue;
+            }
             playerInfo->renderPlayer(graphicsLib, renderPosition, tileSize, i, playerIds.size());
         }
     }
@@ -63,7 +64,7 @@ void DetailedTileRenderStrategy::renderAllMovingPlayers(const std::shared_ptr<IG
     const auto& players = gameState->getPlayers();
 
     for (const auto& [playerId, playerInfo] : players) {
-        if (playerInfo && playerInfo->isMoving() && 
+        if (playerInfo && playerInfo->isMoving() &&
             !EjectionAnimationManager::getInstance().isPlayerBeingEjected(playerId)) {
             ZappyTypes::Vector3 interpolatedPos = playerInfo->getInterpolatedPosition();
             float mapCenterX = gameState->getMapWidth() / 2.0f;

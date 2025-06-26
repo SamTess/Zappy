@@ -13,7 +13,6 @@ MAIN = main.cpp
 # Source files
 SRC = parsing/ParsingCLI.cpp \
 	  shared/exception/AException.cpp \
-	  network/buffer/MessageQueue.cpp \
 	  network/buffer/CircularBuffer.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \
@@ -47,6 +46,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/data/UIDataProvider.cpp \
 	  ui/context/UIContext.cpp \
 	  gameController/GameState.cpp \
+	  gameController/GameStateAdapter.cpp \
 	  gameController/GameController.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
@@ -67,6 +67,16 @@ SRC = parsing/ParsingCLI.cpp \
 	  gameController/networkCommandManager/NetworkCommandManager.cpp \
 	  gameController/playerValidationManager/PlayerValidationManager.cpp \
 	  gameController/soundManager/SoundManager.cpp \
+	  gameController/gameState/GameStateManager.cpp \
+	  gameController/gameState/GameStatusManager.cpp \
+	  gameController/gameState/GameSettingsManager.cpp \
+	  gameController/mapManager/MapManager.cpp \
+	  gameController/playerManager/PlayerManager.cpp \
+	  gameController/messageHandlers/TimeUnitMessageHandler.cpp \
+	  gameController/messageHandlers/IncantationMessageHandler.cpp \
+	  gameController/messageHandlers/IncantationEndMessageHandler.cpp \
+	  gameController/messageHandlers/EggMessageHandler.cpp \
+	  gameController/messageHandlers/EndGameMessageHandler.cpp \
 	  shared/services/ComponentCoordinator.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))

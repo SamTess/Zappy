@@ -36,7 +36,6 @@ class TcpSocket : public ISocket {
         void performConnect();
         void cleanup();
         bool isValidDescriptor() const;
-
 };
 
 } // namespace implementation

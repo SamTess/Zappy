@@ -6,6 +6,10 @@
 */
 
 #include <utility>
+#include <map>
+#include <vector>
+#include <string>
+#include <memory>
 #include "GameState.hpp"
 
 GameState::GameState() {

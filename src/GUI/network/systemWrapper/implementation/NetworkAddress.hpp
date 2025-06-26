@@ -30,7 +30,6 @@ class NetworkAddress : public INetworkAddress {
         sockaddr_in _addr;
         int _port;
         void resolveAddress();
-
 };
 
 } // namespace implementation

@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-TcpConnection::TcpConnection(){
+TcpConnection::TcpConnection() {
     _networkFactory = Network::createFactory();
     _socket = _networkFactory->createTcpSocket();
 }

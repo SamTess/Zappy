@@ -12,7 +12,7 @@
 #include <vector>
 #include "../ITile.hpp"
 #include "../IResource.hpp"
-#include "../network/protocol/messageData/MessageDataAll.hpp"
+#include "../../network/protocol/messageData/MessageDataAll.hpp"
 
 class IMapManager {
 public:

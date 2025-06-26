@@ -5,6 +5,8 @@
 ** GameStatusManager
 */
 
+#include <vector>
+#include <string>
 #include "GameStatusManager.hpp"
 
 GameStatusManager::GameStatusManager()
