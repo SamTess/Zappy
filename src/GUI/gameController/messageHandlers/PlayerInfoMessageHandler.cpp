@@ -33,7 +33,7 @@ void PlayerInfoMessageHandler::handleMessage(std::shared_ptr<IMessageData> data)
 }
 
 bool PlayerInfoMessageHandler::handlePlayerValidation(std::shared_ptr<PlayerInfoData> playerData,
-                                                      std::shared_ptr<const IPlayer> existingPlayer) {
+    std::shared_ptr<const IPlayer> existingPlayer) {
     if (!existingPlayer && playerData->getTeamName().empty()) {
         return _validator->validateAndRequestPlayerInfo(playerData->getId());
     }
@@ -41,8 +41,7 @@ bool PlayerInfoMessageHandler::handlePlayerValidation(std::shared_ptr<PlayerInfo
 }
 
 bool PlayerInfoMessageHandler::handleExistingPlayerWithValidOrientation(std::shared_ptr<PlayerInfoData> playerData,
-                                                                         std::shared_ptr<const IPlayer> existingPlayer,
-                                                                         int playerId) {
+    std::shared_ptr<const IPlayer> existingPlayer, int playerId) {
     if (existingPlayer && playerData->getOrientation() != -1) {
         if (handlePlayerDeath(playerData, existingPlayer, playerId))
             return true;
@@ -57,15 +56,13 @@ void PlayerInfoMessageHandler::updatePlayerInGameState(std::shared_ptr<PlayerInf
 }
 
 void PlayerInfoMessageHandler::handleMissingTeamInfo(std::shared_ptr<PlayerInfoData> playerData,
-                                                     std::shared_ptr<const IPlayer> existingPlayer) {
-    if (existingPlayer && playerData->getTeamName().empty()) {
+    std::shared_ptr<const IPlayer> existingPlayer) {
+    if (existingPlayer && playerData->getTeamName().empty())
         playerData->setTeamName(existingPlayer->getTeamName());
-    }
 }
 
 bool PlayerInfoMessageHandler::handlePlayerDeath(std::shared_ptr<PlayerInfoData> playerData,
-                                                  std::shared_ptr<const IPlayer> existingPlayer,
-                                                  int playerId) {
+    std::shared_ptr<const IPlayer> existingPlayer, int playerId) {
     if (!playerData->isAlive()) {
         processPlayerDeath(existingPlayer, playerId);
         return true;
@@ -76,17 +73,16 @@ bool PlayerInfoMessageHandler::handlePlayerDeath(std::shared_ptr<PlayerInfoData>
 void PlayerInfoMessageHandler::processPlayerDeath(std::shared_ptr<const IPlayer> existingPlayer, int playerId) {
     ZappyTypes::Vector3 playerWorldPos = Zappy::EjectionAnimationManager::getInstance()
         .convertTileToWorldPosition(existingPlayer->getX(), existingPlayer->getY(),
-                                  _gameState->getMapWidth(), _gameState->getMapHeight());
+        _gameState->getMapWidth(), _gameState->getMapHeight());
     _animationManager->startDeathAnimation(playerId, playerWorldPos, existingPlayer->getTeamName());
     _gameState->removePlayer(playerId);
 
-    if (_soundManager->isSfxEnabled()) {
+    if (_soundManager->isSfxEnabled())
         _soundManager->playDeathSound();
-    }
 }
 
 bool PlayerInfoMessageHandler::handlePlayerMovement(std::shared_ptr<PlayerInfoData> playerData,
-                                                     std::shared_ptr<const IPlayer> existingPlayer) {
+    std::shared_ptr<const IPlayer> existingPlayer) {
     int oldX = existingPlayer->getX();
     int oldY = existingPlayer->getY();
     int newX = playerData->getX();
@@ -100,7 +96,7 @@ bool PlayerInfoMessageHandler::handlePlayerMovement(std::shared_ptr<PlayerInfoDa
 }
 
 void PlayerInfoMessageHandler::handleIncompleteOrientationData(std::shared_ptr<PlayerInfoData> playerData,
-                                                                std::shared_ptr<const IPlayer> existingPlayer) {
+    std::shared_ptr<const IPlayer> existingPlayer) {
     if (playerData->getOrientation() == -1 && existingPlayer) {
         playerData->setTeamName(existingPlayer->getTeamName());
         playerData->setX(existingPlayer->getX());

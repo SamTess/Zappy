@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Egg - Implémentation des méthodes pour les œufs
+** Egg
 */
 
 #include "Egg.hpp"

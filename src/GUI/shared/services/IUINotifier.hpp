@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Ui notifier interface
+** IUINotifier
 */
 
 #ifndef IUINOTIFIER_HPP_

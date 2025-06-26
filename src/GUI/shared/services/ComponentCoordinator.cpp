@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** ComponentCoordinator implementation
+** ComponentCoordinator
 */
 
 #include "ComponentCoordinator.hpp"

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Command executor Interface
+** ICommandExecutor
 */
 
 #ifndef ICOMMAND_EXECUTOR_HPP_

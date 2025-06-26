@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Tile - Implémentation concrète d'une tuile
+** Tile
 */
 
 #ifndef TILE_HPP_

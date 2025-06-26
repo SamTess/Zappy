@@ -55,10 +55,8 @@ bool GameLoop::loadLibraries() {
 }
 
 void GameLoop::initializeManagers() {
-    // auto& textureManager = TextureManager::getInstance();
     auto& modelManager = ModelManager::getInstance();
 
-    // textureManager.setGraphicsLib(_graphics);
     modelManager.setGraphicsLib(_graphics);
     _renderer = std::make_shared<Renderer>();
     _renderer->init(_graphics);

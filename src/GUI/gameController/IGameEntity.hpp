@@ -17,12 +17,12 @@
 #include "../../Shared/Common.hpp"
 
 class IGameEntity : public IRenderable {
-public:
-    virtual ~IGameEntity() = default;
-    virtual int getId() const = 0;
-    virtual int getX() const = 0;
-    virtual int getY() const = 0;
-    virtual void setPosition(int x, int y) = 0;
+    public:
+        virtual ~IGameEntity() = default;
+        virtual int getId() const = 0;
+        virtual int getX() const = 0;
+        virtual int getY() const = 0;
+        virtual void setPosition(int x, int y) = 0;
 };
 
 #endif /* !IGAME_ENTITY_HPP_ */

@@ -14,7 +14,6 @@
     #include "../../gameController/IPlayer.hpp"
     #include "../../gameController/ITile.hpp"
     #include "../../gameController/IPlayerInventory.hpp"
-    #include "../../gameController/IBroadcast.hpp"
 
 namespace GUI {
 

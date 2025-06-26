@@ -14,15 +14,15 @@
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
 
 class EndGameMessageHandler : public IMessageHandler {
-public:
-    explicit EndGameMessageHandler(std::shared_ptr<GameState> gameState);
-    ~EndGameMessageHandler() = default;
+    public:
+        explicit EndGameMessageHandler(std::shared_ptr<GameState> gameState);
+        ~EndGameMessageHandler() = default;
 
-    void handleMessage(std::shared_ptr<IMessageData> data) override;
-    MessageType getMessageType() const override { return MessageType::EndGame; }
+        void handleMessage(std::shared_ptr<IMessageData> data) override;
+        MessageType getMessageType() const override { return MessageType::EndGame; }
 
-private:
-    std::shared_ptr<GameState> _gameState;
+    private:
+        std::shared_ptr<GameState> _gameState;
 };
 
 #endif /* !END_GAME_MESSAGE_HANDLER_HPP_ */

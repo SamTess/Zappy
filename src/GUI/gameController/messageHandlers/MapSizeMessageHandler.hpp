@@ -13,15 +13,15 @@
 #include "../GameState.hpp"
 
 class MapSizeMessageHandler : public IMessageHandler {
-public:
-    explicit MapSizeMessageHandler(std::shared_ptr<GameState> gameState);
-    ~MapSizeMessageHandler() = default;
+    public:
+        explicit MapSizeMessageHandler(std::shared_ptr<GameState> gameState);
+        ~MapSizeMessageHandler() = default;
 
-    void handleMessage(std::shared_ptr<IMessageData> data) override;
-    MessageType getMessageType() const override { return MessageType::MapSize; }
+        void handleMessage(std::shared_ptr<IMessageData> data) override;
+        MessageType getMessageType() const override { return MessageType::MapSize; }
 
-private:
-    std::shared_ptr<GameState> _gameState;
+    private:
+        std::shared_ptr<GameState> _gameState;
 };
 
 #endif /* !MAP_SIZE_MESSAGE_HANDLER_HPP_ */

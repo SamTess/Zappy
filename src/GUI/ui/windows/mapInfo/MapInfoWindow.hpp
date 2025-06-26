@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** MapInfoWindow implementation
+** MapInfoWindow
 */
 
 #pragma once

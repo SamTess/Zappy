@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Egg - Implémentation concrète d'un œuf
+** Egg
 */
 
 #ifndef EGG_HPP_

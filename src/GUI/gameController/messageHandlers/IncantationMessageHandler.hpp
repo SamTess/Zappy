@@ -15,17 +15,17 @@
 #include "../../network/protocol/messageData/MessageDataAll.hpp"
 
 class IncantationMessageHandler : public IMessageHandler {
-public:
-    IncantationMessageHandler(std::shared_ptr<GameState> gameState,
-                            std::shared_ptr<PlayerValidationManager> validator);
-    ~IncantationMessageHandler() = default;
+    public:
+        IncantationMessageHandler(std::shared_ptr<GameState> gameState,
+                                std::shared_ptr<PlayerValidationManager> validator);
+        ~IncantationMessageHandler() = default;
 
-    void handleMessage(std::shared_ptr<IMessageData> data) override;
-    MessageType getMessageType() const override { return MessageType::Incantation; }
+        void handleMessage(std::shared_ptr<IMessageData> data) override;
+        MessageType getMessageType() const override { return MessageType::Incantation; }
 
-private:
-    std::shared_ptr<GameState> _gameState;
-    std::shared_ptr<PlayerValidationManager> _validator;
+    private:
+        std::shared_ptr<GameState> _gameState;
+        std::shared_ptr<PlayerValidationManager> _validator;
 };
 
 #endif /* !INCANTATION_MESSAGE_HANDLER_HPP_ */

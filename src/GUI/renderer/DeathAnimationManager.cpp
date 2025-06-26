@@ -4,6 +4,7 @@
 ** File description:
 ** DeathAnimationManager
 */
+
 #include <random>
 #include <algorithm>
 #include <memory>

@@ -2,8 +2,9 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** Map renderer
+** MapRenderer
 */
+
 #pragma once
 
 #include <memory>

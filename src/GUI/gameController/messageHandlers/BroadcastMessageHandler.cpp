@@ -27,12 +27,12 @@ void BroadcastMessageHandler::handleMessage(std::shared_ptr<IMessageData> data) 
     }
     if (shouldThrottleBroadcast(playerId)) {
         std::cout << "[DEBUG] Broadcast throttled for player " << playerId
-                  << " (too frequent)" << std::endl;
+            << " (too frequent)" << std::endl;
         return;
     }
     _soundManager->playBroadcastSound();
     std::cout << "[DEBUG] Broadcast triggered - Player ID: " << playerId
-              << ", Message: '" << message << "'" << std::endl;
+        << ", Message: '" << message << "'" << std::endl;
     auto playerInfo = _gameState->getPlayerInfo(playerId);
     if (playerInfo)
         _animationManager->createBroadcastEffect(playerId, _gameState);

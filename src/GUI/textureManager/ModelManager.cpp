@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** ModelManager - Implementation
+** ModelManager
 */
 
 #include <iostream>
@@ -10,19 +10,15 @@
 #include <string>
 #include <utility>
 #include "ModelManager.hpp"
-#include "TextureManager.hpp"
 
 void ModelManager::setGraphicsLib(std::shared_ptr<IGraphicsLib> graphicsLib) {
-    std::lock_guard<std::mutex> lock(_mutex);
     _graphicsLib = graphicsLib;
 }
 
 int ModelManager::loadModel(const std::string& modelPath, const std::string& texturePath) {
-    std::lock_guard<std::mutex> lock(_mutex);
     auto it = _pathToId.find(modelPath);
-    if (it != _pathToId.end()) {
+    if (it != _pathToId.end())
         return it->second;
-    }
     if (!_graphicsLib) {
         std::cerr << "Erreur: GraphicsLib non initialisé dans ModelManager" << std::endl;
         return -1;
@@ -40,7 +36,7 @@ int ModelManager::loadModel(const std::string& modelPath, const std::string& tex
         }
         Model3D model = createModelObject(modelId);
         if (!texturePath.empty()) {
-            auto [success, updatedModel] = loadTextureForModel(model, texturePath);
+            auto [success, updatedModel] = std::make_pair(false, model);
             if (success)
                 model = updatedModel;
         }
@@ -53,7 +49,6 @@ int ModelManager::loadModel(const std::string& modelPath, const std::string& tex
 }
 
 int ModelManager::loadModelWithTextures(const std::string& modelPath, const std::vector<std::string>& texturePaths) {
-    std::lock_guard<std::mutex> lock(_mutex);
     int cachedModelId = checkModelCache(modelPath);
     if (cachedModelId != -1)
         return cachedModelId;
@@ -80,14 +75,12 @@ int ModelManager::loadModelWithTextures(const std::string& modelPath, const std:
 }
 
 void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, ZappyTypes::Color color) {
-    std::lock_guard<std::mutex> lock(_mutex);
     if (!validateModelForDrawing(modelId))
         return;
     _graphicsLib->DrawModel3D(modelId, position, 1.0f, color);
 }
 
 void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, float scale, ZappyTypes::Color color) {
-    std::lock_guard<std::mutex> lock(_mutex);
     if (!validateModelForDrawing(modelId))
         return;
     _graphicsLib->DrawModel3D(modelId, position, scale, color);
@@ -96,7 +89,6 @@ void ModelManager::drawModel(int modelId, ZappyTypes::Vector3 position, float sc
 void ModelManager::drawModelEx(int modelId, ZappyTypes::Vector3 position,
     ZappyTypes::Vector3 rotationAxis,
     float rotationAngle, float scale, ZappyTypes::Color color) {
-    std::lock_guard<std::mutex> lock(_mutex);
 
     if (!validateModelForDrawing(modelId))
         return;
@@ -104,64 +96,52 @@ void ModelManager::drawModelEx(int modelId, ZappyTypes::Vector3 position,
 }
 
 void ModelManager::unloadModel(int modelId) {
-    std::lock_guard<std::mutex> lock(_mutex);
     auto modelIt = _models.find(modelId);
 
     if (modelIt == _models.end()) {
         std::cerr << "Tentative de libération d'un modèle inexistant (ID: " << modelId << ")" << std::endl;
         return;
     }
-    unloadModelTextures(modelIt->second);
     unloadModelFromGraphicsLib(modelId);
     removeModelPathReferences(modelId);
     _models.erase(modelIt);
 }
 
 void ModelManager::unloadAllModels() {
-    std::lock_guard<std::mutex> lock(_mutex);
 
-    for (const auto& [modelId, model] : _models) {
-        unloadModelTextures(model);
+    for (const auto& [modelId, model] : _models)
         unloadModelFromGraphicsLib(modelId);
-    }
     _models.clear();
     _pathToId.clear();
 }
 
 bool ModelManager::hasModel(const std::string& modelPath) const {
-    std::lock_guard<std::mutex> lock(_mutex);
     return _pathToId.find(modelPath) != _pathToId.end();
 }
 
 int ModelManager::getModelId(const std::string& modelPath) const {
-    std::lock_guard<std::mutex> lock(_mutex);
     auto it = _pathToId.find(modelPath);
-    if (it != _pathToId.end()) {
+    if (it != _pathToId.end())
         return it->second;
-    }
     return -1;
 }
 
 size_t ModelManager::getModelCount() const {
-    std::lock_guard<std::mutex> lock(_mutex);
     return _models.size();
 }
 
 std::pair<ZappyTypes::Vector3, ZappyTypes::Vector3> ModelManager::getBoundingBox(int modelId) const {
-    std::lock_guard<std::mutex> lock(_mutex);
 
     auto it = _models.find(modelId);
-    if (it != _models.end()) {
+    if (it != _models.end())
         return {it->second.boundingBoxMin, it->second.boundingBoxMax};
-    }
     return {ZappyTypes::Vector3{0, 0, 0}, ZappyTypes::Vector3{0, 0, 0}};
 }
 
 int ModelManager::checkModelCache(const std::string& modelPath) {
     auto it = _pathToId.find(modelPath);
-    if (it != _pathToId.end()) {
+    if (it != _pathToId.end())
         return it->second;
-    }
     return -1;
 }
 
@@ -184,26 +164,12 @@ Model3D ModelManager::createModelObject(int modelId) {
 
 Model3D ModelManager::loadTexturesForModel(Model3D model, const std::vector<std::string>& texturePaths) {
     for (const auto& texturePath : texturePaths) {
-        auto [success, updatedModel] = loadTextureForModel(model, texturePath);
+        (void)texturePath;
+        auto [success, updatedModel] = std::make_pair(false, model);
         if (success)
             model = updatedModel;
     }
     return model;
-}
-
-std::pair<bool, Model3D> ModelManager::loadTextureForModel(Model3D model, const std::string& texturePath) {
-    if (texturePath.empty())
-        return {false, model};
-    auto& textureManager = TextureManager::getInstance();
-    int textureId = textureManager.loadTexture(texturePath);
-    if (textureId >= 0) {
-        model.textureIds.push_back(textureId);
-        std::cout << "Texture " << texturePath << " chargée via TextureManager (ID: " << textureId << ")" << std::endl;
-        return {true, model};
-    } else {
-        std::cerr << "Avertissement: Échec du chargement de la texture " << texturePath << std::endl;
-        return {false, model};
-    }
 }
 
 void ModelManager::registerModel(const std::string& modelPath, int modelId, const Model3D& model) {
@@ -211,17 +177,11 @@ void ModelManager::registerModel(const std::string& modelPath, int modelId, cons
     _models[modelId] = model;
 }
 
-void ModelManager::unloadModelTextures(const Model3D& model) {
-    auto& textureManager = TextureManager::getInstance();
-    for (int textureId : model.textureIds) {
-        textureManager.unloadTexture(textureId);
-    }
-}
+
 
 void ModelManager::unloadModelFromGraphicsLib(int modelId) {
-    if (_graphicsLib) {
+    if (_graphicsLib)
         _graphicsLib->UnloadModel3D(modelId);
-    }
 }
 
 void ModelManager::removeModelPathReferences(int modelId) {

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Tile - Implémentation des méthodes pour les tuiles
+** Tile
 */
 
 #include "Tile.hpp"

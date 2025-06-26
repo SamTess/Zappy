@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Map Renderer
+** MapRenderer
 */
 
 #include <algorithm>

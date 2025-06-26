@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** IMapManager interface
+** IMapManager
 */
 
 #ifndef IMAP_MANAGER_HPP_

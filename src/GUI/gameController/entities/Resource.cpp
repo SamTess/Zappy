@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Resource - Implémentation des méthodes pour les ressources
+** Resource
 */
 
 #include "Resource.hpp"

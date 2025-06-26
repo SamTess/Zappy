@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Network Command Sender Interface implementation
+** INetworkCommandSender
 */
 
 #ifndef INETWORK_COMMAND_SENDER_HPP_

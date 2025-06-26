@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** UIDataProvider implementation header
+** UIDataProvider
 */
 
 #ifndef UI_DATA_PROVIDER_HPP_

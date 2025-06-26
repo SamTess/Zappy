@@ -14,21 +14,21 @@
 #include "../GameNetworkCommand.hpp"
 
 class NetworkCommandManager {
-public:
-    explicit NetworkCommandManager(std::shared_ptr<ICommandExecutor> commandExecutor);
-    ~NetworkCommandManager() = default;
+    public:
+        explicit NetworkCommandManager(std::shared_ptr<ICommandExecutor> commandExecutor);
+        ~NetworkCommandManager() = default;
 
-    void requestPlayerPosition(int playerId);
-    void requestPlayerLevel(int playerId);
-    void requestPlayerInventory(int playerId);
-    void requestPlayerInfo(int playerId);
-    void requestMapSize();
-    void requestMapContent();
-    void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
+        void requestPlayerPosition(int playerId);
+        void requestPlayerLevel(int playerId);
+        void requestPlayerInventory(int playerId);
+        void requestPlayerInfo(int playerId);
+        void requestMapSize();
+        void requestMapContent();
+        void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
 
-private:
-    std::shared_ptr<ICommandExecutor> _commandExecutor;
-    void executeCommand(const std::string& command);
+    private:
+        std::shared_ptr<ICommandExecutor> _commandExecutor;
+        void executeCommand(const std::string& command);
 };
 
 #endif /* !NETWORK_COMMAND_MANAGER_HPP_ */

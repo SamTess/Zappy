@@ -16,15 +16,15 @@
 #include "EntityFactory.hpp"
 
 class IGameController {
-public:
-    virtual ~IGameController() = default;
+    public:
+        virtual ~IGameController() = default;
 
-    virtual std::shared_ptr<const GameState> getGameState() const = 0;
-    virtual void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) = 0;
-    virtual void setGraphics(std::shared_ptr<IGraphicsLib> graphics) = 0;
-    virtual void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) = 0;
-    virtual void updateAnimations(float deltaTime) = 0;
-    virtual void processMessage(const Message& message) = 0;
+        virtual std::shared_ptr<const GameState> getGameState() const = 0;
+        virtual void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) = 0;
+        virtual void setGraphics(std::shared_ptr<IGraphicsLib> graphics) = 0;
+        virtual void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) = 0;
+        virtual void updateAnimations(float deltaTime) = 0;
+        virtual void processMessage(const Message& message) = 0;
 };
 
 #endif /* !IGAME_CONTROLLER_HPP_ */

@@ -36,10 +36,15 @@ void PlayerExpulsionMessageHandler::handleMessage(std::shared_ptr<IMessageData> 
 
 ZappyTypes::Vector3 PlayerExpulsionMessageHandler::calculateEjectionDirection(int orientation) {
     switch (orientation) {
-        case 1: return {0.0f, 0.0f, -1.0f}; // North
-        case 2: return {1.0f, 0.0f, 0.0f};  // East
-        case 3: return {0.0f, 0.0f, 1.0f};  // South
-        case 4: return {-1.0f, 0.0f, 0.0f}; // West
-        default: return {1.0f, 0.0f, 0.0f}; // Default to East
+        case 1:
+            return {0.0f, 0.0f, -1.0f};
+        case 2:
+            return {1.0f, 0.0f, 0.0f};
+        case 3:
+            return {0.0f, 0.0f, 1.0f};
+        case 4:
+            return {-1.0f, 0.0f, 0.0f};
+        default:
+            return {1.0f, 0.0f, 0.0f};
     }
 }

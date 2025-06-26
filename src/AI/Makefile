@@ -1,27 +1,13 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy AI Makefile
+## Zappy
 ## File description:
-## Builds the Zappy AI client
+## Makefile
 ##
 
-# Binary name
 NAME = ../../zappy_ai
 BUILD_DIR = ../../build/AI
 
-# Python files
-PY_MAIN = main.py
-PY_MODULES = logger/logger.py \
-			 utils/input.py \
-			 utils/zappy.py \
-			 agent/agent.py \
-			 parser/paringArgsClass.py \
-			 defs/zappy.py
-
-# Build script
-BUILD_SCRIPT = build_zipapp/build_zipapp.py
-
-# Colors and animations
 RED = \033[31m
 GREEN = \033[32m
 YELLOW = \033[33m
@@ -34,14 +20,11 @@ RESET = \033[0m
 BG_BLACK = \033[40m
 BG_WHITE = \033[47m
 
-# Main target
 all: setup_dirs display_info $(NAME)
 
-# Create the necessary build directories
 setup_dirs:
 	@mkdir -p $(BUILD_DIR)
 
-# Display fancy introduction
 display_info:
 	@clear
 	@echo "$(CYAN)╔═══════════════════════════════════════════╗$(RESET)"
@@ -54,7 +37,6 @@ display_info:
 	de l'environnement Python...$(RESET)"
 	@sleep 0.5
 
-# Build the AI client
 $(NAME): check_python
 	@echo "$(MAGENTA)[$(BOLD)BUILDING$(RESET)$(MAGENTA)]$(RESET) $(BOLD)\
 	Création du client AI...$(RESET)"
@@ -79,7 +61,6 @@ $(NAME): check_python
 	!$(RESET)     $(CYAN)║$(RESET)"
 	@echo "$(CYAN)╚═════════════════════════════════════════════╝$(RESET)"
 
-# Check Python installation
 check_python:
 	@which python3 > /dev/null 2>&1 || (echo "$(RED)[$(BOLD)ERROR\
 	$(RESET)$(RED)]$(RESET) $(BOLD)Python 3 n'est pas installé.$(RESET)" \
@@ -87,7 +68,6 @@ check_python:
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Python \
 	3 trouvé.$(RESET)"
 
-# Install dependencies
 install:
 	@echo "$(BLUE)[$(BOLD)INSTALL$(RESET)$(BLUE)]$(RESET) $(BOLD)Installation \
 	des dépendances...$(RESET)"
@@ -96,7 +76,6 @@ install:
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances \
 	installées.$(RESET)"
 
-# Clean build files
 clean:
 	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
 	$(BOLD)Nettoyage des fichiers temporaires...$(RESET)"
@@ -110,7 +89,6 @@ clean:
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage effectué.$(RESET)"
 
-# Full clean
 fclean: clean
 	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) \
 	$(BOLD)Suppression du client AI...$(RESET)"
@@ -119,15 +97,12 @@ fclean: clean
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage complet effectué.$(RESET)"
 
-# Clean and rebuild
 re: fclean all
 
-# Debug (Just for compatibility with other Makefiles)
 debug: all
 	@echo "$(MAGENTA)[$(BOLD)NOTE$(RESET)$(MAGENTA)]$(RESET) \
 	$(BOLD)Pas de mode debug spécifique pour le client Python.$(RESET)"
 
-# Coverage build for tests
 coverage: all
 	@echo "$(MAGENTA)[$(BOLD)COVERAGE$(RESET)$(MAGENTA)]$(RESET) \
 	$(BOLD)Mode couverture pour Python...$(RESET)"

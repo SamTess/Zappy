@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Player - Implémentation des méthodes pour les joueurs
+** Player
 */
 
 #include "Player.hpp"

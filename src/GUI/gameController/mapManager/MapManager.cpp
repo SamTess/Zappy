@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** MapManager implementation
+** MapManager
 */
 
 #include <iostream>

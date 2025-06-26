@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** PlayerManager implementation
+** PlayerManager
 */
 
 #include <iostream>
@@ -27,6 +27,7 @@ void PlayerManager::setMapManager(std::shared_ptr<IMapManager> mapManager) {
 
 std::shared_ptr<const IPlayer> PlayerManager::getPlayerInfo(int playerId) const {
     auto it = _players.find(playerId);
+
     if (it != _players.end())
         return it->second;
     return nullptr;

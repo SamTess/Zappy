@@ -14,18 +14,18 @@
 #include "../GameState.hpp"
 
 class SoundManager {
-public:
-    SoundManager(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<GameState> gameState);
-    ~SoundManager() = default;
+    public:
+        SoundManager(std::shared_ptr<IGraphicsLib> graphics, std::shared_ptr<GameState> gameState);
+        ~SoundManager() = default;
 
-    void playDeathSound();
-    void playBroadcastSound();
-    void playSound(const std::string& soundPath);
-    bool isSfxEnabled() const;
+        void playDeathSound();
+        void playBroadcastSound();
+        void playSound(const std::string& soundPath);
+        bool isSfxEnabled() const;
 
-private:
-    std::shared_ptr<IGraphicsLib> _graphics;
-    std::shared_ptr<GameState> _gameState;
+    private:
+        std::shared_ptr<IGraphicsLib> _graphics;
+        std::shared_ptr<GameState> _gameState;
 };
 
 #endif /* !SOUND_MANAGER_HPP_ */

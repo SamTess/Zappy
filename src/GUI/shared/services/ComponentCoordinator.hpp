@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Simple coordinator
+** ComponentCoordinator
 */
 
 #ifndef COMPONENT_COORDINATOR_HPP_

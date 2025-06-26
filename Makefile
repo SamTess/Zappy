@@ -1,18 +1,16 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy Main Makefile
+## Zappy
 ## File description:
-## Main Makefile orchestrating all components
+## Makefile
 ##
 
-# Binary names
 SERVER_NAME=zappy_server
 GUI_NAME=zappy_gui
 AI_NAME=zappy_ai
 UNIT_TESTS_NAME=unit_tests
 FUNCTIONAL_TESTS_NAME=functional_tests
 
-# Directories
 SERVER_DIR=src/Server
 GUI_DIR=src/GUI
 AI_DIR=src/AI
@@ -22,10 +20,8 @@ DOCS_DIR=docs
 PLUGINS_DIR=plugins
 LIBS_DIR=libs
 
-# Documentation
 DOCS_NAME=ZappyDocumation
 
-# Colors and animations
 RED=\033[31m
 GREEN=\033[32m
 YELLOW=\033[33m
@@ -72,7 +68,6 @@ coverage: display_banner
 	@echo "$(CYAN)╚═════════════════════════════════════════════════════════\
 	════╝$(RESET)"
 
-# Display a fancy banner for the build process
 display_banner:
 	@clear
 	@echo "$(CYAN)╔═══════════════════════════════════════════╗$(RESET)"

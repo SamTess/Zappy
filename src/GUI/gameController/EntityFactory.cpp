@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** EntityFactory - Implémentation du factory pour créer les entités
+** EntityFactory
 */
 
 #include <memory>
@@ -14,7 +14,6 @@
 #include "entities/Resource.hpp"
 #include "entities/Tile.hpp"
 #include "entities/PlayerInventory.hpp"
-#include "entities/Broadcast.hpp"
 
 std::shared_ptr<IPlayer> GameEntityFactory::createPlayer(const PlayerInfoData& data) {
     return std::make_shared<Player>(data);
@@ -38,10 +37,6 @@ std::shared_ptr<ITile> GameEntityFactory::createTile(const TileContentData& data
 
 std::shared_ptr<IResource> GameEntityFactory::createResource(ResourceType type, int quantity) {
     return std::make_shared<Resource>(type, quantity);
-}
-
-std::shared_ptr<IBroadcast> GameEntityFactory::createBroadcast(const std::string& team, const std::string& message, int playerId, float timeLeft) {
-    return std::make_shared<Broadcast>(team, message, playerId, timeLeft);
 }
 
 EntityFactoryManager::EntityFactoryManager() {
@@ -85,8 +80,4 @@ std::shared_ptr<ITile> EntityFactoryManager::createTile(const TileContentData& d
 
 std::shared_ptr<IResource> EntityFactoryManager::createResource(ResourceType type, int quantity) {
     return getFactory().createResource(type, quantity);
-}
-
-std::shared_ptr<IBroadcast> EntityFactoryManager::createBroadcast(const std::string& team, const std::string& message, int playerId, float timeLeft) {
-    return getFactory().createBroadcast(team, message, playerId, timeLeft);
 }

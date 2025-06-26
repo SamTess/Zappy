@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** TileRendererStrategy interface
+** TileRendererStrategy
 */
 
 #pragma once
@@ -11,10 +11,9 @@
 
 namespace Zappy {
 class ITileRenderStrategy {
-public:
-    virtual ~ITileRenderStrategy() = default;
-    virtual void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-        int x, int y, float tileSize,
-        float spacing) = 0;
+    public:
+        virtual ~ITileRenderStrategy() = default;
+        virtual void renderTile(const std::shared_ptr<IGraphicsLib>& graphicsLib,
+            int x, int y, float tileSize, float spacing) = 0;
 };
 } // namespace Zappy

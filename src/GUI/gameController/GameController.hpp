@@ -40,29 +40,29 @@
 #include "messageHandlers/TimeUnitMessageHandler.hpp"
 
 class GameController : public IGameController {
-public:
-    GameController();
-    GameController(std::shared_ptr<ICommandExecutor> commandExecutor,
-                           std::shared_ptr<EntityFactoryManager> entityFactory);
-    ~GameController() = default;
-    std::shared_ptr<const GameState> getGameState() const override { return _gameState; }
-    void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) override;
-    void setGraphics(std::shared_ptr<IGraphicsLib> graphics) override;
-    void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) override;
-    void updateAnimations(float deltaTime) override;
-    void processMessage(const Message& message) override;
+    public:
+        GameController();
+        GameController(std::shared_ptr<ICommandExecutor> commandExecutor,
+            std::shared_ptr<EntityFactoryManager> entityFactory);
+        ~GameController() = default;
+        std::shared_ptr<const GameState> getGameState() const override { return _gameState; }
+        void setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) override;
+        void setGraphics(std::shared_ptr<IGraphicsLib> graphics) override;
+        void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) override;
+        void updateAnimations(float deltaTime) override;
+        void processMessage(const Message& message) override;
 
-private:
-    std::shared_ptr<GameState> _gameState;
-    std::shared_ptr<MessageHandlerRegistry> _messageRegistry;
-    std::shared_ptr<AnimationManager> _animationManager;
-    std::shared_ptr<SoundManager> _soundManager;
-    std::shared_ptr<NetworkCommandManager> _networkManager;
-    std::shared_ptr<PlayerValidationManager> _playerValidator;
-    std::shared_ptr<GraphicsManager> _graphicsManager;
+    private:
+        std::shared_ptr<GameState> _gameState;
+        std::shared_ptr<MessageHandlerRegistry> _messageRegistry;
+        std::shared_ptr<AnimationManager> _animationManager;
+        std::shared_ptr<SoundManager> _soundManager;
+        std::shared_ptr<NetworkCommandManager> _networkManager;
+        std::shared_ptr<PlayerValidationManager> _playerValidator;
+        std::shared_ptr<GraphicsManager> _graphicsManager;
 
-    void initializeManagers();
-    void registerMessageHandlers();
+        void initializeManagers();
+        void registerMessageHandlers();
 };
 
 #endif /* !REFACTORED_GAME_CONTROLLER_HPP_ */

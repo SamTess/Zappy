@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Resource - Implémentation concrète d'une ressource
+** Resource
 */
 
 #ifndef RESOURCE_HPP_

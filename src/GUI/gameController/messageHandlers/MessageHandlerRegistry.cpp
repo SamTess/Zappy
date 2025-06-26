@@ -31,5 +31,9 @@ void MessageHandlerRegistry::processMessage(const Message& message) {
 }
 
 bool MessageHandlerRegistry::hasHandler(MessageType messageType) const {
-    return _handlers.find(messageType) != _handlers.end();
+    auto it = _handlers.find(messageType);
+
+    if (it != _handlers.end())
+        return true;
+    return false;
 }
