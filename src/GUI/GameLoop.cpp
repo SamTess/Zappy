@@ -89,8 +89,10 @@ void GameLoop::setupComponents() {
         _mapRenderer = std::make_shared<Zappy::MapRenderer>(_graphics, _gameController->getGameState());
     _userInterface = std::make_shared<GUI::UserInterface>(_gui);
     _userInterface->initialize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    if (_coordinator)
+    if (_coordinator) {
         _coordinator->setUINotifier(_userInterface);
+        _userInterface->setCommandExecutor(_coordinator);
+    }
 }
 
 int GameLoop::run() {
