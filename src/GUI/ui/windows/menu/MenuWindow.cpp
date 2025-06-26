@@ -74,7 +74,7 @@ float GUI::MenuWindow::getSubmenuHeight() const {
 void GUI::MenuWindow::handleMenuClickOutside(const ZappyTypes::Vector2& mousePosition, float menuItemWidth, float menuItemHeight, float startY, bool mousePressed) {
     if (!mousePressed)
         return;
-    ZappyTypes::Rectangle menuMainRect = {_position.x, startY, menuItemWidth, menuItemHeight * 4};
+    ZappyTypes::Rectangle menuMainRect = {_position.x, startY, menuItemWidth, menuItemHeight * 3};
     float submenuWidth = 300;
     float submenuHeight = getSubmenuHeight();
     float startX = _position.x + menuItemWidth;
@@ -302,16 +302,11 @@ void MenuWindow::applyMusicVolumeChange(float newVolume) {
 }
 
 void MenuWindow::applySfxEnabledChange(bool enabled) {
-    std::cout << "DEBUG MenuWindow: applySfxEnabledChange(" << (enabled ? "true" : "false") << ") called" << std::endl;
     if (!_dataProvider)
         return;
     auto settingsProvider = std::dynamic_pointer_cast<GUI::IUISettingsProvider>(_dataProvider);
-    if (settingsProvider) {
+    if (settingsProvider)
         settingsProvider->setSfxEnabled(enabled);
-        std::cout << "DEBUG MenuWindow: SFX setting applied to GameState" << std::endl;
-    } else {
-        std::cout << "DEBUG MenuWindow: Failed to cast to IUISettingsProvider" << std::endl;
-    }
 }
 
 } // namespace GUI

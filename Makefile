@@ -143,7 +143,9 @@ check_raylib:
 			git clone https://github.com/raysan5/raylib.git \
 	$(LIBS_DIR)/raylib_src; \
 			cd $(LIBS_DIR)/raylib_src && mkdir -p build && \
-	cd build && cmake .. && make && sudo make install && sudo ldconfig; \
+	cd build && cmake -DBUILD_SHARED_LIBS=ON \
+	-DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && make \
+	&& sudo make install && sudo ldconfig; \
 			if pkg-config --exists raylib; then \
 				echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)raylib installé avec succès depuis GitHub.$(RESET)"; \
