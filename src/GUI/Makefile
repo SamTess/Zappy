@@ -15,7 +15,6 @@ SRC = parsing/ParsingCLI.cpp \
       gameController/GameController.cpp \
 	  gameController/GameState.cpp \
 	  shared/exception/AException.cpp \
-	  network/buffer/MessageQueue.cpp \
 	  network/buffer/CircularBuffer.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \
