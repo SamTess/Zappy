@@ -116,8 +116,6 @@ void CameraController::handleKeyboardInput(std::shared_ptr<IGraphicsLib> graphic
         newTarget.x += right.x * _keyboardSpeed;
         newTarget.z += right.z * _keyboardSpeed;
     }
-    newTarget.x = std::max(std::min(newTarget.x, 13 - 2.0f),  -13  + 2.0f);
-    newTarget.z = std::max(std::min(newTarget.z, 13 - 2.0f),  -13  + 2.0f);
     _cameraTarget = newTarget;
 }
 
