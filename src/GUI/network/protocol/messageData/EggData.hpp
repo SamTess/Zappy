@@ -10,14 +10,16 @@
 
 #include "IMessageData.hpp"
 
+typedef enum EggAction {
+    Drop,
+    Connection,
+    Death,
+    Laying
+} EggAction;
+
 class EggData : public IMessageData {
     public:
-        enum class EggAction {
-            Drop,       // enw - Egg creation
-            Connection, // ebo - Egg hatching/connection
-            Death,      // edi - Egg death
-            Laying      // pfk - Player starts laying an egg
-        };
+
 
         EggData() : _eggId(0), _playerId(0), _x(0), _y(0), _action(EggAction::Drop) {}
         EggData(int eggId, int playerId, int x, int y, EggAction action = EggAction::Drop)

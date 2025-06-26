@@ -18,9 +18,7 @@ class TeamNameData : public IMessageData {
             : _names(names) {}
 
         MessageType getType() const override { return MessageType::TeamName; }
-
         const std::vector<std::string>& getNames() const { return _names; }
-
         void setNames(const std::vector<std::string>& value) { _names = value; }
         void addName(const std::string& name) { _names.push_back(name); }
 

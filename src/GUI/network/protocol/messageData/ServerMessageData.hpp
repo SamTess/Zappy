@@ -17,9 +17,7 @@ class ServerMessageData : public IMessageData {
             : _message(message) {}
 
         MessageType getType() const override { return MessageType::ServerMessage; }
-
         const std::string& getMessage() const { return _message; }
-
         void setMessage(const std::string& value) { _message = value; }
 
     private:

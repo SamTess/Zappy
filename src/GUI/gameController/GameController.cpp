@@ -304,17 +304,17 @@ void GameController::handleEggDrop(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
 
     switch (eggData->getAction()) {
-        case EggData::EggAction::Drop: {
+        case EggAction::Drop: {
             _gameState->addEgg(*eggData);
             break;
         }
-        case EggData::EggAction::Connection:
+        case EggAction::Connection:
             handleEggConnection(data);
             break;
-        case EggData::EggAction::Death:
+        case EggAction::Death:
             handleEggDeath(data);
             break;
-        case EggData::EggAction::Laying:
+        case EggAction::Laying:
             handleEggLaying(data);
             break;
     }
