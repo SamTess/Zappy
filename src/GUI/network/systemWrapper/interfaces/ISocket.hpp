@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Socket interface implementation
+** ISocket
 */
 #pragma once
 
@@ -11,9 +11,6 @@
 
 namespace Network {
 
-/**
- * @brief Interface abstraite pour les sockets
- */
 class ISocket {
 public:
     virtual ~ISocket() = default;
@@ -27,9 +24,6 @@ public:
     virtual bool setNonBlocking() = 0;
 };
 
-/**
- * @brief Interface pour les adresses réseau
- */
 class INetworkAddress {
 public:
     virtual ~INetworkAddress() = default;
@@ -39,9 +33,6 @@ public:
     virtual std::string toString() const = 0;
 };
 
-/**
- * @brief Interface pour le polling de sockets
- */
 class IPoller {
 public:
     virtual ~IPoller() = default;

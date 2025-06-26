@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Buffer implementation
+** Buffer
 */
 #pragma once
 #include <string>
@@ -11,9 +11,6 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Implémentation concrète d'un buffer
- */
 class Buffer : public IBuffer {
 private:
     std::string _data;

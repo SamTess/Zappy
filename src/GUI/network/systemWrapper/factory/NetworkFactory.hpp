@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Network Factory
+** NetworkFactory
 */
 #pragma once
 #include <memory>
@@ -16,9 +16,6 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Factory concrète pour créer les objets réseau
- */
 class NetworkFactory : public INetworkFactory {
 public:
     std::unique_ptr<ISocket> createTcpSocket() override;
@@ -27,9 +24,6 @@ public:
     std::unique_ptr<IBuffer> createBuffer(size_t size = 1024) override;
 };
 
-/**
- * @brief Fonction utilitaire pour obtenir la factory
- */
 std::unique_ptr<INetworkFactory> createNetworkFactory();
 
 } // namespace implementation

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** Buffer interface implementation
+** IBuffer
 */
 #pragma once
 
@@ -12,9 +12,6 @@
 
 namespace Network {
 
-/**
- * @brief Interface pour les buffers de données
- */
 class IBuffer {
 public:
     virtual ~IBuffer() = default;
@@ -28,9 +25,6 @@ public:
     virtual std::string toString() const = 0;
 };
 
-/**
- * @brief Factory pour créer les objets réseau
- */
 class INetworkFactory {
 public:
     virtual ~INetworkFactory() = default;
