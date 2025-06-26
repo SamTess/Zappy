@@ -108,7 +108,6 @@ void ModelManager::unloadModel(int modelId) {
 }
 
 void ModelManager::unloadAllModels() {
-
     for (const auto& [modelId, model] : _models)
         unloadModelFromGraphicsLib(modelId);
     _models.clear();
@@ -131,7 +130,6 @@ size_t ModelManager::getModelCount() const {
 }
 
 std::pair<ZappyTypes::Vector3, ZappyTypes::Vector3> ModelManager::getBoundingBox(int modelId) const {
-
     auto it = _models.find(modelId);
     if (it != _models.end())
         return {it->second.boundingBoxMin, it->second.boundingBoxMax};

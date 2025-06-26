@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Interface for UI settings access
+** IUISettingProvider
 */
 
 #ifndef IUI_SETTINGS_PROVIDER_HPP_
@@ -11,14 +11,13 @@
 namespace GUI {
 
 class IUISettingsProvider {
-public:
-    virtual ~IUISettingsProvider() = default;
+    public:
+        virtual ~IUISettingsProvider() = default;
 
-    virtual bool getSfxEnabled() const = 0;
-    virtual float getMusicVolume() const = 0;
-    
-    virtual void setSfxEnabled(bool enabled) = 0;
-    virtual void setMusicVolume(float volume) = 0;
+        virtual bool getSfxEnabled() const = 0;
+        virtual float getMusicVolume() const = 0;
+        virtual void setSfxEnabled(bool enabled) = 0;
+        virtual void setMusicVolume(float volume) = 0;
 };
 
 } // namespace GUI

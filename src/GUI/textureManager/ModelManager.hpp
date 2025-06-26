@@ -61,7 +61,7 @@ public:
         getBoundingBox(int modelId) const;
 
 private:
-    ModelManager() {};
+    ModelManager() {}
     ~ModelManager();
     int checkModelCache(const std::string& modelPath);
     bool checkGraphicsLibInitialized();
