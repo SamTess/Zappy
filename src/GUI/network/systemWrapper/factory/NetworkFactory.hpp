@@ -7,11 +7,10 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "../interfaces/IBuffer.hpp"
+#include "../interfaces/INetworkFactory.hpp"
 #include "../implementation/NetworkAddress.hpp"
 #include "../implementation/TcpSocket.hpp"
 #include "../implementation/SocketPoller.hpp"
-#include "../implementation/Buffer.hpp"
 
 namespace Network {
 namespace Implementation {
@@ -21,7 +20,6 @@ public:
     std::unique_ptr<ISocket> createTcpSocket() override;
     std::unique_ptr<INetworkAddress> createAddress(const std::string& host, int port) override;
     std::unique_ptr<IPoller> createPoller() override;
-    std::unique_ptr<IBuffer> createBuffer(size_t size = 1024) override;
 };
 
 std::unique_ptr<INetworkFactory> createNetworkFactory();

@@ -9,7 +9,6 @@
 
 #include <memory>
 #include "interfaces/ISocket.hpp"
-#include "interfaces/IBuffer.hpp"
 #include "factory/NetworkFactory.hpp"
 
 namespace Network {

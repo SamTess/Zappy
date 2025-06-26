@@ -14,7 +14,7 @@ namespace Network {
 namespace Implementation {
 
 SocketPoller::SocketPoller() {
-    _pollfds.reserve(32);
+    _pollfds.reserve(1);
 }
 
 void SocketPoller::addSocket(int fd, int events) {

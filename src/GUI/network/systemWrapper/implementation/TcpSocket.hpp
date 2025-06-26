@@ -15,28 +15,28 @@ namespace Network {
 namespace Implementation {
 
 class TcpSocket : public ISocket {
-private:
-    int _fd;
-    bool _connected;
-    std::unique_ptr<NetworkAddress> _address;
+    public:
+        TcpSocket();
+        ~TcpSocket() override;
 
-    void createSocket();
-    void performConnect();
-    void cleanup();
-    bool isValidDescriptor() const;
+        bool connect(const std::string& host, int port) override;
+        bool isConnected() const override;
+        void disconnect() override;
+        bool send(const std::string& data) override;
+        std::string receive() override;
+        bool hasData() const override;
+        bool setNonBlocking() override;
+        int getFileDescriptor() const;
+    private:
+        int _fd;
+        bool _connected;
+        std::unique_ptr<NetworkAddress> _address;
 
-public:
-    TcpSocket();
-    ~TcpSocket() override;
+        void createSocket();
+        void performConnect();
+        void cleanup();
+        bool isValidDescriptor() const;
 
-    bool connect(const std::string& host, int port) override;
-    bool isConnected() const override;
-    void disconnect() override;
-    bool send(const std::string& data) override;
-    std::string receive() override;
-    bool hasData() const override;
-    bool setNonBlocking() override;
-    int getFileDescriptor() const;
 };
 
 } // namespace implementation

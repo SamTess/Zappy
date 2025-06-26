@@ -16,32 +16,23 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Implémentation concrète du poller
- */
 class SocketPoller : public IPoller {
-private:
-    struct PollEntry {
-        int fd;
-        int events;
-        int revents;
-    };
-    std::vector<pollfd> _pollfds;
-    std::unordered_map<int, size_t> _fdToIndex;
+    public:
+        SocketPoller();
+        void addSocket(int fd, int events) override;
+        void removeSocket(int fd) override;
+        int poll(int timeoutMs) override;
+        bool hasEvent(int fd, int event) const override;
+        void clear() override;
+        void addSocket(const TcpSocket& socket, int events);
+        void removeSocket(const TcpSocket& socket);
+        bool hasEvent(const TcpSocket& socket, int event) const;
 
-    void updateIndices();
+    private:
+        std::vector<pollfd> _pollfds;
+        std::unordered_map<int, size_t> _fdToIndex;
 
-public:
-    SocketPoller();
-
-    void addSocket(int fd, int events) override;
-    void removeSocket(int fd) override;
-    int poll(int timeoutMs) override;
-    bool hasEvent(int fd, int event) const override;
-    void clear() override;
-    void addSocket(const TcpSocket& socket, int events);
-    void removeSocket(const TcpSocket& socket);
-    bool hasEvent(const TcpSocket& socket, int event) const;
+        void updateIndices();
 };
 
 } // namespace implementation
