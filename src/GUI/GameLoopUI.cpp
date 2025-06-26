@@ -131,7 +131,6 @@ float GameLoop::calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, Zappy
 ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers) {
     float tileSize = 1.0f;
     float spacing = 1.5f;
-
     if (_mapRenderer) {
         tileSize = _mapRenderer->getTileSize();
         spacing = _mapRenderer->getTileSpacing();
@@ -141,7 +140,6 @@ ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int play
             spacing = tileSize * 1.5f;
         }
     }
-    
     float mapCenterX = _mapWidth / 2.0f;
     float mapCenterY = _mapHeight / 2.0f;
     ZappyTypes::Vector3 playerPos = {(playerX - mapCenterX + 0.5f) * (tileSize + spacing), 0.55f, (playerY - mapCenterY + 0.5f) * (tileSize + spacing)};
