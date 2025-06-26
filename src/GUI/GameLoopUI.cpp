@@ -86,9 +86,14 @@ bool GameLoop::worldToTileCoordinates(ZappyTypes::Vector3 worldPos, std::shared_
         return false;
     float tileSize = 1.0f;
     float spacing = 1.5f;
-    if (_mapWidth > 20 || _mapHeight > 20) {
-        tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
-        spacing = tileSize * 0.1f;
+    if (_mapRenderer) {
+        tileSize = _mapRenderer->getTileSize();
+        spacing = _mapRenderer->getTileSpacing();
+    } else {
+        if (_mapWidth > 20 || _mapHeight > 20) {
+            tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
+            spacing = tileSize * 1.5f;
+        }
     }
     float mapCenterX = _mapWidth / 2.0f;
     float mapCenterY = _mapHeight / 2.0f;
@@ -127,10 +132,16 @@ ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int play
     float tileSize = 1.0f;
     float spacing = 1.5f;
 
-    if (_mapWidth > 20 || _mapHeight > 20) {
-        tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
-        spacing = tileSize * 0.1f;
+    if (_mapRenderer) {
+        tileSize = _mapRenderer->getTileSize();
+        spacing = _mapRenderer->getTileSpacing();
+    } else {
+        if (_mapWidth > 20 || _mapHeight > 20) {
+            tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
+            spacing = tileSize * 1.5f;
+        }
     }
+    
     float mapCenterX = _mapWidth / 2.0f;
     float mapCenterY = _mapHeight / 2.0f;
     ZappyTypes::Vector3 playerPos = {(playerX - mapCenterX + 0.5f) * (tileSize + spacing), 0.55f, (playerY - mapCenterY + 0.5f) * (tileSize + spacing)};
@@ -152,6 +163,16 @@ bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared
     float minDistance = std::numeric_limits<float>::max();
     int closestPlayerId = -1;
     bool foundPlayer = false;
+    float maxSelectionDistance = 1.0f;
+    if (_mapRenderer) {
+        float tileSize = _mapRenderer->getTileSize();
+        maxSelectionDistance = tileSize * 2.0f;
+    } else {
+        if (_mapWidth > 20 || _mapHeight > 20) {
+            float tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
+            maxSelectionDistance = tileSize * 2.0f;
+        }
+    }
     for (int y = 0; y < _mapHeight; ++y) {
         for (int x = 0; x < _mapWidth; ++x) {
             auto playerIds = gameState->getPlayersOnTile(x, y);
@@ -161,7 +182,6 @@ bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared
                 int currentPlayerId = playerIds[i];
                 ZappyTypes::Vector3 playerWorldPos = calculatePlayerWorldPosition(x, y, i, playerIds.size());
                 float distance = calculateRayToPointDistance(cameraPos, rayDirection, playerWorldPos);
-                const float maxSelectionDistance = 1.0f;
                 if (distance < maxSelectionDistance && distance < minDistance) {
                     minDistance = distance;
                     closestPlayerId = currentPlayerId;

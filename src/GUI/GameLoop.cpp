@@ -169,10 +169,14 @@ void GameLoop::updateCameraForMapSize() {
     int mapWidth = gameState->getMapWidth();
     int mapHeight = gameState->getMapHeight();
     float tileSize = 1.0f;
-    float spacing = 0.1f;
+    float spacing = 1.5f;
     if (mapWidth > 20 || mapHeight > 20) {
         tileSize = 10.0f / std::max(mapWidth, mapHeight);
-        spacing = tileSize * 0.1f;
+        spacing = tileSize * 1.5f;
+    }
+    if (_mapRenderer) {
+        _mapRenderer->setTileSize(tileSize);
+        _mapRenderer->setTileSpacing(spacing);
     }
     float mapExtentX = mapWidth * (tileSize + spacing);
     float mapExtentZ = mapHeight * (tileSize + spacing);

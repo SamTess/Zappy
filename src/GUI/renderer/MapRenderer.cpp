@@ -117,6 +117,14 @@ void MapRenderer::setTileSpacing(float spacing) {
     tileSpacing = std::max(0.0f, spacing);
 }
 
+float MapRenderer::getTileSize() const {
+    return tileSize;
+}
+
+float MapRenderer::getTileSpacing() const {
+    return tileSpacing;
+}
+
 void MapRenderer::setResourceColor(int resourceType, const ZappyTypes::Color& color) {
     resourceColors[resourceType] = color;
 }

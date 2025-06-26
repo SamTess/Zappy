@@ -25,6 +25,8 @@ class MapRenderer {
         void renderWithSelection(int selectedTileX, int selectedTileY, int selectedPlayerId);
         void setTileSize(float size);
         void setTileSpacing(float spacing);
+        float getTileSize() const;
+        float getTileSpacing() const;
         void setResourceColor(int resourceType, const ZappyTypes::Color& color);
 
     private:
