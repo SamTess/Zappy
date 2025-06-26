@@ -26,7 +26,7 @@ GameController::GameController(
 
 void GameController::initializeManagers() {
     _graphicsManager = std::make_shared<GraphicsManager>(nullptr);
-    _animationManager = std::make_shared<AnimationManager>();
+    _animationManager = std::make_shared<AnimationManager>(_gameState);
     _soundManager = std::make_shared<SoundManager>(_graphicsManager->getGraphics(), _gameState);
     _networkManager = std::make_shared<NetworkCommandManager>(nullptr);
     _playerValidator = std::make_shared<PlayerValidationManager>(_gameState, _networkManager);
