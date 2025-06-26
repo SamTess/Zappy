@@ -122,11 +122,11 @@ class JoinTeamMatesBehavior(Behavior):
       return
 
     try:
-      agent_ids = list(self.agent.other_agents.keys())
-      if not agent_ids:
-        print("JoinTeamMatesBehavior: No agent IDs found.")
+      min_id = min([int(agent_id) for agent_id in self.agent.other_agents.keys()])
+
+      if self.agent.id <= min_id:
+        print(f"JoinTeamMatesBehavior: Agent ID {self.agent.id} is already the minimum ID.")
         return
-      min_id = min(agent_ids)
 
       self.agent.other_agents[min_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[min_id]["direction"])
 
@@ -205,9 +205,14 @@ class FillTeamBehavior(Behavior):
         break
 
 
+class StartCollectingBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    self.agent.current_phase = "collecting"
+
+
 class ForkBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    self.agent.process_server_message()
+    if self.agent.is_original:
+      self.agent.send_command("Fork")
 
-    self.agent.send_command("Fork")
     print("Fork command sent.")

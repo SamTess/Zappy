@@ -18,6 +18,7 @@ class DecisionManager:
       "TakeOneFoodHere": behaviors.TakeOneFoodHereBehavior(agent),
       "DropEveryMinerals": behaviors.DropEveryMineralsBehavior(agent),
       "DropAllFood": behaviors.DropAllFoodBehavior(agent),
+      "StartCollecting": behaviors.StartCollectingBehavior(agent),
       "FillTeam": behaviors.FillTeamBehavior(agent),
       "Fork": behaviors.ForkBehavior(agent),
       "None": behaviors.NoActionBehavior(agent),
@@ -26,8 +27,9 @@ class DecisionManager:
 
 
     self.decisions = {
-      "reproducing": {"miner": ["FoodDyson", "Fork", "FillTeam"], "fighter": ["FoodBigDyson"]},
-      "collecting": {"miner": ["FillTeam", "Dyson"], "fighter": ["FoodDyson", "FillTeam"]},
+      "start": {"miner": ["FillTeam", "StartCollecting"], "fighter": ["FillTeam", "StartCollecting"]},
+      "reproducing": {"miner": ["FoodBigDyson", "Fork", "FillTeam"], "fighter": ["FoodBigDyson"]},
+      "collecting": {"miner": ["FillTeam", "BigDyson"], "fighter": ["FoodBigDyson", "FillTeam"]},
       "rallying": {"miner": ["JoinTeamMates", "TakeAllFoodHere"], "fighter": ["JoinTeamMates"]},
       "setting": {"miner": ["DropEveryMinerals"], "fighter": ["DropAllFood"]},
       "upgrading": {"miner": ["Upgrade", "TakeOneFoodHere", "TakeOneFoodHere"], "fighter": ["FoodBigDyson"]}
@@ -35,16 +37,21 @@ class DecisionManager:
 
 
   def take_action(self):
-    inventory = self.agent.send_command("Inventory")
-    surroundings = self.agent.send_command("Look")
+    try:
+      inventory = self.agent.send_command("Inventory")
+      surroundings = self.agent.send_command("Look")
 
-    self.agent.last_known_inventory = inventory
-    self.agent.last_known_surroundings = surroundings
+      self.agent.last_known_inventory = inventory
+      self.agent.last_known_surroundings = surroundings
 
-    if inventory is None or surroundings is None:
-      print("Failed to retrieve inventory or surroundings.")
+      if inventory is None or surroundings is None:
+        print("Failed to retrieve inventory or surroundings.")
+        return
+
+      for action in self.decisions[self.agent.current_phase][self.agent.current_role]:
+        self.behaviors[action].execute(surroundings, inventory)
+
+    except Exception as e:
+      print(f"DecisionManager: Error in take_action: {e}")
       return
-
-    for action in self.decisions[self.agent.current_phase][self.agent.current_role]:
-      self.behaviors[action].execute(surroundings, inventory)
     # print(inventory)

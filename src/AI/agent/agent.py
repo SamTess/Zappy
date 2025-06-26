@@ -1,4 +1,4 @@
-from time import sleep
+from time import sleep, time
 from agent.socketManager import SocketManager
 from agent.decisionManager import DecisionManager
 from agent.broadcastManager import BroadcastManager
@@ -42,10 +42,14 @@ class Agent:
       self.last_enemy_direction = None      #? 0 - 8
 
       self.current_role = "miner"           #? "fighter", "miner"
-      self.current_phase = "collecting"
+      self.current_phase = "start"          #? "collecting", "rallying", "setting", "upgrading", "reproducing"
 
       self.last_known_inventory = {}
       self.last_known_surroundings = {}
+
+
+      self.first_message_processing = True
+      self.is_original = True
 
       self.running = False
 
@@ -62,7 +66,12 @@ class Agent:
 
   def start(self):
     welcome_msg = self.get_message(timeout=4)
+
+    start_time = time()
     team_slots = self.send_command(self.team)
+    end_time = time()
+    self.server_response_time = end_time - start_time
+
     map_size = self.get_message(timeout=4)
 
     if welcome_msg is None or team_slots is None or map_size is None \
@@ -75,6 +84,11 @@ class Agent:
     self.map_size_y = int(map_size.split()[1])
 
     print(f"Agent {self.id}: Joined team {self.team} successfully.")
+
+
+    sleep(self.server_response_time * 5)
+
+    self.process_server_message()
 
     self.running = True
     self._run()
@@ -119,147 +133,166 @@ class Agent:
         self.tick += 1
         if self.tick > 20:
           self.tick = 0
+
       except BrokenPipeError:
         print(f"Agent {self.id}: Connection closed by server.")
+        break
       except Exception as e:
         print(f"Agent {self.id}: Error: {e}")
 
 
   def process_server_message(self):
-    while self.has_messages():
-      message = self.get_message()
-      if message.startswith("message "):
-        self.broadcastManager.manage_broadcast(message)
-      elif message.startswith("dead"):
-        print("Agent has died.")
-        self.stop()
-      elif message.startswith("Current level: "):
-        try:
-          self.level = int(message.split(": ")[1])
-          print(f"Current level set to: {self.level}")
-        except ValueError:
-          print(f"Failed to parse level from message: {message}")
-      else:
-        print(f"Unknown server message: {message}")
+    try:
+      while self.has_messages():
+        message = self.get_message()
+        if message.startswith("message "):
+          self.broadcastManager.manage_broadcast(message)
+        elif message.startswith("dead"):
+          print("Agent has died.")
+          self.stop()
+        elif message.startswith("Current level: "):
+          try:
+            self.level = int(message.split(": ")[1])
+            print(f"Current level set to: {self.level}")
+          except ValueError:
+            print(f"Failed to parse level from message: {message}")
+        else:
+          print(f"Unknown server message: {message}")
+      self.first_message_processing = False
+
+    except Exception as e:
+      print(f"Error processing server message: {e}")
 
 
   def _update_self_state(self):
-    #? On modifie son propre id si un autre agent a le même
-    new_id = self.id
-    while new_id in self.other_agents:
-      print(f"Agent {self.id}: Updating own ID to avoid conflict with other agents.")
-      new_id = randint(1, 10000)  #? On change l'id pour éviter les conflits
-    if new_id != self.id:
-      self.broadcastManager.send_broadcast("U", str(new_id))
-      self.id = new_id
+    try:
+      #? On modifie son propre id si un autre agent a le même
+      new_id = self.id
+      while new_id in self.other_agents:
+        print(f"Agent {self.id}: Updating own ID to avoid conflict with other agents.")
+        new_id = randint(1, 10000)  #? On change l'id pour éviter les conflits
+      if new_id != self.id:
+        self.broadcastManager.send_broadcast("U", str(new_id))
+        self.id = new_id
 
-    #? On détermine le rôle de l'agent en fonction de son id
-    agent_ids = list(self.other_agents.keys())
-    agent_ids.append(self.id)
-    agent_ids.sort()
-    self.current_role = "miner"
-    # if self.id >= max(agent_ids) - minimum_players_for_upgrade - 2:
-    #   self.current_role = "miner"
-    # else:
-    #   self.current_role = "fighter"
+      #? On détermine le rôle de l'agent en fonction de son id
+      agent_ids = list(self.other_agents.keys())
+      agent_ids.append(self.id)
+      agent_ids.sort()
+      self.current_role = "miner"
+      # if self.id >= max(agent_ids) - minimum_players_for_upgrade - 2:
+      #   self.current_role = "miner"
+      # else:
+      #   self.current_role = "fighter"
 
-    # #? L'agent "originel" regarde si il y a assez de monde pour upgrade, sinon il fork et appelle les autres à fork aussi
-    # #? L'agent originel est celui qui a l'id le plus élevé
-    if len(self.other_agents) < minimum_players_for_upgrade * 2:
-      if self.id >= max(agent_ids):
-        #? plus de place dans l'équipe, on fork
-        if self.id == 0:
-          self.fork()
-          self.fill_team()
-        #? sinon on demande aux autres de fork
-        else:
-          self.fill_team()
-
-    #? On retire les agents qui n'ont pas envoyé de message depuis trop longtemps
-    agents_to_remove = []
-    for agent_id, items in self.other_agents.items():
-      if items['last_ping'] > self.tick:
-        agents_to_remove.append(agent_id)
-
-    for agent_id in agents_to_remove:
-      print(f"Removing agent {agent_id} from other_agents due to inactivity.")
-      del self.other_agents[agent_id]
-
-    if  self.current_phase == "collecting":
-      #? On check si l'inventaire de tout le monde permet d'upgrade de 0 à 8
-      required_total_amount_of_resources = get_total_upgrade_resources()
-      team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
-
-      for agent_id, agent_info in self.other_agents.items():
-        agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
-        for key, value in agent_inventory.items():
-            if key in team_total_amount_of_resources:
-                team_total_amount_of_resources[key] += value
-            else:
-                team_total_amount_of_resources[key] = value
-
-      have_enough_resources = True
-      for key, required_value in required_total_amount_of_resources.items():
-        available_value = team_total_amount_of_resources.get(key, 0)
-        if available_value < required_value:
-          have_enough_resources = False
-
-      if have_enough_resources:
-        print(f"Agent {self.id}: required resources for upgrade are available. Enough players: {len(self.other_agents)}")
-        self.current_phase = "rallying"
-      else:
-        print(f"Agent {self.id}: Not all required resources for upgrade are available.")
-
-    #? On check si assez de monde est rassemblé et qu'il y a assez de ressources pour passer au setting
-    elif self.current_phase == "rallying":
+      # #? L'agent "originel" regarde si il y a assez de monde pour upgrade, sinon il fork et appelle les autres à fork aussi
+      # #? L'agent originel est celui qui a l'id le plus élevé
       if len(self.other_agents) < minimum_players_for_upgrade * 2:
-        if self.current_role == "miner":
-          self.current_phase = "reproducing"
+        if self.id >= max(agent_ids):
+          #? plus de place dans l'équipe, on fork
+          if self.id == 0:
+            self.fork()
+            self.fill_team()
+          #? sinon on demande aux autres de fork
+          else:
+            self.fill_team()
+
+      #? On retire les agents qui n'ont pas envoyé de message depuis trop longtemps
+      agents_to_remove = []
+      for agent_id, items in self.other_agents.items():
+        if items['last_ping'] > self.tick:
+          agents_to_remove.append(agent_id)
+
+      for agent_id in agents_to_remove:
+        print(f"Removing agent {agent_id} from other_agents due to inactivity.")
+        del self.other_agents[agent_id]
+
+      if  self.current_phase == "collecting":
+        #? On check si l'inventaire de tout le monde permet d'upgrade de 0 à 8
+        required_total_amount_of_resources = get_total_upgrade_resources()
+        team_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
+
+        for agent_id, agent_info in self.other_agents.items():
+          agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+          for key, value in agent_inventory.items():
+            if key in team_total_amount_of_resources:
+              team_total_amount_of_resources[key] += value
+            else:
+              team_total_amount_of_resources[key] = value
+
+        have_enough_resources = True
+        for key, required_value in required_total_amount_of_resources.items():
+          available_value = team_total_amount_of_resources.get(key, 0)
+          if available_value < required_value:
+            have_enough_resources = False
+
+        if have_enough_resources:
+          print(f"Agent {self.id}: required resources for upgrade are available. Enough players: {len(self.other_agents)}")
+          self.current_phase = "rallying"
+        else:
+          print(f"Agent {self.id}: Not all required resources for upgrade are available.")
+
+      elif self.current_phase == "reproducing":
+        #? On check si on est assez nombreux pour passer à la phase de rallying
+        if len(self.other_agents) >= minimum_players_for_upgrade * 2:
+          print(f"Agent {self.id}: Enough players for rallying phase.")
+          self.current_phase = "rallying"
+        else:
+          print(f"Agent {self.id}: Not enough players for rallying phase. Current count: {len(self.other_agents)}")
           return
 
-      required_total_amount_of_resources = get_total_upgrade_resources()
-      tile_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
-      for agent_info in self.other_agents.items():
-        if agent_info[1]['direction'] is None or agent_info[1]['direction'] != 0:
-          print(f"Agent {self.id}: Waiting for all agents to be ready for setting.")
-          continue
-        agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
-        for key, value in agent_inventory.items():
-            if key in tile_total_amount_of_resources:
-                tile_total_amount_of_resources[key] += value
-            else:
-                tile_total_amount_of_resources[key] = value
+      #? On check si assez de monde est rassemblé et qu'il y a assez de ressources pour passer au setting
+      elif self.current_phase == "rallying":
+        if len(self.other_agents) < minimum_players_for_upgrade * 2:
+          if self.current_role == "miner":
+            self.current_phase = "reproducing"
+            return
 
-      have_enough_resources = True
-      for key, required_value in required_total_amount_of_resources.items():
-        available_value = tile_total_amount_of_resources.get(key, 0)
-        if available_value < required_value:
-          have_enough_resources = False
+        required_total_amount_of_resources = get_total_upgrade_resources()
+        tile_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
+        for agent_id, agent_info in self.other_agents.items():
+          if agent_info['direction'] is None or agent_info['direction'] != 0:
+            continue
+          agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+          for key, value in agent_inventory.items():
+              if key in tile_total_amount_of_resources:
+                  tile_total_amount_of_resources[key] += value
+              else:
+                  tile_total_amount_of_resources[key] = value
 
-      if have_enough_resources:
-        print(f"Agent {self.id}: All agents are ready for setting.")
-        self.current_phase = "setting"
+        have_enough_resources = True
+        for key, required_value in required_total_amount_of_resources.items():
+          available_value = tile_total_amount_of_resources.get(key, 0)
+          if available_value < required_value:
+            have_enough_resources = False
 
-    #? On check si assez de ressources ont été lachées pour passer à l'upgrade
-    elif self.current_phase == "setting":
-      last_surroundings = self.last_known_surroundings
-      if last_surroundings is None or "ko" in last_surroundings:
-        print(f"Agent {self.id}: Failed to retrieve surroundings for setting phase.")
-        return
+        if have_enough_resources:
+          print(f"Agent {self.id}: All agents are ready for setting.")
+          self.current_phase = "setting"
 
-      required_total_amount_of_resources = get_total_upgrade_resources()
-      for key, value in required_total_amount_of_resources.items():
-          distance_to_item, amount_found = zappy.get_closest_of_item(last_surroundings, key)
-          if distance_to_item == -1 or amount_found < value:
-              print(f"Agent {self.id}: Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
-              return
-      distance_to_players,  amount_of_players = zappy.get_closest_of_item(last_surroundings, "player")
-      #? Si des agents sont morts entre temps, on retourne collecter (et fork aussi)
-      if distance_to_players == -1 or amount_of_players < minimum_players_for_upgrade:
-        self.current_phase = "collecting"
-      else:
-        print(f"Agent {self.id}: All required resources for upgrading are available.")
-        self.current_phase = "upgrading"
+      #? On check si assez de ressources ont été lachées pour passer à l'upgrade
+      elif self.current_phase == "setting":
+        last_surroundings = self.last_known_surroundings
+        if last_surroundings is None or "ko" in last_surroundings:
+          print(f"Agent {self.id}: Failed to retrieve surroundings for setting phase.")
+          return
+
+        required_total_amount_of_resources = get_total_upgrade_resources()
+        for key, value in required_total_amount_of_resources.items():
+            distance_to_item, amount_found = zappy.get_closest_of_item(last_surroundings, key)
+            if distance_to_item == -1 or amount_found < value:
+                print(f"Agent {self.id}: Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
+                return
+        distance_to_players,  amount_of_players = zappy.get_closest_of_item(last_surroundings, "player")
+        #? Si des agents sont morts entre temps, on retourne collecter (et fork aussi)
+        if distance_to_players == -1 or amount_of_players < minimum_players_for_upgrade:
+          self.current_phase = "collecting"
+        else:
+          print(f"Agent {self.id}: All required resources for upgrading are available.")
+          self.current_phase = "upgrading"
+
+    except Exception as e:
+      print(f"Agent {self.id}: Error updating self state: {e}")
 
 
   def send_command(self, command, timeout=2.0):

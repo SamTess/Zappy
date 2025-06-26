@@ -52,6 +52,11 @@ class BroadcastManager:
         self._handle_enemy_broadcast(sender_agent_direction, broadcast_message)
         return
 
+      if self.agent.first_message_processing:
+        self.agent.is_original = False
+        self.agent.first_message_processing = False
+
+
       try:
         sender_agent_id = int(sender_agent_id_str)
       except ValueError:
