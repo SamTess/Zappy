@@ -9,7 +9,7 @@
 #include <iostream>
 
 PlayerValidator::PlayerValidator(std::shared_ptr<GameState> gameState,
-                               std::shared_ptr<NetworkCommandManager> networkManager)
+    std::shared_ptr<NetworkCommandManager> networkManager)
     : _gameState(gameState), _networkManager(networkManager) {
 }
 
