@@ -26,7 +26,7 @@ static char *get_one_item_content(resource_type_t type, int quantity)
 }
 
 static bool append_item_string(char **content, size_t *content_length,
-    const char *item_str)
+    char *item_str)
 {
     size_t item_length = strlen(item_str);
     char *temp;

@@ -5,8 +5,7 @@
 ** broadcast
 */
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
-#include "../include/server.h"
+#include "../include/zappy.h"
 #include "../include/parsing.h"
 #include <string.h>
 #include <stdio.h>
@@ -80,11 +79,11 @@ static int calculate_shortest_distance_y(int sender_y,
     return wrap_distance_up;
 }
 
-static int calculate_direction(client_t *receiver, int source_rel_x,
+static int calculate_direction(player_t *receiver, int source_rel_x,
     int source_rel_y)
 {
     int base_tile_for_north;
-    int new_rota = adapt_rota_player(receiver->player->rotation);
+    int new_rota = adapt_rota_player(receiver->rotation);
 
     if (source_rel_x == 0 && source_rel_y == 0)
         return 0;
@@ -96,8 +95,8 @@ static int calculate_direction(client_t *receiver, int source_rel_x,
         + 8) % 8) + 1;
 }
 
-static int send_broadcast_to_client(server_t *server, client_t *sender,
-    client_t *receiver, char *message)
+static int send_broadcast_to_client(game_t *game, zappy_client_t *sender,
+    zappy_client_t *receiver, char *message)
 {
     int direction = 0;
     size_t res_size = snprintf(NULL, 0, "message %d, %s\n", 0, message) + 1;
@@ -110,12 +109,12 @@ static int send_broadcast_to_client(server_t *server, client_t *sender,
     if (response == NULL)
         return 84;
     source_rel_x = calculate_shortest_distance_x(receiver->player->pos_x,
-        sender->player->pos_x, server->parsed_info->width);
+        sender->player->pos_x, game->parsed_info->width);
     source_rel_y = calculate_shortest_distance_y(receiver->player->pos_y,
-        sender->player->pos_y, server->parsed_info->height);
-    direction = calculate_direction(receiver, source_rel_x, source_rel_y);
+        sender->player->pos_y, game->parsed_info->height);
+    direction = calculate_direction(receiver->player, source_rel_x, source_rel_y);
     snprintf(response, res_size, "message %d, %s\n", direction, message);
-    write_command_output_buffer(receiver, response);
+    write_command_output_buffer(receiver->client, response);
     free(response);
     return 0;
 }
@@ -165,26 +164,25 @@ static char *build_broadcast_message(char **buffer)
     return message;
 }
 
-void broadcast(server_t *server, client_t *user, char **buffer)
+void broadcast(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer)
 {
     char *message;
-    client_t *current;
+    zappy_client_t *current;
 
-    if (!user || !user->player || !buffer || arr_len(buffer) < 2)
-        return write_command_output_buffer(user, "ko\n");
+    if (!sender || !sender->player || !buffer || arr_len(buffer) < 2)
+        return write_command_output_buffer(sender->client, "ko\n");
     message = build_broadcast_message(buffer);
     if (!message)
-        return write_command_output_buffer(user, "ko\n");
-    current = server->client;
-    if (current)
-        current = current->next;
-    command_pbc(server, user, message);
-    for (int temp = 0; current != NULL; current = current->next){
-        if (current->player && current != user && current->type != GRAPHICAL)
-            temp = send_broadcast_to_client(server, user, current, message);
+        return write_command_output_buffer(sender->client, "ko\n");
+    current = clients;
+    command_pbc(game, sender, clients, message);
+    for (int temp = 0; current != NULL; current = current->next) {
+        if (current->player && current != sender && current->type != GRAPHICAL)
+            temp = send_broadcast_to_client(game, sender, current, message);
         if (temp == 84)
-            return write_command_output_buffer(user, "ko\n");
+            return write_command_output_buffer(sender->client, "ko\n");
     }
     free(message);
-    write_command_output_buffer(user, "ok\n");
+    write_command_output_buffer(sender->client, "ok\n");
 }

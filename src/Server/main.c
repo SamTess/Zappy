@@ -12,6 +12,8 @@
 #include <time.h>
 #include <signal.h>
 #include "include/server.h"
+#include "include/zappy.h"
+#include "include/game.h"
 
 static int *get_running_flag(void)
 {
@@ -94,11 +96,11 @@ static void disp_args(parsing_info_t *parsed_info)
     printf("\n");
 }
 
-static void server_loop(server_t *server)
+static void server_loop(zappy_t *zappy)
 {
     while (should_continue_running()) {
-        if (server->should_run)
-            check_client(server);
+        if (zappy->server->should_run)
+            check_client(zappy);
     }
     printf("Server is shutting down\n");
 }
@@ -122,7 +124,7 @@ static void set_rdm_seed(void)
 int main(int ac, char **av)
 {
     parsing_info_t parsed_info;
-    server_t server;
+    zappy_t zappy;
 
     if (ac <= 10 || check_mini_args(ac, av) == 1) {
         display_help();
@@ -132,12 +134,10 @@ int main(int ac, char **av)
         server_err("Couldn't setup signal handler");
     parse_args(ac, av, &parsed_info);
     disp_args(&parsed_info);
-    create_server(&server, &parsed_info);
     set_rdm_seed();
-    create_map(&server, &parsed_info);
-    init_server_eggs(&server);
-    server_loop(&server);
-    free_all(&server, &parsed_info);
-    close(server.s_fd);
+    zappy_create(&parsed_info, &zappy);
+    server_loop(&zappy);
+    free_all(zappy.server, zappy.game, zappy.clients, &parsed_info);
+    close(zappy.server->s_fd);
     return 0;
 }

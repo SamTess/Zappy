@@ -5,76 +5,85 @@
 ** command_pnw
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-static int calcul_size_pnw_command(client_t *client)
+static int calculate_size_pnw_command(player_t *player, int client_id)
 {
-    if (!client || !client->player)
+    if (!player)
         return 0;
     return snprintf(NULL, 0, "pnw #%d %d %d %d %d %s\n",
-                client->client_id,
-                client->player->pos_x,
-                client->player->pos_y,
-                client->player->rotation,
-                client->player->level,
-                client->player->team_name);
+                client_id,
+                player->pos_x,
+                player->pos_y,
+                player->rotation,
+                player->level,
+                player->team_name);
 }
 
-void send_pnw_command(server_t *server, client_t *client, client_t *recipient)
+static char *format_pnw_response(player_t *player, int client_id)
 {
-    int size = 0;
-    char *buffer = NULL;
+    int size;
+    char *buffer;
 
-    if (!server || !client || !client->player)
-        return;
-    size = calcul_size_pnw_command(client);
+    if (!player)
+        return NULL;
+    size = calculate_size_pnw_command(player, client_id);
     buffer = malloc(size + 1);
     if (!buffer)
-        return;
+        return NULL;
     snprintf(buffer, size + 1, "pnw #%d %d %d %d %d %s\n",
-            client->client_id,
-            client->player->pos_x,
-            client->player->pos_y,
-            client->player->rotation,
-            client->player->level,
-            client->player->team_name);
-    write_command_output_buffer(recipient, buffer);
-    free(buffer);
+            client_id,
+            player->pos_x,
+            player->pos_y,
+            player->rotation,
+            player->level,
+            player->team_name);
+    return buffer;
 }
 
-void send_pnw_command_to_all(server_t *server, client_t *client)
+void send_pnw_command(game_t *game, zappy_client_t *clients, zappy_client_t *sender, zappy_client_t *recipient)
 {
-    client_t *current = NULL;
+    char *buffer;
 
-    if (!server || !client || !client->player)
+    (void)game;
+    (void)clients;
+    if (!sender || !sender->player || !recipient || !recipient->client)
         return;
-    current = server->client;
+    buffer = format_pnw_response(sender->player, sender->client->client_id);
+    if (buffer) {
+        write_command_output_buffer(recipient->client, buffer);
+        free(buffer);
+    }
+}
+
+void send_pnw_command_to_all(game_t *game, zappy_client_t *clients, zappy_client_t *sender)
+{
+    zappy_client_t *current = clients;
+
+    (void)game;
+    if (!clients || !sender || !sender->player)
+        return;
     while (current) {
-        if (current->type == GRAPHICAL && current->is_fully_connected)
-            send_pnw_command(server, client, current);
+        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+            send_pnw_command(game, clients, sender, current);
         current = current->next;
     }
 }
 
-void send_all_player_info_to_one_client(server_t *server, client_t *client)
+void send_all_player_info_to_one_client(game_t *game, zappy_client_t *clients, zappy_client_t *recipient)
 {
-    client_t *current = NULL;
+    zappy_client_t *current = clients;
 
-    if (!server || !client || !server->graphical_clients)
+    (void)game;
+    if (!clients || !recipient || !recipient->client || recipient->type != GRAPHICAL)
         return;
-    current = server->client;
     while (current) {
-        if (current->player && current->type == AI &&
-            current->is_fully_connected) {
-            send_pnw_command(server, current, client);
-            send_pin_command(server, current, client);
-            send_plv_command(server, current, client);
-        }
+        if (current->player && current->type == AI && current->is_fully_connected)
+            send_pnw_command(game, clients, current, recipient);
         current = current->next;
     }
 }

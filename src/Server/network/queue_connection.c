@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void add_to_command_queue(server_t *server, client_t *client, char *command)
+void add_to_command_queue(zappy_client_t *client, char *command)
 {
     if (!client || !client->player || !command ||
         client->player->queue_size >= 10 || !client->player->command_queue)
@@ -19,18 +19,16 @@ void add_to_command_queue(server_t *server, client_t *client, char *command)
     client->player->command_queue[client->player->queue_size] =
         strdup(command);
     client->player->queue_size++;
-    if (client->player->queue_size >= 10 && server && server->poll_manager)
-        server->poll_manager->needs_rebuild = true;
 }
 
-static void check_rebuild(bool was_full, client_t *client, server_t *server)
+static void check_rebuild(bool was_full, zappy_client_t *client, server_t *server)
 {
     if (was_full && client->player->queue_size < 10 &&
         server && server->poll_manager)
         server->poll_manager->needs_rebuild = true;
 }
 
-void process_next_queued_command(server_t *server, client_t *client)
+void process_next_queued_command(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients)
 {
     char *next_command;
     bool was_full;
@@ -48,7 +46,7 @@ void process_next_queued_command(server_t *server, client_t *client)
     client->player->queue_size--;
     check_rebuild(was_full, client, server);
     if (next_command) {
-        execute_com(server, client, next_command);
+        execute_com(game, client, clients, next_command);
         free(next_command);
         next_command = NULL;
     }

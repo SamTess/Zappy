@@ -163,3 +163,15 @@ char **str_to_word_arr(char *str, char *delim)
     free(str_copy);
     return result;
 }
+
+void free_arr(char **array)
+{
+    if (!array)
+        return;
+    for (int i = 0; array[i] != NULL; i++) {
+        if (array[i] == NULL)
+            break;
+        free(array[i]);
+    }
+    free(array);
+}

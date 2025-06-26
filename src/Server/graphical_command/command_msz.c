@@ -8,34 +8,33 @@
 #include "../include/server.h"
 #include "../include/client.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void send_msz_command(server_t *server, client_t *client)
+void send_msz_command(game_t *game, zappy_client_t *client)
 {
     char *buffer = NULL;
     int size = 0;
 
-    if (!server || !client)
+    if (!game || !client)
         return;
     buffer = NULL;
     size = snprintf(NULL, 0, "msz %d %d\n",
-            server->parsed_info->width, server->parsed_info->height);
+        game->parsed_info->width, game->parsed_info->height);
     buffer = malloc(size + 1);
     if (!buffer)
         return;
     snprintf(buffer, size + 1, "msz %d %d\n",
-            server->parsed_info->width, server->parsed_info->height);
-    write_command_output_buffer(client, buffer);
+            game->parsed_info->width, game->parsed_info->height);
+    write_command_output_buffer(client->client, buffer);
     free(buffer);
 }
 
-void command_msz(server_t *server, client_t *client, char **buffer)
+void command_msz(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
 {
-    if (!server || !client || !server->graphical_clients ||
-        arr_len(buffer) != 1)
-        return write_command_output_buffer(client, "sbp\n");
-    send_msz_command(server, client);
+    (void)clients;
+    if (!game || !client || arr_len(buffer) != 1)
+        return write_command_output_buffer(client->client, "sbp\n");
+    send_msz_command(game, client);
 }

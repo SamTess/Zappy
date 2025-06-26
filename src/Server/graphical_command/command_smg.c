@@ -5,30 +5,42 @@
 ** command_smg
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void send_smg_command(server_t *server, const char *msg)
+static char *format_smg_response(char *msg)
 {
-    graphical_client_t *current = NULL;
     char *buffer = NULL;
     int size = 0;
 
-    if (!server || !server->graphical_clients || !msg)
-        return;
+    if (!msg)
+        return NULL;
     size = snprintf(NULL, 0, "smg %s\n", msg);
     buffer = malloc(size + 1);
     if (!buffer)
-        return;
+        return NULL;
     snprintf(buffer, size + 1, "smg %s\n", msg);
-    current = server->graphical_clients;
+    return buffer;
+}
+
+void send_smg_command(game_t *game, zappy_client_t *clients, char *msg)
+{
+    zappy_client_t *current = clients;
+    char *buffer = NULL;
+
+    (void)game;
+    if (!clients || !msg)
+        return;
+    buffer = format_smg_response(msg);
+    if (!buffer)
+        return;
     while (current) {
-        write_command_output_buffer(current->client, buffer);
+        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+            write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);

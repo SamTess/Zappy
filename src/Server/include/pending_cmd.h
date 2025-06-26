@@ -7,12 +7,12 @@
 #ifndef PENDING_CMD_H_
     #define PENDING_CMD_H_
 
-struct server_s;
-typedef struct server_s server_t;
-struct client_s;
-typedef struct client_s client_t;
+struct game_s;
+typedef struct game_s game_t;
+struct zappy_client_s;
+typedef struct zappy_client_s zappy_client_t;
 
-typedef void (*cmd_func_t)(server_t *, client_t *, char **);
+typedef void (*cmd_func_t)(game_t *, zappy_client_t *, zappy_client_t *, char **);
 
 typedef struct pending_cmd_s {
     cmd_func_t func;

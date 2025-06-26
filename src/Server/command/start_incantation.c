@@ -6,32 +6,31 @@
 */
 
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include "../include/parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-static client_t *get_client_by_id_player(server_t *server, int player_id)
+static zappy_client_t *get_client_by_id_player(zappy_client_t *clients, int player_id)
 {
-    client_t *tmp = server->client->next;
+    zappy_client_t *tmp = clients;
 
     while (tmp != NULL) {
-        if (tmp->player != NULL && tmp->client_id == player_id)
+        if (tmp->player != NULL && tmp->client->client_id == player_id)
             return tmp;
         tmp = tmp->next;
     }
     return NULL;
 }
 
-static int nb_valid_players_on_tile(server_t *server, tile_t *tile,
+static int nb_valid_players_on_tile(zappy_client_t *clients, tile_t *tile,
     int current_level)
 {
     int count = 0;
 
     for (int i = 0; i < tile->player_count; i++) {
         if (tile->player_ids[i] != -1 &&
-            get_client_by_id_player(server, tile->player_ids[i])->
+            get_client_by_id_player(clients, tile->player_ids[i])->
             player->level == current_level) {
             count++;
         }
@@ -39,23 +38,24 @@ static int nb_valid_players_on_tile(server_t *server, tile_t *tile,
     return count;
 }
 
-static void set_busy_until(server_t *server, client_t *client, int duration)
+static void set_busy_until(game_t *game, zappy_client_t *client, int duration)
 {
-    client->player->busy_until = server->current_tick + duration;
+    client->player->busy_until = game->current_tick + duration;
     client->player->is_in_incantation = true;
 }
 
-static void set_busy_all(server_t *server, client_t *client, int duration)
+static void set_busy_all(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, int duration)
 {
-    tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
-    client_t *tmp_client;
+    tile_t *tile = &game->map[client->player->pos_y][client->player->pos_x];
+    zappy_client_t *tmp_client;
 
     for (int i = 0; i < tile->player_count; i++) {
-        tmp_client = get_client_by_id_player(server, tile->player_ids[i]);
+        tmp_client = get_client_by_id_player(clients, tile->player_ids[i]);
         if (tmp_client && tmp_client->player &&
             tmp_client->player->level == client->player->level) {
-            tmp_client->player->incantation_leader_id = client->client_id;
-            set_busy_until(server, tmp_client, duration);
+            tmp_client->player->incantation_leader_id = client->client->client_id;
+            set_busy_until(game, tmp_client, duration);
         }
     }
 }
@@ -88,11 +88,11 @@ static int how_many_players_needed(int level)
     return required_players[level - 1];
 }
 
-bool can_start_incantation(server_t *server, client_t *client)
+bool can_start_incantation(game_t *game, zappy_client_t *client, zappy_client_t *clients)
 {
     int required_players = 0;
     int prerequisite_level = client->player->level;
-    tile_t *tile = &server->map[client->player->pos_y][client->player->pos_x];
+    tile_t *tile = &game->map[client->player->pos_y][client->player->pos_x];
     int current_players = 0;
 
     if (prerequisite_level > 7 ||
@@ -100,22 +100,23 @@ bool can_start_incantation(server_t *server, client_t *client)
         return false;
     required_players = how_many_players_needed(prerequisite_level);
     current_players =
-        nb_valid_players_on_tile(server, tile, client->player->level);
+        nb_valid_players_on_tile(clients, tile, client->player->level);
     if (current_players < required_players)
         return false;
     return true;
 }
 
-void start_incantation(server_t *server, client_t *client, char **buffer)
+void start_incantation(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
-    if (!server || !client || !client->player || arr_len(buffer) != 1)
-        return write_command_output_buffer(client, "ko\n");
-    if (!can_start_incantation(server, client))
-        return write_command_output_buffer(client, "ko\n");
-    command_pic(server, client->player->pos_x, client->player->pos_y,
+    if (!game || !client || !client->player || arr_len(buffer) != 1)
+        return write_command_output_buffer(client->client, "ko\n");
+    if (!can_start_incantation(game, client, clients))
+        return write_command_output_buffer(client->client, "ko\n");
+    command_pic(game, clients, client->player->pos_x, client->player->pos_y,
         client->player->level);
-    set_busy_all(server, client, 300);
+    set_busy_all(game, client, clients, 300);
     client->player->is_in_incantation = true;
-    client->player->incantation_leader_id = client->client_id;
-    write_command_output_buffer(client, "Elevation underway\n");
+    client->player->incantation_leader_id = client->client->client_id;
+    write_command_output_buffer(client->client, "Elevation underway\n");
 }

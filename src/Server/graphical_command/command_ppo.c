@@ -5,21 +5,20 @@
 ** command_ppo
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-client_t *find_client_by_id(server_t *server, int id)
+zappy_client_t *find_client_by_id(zappy_client_t *clients, int id)
 {
-    client_t *current = server->client;
+    zappy_client_t *current = clients;
 
     while (current != NULL) {
-        if (current->client_id == id &&
+        if (current->client && current->client->client_id == id &&
             current->player && current->type == AI) {
             return current;
         }
@@ -28,51 +27,63 @@ client_t *find_client_by_id(server_t *server, int id)
     return NULL;
 }
 
-static char *get_ppo_buffer(client_t *tmp)
+static int calculate_ppo_buffer_size(zappy_client_t *client)
 {
-    char *buffer = NULL;
-    int size = 0;
+    if (!client || !client->player || !client->client)
+        return 0;
+    return snprintf(NULL, 0, "ppo #%d %d %d %d\n", client->client->client_id,
+        client->player->pos_x, client->player->pos_y, client->player->rotation);
+}
 
-    if (!tmp || !tmp->player)
+static char *format_ppo_response(zappy_client_t *client)
+{
+    int size;
+    char *buffer;
+
+    if (!client || !client->player || !client->client)
         return NULL;
-    size = snprintf(NULL, 0, "ppo #%d %d %d %d\n", tmp->client_id,
-        tmp->player->pos_x, tmp->player->pos_y, tmp->player->rotation);
+    size = calculate_ppo_buffer_size(client);
     buffer = malloc(size + 1);
     if (!buffer)
         return NULL;
-    snprintf(buffer, size + 1, "ppo #%d %d %d %d\n", tmp->client_id,
-        tmp->player->pos_x, tmp->player->pos_y, tmp->player->rotation);
+    snprintf(buffer, size + 1, "ppo #%d %d %d %d\n", client->client->client_id,
+        client->player->pos_x, client->player->pos_y, client->player->rotation);
     return buffer;
 }
 
-bool send_ppo_command(server_t *server, int id)
+bool send_ppo_command(game_t *game, zappy_client_t *clients, int id)
 {
     char *buffer = NULL;
-    client_t *tmp = NULL;
+    zappy_client_t *target = NULL;
+    zappy_client_t *current = NULL;
 
-    if (!server)
+    if (!game || !clients)
         return false;
-    tmp = find_client_by_id(server, id);
-    if (!tmp || !tmp->player)
+    target = find_client_by_id(clients, id);
+    if (!target || !target->player)
         return false;
-    buffer = get_ppo_buffer(tmp);
-    for (client_t *current = server->client;
-            current != NULL; current = current->next) {
-        if (current->type == GRAPHICAL && current->is_fully_connected)
-            write_command_output_buffer(current, buffer);
+    buffer = format_ppo_response(target);
+    if (!buffer)
+        return false;
+    current = clients;
+    while (current) {
+        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+            write_command_output_buffer(current->client, buffer);
+        current = current->next;
     }
     free(buffer);
     return true;
 }
 
-void command_ppo(server_t *server, client_t *client, char **buffer)
+void command_ppo(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int id = 0;
 
-    if (!server || !client || !buffer || !server->graphical_clients ||
-        arr_len(buffer) != 2 || sscanf(buffer[1], "#%d\n", &id) != 1 ||
-        id < 0 || !find_client_by_id(server, id) ||
-        !send_ppo_command(server, id)) {
-        return write_command_output_buffer(client, "sbp\n");
+    if (!game || !client || !client->client || !buffer || !clients ||
+        client->type != GRAPHICAL || arr_len(buffer) != 2 ||
+        sscanf(buffer[1], "#%d", &id) != 1 || id < 0 ||
+        !find_client_by_id(clients, id) || !send_ppo_command(game, clients, id)) {
+        return write_command_output_buffer(client->client, "sbp\n");
     }
 }

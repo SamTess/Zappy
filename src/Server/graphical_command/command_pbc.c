@@ -5,31 +5,42 @@
 ** command_pbc
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void command_pbc(server_t *server, client_t *client, char *buffer)
+static char *format_pbc_response(int client_id, char *message)
 {
-    graphical_client_t *graphical_client = NULL;
-    char *msg = NULL;
+    char *buffer = NULL;
     int size = 0;
 
-    if (!server || !client || !buffer ||
-        !server->graphical_clients || !client->player)
+    if (!message)
+        return NULL;
+    size = snprintf(NULL, 0, "pbc #%d %s", client_id, message);
+    buffer = malloc(size + 1);
+    if (!buffer)
+        return NULL;
+    snprintf(buffer, size + 1, "pbc #%d %s", client_id, message);
+    return buffer;
+}
+
+void command_pbc(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char *message)
+{
+    zappy_client_t *current = NULL;
+    char *response = NULL;
+
+    if (!game || !client || !client->client || !client->player || !clients || !message)
         return;
-    size = snprintf(NULL, 0, "pbc #%d %s", client->client_id, buffer);
-    msg = malloc(size + 1);
-    if (!msg)
+    response = format_pbc_response(client->client->client_id, message);
+    if (!response)
         return;
-    snprintf(msg, size + 1, "pbc #%d %s", client->client_id, buffer);
-    graphical_client = server->graphical_clients;
-    while (graphical_client) {
-        write_command_output_buffer(graphical_client->client, msg);
-        graphical_client = graphical_client->next;
+    current = clients;
+    for (; current != NULL; current = current->next) {
+        if (current->type == GRAPHICAL)
+            write_command_output_buffer(current->client, response);
     }
-    free(msg);
+    free(response);
 }

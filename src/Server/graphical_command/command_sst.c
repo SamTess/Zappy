@@ -5,13 +5,15 @@
 ** command_sst
 */
 
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
 #include "../include/parsing.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-static char *get_buffer_sst(int time)
+static char *format_sst_response(int time)
 {
     char *buffer = NULL;
     int size = snprintf(NULL, 0, "sst %d\n", time);
@@ -28,31 +30,34 @@ static int get_time_from_buffer(char *buffer)
 {
     int time = 0;
 
-    if (sscanf(buffer, "%d\n", &time) != 1 || time < 0) {
+    if (sscanf(buffer, "%d", &time) != 1 || time <= 0) {
         return -1;
     }
     return time;
 }
 
-void command_sst(server_t *server, client_t *client, char **buffer)
+void command_sst(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int time;
-    graphical_client_t *graphical_client = NULL;
-    char *tmp_buffer = NULL;
+    zappy_client_t *current = NULL;
+    char *response = NULL;
 
-    if (!buffer || client->type != GRAPHICAL || !server->graphical_clients ||
-        arr_len(buffer) != 2)
-        return write_command_output_buffer(client, "sbp\n");
+    if (!game || !client || !client->client || !clients || !buffer ||
+        client->type != GRAPHICAL || arr_len(buffer) != 2)
+        return write_command_output_buffer(client->client, "sbp\n");
     time = get_time_from_buffer(buffer[1]);
     if (time <= 0)
-        return write_command_output_buffer(client, "sbp\n");
-    tmp_buffer = get_buffer_sst(time);
-    server->parsed_info->frequence = time;
-    graphical_client = server->graphical_clients;
-    while (graphical_client) {
-        write_command_output_buffer(graphical_client->client,
-            tmp_buffer);
-        graphical_client = graphical_client->next;
+        return write_command_output_buffer(client->client, "sbp\n");
+    response = format_sst_response(time);
+    if (!response)
+        return write_command_output_buffer(client->client, "sbp\n");
+    game->parsed_info->frequence = time;
+    current = clients;
+    while (current) {
+        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+            write_command_output_buffer(current->client, response);
+        current = current->next;
     }
-    free(tmp_buffer);
+    free(response);
 }

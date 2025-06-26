@@ -13,6 +13,7 @@ MAIN = main.c
 # Source files
 SRC = 	help.c								\
 		free.c								\
+		zappy.c								\
 		parsing_err.c						\
 		parsing.c							\
 		network/connection_err.c			\

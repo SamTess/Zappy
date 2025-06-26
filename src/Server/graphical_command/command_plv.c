@@ -5,62 +5,84 @@
 ** command_plv
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void send_plv_command(server_t *server, client_t *client, client_t *recipient)
+static int calculate_plv_buffer_size(zappy_client_t *client)
 {
-    int size = 0;
-    char *buffer = NULL;
-
-    if (!server || !client || !client->player)
-        return;
-    size = snprintf(NULL, 0, "plv #%d %d\n",
-                client->client_id,
+    if (!client || !client->player || !client->client)
+        return 0;
+    return snprintf(NULL, 0, "plv #%d %d\n",
+                client->client->client_id,
                 client->player->level);
-    buffer = malloc(size + 1);
-    if (!buffer)
-        return;
-    snprintf(buffer, size + 1, "plv #%d %d\n",
-            client->client_id,
-            client->player->level);
-    write_command_output_buffer(recipient, buffer);
-    free(buffer);
 }
 
-void send_plv_to_all(server_t *server, client_t *client)
+static char *format_plv_response(zappy_client_t *client)
 {
-    client_t *current = server->client;
+    int size;
+    char *buffer;
 
-    if (!server || !client || !client->player)
+    if (!client || !client->player || !client->client)
+        return NULL;
+    size = calculate_plv_buffer_size(client);
+    buffer = malloc(size + 1);
+    if (!buffer)
+        return NULL;
+    snprintf(buffer, size + 1, "plv #%d %d\n",
+            client->client->client_id,
+            client->player->level);
+    return buffer;
+}
+
+void send_plv_command(game_t *game, zappy_client_t *clients, zappy_client_t *sender, zappy_client_t *recipient)
+{
+    char *buffer;
+
+    (void)game;
+    (void)clients;
+    if (!sender || !sender->player || !sender->client ||
+        !recipient || !recipient->client)
+        return;
+    buffer = format_plv_response(sender);
+    if (buffer) {
+        write_command_output_buffer(recipient->client, buffer);
+        free(buffer);
+    }
+}
+
+void send_plv_to_all(game_t *game, zappy_client_t *clients, zappy_client_t *sender)
+{
+    zappy_client_t *current = clients;
+
+    if (!game || !sender || !sender->player || !clients)
         return;
     while (current) {
-        if (current->type == GRAPHICAL && current != client) {
-            send_plv_command(server, client, current);
-        }
+        if (current->type == GRAPHICAL && current->client &&
+            current->is_fully_connected && current != sender)
+            send_plv_command(game, clients, sender, current);
         current = current->next;
     }
 }
 
-void command_plv(server_t *server, client_t *client, char **buffer)
+void command_plv(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
-    client_t *recipient = NULL;
+    zappy_client_t *target = NULL;
     int id = -1;
 
-    if (!server || !client || !buffer ||
-        !server->graphical_clients || arr_len(buffer) != 2 ||
-        sscanf(buffer[1], "#%d\n", &id) != 1)
-        return write_command_output_buffer(client, "sbp\n");
-    recipient = find_client_by_id(server, id);
-    if (!recipient || recipient->type != AI) {
-        write_command_output_buffer(client, "sbp\n");
+    if (!game || !client || !client->client || !clients || !buffer ||
+        client->type != GRAPHICAL || arr_len(buffer) != 2 ||
+        sscanf(buffer[1], "#%d", &id) != 1 || id < 0)
+        return write_command_output_buffer(client->client, "sbp\n");
+    target = find_client_by_id(clients, id);
+    if (!target || target->type != AI) {
+        write_command_output_buffer(client->client, "sbp\n");
         return;
     }
-    send_plv_command(server, recipient, client);
+    send_plv_command(game, clients, target, client);
 }

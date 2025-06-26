@@ -6,7 +6,7 @@
 */
 
 #include "../include/tile.h"
-#include "../include/server.h"
+#include "../include/game.h"
 #include "../include/egg.h"
 #include <stdlib.h>
 #include <string.h>
@@ -44,13 +44,13 @@ static int remove_id_from_array(int **array, int *count, int id)
     return -1;
 }
 
-static void remove_node(egg_t *current, egg_t *prev, server_t *server)
+static void remove_node(egg_t *current, egg_t *prev, game_t *game)
 {
     egg_t *node_to_delete = NULL;
 
     node_to_delete = current;
     if (prev == NULL)
-        server->eggs = current->next;
+        game->eggs = current->next;
     else
         prev->next = current->next;
     if (node_to_delete->team_name)
@@ -59,14 +59,14 @@ static void remove_node(egg_t *current, egg_t *prev, server_t *server)
     return;
 }
 
-static void remove_egg_by_id(server_t *server, int id)
+static void remove_egg_by_id(game_t *game, int id)
 {
-    egg_t *current = server->eggs;
+    egg_t *current = game->eggs;
     egg_t *prev = NULL;
 
     while (current != NULL) {
         if (current->egg_id == id) {
-            remove_node(current, prev, server);
+            remove_node(current, prev, game);
             return;
         }
         prev = current;
@@ -81,12 +81,12 @@ void remove_egg_from_tile(tile_t *tile, int egg_id)
     remove_id_from_array(&tile->egg_ids, &tile->egg_count, egg_id);
 }
 
-void remove_egg(server_t *server, int id, tile_t *tile)
+void remove_egg(game_t *game, int id, tile_t *tile)
 {
     if (tile == NULL)
         return;
     remove_egg_from_tile(tile, id);
-    remove_egg_by_id(server, id);
+    remove_egg_by_id(game, id);
 }
 
 void add_egg_to_tile(tile_t *tile, int egg_id)
@@ -111,14 +111,14 @@ void add_egg_to_tile(tile_t *tile, int egg_id)
     tile->egg_count++;
 }
 
-void add_egg(server_t *server, egg_t *egg)
+void add_egg(game_t *game, egg_t *egg)
 {
     tile_t *tile = NULL;
 
-    if (server == NULL || egg == NULL)
+    if (game == NULL || egg == NULL)
         return;
-    egg->next = server->eggs;
-    server->eggs = egg;
-    tile = &server->map[egg->pos_y][egg->pos_x];
+    egg->next = game->eggs;
+    game->eggs = egg;
+    tile = &game->map[egg->pos_y][egg->pos_x];
     add_egg_to_tile(tile, egg->egg_id);
 }

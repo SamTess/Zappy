@@ -8,62 +8,59 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "../include/server.h"
+#include "../include/game.h"
+#include "../include/zappy.h"
 
-static void free_client(server_t *server)
+static void free_client(zappy_client_t *clients)
 {
-    client_t *current_client = server->client;
-    client_t *next_client;
+    zappy_client_t *current_client = clients;
+    zappy_client_t *next_client;
 
     while (current_client != NULL) {
         next_client = current_client->next;
-        free_node(current_client, server);
+        free_node(current_client);
         current_client = next_client;
     }
-    server->client = NULL;
 }
 
-static void free_eggs(server_t *server)
+static void free_eggs(game_t *game)
 {
-    egg_t *current_egg = server->eggs;
+    egg_t *current_egg = game->eggs;
     egg_t *next_egg;
 
     while (current_egg != NULL) {
         next_egg = current_egg->next;
         free(current_egg->team_name);
-        current_egg->team_name = NULL;
         free(current_egg);
         current_egg = next_egg;
     }
-    server->eggs = NULL;
+    game->eggs = NULL;
 }
 
-static void free_tiles(server_t *server, int i, parsing_info_t *parsed_info)
+static void free_tiles(game_t *game, int i, parsing_info_t *parsed_info)
 {
-    if (!server || !server->map || !server->map[i] || !parsed_info)
+    if (!game || !game->map || !game->map[i] || !parsed_info)
         return;
     for (int j = 0; j < parsed_info->width; j++) {
-        tile_free(&server->map[i][j]);
+        tile_free(&game->map[i][j]);
     }
-    free(server->map[i]);
-    server->map[i] = NULL;
+    free(game->map[i]);
+    game->map[i] = NULL;
 }
 
-static void free_map(server_t *server, parsing_info_t *parsed_info)
+static void free_map(game_t *game, parsing_info_t *parsed_info)
 {
-    if (server->map && parsed_info && parsed_info->height > 0
-        && parsed_info->width > 0) {
+    if (game->map && parsed_info && parsed_info->height > 0 && parsed_info->width > 0) {
         for (int i = 0; i < parsed_info->height; i++) {
-            free_tiles(server, i, parsed_info);
+            free_tiles(game, i, parsed_info);
         }
-        free(server->map);
-        server->map = NULL;
+        free(game->map);
+        game->map = NULL;
     }
-    free(server->serv_add);
-    server->serv_add = NULL;
-    free(server->total_resources);
-    server->total_resources = NULL;
-    free(server->current_resources);
-    server->current_resources = NULL;
+    free(game->total_resources);
+    game->total_resources = NULL;
+    free(game->current_resources);
+    game->current_resources = NULL;
 }
 
 static void free_parsed_info(parsing_info_t *p_info)
@@ -80,37 +77,23 @@ static void free_parsed_info(parsing_info_t *p_info)
 
 static void free_poll_mana(server_t *server)
 {
-    if (server->poll_manager->fds)
+    if (server->poll_manager && server->poll_manager->fds)
         free(server->poll_manager->fds);
-    free(server->poll_manager);
+    if (server->poll_manager)
+        free(server->poll_manager);
 }
 
-void free_all(server_t *server, parsing_info_t *parsed_info)
+void free_all(server_t *server, game_t *game, zappy_client_t *clients, parsing_info_t *parsed_info)
 {
-    if (!server)
+    if (!server || !game)
         return;
-    free_client(server);
-    free_eggs(server);
-    free_map(server, parsed_info);
+    free_client(clients);
+    free_eggs(game);
+    free_map(game, parsed_info);
     if (server->poll_manager)
         free_poll_mana(server);
     if (parsed_info)
         free_parsed_info(parsed_info);
-    if (server->parsed_info) {
-        free_parsed_info(server->parsed_info);
-        free(server->parsed_info);
-        server->parsed_info = NULL;
-    }
-}
-
-void free_arr(char **array)
-{
-    if (!array)
-        return;
-    for (int i = 0; array[i] != NULL; i++) {
-        if (array[i] == NULL)
-            break;
-        free(array[i]);
-    }
-    free(array);
+    if (game->parsed_info)
+        free_parsed_info(game->parsed_info);
 }

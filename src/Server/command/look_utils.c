@@ -7,49 +7,49 @@
 #include "../include/command.h"
 #include <string.h>
 
-static char *check_up(client_t *user, int i, int j, server_t *server)
+static char *check_up(player_t *player, int i, int j, game_t *game)
 {
-    int y = (user->player->pos_y - i + server->parsed_info->height)
-        % server->parsed_info->height;
-    int x = (user->player->pos_x - i + j + server->parsed_info->width)
-        % server->parsed_info->width;
-    char *res = tile_to_str(&server->map[y][x]);
+    int y = (player->pos_y - i + game->parsed_info->height)
+        % game->parsed_info->height;
+    int x = (player->pos_x - i + j + game->parsed_info->width)
+        % game->parsed_info->width;
+    char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
         return NULL;
     return res;
 }
 
-static char *check_down(client_t *user, int i, int j, server_t *server)
+static char *check_down(player_t *player, int i, int j, game_t *game)
 {
-    int y = (user->player->pos_y + i) % server->parsed_info->height;
-    int x = (user->player->pos_x + i - j + server->parsed_info->width)
-        % server->parsed_info->width;
-    char *res = tile_to_str(&server->map[y][x]);
+    int y = (player->pos_y + i) % game->parsed_info->height;
+    int x = (player->pos_x + i - j + game->parsed_info->width)
+        % game->parsed_info->width;
+    char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
         return NULL;
     return res;
 }
 
-static char *check_left(client_t *user, int i, int j, server_t *server)
+static char *check_left(player_t *player, int i, int j, game_t *game)
 {
-    int y = (user->player->pos_y + j) % server->parsed_info->height;
-    int x = (user->player->pos_x - i + server->parsed_info->width)
-        % server->parsed_info->width;
-    char *res = tile_to_str(&server->map[y][x]);
+    int y = (player->pos_y + j) % game->parsed_info->height;
+    int x = (player->pos_x - i + game->parsed_info->width)
+        % game->parsed_info->width;
+    char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
         return NULL;
     return res;
 }
 
-static char *check_right(client_t *user, int i, int j, server_t *server)
+static char *check_right(player_t *player, int i, int j, game_t *game)
 {
-    int y = (user->player->pos_y - j + server->parsed_info->height)
-        % server->parsed_info->height;
-    int x = (user->player->pos_x + i) % server->parsed_info->width;
-    char *res = tile_to_str(&server->map[y][x]);
+    int y = (player->pos_y - j + game->parsed_info->height)
+        % game->parsed_info->height;
+    int x = (player->pos_x + i) % game->parsed_info->width;
+    char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
         return NULL;
@@ -63,22 +63,22 @@ static char *check_res(char *res)
     return res;
 }
 
-char *check_rota_tiles(client_t *user, server_t *server, int i, int j)
+char *check_rota_tiles(player_t *player, game_t *game, int i, int j)
 {
     char *res;
 
-    switch (user->player->rotation) {
+    switch (player->rotation) {
     case UP:
-        res = check_up(user, i, j, server);
+        res = check_up(player, i, j, game);
         break;
     case DOWN:
-        res = check_down(user, i, j, server);
+        res = check_down(player, i, j, game);
         break;
     case LEFT:
-        res = check_left(user, i, j, server);
+        res = check_left(player, i, j, game);
         break;
     case RIGHT:
-        res = check_right(user, i, j, server);
+        res = check_right(player, i, j, game);
         break;
     default:
         res = strdup("");

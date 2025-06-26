@@ -5,40 +5,40 @@
 ** parse_command_utils_bis
 */
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
+#include "../include/zappy.h"
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-static int check_disconnect(int bytes_read, client_t *user, server_t *server)
+static int check_disconnect(int bytes_read, server_t *server, zappy_client_t **clients, zappy_client_t *user)
 {
     if (bytes_read <= 0){
-        command_pdi(server, user);
-        remove_fd(server, user->client_fd);
+        command_pdi(NULL, user, *clients);
+        remove_fd(server, clients, user->client->client_fd);
         return 1;
     }
     return 0;
 }
 
-bool handle_socket_read(client_t *user, server_t *server)
+bool handle_socket_read(server_t *server, zappy_client_t **clients, zappy_client_t *user)
 {
     char temp_read_storage[1024];
     int bytes_read;
 
-    bytes_read = read(user->client_fd,
+    bytes_read = read(user->client->client_fd,
         temp_read_storage, sizeof(temp_read_storage) - 1);
-    if (check_disconnect(bytes_read, user, server) == 1)
+    if (check_disconnect(bytes_read, server, clients, user) == 1)
         return false;
     for (int i = 0; i < bytes_read; i++) {
-        if (add_to_circular_buffer(&user->read_buffer,
+        if (add_to_circular_buffer(&user->client->read_buffer,
             temp_read_storage[i]) == -1)
             break;
     }
     return true;
 }
 
-static void add_type_graphic_user(client_t *user)
+static void add_type_graphic_user(zappy_client_t *user)
 {
     user->type = GRAPHICAL;
     free(user->player->command_queue);
@@ -47,11 +47,11 @@ static void add_type_graphic_user(client_t *user)
     user->player = NULL;
 }
 
-static bool is_valid_team_name(char *team_name, server_t *server,
-    client_t *user)
+static bool is_valid_team_name(char *team_name, game_t *game,
+    zappy_client_t *user, zappy_client_t *clients)
 {
-    if (!team_name || !server ||
-        !server->parsed_info || !server->parsed_info->names)
+    if (!team_name || !game ||
+        !game->parsed_info || !game->parsed_info->names)
         return false;
     if (strlen(team_name) < 2 || team_name[strlen(team_name) - 1] != '\n')
         return false;
@@ -60,11 +60,11 @@ static bool is_valid_team_name(char *team_name, server_t *server,
         add_type_graphic_user(user);
         return true;
     }
-    for (int i = 0; server->parsed_info->names[i] != NULL; i++) {
-        if (strcmp(team_name, server->parsed_info->names[i]) == 0){
+    for (int i = 0; game->parsed_info->names[i] != NULL; i++) {
+        if (strcmp(team_name, game->parsed_info->names[i]) == 0){
             user->player->team_name = strdup(team_name);
             user->type = AI;
-            init_new_player_pos(server, user);
+            init_new_player_pos(game, user, clients);
             return true;
         }
     }
@@ -104,19 +104,19 @@ void flush_client_write_buffer(client_t *client)
     free(temp);
 }
 
-bool can_connect(server_t *server, client_t *user, char *buffer)
+bool can_connect(game_t *game, zappy_client_t *user, char *buffer, zappy_client_t *clients)
 {
-    if (!is_valid_team_name(buffer, server, user)){
-        write_command_output_buffer(user, "ko\n");
+    if (!is_valid_team_name(buffer, game, user, clients)){
+        write_command_output_buffer(user->client, "ko\n");
         return false;
     }
     if (user->type != GRAPHICAL &&
-        connect_nbr_srv(server, user->player->team_name) < 0) {
+        connect_nbr_srv(game, user->player->team_name) < 0) {
         if (user->player->team_name) {
             free(user->player->team_name);
             user->player->team_name = NULL;
         }
-        write_command_output_buffer(user, "ko\n");
+        write_command_output_buffer(user->client, "ko\n");
         return false;
     }
     return true;
