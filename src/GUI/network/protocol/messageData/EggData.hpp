@@ -19,8 +19,6 @@ typedef enum EggAction {
 
 class EggData : public IMessageData {
     public:
-
-
         EggData() : _eggId(0), _playerId(0), _x(0), _y(0), _action(EggAction::Drop) {}
         EggData(int eggId, int playerId, int x, int y, EggAction action = EggAction::Drop)
             : _eggId(eggId), _playerId(playerId), _x(x), _y(y), _action(action) {}

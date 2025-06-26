@@ -16,16 +16,16 @@ void EggMessageHandler::handleMessage(std::shared_ptr<IMessageData> data) {
     auto eggData = std::static_pointer_cast<EggData>(data);
 
     switch (eggData->getAction()) {
-        case EggData::EggAction::Drop:
+        case EggAction::Drop:
             handleEggDrop(eggData);
             break;
-        case EggData::EggAction::Connection:
+        case EggAction::Connection:
             handleEggConnection(eggData);
             break;
-        case EggData::EggAction::Death:
+        case EggAction::Death:
             handleEggDeath(eggData);
             break;
-        case EggData::EggAction::Laying:
+        case EggAction::Laying:
             handleEggLaying(eggData);
             break;
     }

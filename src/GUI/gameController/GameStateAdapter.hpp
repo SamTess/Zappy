@@ -2,27 +2,28 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameState
+** GameStateAdapter
 */
 
-#ifndef GAME_STATE_HPP_
-#define GAME_STATE_HPP_
+#ifndef GAME_STATE_ADAPTER_HPP_
+#define GAME_STATE_ADAPTER_HPP_
 
 #include <memory>
 #include <vector>
 #include <map>
 #include <string>
-#include "GameStateAdapter.hpp"
-#include "gameState/GameStateManager.hpp"
-#include "EntityFactory.hpp"
+#include "gameState/IGameStateManager.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
+#include "IPlayer.hpp"
+#include "IPlayerInventory.hpp"
+#include "IEgg.hpp"
+#include "ITile.hpp"
+#include "IRenderable.hpp"
 
-class GameState {
+class GameStateAdapter {
 public:
-    GameState();
-    explicit GameState(std::shared_ptr<EntityFactoryManager> factory);
-    ~GameState() = default;
-
+    explicit GameStateAdapter(std::shared_ptr<IGameStateManager> gameStateManager);
+    ~GameStateAdapter() = default;
     int getMapWidth() const;
     int getMapHeight() const;
     bool isMapInitialized() const;
@@ -36,7 +37,6 @@ public:
     bool isPlayerOnTile(int x, int y, int playerId) const;
     std::vector<int> getPlayersOnTile(int x, int y) const;
     std::vector<int> getEggsOnTile(int x, int y) const;
-
     std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const;
     std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const;
     std::vector<int> getPlayerIds() const;
@@ -45,11 +45,9 @@ public:
     void removePlayer(int playerId);
     void updatePlayerInventory(const PlayerInventoryData& inventoryData);
     void movePlayer(int playerId, int newX, int newY);
-
     std::shared_ptr<const IEgg> getEggInfo(int eggId) const;
     void addEgg(const EggData& eggData);
     void removeEgg(int eggId);
-
     const std::vector<std::string>& getTeamNames() const;
     void setTeamNames(const std::vector<std::string>& teamNames);
     int getTimeUnit() const;
@@ -57,21 +55,14 @@ public:
     bool isGameEnded() const;
     const std::string& getWinningTeam() const;
     void setGameEnded(bool ended, const std::string& winningTeam = "");
-
     bool getSfxEnabled() const;
     void setSfxEnabled(bool enabled);
     float getMusicVolume() const;
     void setMusicVolume(float volume);
-
     std::shared_ptr<IGameStateManager> getGameStateManager() const;
-    std::shared_ptr<IMapManager> getMapManager() const;
-    std::shared_ptr<IPlayerManager> getPlayerManager() const;
-    std::shared_ptr<IGameStatusManager> getGameStatusManager() const;
-    std::shared_ptr<IGameSettingsManager> getGameSettingsManager() const;
 
 private:
-    std::unique_ptr<GameStateAdapter> _adapter;
-    std::shared_ptr<GameStateManager> _gameStateManager;
+    std::shared_ptr<IGameStateManager> _gameStateManager;
 };
 
-#endif /* !GAME_STATE_HPP_ */
+#endif /* !GAME_STATE_ADAPTER_HPP_ */
