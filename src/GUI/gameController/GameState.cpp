@@ -297,6 +297,10 @@ std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() {
     return _players;
 }
 
+const std::map<int, std::shared_ptr<IPlayer>>& GameState::getPlayers() const {
+    return _players;
+}
+
 bool GameState::getSfxEnabled() const {
     return _sfxEnabled;
 }
