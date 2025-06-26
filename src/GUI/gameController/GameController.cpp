@@ -356,6 +356,13 @@ void GameController::updateAnimations(float deltaTime) {
     Zappy::EjectionAnimationManager::getInstance().update(deltaTime);
     Zappy::ParticleSystem::getInstance().update(deltaTime);
     Zappy::DeathAnimationManager::getInstance().update(deltaTime);
+
+    auto players = _gameState->getPlayers();
+    for (auto& [playerId, player] : players) {
+        if (player) {
+            player->updateAnimation(deltaTime);
+        }
+    }
 }
 
 void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> factory) {
