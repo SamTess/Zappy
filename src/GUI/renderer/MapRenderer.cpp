@@ -56,6 +56,9 @@ void MapRenderer::renderWithSelection(int selectedTileX, int selectedTileY, int 
             renderTile(x, y);
         }
     }
+    auto detailedStrategy = std::dynamic_pointer_cast<DetailedTileRenderStrategy>(tileRenderStrategy);
+    if (detailedStrategy)
+        detailedStrategy->renderAllMovingPlayers(graphicsLib, tileSize, tileSpacing);
     if (selectedTileX >= 0 && selectedTileY >= 0 &&
         selectedTileX < mapWidth && selectedTileY < mapHeight) {
         renderTileSelectionEffect(selectedTileX, selectedTileY);
