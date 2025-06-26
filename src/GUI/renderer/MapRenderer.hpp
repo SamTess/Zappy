@@ -16,7 +16,6 @@
 namespace Zappy {
 
 class MapRenderer {
-
     public:
         MapRenderer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
             const std::shared_ptr<const GameState>& gameState);
@@ -45,7 +44,6 @@ class MapRenderer {
         float tileSize;
         float tileSpacing;
         std::unordered_map<int, ZappyTypes::Color> resourceColors;
-
 };
 
 } // namespace Zappy

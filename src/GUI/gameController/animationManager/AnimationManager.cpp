@@ -5,6 +5,7 @@
 ** AnimationManager
 */
 
+#include <memory>
 #include <string>
 #include "AnimationManager.hpp"
 

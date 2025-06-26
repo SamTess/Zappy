@@ -17,7 +17,6 @@ void TileContentMessageHandler::handleMessage(std::shared_ptr<IMessageData> data
         handleUninitializedMap();
         return;
     }
-    
     auto tileData = std::static_pointer_cast<TileContentData>(data);
     updateTileContent(tileData);
 }

@@ -5,6 +5,7 @@
 ** SoundManager
 */
 
+#include <memory>
 #include <string>
 #include "SoundManager.hpp"
 

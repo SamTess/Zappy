@@ -5,6 +5,7 @@
 ** PlayerValidationManager
 */
 
+#include <memory>
 #include <iostream>
 #include "PlayerValidationManager.hpp"
 #include "../networkCommandManager/NetworkCommandManager.hpp"

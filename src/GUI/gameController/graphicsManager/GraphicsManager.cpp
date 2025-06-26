@@ -5,6 +5,7 @@
 ** GraphicsManager
 */
 
+#include <memory>
 #include "GraphicsManager.hpp"
 
 GraphicsManager::GraphicsManager(std::shared_ptr<IGraphicsLib> graphics)

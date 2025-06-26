@@ -5,6 +5,7 @@
 ** GameController
 */
 
+#include <memory>
 #include "GameController.hpp"
 
 GameController::GameController() {

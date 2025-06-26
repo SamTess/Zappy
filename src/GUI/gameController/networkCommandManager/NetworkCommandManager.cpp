@@ -5,8 +5,10 @@
 ** NetworkCommandManager
 */
 
-#include "NetworkCommandManager.hpp"
+#include <memory>
+#include <string>
 #include <iostream>
+#include "NetworkCommandManager.hpp"
 
 NetworkCommandManager::NetworkCommandManager(std::shared_ptr<ICommandExecutor> commandExecutor)
     : _commandExecutor(commandExecutor) {}

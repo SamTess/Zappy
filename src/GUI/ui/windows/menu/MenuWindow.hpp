@@ -19,7 +19,6 @@
 namespace GUI {
 
 class MenuWindow : public AUIWindow {
-
 typedef struct WindowInfo_s {
     std::string id;
     std::string name;

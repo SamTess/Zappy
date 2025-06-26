@@ -8,6 +8,7 @@
 #ifndef INCANTATION_MESSAGE_HANDLER_HPP_
 #define INCANTATION_MESSAGE_HANDLER_HPP_
 
+#include <memory>
 #include "IMessageHandler.hpp"
 #include "../GameState.hpp"
 #include "../playerValidationManager/PlayerValidationManager.hpp"

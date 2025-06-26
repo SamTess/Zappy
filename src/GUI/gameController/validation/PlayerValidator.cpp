@@ -5,8 +5,9 @@
 ** PlayerValidator - Implémentation de la validation des joueurs
 */
 
-#include "PlayerValidator.hpp"
+#include <memory>
 #include <iostream>
+#include "PlayerValidator.hpp"
 
 PlayerValidator::PlayerValidator(std::shared_ptr<GameState> gameState,
     std::shared_ptr<NetworkCommandManager> networkManager)

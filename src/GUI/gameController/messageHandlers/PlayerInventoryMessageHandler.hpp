@@ -25,6 +25,8 @@ public:
 private:
     std::shared_ptr<GameState> _gameState;
     std::shared_ptr<PlayerValidationManager> _validator;
+    bool shouldValidatePlayer(std::shared_ptr<PlayerInventoryData> inventoryData);
+    void updatePlayerInventory(std::shared_ptr<PlayerInventoryData> inventoryData);
 };
 
 #endif /* !PLAYER_INVENTORY_MESSAGE_HANDLER_HPP_ */

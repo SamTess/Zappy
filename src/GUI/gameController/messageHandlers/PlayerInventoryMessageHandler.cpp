@@ -18,7 +18,6 @@ void PlayerInventoryMessageHandler::handleMessage(std::shared_ptr<IMessageData> 
 
     if (shouldValidatePlayer(inventoryData))
         return;
-        
     updatePlayerInventory(inventoryData);
 }
 
@@ -28,5 +27,4 @@ bool PlayerInventoryMessageHandler::shouldValidatePlayer(std::shared_ptr<PlayerI
 
 void PlayerInventoryMessageHandler::updatePlayerInventory(std::shared_ptr<PlayerInventoryData> inventoryData) {
     _gameState->updatePlayerInventory(*inventoryData);
-}
 }

@@ -5,6 +5,7 @@
 ** EggMessageHandler
 */
 
+#include <memory>
 #include "EggMessageHandler.hpp"
 
 EggMessageHandler::EggMessageHandler(std::shared_ptr<GameState> gameState,
