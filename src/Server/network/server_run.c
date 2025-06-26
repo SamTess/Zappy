@@ -14,21 +14,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-client_t *find_client_by_socket(server_t *server, int socket_fd)
-{
-    client_t *temp = server->client;
-
-    if (temp && temp->client_fd == server->s_fd)
-        temp = temp->next;
-    while (temp) {
-        if (temp->client_fd == socket_fd)
-            return temp;
-        temp = temp->next;
-    }
-    printf("Error: Could not find client for socket %d\n", socket_fd);
-    return NULL;
-}
-
 static void new_connection(server_t *server)
 {
     struct sockaddr_in client_addr;
@@ -54,18 +39,29 @@ static void check_new_connection(server_t *server)
         new_connection(server);
 }
 
+static void pollin_pollout_client(client_t *temp,
+    server_t *server, int temp_fd)
+{
+    if (temp->client_poll->revents & POLLIN)
+        get_message(server, temp);
+    if (find_client_by_socket(server, temp_fd) != NULL &&
+        temp->client_poll->revents & POLLOUT && temp->need_write)
+        flush_client_write_buffer(temp);
+}
+
 static void check_client_message(server_t *server)
 {
     client_t *temp = server->client;
     client_t *next = NULL;
+    int temp_fd;
 
     if (temp != NULL)
         temp = temp->next;
     while (temp != NULL) {
         next = temp->next;
-        if (temp->client_poll != NULL && temp->client_poll->revents != 0
-            && (temp->client_poll->revents & POLLIN))
-                get_message(server, temp);
+        temp_fd = temp->client_fd;
+        if (temp->client_poll != NULL && temp->client_poll->revents != 0)
+            pollin_pollout_client(temp, server, temp_fd);
         temp = next;
     }
 }
@@ -92,13 +88,15 @@ static void smart_polling(client_t *current, poll_manager_t *poll_mana,
     server_t *server, int i)
 {
     if (current->type == GRAPHICAL) {
-        poll_mana->fds[i].events = POLLIN;
+        poll_mana->fds[i].events |= POLLIN;
     } else if (current->player &&
         current->player->busy_until > server->current_tick &&
         current->player->queue_size >= 10) {
         poll_mana->fds[i].events = 0;
     } else
-        poll_mana->fds[i].events = POLLIN;
+        poll_mana->fds[i].events |= POLLIN;
+    if (current->need_write)
+        poll_mana->fds[i].events |= POLLOUT;
 }
 
 static void fill_poll_array(server_t *server, poll_manager_t *poll_mana)

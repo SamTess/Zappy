@@ -44,17 +44,17 @@ static void change_map_pos(server_t *server, client_t *client)
 void forward(server_t *server, client_t *client, char **buffer)
 {
     if (!client || !client->player || arr_len(buffer) != 1) {
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output_buffer(client, "ko\n");
         return;
     }
     if (client->player->rotation != UP && client->player->rotation != DOWN
         && client->player->rotation != LEFT
         && client->player->rotation != RIGHT) {
         perror("Unexpected forward rotation");
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output_buffer(client, "ko\n");
         return;
     }
     change_map_pos(server, client);
     send_ppo_command(server, client->client_id);
-    write_command_output(client->client_fd, "ok\n");
+    write_command_output_buffer(client, "ok\n");
 }

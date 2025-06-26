@@ -43,7 +43,7 @@ void send_pnw_command(server_t *server, client_t *client, client_t *recipient)
             client->player->rotation,
             client->player->level,
             client->player->team_name);
-    write_command_output(recipient->client_fd, buffer);
+    write_command_output_buffer(recipient, buffer);
     free(buffer);
 }
 

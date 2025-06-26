@@ -37,7 +37,7 @@ void command_pie(server_t *server, int x, int y, int result)
         return;
     current = server->client;
     while (current) {
-        write_command_output(current->client_fd, buffer);
+        write_command_output_buffer(current, buffer);
         current = current->next;
     }
     free(buffer);

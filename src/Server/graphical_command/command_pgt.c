@@ -25,7 +25,7 @@ void command_pgt(server_t *server, client_t *client,
     sprintf(buffer, "pgt #%d %d\n", client->client_id, resource_type);
     graphical_client = server->graphical_clients;
     while (graphical_client != NULL) {
-        write_command_output(graphical_client->client->client_fd, buffer);
+        write_command_output_buffer(graphical_client->client, buffer);
         graphical_client = graphical_client->next;
     }
     free(buffer);

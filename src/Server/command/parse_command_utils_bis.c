@@ -71,10 +71,43 @@ static bool is_valid_team_name(char *team_name, server_t *server,
     return false;
 }
 
+int add_string_to_write_buffer(circular_buffer_t *cb, char *msg)
+{
+    size_t len = strlen(msg);
+
+    for (size_t i = 0; i < len; i++) {
+        if (add_to_circular_buffer(cb, msg[i]) == -1)
+            return -1;
+    }
+    return 0;
+}
+
+void flush_client_write_buffer(client_t *client)
+{
+    int available = client->write_buffer.count;
+    char *temp;
+
+    if (!client || client->write_buffer.count == 0)
+        return;
+    temp = malloc(sizeof(char) * (available + 1));
+    if (!temp)
+        return;
+    for (int i = 0; i < available; i++) {
+        temp[i] = client->write_buffer.buffer[client->write_buffer.start];
+        client->write_buffer.start =
+            (client->write_buffer.start + 1) % BUFFER_SIZE;
+        client->write_buffer.count--;
+    }
+    temp[available] = '\0';
+    write_command_output(client->client_fd, temp);
+    client->need_write = false;
+    free(temp);
+}
+
 bool can_connect(server_t *server, client_t *user, char *buffer)
 {
     if (!is_valid_team_name(buffer, server, user)){
-        write_command_output(user->client_fd, "ko\n");
+        write_command_output_buffer(user, "ko\n");
         return false;
     }
     if (user->type != GRAPHICAL &&
@@ -83,7 +116,7 @@ bool can_connect(server_t *server, client_t *user, char *buffer)
             free(user->player->team_name);
             user->player->team_name = NULL;
         }
-        write_command_output(user->client_fd, "ko\n");
+        write_command_output_buffer(user, "ko\n");
         return false;
     }
     return true;

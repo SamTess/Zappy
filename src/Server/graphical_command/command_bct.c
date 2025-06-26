@@ -57,7 +57,7 @@ static void send_bct_command(server_t *server, client_t *client, int x, int y)
         return;
     tile = &server->map[y][x];
     buffer = get_buffer_bct_command(x, y, tile);
-    write_command_output(client->client_fd, buffer);
+    write_command_output_buffer(client, buffer);
     free(buffer);
 }
 
@@ -107,7 +107,7 @@ void command_bct(server_t *server, client_t *client, char **buffer)
         x < 0 || y < 0 ||
         y >= server->parsed_info->height ||
         x >= server->parsed_info->width)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     send_bct_command(server, client, x, y);
 }
 
@@ -115,6 +115,6 @@ void command_mtc(server_t *server, client_t *client, char **buffer)
 {
     if (!server || !client || !server->graphical_clients
         || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     send_tile_content_to_one_client(server, client);
 }

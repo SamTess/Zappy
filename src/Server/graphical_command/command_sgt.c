@@ -20,13 +20,13 @@ void command_sgt(server_t *server, client_t *client, char **buffer)
 
     if (!server || !client || !server->graphical_clients ||
         arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "spb\n");
+        return write_command_output_buffer(client, "spb\n");
     tmp = NULL;
     size = snprintf(NULL, 0, "sgt %d\n", server->parsed_info->frequence);
     tmp = malloc(size + 1);
     if (!tmp)
         return;
     snprintf(tmp, size + 1, "sgt %d\n", server->parsed_info->frequence);
-    write_command_output(client->client_fd, tmp);
+    write_command_output_buffer(client, tmp);
     free(tmp);
 }

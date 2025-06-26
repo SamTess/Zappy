@@ -45,10 +45,10 @@ void take_object(server_t *server, client_t *client, char **buffer)
     resource_type_t type;
 
     if (!server || !client || !client->player || arr_len(buffer) != 2)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     type = determine_type(buffer[1]);
     if (type == COUNT)
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client, "ko\n");
     if (server->map[client->player->pos_y]
         [client->player->pos_x].resources[type] > 0) {
         update_resources(server, client, type);
@@ -57,7 +57,7 @@ void take_object(server_t *server, client_t *client, char **buffer)
         send_bct_to_all_graphical_clients(server, client->player->pos_x,
             client->player->pos_y);
         send_pin_to_all(server, client);
-        write_command_output(client->client_fd, "ok\n");
+        write_command_output_buffer(client, "ok\n");
     } else
-        write_command_output(client->client_fd, "ko\n");
+        write_command_output_buffer(client, "ko\n");
 }

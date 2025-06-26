@@ -26,7 +26,7 @@ static void send_one_tna_command(server_t *server, client_t *client,
     if (!buffer)
         return;
     snprintf(buffer, size + 1, "tna %s\n", team);
-    write_command_output(client->client_fd, buffer);
+    write_command_output_buffer(client, buffer);
     free(buffer);
 }
 
@@ -44,6 +44,6 @@ void command_tna(server_t *server, client_t *client, char **buffer)
     if (!server || !client || !buffer || !server->parsed_info ||
         !server->parsed_info->names || !server->graphical_clients
         || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "sbp\n");
+        return write_command_output_buffer(client, "sbp\n");
     send_tna_command(server, client);
 }

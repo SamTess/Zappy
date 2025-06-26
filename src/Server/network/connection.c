@@ -144,7 +144,7 @@ static void copy_names(server_t *server, parsing_info_t *parsed_info)
     server->parsed_info->names[i] = NULL;
 }
 
-void init_server_resources(server_t *server)
+static void init_server_resources(server_t *server)
 {
     server->total_resources = malloc(sizeof(int) * COUNT);
     server->current_resources = malloc(sizeof(int) * COUNT);

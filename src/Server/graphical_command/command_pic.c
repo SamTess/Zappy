@@ -50,7 +50,7 @@ void command_pic(server_t *server, int x, int y, int level)
         return;
     current = server->graphical_clients;
     while (current) {
-        write_command_output(current->client->client_fd, buffer);
+        write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);
