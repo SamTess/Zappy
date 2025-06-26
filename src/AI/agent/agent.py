@@ -144,12 +144,12 @@ class Agent:
 
 
   def _update_self_state(self):
-
-
     #? On modifie son propre id si un autre agent a le même
-    if self.id in self.other_agents:
+    new_id = self.id
+    while new_id in self.other_agents:
       print(f"Agent {self.id}: Updating own ID to avoid conflict with other agents.")
-      new_id = max(self.other_agents.keys()) + randint(1, 100)  #? On change l'id pour éviter les conflits
+      new_id = randint(1, 10000)  #? On change l'id pour éviter les conflits
+    if new_id != self.id:
       self.broadcastManager.send_broadcast("U", str(new_id))
       self.id = new_id
 
@@ -157,10 +157,11 @@ class Agent:
     agent_ids = list(self.other_agents.keys())
     agent_ids.append(self.id)
     agent_ids.sort()
-    if self.id >= max(agent_ids) - minimum_players_for_upgrade - 2:
-      self.current_role = "miner"
-    else:
-      self.current_role = "fighter"
+    self.current_role = "miner"
+    # if self.id >= max(agent_ids) - minimum_players_for_upgrade - 2:
+    #   self.current_role = "miner"
+    # else:
+    #   self.current_role = "fighter"
 
     # #? L'agent "originel" regarde si il y a assez de monde pour upgrade, sinon il fork et appelle les autres à fork aussi
     # #? L'agent originel est celui qui a l'id le plus élevé
@@ -209,25 +210,35 @@ class Agent:
       else:
         print(f"Agent {self.id}: Not all required resources for upgrade are available.")
 
-    elif self.current_phase == "reproducing":
-      self.current_phase = "rallying"
-
-    #? On check si assez de monde est rassemblé pour passer au setting
+    #? On check si assez de monde est rassemblé et qu'il y a assez de ressources pour passer au setting
     elif self.current_phase == "rallying":
       if len(self.other_agents) < minimum_players_for_upgrade * 2:
         if self.current_role == "miner":
           self.current_phase = "reproducing"
           return
 
-      i = 0
+      required_total_amount_of_resources = get_total_upgrade_resources()
+      tile_total_amount_of_resources = zappy.inventory_to_dict(self.last_known_inventory)
       for agent_info in self.other_agents.items():
         if agent_info[1]['direction'] is None or agent_info[1]['direction'] != 0:
           print(f"Agent {self.id}: Waiting for all agents to be ready for setting.")
-          return
-        if i >= minimum_players_for_upgrade:
-          break
-      print(f"Agent {self.id}: All agents are ready for setting.")
-      self.current_phase = "setting"
+          continue
+        agent_inventory = zappy.inventory_to_dict(agent_info['inventory'])
+        for key, value in agent_inventory.items():
+            if key in tile_total_amount_of_resources:
+                tile_total_amount_of_resources[key] += value
+            else:
+                tile_total_amount_of_resources[key] = value
+
+      have_enough_resources = True
+      for key, required_value in required_total_amount_of_resources.items():
+        available_value = tile_total_amount_of_resources.get(key, 0)
+        if available_value < required_value:
+          have_enough_resources = False
+
+      if have_enough_resources:
+        print(f"Agent {self.id}: All agents are ready for setting.")
+        self.current_phase = "setting"
 
     #? On check si assez de ressources ont été lachées pour passer à l'upgrade
     elif self.current_phase == "setting":
