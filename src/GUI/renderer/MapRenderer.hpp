@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include "../gameController/GameState.hpp"
 #include "../../Shared/IGraphicsLib.hpp"
-#include "strategies/DetailedTileRenderStrategy.hpp"
+#include "TileRender.hpp"
 
 namespace Zappy {
 

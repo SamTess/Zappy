@@ -7,7 +7,7 @@
 
 #pragma once
 #include <memory>
-#include "../../../Shared/IGraphicsLib.hpp"
+#include "../../Shared/IGraphicsLib.hpp"
 
 namespace Zappy {
 class ITileRenderStrategy {

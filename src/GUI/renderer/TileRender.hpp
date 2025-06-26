@@ -8,8 +8,8 @@
 #pragma once
 #include <memory>
 #include <string>
-#include "ITileRenderStrategy.hpp"
-#include "../../gameController/GameState.hpp"
+#include "ITileRender.hpp"
+#include "../gameController/GameState.hpp"
 
 namespace Zappy {
 

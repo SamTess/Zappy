@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include "MapRenderer.hpp"
-#include "strategies/DetailedTileRenderStrategy.hpp"
+#include "TileRender.hpp"
 #include "../gameController/GameState.hpp"
 
 namespace Zappy {

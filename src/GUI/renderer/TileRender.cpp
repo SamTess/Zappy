@@ -9,14 +9,14 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include "DetailedTileRenderStrategy.hpp"
-#include "../../gameController/entities/Tile.hpp"
-#include "../../gameController/entities/Player.hpp"
-#include "../../gameController/entities/Resource.hpp"
-#include "../../gameController/entities/Egg.hpp"
-#include "../../gameController/GameState.hpp"
-#include "../EjectionAnimationManager.hpp"
-#include "../DeathAnimationManager.hpp"
+#include "TileRender.hpp"
+#include "../gameController/entities/Tile.hpp"
+#include "../gameController/entities/Player.hpp"
+#include "../gameController/entities/Resource.hpp"
+#include "../gameController/entities/Egg.hpp"
+#include "../gameController/GameState.hpp"
+#include "EjectionAnimationManager.hpp"
+#include "DeathAnimationManager.hpp"
 
 namespace Zappy {
 
@@ -46,8 +46,8 @@ void DetailedTileRenderStrategy::renderAllPlayers(std::shared_ptr<const ITile> t
         auto playerInfo = gameState->getPlayerInfo(playerId);
         if (playerInfo) {
             ZappyTypes::Vector3 renderPosition = position;
-            if (Zappy::EjectionAnimationManager::getInstance().isPlayerBeingEjected(playerId)) {
-                ZappyTypes::Vector3 animPos = Zappy::EjectionAnimationManager::getInstance().getPlayerAnimationPosition(playerId);
+            if (EjectionAnimationManager::getInstance().isPlayerBeingEjected(playerId)) {
+                ZappyTypes::Vector3 animPos = EjectionAnimationManager::getInstance().getPlayerAnimationPosition(playerId);
                 if (animPos.x != 0 || animPos.y != 0 || animPos.z != 0)
                     renderPosition = animPos;
             }
