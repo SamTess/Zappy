@@ -37,7 +37,7 @@ BOLD=\033[1m
 RESET=\033[0m
 BG_BLACK=\033[40m
 
-all: display_banner check_submodules
+all: display_banner check_raylib check_submodules
 	@echo "$(CYAN)[$(BOLD)BUILDING$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de tous les composants...$(RESET)"
 	@sleep 0.3
@@ -134,6 +134,37 @@ install_ai:
 	@$(MAKE) -C $(AI_DIR) install
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
 	 IA installées avec succès !$(RESET)"
+
+check_raylib:
+	@echo "$(CYAN)[$(BOLD)DEP$(RESET)$(CYAN)]$(RESET) $(BOLD)Vérification de \
+	la présence de raylib...$(RESET)"
+	@if ! pkg-config --exists raylib; then \
+		echo "$(YELLOW)[$(BOLD)WARNING$(RESET)$(YELLOW)]$(RESET) $(BOLD)raylib \
+	non trouvé, tentative d'installation via APT...$(RESET)"; \
+		sudo apt update && sudo apt install -y libraylib-dev; \
+		if ! pkg-config --exists raylib; then \
+			echo "$(YELLOW)[$(BOLD)WARNING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)raylib introuvable via APT, installation depuis GitHub...$(RESET)"; \
+			git clone https://github.com/raysan5/raylib.git \
+	$(LIBS_DIR)/raylib_src; \
+			cd $(LIBS_DIR)/raylib_src && mkdir -p build && \
+	cd build && cmake .. && make && sudo make install && sudo ldconfig; \
+			if pkg-config --exists raylib; then \
+				echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)raylib installé avec succès depuis GitHub.$(RESET)"; \
+			else \
+				echo "$(RED)[$(BOLD)ERROR$(RESET)$(RED)]$(RESET) \
+	$(BOLD)Échec d'installation de raylib.$(RESET)"; \
+				exit 1; \
+			fi; \
+		else \
+			echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)raylib installé avec succès via APT.$(RESET)"; \
+		fi; \
+	else \
+		echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)raylib déjà présent.$(RESET)"; \
+	fi
 
 check_submodules:
 	@echo "$(CYAN)[$(BOLD)SUBMODULES$(RESET)$(CYAN)]$(RESET) \
