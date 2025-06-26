@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <optional>
 #include "Common.hpp"
 
 class IGraphicsLib {
@@ -94,8 +95,8 @@ public:
     virtual ZappyTypes::Vector3 GetCameraPosition() = 0;
     virtual ZappyTypes::Vector3 GetCameraTarget() = 0;
     virtual ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) = 0;
-    virtual bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) = 0;
-    
+    virtual std::optional<ZappyTypes::Vector3> RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal) = 0;
+
     // Performance
     virtual int GetFPS() = 0;
 };

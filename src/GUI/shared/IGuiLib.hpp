@@ -41,8 +41,6 @@ class IGuiLib {
         virtual void LoadStyle(const std::string& file) = 0;
         virtual void SetStyle(int control, int property, int value) = 0;
         virtual int GetStyle(int control, int property) = 0;
-        
-        // Fonctions de souris et clavier pour le glissement des fenêtres
         virtual ZappyTypes::Vector2 GetMousePosition() = 0;
         virtual bool IsMouseButtonDown(int button) = 0;
         virtual bool IsMouseButtonPressed(int button) = 0;

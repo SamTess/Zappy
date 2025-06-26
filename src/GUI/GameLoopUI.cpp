@@ -108,10 +108,10 @@ bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_p
     ZappyTypes::Vector3 rayDirection = _graphics->ScreenToWorldRay(screenPos);
     ZappyTypes::Vector3 planePoint = {0.0f, 0.0f, 0.0f};
     ZappyTypes::Vector3 planeNormal = {0.0f, 1.0f, 0.0f};
-    ZappyTypes::Vector3 intersectionPoint;
-    if (_graphics->RayPlaneIntersection(cameraPos, rayDirection,
-        planePoint, planeNormal, intersectionPoint))
-        return worldToTileCoordinates(intersectionPoint, tileX, tileY);
+    auto intersectionPoint = _graphics->RayPlaneIntersection(cameraPos, rayDirection,
+        planePoint, planeNormal);
+    if (intersectionPoint.has_value())
+        return worldToTileCoordinates(intersectionPoint.value(), tileX, tileY);
     return false;
 }
 

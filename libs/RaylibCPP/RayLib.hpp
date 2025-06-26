@@ -104,7 +104,7 @@ public:
     ZappyTypes::Vector3 GetCameraPosition() override;
     ZappyTypes::Vector3 GetCameraTarget() override;
     ZappyTypes::Vector3 ScreenToWorldRay(ZappyTypes::Vector2 screenPos) override;
-    bool RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal, ZappyTypes::Vector3& intersectionPoint) override;
+    std::optional<ZappyTypes::Vector3> RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal) override;
 
     // Performance
     int GetFPS() override;
