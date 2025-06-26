@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** CircularBuffer implementation
+** CircularBuffer
 */
 
 #include "CircularBuffer.hpp"
@@ -16,7 +16,6 @@ CircularBuffer::CircularBuffer(size_t capacity)
 }
 
 bool CircularBuffer::write(const std::string& data, size_t size) {
-    std::lock_guard<std::mutex> lock(_mutex);
     for (size_t i = 0; i < size; ++i) {
         _buffer[_head] = data[i];
         _head = nextIndex(_head);
@@ -34,7 +33,6 @@ bool CircularBuffer::write(const std::string& data) {
 }
 
 std::string CircularBuffer::readLine() {
-    std::lock_guard<std::mutex> lock(_mutex);
     std::string result;
     size_t currentTail = _tail;
     size_t elementsRead = 0;
@@ -57,7 +55,6 @@ std::string CircularBuffer::readLine() {
 }
 
 size_t CircularBuffer::size() const {
-    std::lock_guard<std::mutex> lock(_mutex);
     return _size;
 }
 
@@ -66,25 +63,20 @@ size_t CircularBuffer::capacity() const {
 }
 
 bool CircularBuffer::empty() const {
-    std::lock_guard<std::mutex> lock(_mutex);
     return _size == 0;
 }
 
 bool CircularBuffer::full() const {
-    std::lock_guard<std::mutex> lock(_mutex);
     return _size == _capacity;
 }
 
 void CircularBuffer::clear() {
-    std::lock_guard<std::mutex> lock(_mutex);
     _head = 0;
     _tail = 0;
     _size = 0;
 }
 
 bool CircularBuffer::hasLine() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
     size_t currentTail = _tail;
     for (size_t i = 0; i < _size; ++i) {
         if (_buffer[currentTail] == '\n') {
@@ -96,5 +88,7 @@ bool CircularBuffer::hasLine() const {
 }
 
 size_t CircularBuffer::nextIndex(size_t index) const {
-    return (index + 1) % _capacity;
+    if (index + 1 == _capacity)
+        return 0;
+    return index + 1;
 }
