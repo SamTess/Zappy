@@ -34,7 +34,6 @@ void ComponentCoordinator::setupConnections() {
         });
         nm->setConnectionCallback([this](bool connected) {
             (void)connected;
-            // this->onConnectionStatusChanged(connected);
         });
     }
     if (auto gc = _gameController.lock())

@@ -18,21 +18,18 @@ class DLLoader {
     public:
         explicit DLLoader(const std::string& libPath) {
             _handle = dlopen(libPath.c_str(), RTLD_LAZY);
-            if (!_handle) {
+            if (!_handle)
                 throw std::runtime_error("Impossible de charger la bibliothèque: " + std::string(dlerror()));
-            }
         }
         ~DLLoader() {
-            if (_handle) {
+            if (_handle)
                 dlclose(_handle);
-            }
         }
         template<typename SymbolType>
         SymbolType getSymbol(const std::string& symbolName) {
             void* symbol = dlsym(_handle, symbolName.c_str());
-            if (!symbol) {
+            if (!symbol)
                 throw std::runtime_error("Impossible de trouver le symbole '" + symbolName + "': " + std::string(dlerror()));
-            }
             return reinterpret_cast<SymbolType>(symbol);
         }
         std::unique_ptr<T, std::function<void(T*)>> getInstance(const std::string& creatorName) {

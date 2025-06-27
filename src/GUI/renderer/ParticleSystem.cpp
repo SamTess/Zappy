@@ -46,7 +46,7 @@ void ParticleSystem::createEffect(ParticleType type, const ZappyTypes::Vector3& 
         if (activeEffects.size() >= maxActiveEffects)
             return;
     }
-    std::unique_ptr<ParticleEffect> effect;
+    std::unique_ptr<AParticleEffect> effect;
     if (type == ParticleType::BROADCAST_RING)
         effect = std::make_unique<BroadcastEffect>();
     effect->initialize(position, type, intensity);
@@ -71,7 +71,7 @@ void ParticleSystem::cleanup() {
 void ParticleSystem::removeInactiveEffects() {
     activeEffects.erase(
         std::remove_if(activeEffects.begin(), activeEffects.end(),
-            [](const std::unique_ptr<ParticleEffect>& effect) {
+            [](const std::unique_ptr<AParticleEffect>& effect) {
                 return !effect || !effect->isActive();
         }),
         activeEffects.end()

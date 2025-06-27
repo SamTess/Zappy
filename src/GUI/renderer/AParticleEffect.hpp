@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** ParticleEffect
+** AParticleEffect
 */
 
 #pragma once
@@ -33,10 +33,10 @@ enum class ParticleType {
     BROADCAST_RING,
 };
 
-class ParticleEffect {
+class AParticleEffect {
     public:
-        ParticleEffect();
-        virtual ~ParticleEffect() = default;
+        AParticleEffect();
+        virtual ~AParticleEffect() = default;
 
         virtual void initialize(const ZappyTypes::Vector3& position, ParticleType type, int maxParticles = 20) = 0;
         virtual void update(float deltaTime) = 0;

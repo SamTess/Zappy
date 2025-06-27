@@ -210,7 +210,7 @@ void UIDataProvider::setSfxEnabled(bool enabled) {
 
 float UIDataProvider::getMusicVolume() const {
     if (!isValidGameState())
-        return 0.8f; // valeur par défaut
+        return 0.8f;
     return _gameState->getMusicVolume();
 }
 

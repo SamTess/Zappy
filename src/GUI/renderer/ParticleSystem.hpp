@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <memory>
-#include "ParticleEffect.hpp"
+#include "AParticleEffect.hpp"
 #include "BroadcastEffect.hpp"
 
 class GameState;
@@ -32,7 +32,7 @@ class ParticleSystem {
         ~ParticleSystem() = default;
         void removeInactiveEffects();
 
-        std::vector<std::unique_ptr<ParticleEffect>> activeEffects;
+        std::vector<std::unique_ptr<AParticleEffect>> activeEffects;
         size_t maxActiveEffects;
 };
 

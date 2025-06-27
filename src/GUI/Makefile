@@ -26,7 +26,7 @@ SRC = parsing/ParsingCLI.cpp \
 	  renderer/Renderer.cpp \
 	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
-	  renderer/ParticleEffect.cpp \
+	  renderer/AParticleEffect.cpp \
 	  renderer/BroadcastEffect.cpp \
 	  renderer/ParticleSystem.cpp \
 	  renderer/EjectionAnimationManager.cpp \

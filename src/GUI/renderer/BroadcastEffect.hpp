@@ -9,13 +9,13 @@
 
 #include <memory>
 #include <vector>
-#include "ParticleEffect.hpp"
+#include "AParticleEffect.hpp"
 
 class GameState;
 
 namespace Zappy {
 
-class BroadcastEffect : public ParticleEffect {
+class BroadcastEffect : public AParticleEffect {
     public:
         BroadcastEffect();
         ~BroadcastEffect() override = default;
