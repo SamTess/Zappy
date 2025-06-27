@@ -13,6 +13,7 @@ class DecisionManager:
       "FoodBigDyson": behaviors.FoodBigDysonBehavior(agent),
       "FoodDyson": behaviors.FoodDysonBehavior(agent),
       "JoinTeamMates": behaviors.JoinTeamMatesBehavior(agent),
+      "JoinCaptain": behaviors.JoinCaptainBehavior(agent),
       "TakeEverythingHere": behaviors.TakeEverythingHereBehavior(agent),
       "TakeAllFoodHere": behaviors.TakeAllFoodHereBehavior(agent),
       "TakeOneFoodHere": behaviors.TakeOneFoodHereBehavior(agent),
@@ -29,6 +30,9 @@ class DecisionManager:
       "fork": {"all": ["Fork", "FoodBigDyson"]},
       "fill": {"all": ["FillTeam"]},
       "collect": {"miner": ["BigDyson"], "fighter": ["BigDyson"]},
+      "rally": { "all": ["TakeOneFoodHere", "JoinCaptain"]},
+      "set": {"all": ["DropEveryMinerals"]},
+      "upgrade": {"all": ["Upgrade"]},
     }
 
 

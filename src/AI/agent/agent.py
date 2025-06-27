@@ -122,6 +122,9 @@ class Agent:
   def _run(self):
     while self.socketManager.running and self.running:
       try:
+        if self.is_original:
+          self.broadcastManager.send_broadcast("C", "Captain")
+          print(f"Agent {self.id}: Broadcasting as captain.")
         self.broadcastManager.send_broadcast("I", f"{self.last_known_inventory}")
         self.process_server_message()
         self.stateManager.update()
@@ -183,11 +186,40 @@ class Agent:
         del self.other_agents[agent_id]
       return
 
+    if agent_id in self.other_agents:
+      self.other_agents[agent_id]['direction'] = direction
+      self.other_agents[agent_id]['inventory'] = inventory
+      self.other_agents[agent_id]['last_ping'] = self.tick
+      return
+
     self.other_agents[agent_id] = {
         "direction": direction,
         "inventory": inventory,
-        "last_ping": self.tick
+        "last_ping": self.tick,
+        "is_captain": False
     }
+
+
+  def update_captain(self, agent_id, direction):
+    if agent_id is None or direction is None:
+      return
+
+    for agent in self.other_agents:
+      if self.other_agents[agent]['is_captain']:
+        self.other_agents[agent]['is_captain'] = False
+
+    if agent_id in self.other_agents:
+      self.other_agents[agent_id]['is_captain'] = True
+      self.other_agents[agent_id]['direction'] = direction
+      print(f"Agent {self.id}: Updated captain to agent {agent_id} with direction {direction}.")
+    else:
+      self.other_agents[agent_id] = {
+        "direction": direction,
+        "inventory": {},
+        "last_ping": self.tick,
+        "is_captain": True
+      }
+
 
   def update_agent_id(self, agent_id, direction, new_id):
     if agent_id is None or new_id is None:
@@ -201,6 +233,7 @@ class Agent:
       print(f"Agent {self.id}: Updated agent ID from {agent_id} to {new_id}.")
     else:
       print(f"Agent {self.id}: Agent ID {agent_id} not found for update.")
+
 
   def fork(self):
     fork_res = self.send_command("Fork")
@@ -231,4 +264,3 @@ class Agent:
       self.last_enemy_direction = direction
       if direction == 0:
         self.send_command("Eject")
-

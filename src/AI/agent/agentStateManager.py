@@ -1,6 +1,6 @@
 from agent.agentActionsService import AgentActionManager
 from constants.upgrades import get_total_upgrade_resources, minimum_players_for_upgrade
-from utils.zappy import inventory_to_dict
+from utils.zappy import inventory_to_dict, get_closest_of_item
 from random import randint
 
 
@@ -68,17 +68,52 @@ class AgentStateManager:
 
 
   def _manage_rally_phase(self):
-    print(f"Agent {self.agent.id}: Managing rally phase...")
-    # Implement rally phase logic here
+    required_total_amount_of_resources = get_total_upgrade_resources()
+    tile_agents_total_amount_of_resources = inventory_to_dict(self.agent.last_known_inventory)
+    i = 0
+    for agent_id, agent_info in self.agent.other_agents.items():
+      if agent_info['direction'] is None or agent_info['direction'] != 0:
+        continue
+      agent_inventory = inventory_to_dict(agent_info['inventory'])
+      for key, value in agent_inventory.items():
+          if key in tile_agents_total_amount_of_resources:
+              tile_agents_total_amount_of_resources[key] += value
+          else:
+              tile_agents_total_amount_of_resources[key] = value
+      i += 1
+
+    if i < minimum_players_for_upgrade:
+      return
+
+    have_enough_resources = True
+    for key, required_value in required_total_amount_of_resources.items():
+      available_value = tile_agents_total_amount_of_resources.get(key, 0)
+      if available_value < required_value:
+        have_enough_resources = False
+
+    if have_enough_resources:
+      print(f"Agent {self.agent.id}: All agents are ready for setting.")
+      self.agent.current_phase = "set"
 
 
   def _manage_set_phase(self):
-    print(f"Agent {self.agent.id}: Managing set phase...")
-    # Implement set phase logic here
+    last_surroundings = self.agent.last_known_surroundings
+    if last_surroundings is None or "ko" in last_surroundings:
+      print(f"Agent {self.agent.id}: Failed to retrieve surroundings for setting phase.")
+      return
+
+    required_total_amount_of_resources = get_total_upgrade_resources()
+    for key, value in required_total_amount_of_resources.items():
+        distance_to_item, amount_found = get_closest_of_item(last_surroundings, key)
+        if distance_to_item == -1 or amount_found < value:
+          print(f"Agent {self.agent.id}: Not enough {key} for upgrade. Found: {amount_found}, Required: {value}")
+          return
+    print(f"Agent {self.agent.id}: All required resources for upgrading are available.")
+    self.agent.current_phase = "upgrade"
 
 
   def _manage_upgrade_phase(self):
-    print("Managing upgrade phase...")
+    print(f"Agent {self.agent.id}: Managing upgrade phase...")
     # Implement upgrade phase logic here
 
 

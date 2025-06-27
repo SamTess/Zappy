@@ -69,6 +69,8 @@ class BroadcastManager:
         self._handle_fork_query_message(sender_agent_id, sender_agent_direction, payload)
       elif msg_type == "U":
         self._handle_id_change_message(sender_agent_id, sender_agent_direction, payload)
+      elif msg_type == "C":
+        self._handle_captain_message(sender_agent_id, sender_agent_direction, payload)
       else:
         print(f"Unknown message type: {msg_type} in decrypted message: {decrypted_message}")
 
@@ -111,6 +113,17 @@ class BroadcastManager:
       return
     except Exception as e:
       print(f"Error updating agent ID: {e}")
+      return
+
+
+  def _handle_captain_message(self, sender_agent_id, sender_agent_direction, message):
+    if not hasattr(self.agent, 'update_captain'):
+      print("Agent is missing 'update_captain' method for handling captain messages.")
+      return
+    try:
+      self.agent.update_captain(sender_agent_id, sender_agent_direction)
+    except Exception as e:
+      print(f"Error updating captain: {e}")
       return
 
 
