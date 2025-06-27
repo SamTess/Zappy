@@ -43,7 +43,6 @@ typedef struct resource_dist_s {
     int width;
     int height;
     int *tile_indices;
-    int tile_idx;
     int total;
 } resource_dist_t;
 
