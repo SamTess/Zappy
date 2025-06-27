@@ -160,28 +160,19 @@ void MapRenderer::renderTileSelectionEffect(int x, int y) {
 }
 
 void MapRenderer::renderPlayerSelectionEffect(int playerId) {
-    if (!gameState) {
+    if (!gameState)
         return;
-    }
     auto player = gameState->getPlayerInfo(playerId);
-    if (!player) {
+    if (!player)
         return;
-    }
-
     ZappyTypes::Vector3 basePosition;
     ZappyTypes::Vector3 playerPosition;
-
     if (player->isMoving()) {
         ZappyTypes::Vector3 interpolatedPos = player->getInterpolatedPosition();
         float mapCenterX = gameState->getMapWidth() / 2.0f;
         float mapCenterY = gameState->getMapHeight() / 2.0f;
-
-        basePosition = {
-            (interpolatedPos.x - mapCenterX + 0.5f) * (tileSize + tileSpacing),
-            0.0f,
-            (interpolatedPos.z - mapCenterY + 0.5f) * (tileSize + tileSpacing)
-        };
-
+        basePosition = {(interpolatedPos.x - mapCenterX + 0.5f) * (tileSize + tileSpacing), 0.0f,
+            (interpolatedPos.z - mapCenterY + 0.5f) * (tileSize + tileSpacing)};
         playerPosition = basePosition;
         playerPosition.y = interpolatedPos.y + 0.55f;
     } else {
@@ -190,7 +181,6 @@ void MapRenderer::renderPlayerSelectionEffect(int playerId) {
         basePosition = calculateBasePosition(playerX, playerY);
         playerPosition = calculatePlayerVisualPosition(playerId, playerX, playerY, basePosition);
     }
-
     float time = static_cast<float>(clock()) / CLOCKS_PER_SEC;
     float pulseIntensity = 0.8f + 0.2f * sin(time * 4.0f);
     renderPlayerWireframe(playerPosition, time, pulseIntensity);
