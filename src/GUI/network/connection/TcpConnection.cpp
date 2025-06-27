@@ -9,10 +9,9 @@
 #include <memory>
 #include <string>
 
-TcpConnection::TcpConnection(size_t initialBufferSize) : _initialBufferSize(initialBufferSize) {
+TcpConnection::TcpConnection() {
     _networkFactory = Network::createFactory();
     _socket = _networkFactory->createTcpSocket();
-    _recvBuffer = _networkFactory->createBuffer(_initialBufferSize);
 }
 
 TcpConnection::~TcpConnection() {
@@ -32,9 +31,8 @@ void TcpConnection::createAndConfigureSocket() {
 }
 
 void TcpConnection::performConnect(const std::string &host, int port) {
-    if (!_socket || !_socket->connect(host, port)) {
+    if (!_socket || !_socket->connect(host, port))
         throw TcpConnectionException("Connection failed to " + host + ":" + std::to_string(port));
-    }
 }
 
 void TcpConnection::send(const std::string &message) {
@@ -45,9 +43,8 @@ void TcpConnection::send(const std::string &message) {
     finalMessage = message;
     if (finalMessage.empty() || finalMessage.back() != '\n')
         finalMessage += '\n';
-    if (!_socket->send(finalMessage)) {
+    if (!_socket->send(finalMessage))
         throw TcpConnectionException("Send failed");
-    }
 }
 
 std::string TcpConnection::receive() {
@@ -63,11 +60,7 @@ std::string TcpConnection::receive() {
 }
 
 std::string TcpConnection::readDataFromSocket() {
-    std::string data = _socket->receive();
-
-    if (!data.empty())
-        _recvBuffer->setData(data);
-    return data;
+    return _socket->receive();
 }
 
 void TcpConnection::close() {
@@ -76,9 +69,13 @@ void TcpConnection::close() {
 }
 
 bool TcpConnection::isConnected() const {
-    return _socket && _socket->isConnected();
+    if (_socket)
+        return _socket->isConnected();
+    return false;
 }
 
 bool TcpConnection::hasData() const {
-    return _socket && _socket->hasData();
+    if (_socket)
+        return _socket->hasData();
+    return false;
 }

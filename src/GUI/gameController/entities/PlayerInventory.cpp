@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** PlayerInventory - Implémentation des méthodes pour l'inventaire des joueurs
+** PlayerInventory
 */
 
 #include "PlayerInventory.hpp"

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** MapInfoWindow implementation
+** MapInfoWindow
 */
 
 #include <sstream>
@@ -11,38 +11,41 @@
 #include <algorithm>
 #include <vector>
 #include "MapInfoWindow.hpp"
-#include "../../../gameController/IRenderable.hpp"
 
 namespace GUI {
 
 MapInfoWindow::MapInfoWindow(std::shared_ptr<IGuiLib> guiLib)
-    : AUIWindow(guiLib, "mapInfo") {
+    : AUIWindow(guiLib, "Informations de la carte") {
 }
 
 void MapInfoWindow::renderContent() {
+    if (!_dataProvider) {
+        _guiLib->DrawLabel(_position.x + 10, _position.y + 40, _dimensions.x - 20,
+            30, "Données non disponibles");
+        return;
+    }
+    if (_dataProvider->getMapWidth() == 0 || _dataProvider->getMapHeight() == 0) {
+        _guiLib->DrawLabel(_position.x + 10, _position.y + 40, _dimensions.x - 20,
+            30, "Carte non initialisée");
+        return;
+    }
     const float lineHeight = 20.0f;
-    const float panelWidth = m_dimensions.x - 20;
-    const float panelHeight = m_dimensions.y - 40;
+    const float panelWidth = _dimensions.x - 20;
+    const float panelHeight = _dimensions.y - 40;
     const float contentWidth = panelWidth - 20;
-    ZappyTypes::Rectangle view = {
-        m_position.x + 10,
-        m_position.y + 30,
-        panelWidth,
-        panelHeight
-    };
+    ZappyTypes::Rectangle view = {_position.x + 10, _position.y + 30, panelWidth, panelHeight};
     int startIndex = 0;
-
     renderMapInfo(view, startIndex, lineHeight, contentWidth);
 }
 
 void GUI::MapInfoWindow::initialize(const ZappyTypes::Vector2& position,
     const ZappyTypes::Vector2& dimensions) {
-    m_position = position;
-    m_dimensions = dimensions;
-    m_visible = true;
-    m_showWindowBox = true;
-    m_dragging = false;
-    m_dragOffset = {0, 0};
+    _position = position;
+    _dimensions = dimensions;
+    _visible = true;
+    _showWindowBox = true;
+    _dragging = false;
+    _dragOffset = {0, 0};
 }
 
 int GUI::MapInfoWindow::calculateVisibleItemCount(float panelHeight, float lineHeight) {
@@ -65,77 +68,63 @@ std::string GUI::MapInfoWindow::getFormattedResource(std::vector<int> totalResso
 
 void GUI::MapInfoWindow::renderMapInfoTeam(const ZappyTypes::Rectangle& view,
     int startIndex, float lineHeight, float contentWidth, int textY) {
-    auto teamname = m_gameState->getTeamNames();
+    if (!_dataProvider)
+        return;
+    auto teamNames = _dataProvider->getTeamNames();
+    auto teamPlayerCounts = _dataProvider->getTeamPlayerCounts();
+    auto teamResourceTotals = _dataProvider->getTeamResourceTotals();
     std::string message;
-
     (void)startIndex;
-    for (const auto& team : m_gameState->getTeamNames()) {
-        int totalAlivePlayers = 0;
+    for (const auto& team : teamNames) {
         textY += lineHeight + 5;
         message = "Team: " + team;
-        m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-        std::vector<int> totalRessourceTeam = {0, 0 , 0, 0, 0, 0, 0};
-        for (const auto& player : m_gameState->getPlayers()) {
-            if (player.second->isAlive() && player.second->getTeamName() == team) {
-                totalAlivePlayers++;
-                auto inventory = m_gameState->getPlayerInventory(player.first);
-                std::string messageTmp = "pin #" + std::to_string(player.second->getId()) + "\n";
-                m_networkManager->sendCommand(messageTmp);
-                if (!inventory)
-                    continue;
-                totalRessourceTeam[0] += inventory->getResourceCount(0);
-                totalRessourceTeam[1] += inventory->getResourceCount(1);
-                totalRessourceTeam[2] += inventory->getResourceCount(2);
-                totalRessourceTeam[3] += inventory->getResourceCount(3);
-                totalRessourceTeam[4] += inventory->getResourceCount(4);
-                totalRessourceTeam[5] += inventory->getResourceCount(5);
-                totalRessourceTeam[6] += inventory->getResourceCount(6);
+        _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+                textY += lineHeight + 5;
+        int alivePlayers = teamPlayerCounts.count(team) ? teamPlayerCounts.at(team) : 0;
+        message = "Alive players: " + std::to_string(alivePlayers);
+        _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+        textY += lineHeight;
+        if (teamResourceTotals.count(team)) {
+            message = getFormattedResource(teamResourceTotals.at(team));
+            _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+        }
+        if (_uiContext) {
+            auto playerIds = _dataProvider->getPlayerIds();
+            for (int playerId : playerIds) {
+                auto player = _dataProvider->getPlayerInfo(playerId);
+                if (player && player->getTeamName() == team) {
+                    std::string pinCommand = "pin #" + std::to_string(playerId) + "\n";
+                    _uiContext->executeNetworkCommand(pinCommand);
+                }
             }
         }
-        textY += lineHeight + 5;
-        message = "Alive players: " + std::to_string(totalAlivePlayers);
-        m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-        textY += lineHeight;
-        message = getFormattedResource(totalRessourceTeam);
-        m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
     }
 }
 
 void GUI::MapInfoWindow::renderMapInfo(const ZappyTypes::Rectangle& view,
     int startIndex, float lineHeight,
     float contentWidth) {
-
-    m_dimensions.y = 120 + (m_gameState->getTeamNames().size() * 90);
+    if (!_dataProvider)
+        return;
+    auto teamNames = _dataProvider->getTeamNames();
+    _dimensions.y = 120 + (teamNames.size() * 90);
     float textY = view.y + 10;
-    std::string message = "Map size: width " + std::to_string(m_gameState->getMapWidth()) + ", height " + std::to_string(m_gameState->getMapHeight());
-
-    m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-    size_t totalNbPlayers = m_gameState->getPlayerCount();
+    std::string message = "Map size: width " + std::to_string(_dataProvider->getMapWidth()) +
+                         ", height " + std::to_string(_dataProvider->getMapHeight());
+    _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
     textY += lineHeight;
-    message = "Total players: " + std::to_string(totalNbPlayers);
-    m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
-
-    std::vector<int> totalRessource = {0, 0 , 0, 0, 0, 0, 0};
-    auto tiles = m_gameState->getTiles();
-    for (const auto& row : tiles) {
-        for (const auto& tile : row) {
-            totalRessource[0] += tile->getResourceQuantity(ResourceType::FOOD);
-            totalRessource[1] += tile->getResourceQuantity(ResourceType::LINEMATE);
-            totalRessource[2] += tile->getResourceQuantity(ResourceType::DERAUMERE);
-            totalRessource[3] += tile->getResourceQuantity(ResourceType::SIBUR);
-            totalRessource[4] += tile->getResourceQuantity(ResourceType::MENDIANE);
-            totalRessource[5] += tile->getResourceQuantity(ResourceType::PHIRAS);
-            totalRessource[6] += tile->getResourceQuantity(ResourceType::THYSTAME);
-        }
-    }
+    auto playerIds = _dataProvider->getPlayerIds();
+    message = "Total players: " + std::to_string(playerIds.size());
+    _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
     textY += lineHeight;
-    message = getFormattedResource(totalRessource);
-    m_guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
+    auto totalResources = _dataProvider->calculateTotalResources();
+    message = getFormattedResource(totalResources);
+    _guiLib->DrawLabel(view.x + 5, textY, contentWidth - 10, lineHeight, message);
     renderMapInfoTeam(view, startIndex, lineHeight, contentWidth, textY);
 }
 
-void GUI::MapInfoWindow::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
-    m_networkManager = networkManager;
+void GUI::MapInfoWindow::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {
+    _commandSender = sender;
 }
 
 } // namespace GUI

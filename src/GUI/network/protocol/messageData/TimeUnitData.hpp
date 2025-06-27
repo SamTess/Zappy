@@ -14,10 +14,9 @@ class TimeUnitData : public IMessageData {
     public:
         explicit TimeUnitData(int timeUnit)
             : _timeUnit(timeUnit) {}
+
         MessageType getType() const override { return MessageType::TimeUnit; }
-
         int getTimeUnit() const { return _timeUnit; }
-
         void setTimeUnit(int value) { _timeUnit = value; }
 
     private:

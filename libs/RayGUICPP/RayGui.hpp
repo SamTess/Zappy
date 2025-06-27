@@ -9,8 +9,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "../../src/Shared/IGuiLib.hpp"
-#include "../../src/Shared/Common.hpp"
+#include "../../src/GUI/shared/IGuiLib.hpp"
+#include "../../src/GUI/shared/Common.hpp"
 
 class RayGui : public IGuiLib {
 public:

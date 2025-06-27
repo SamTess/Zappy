@@ -17,15 +17,11 @@ class ParsingCLI {
         ~ParsingCLI();
 
         void parse(int argc, char **argv);
-
         int getPort() const;
         const std::string &getMachine() const;
-
         void setPort(int port);
         void setMachine(const std::string &machine);
-
         void displayHelp() const;
-
         void checkValidityCLI() const;
 
     private:
