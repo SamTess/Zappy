@@ -5,8 +5,6 @@
 ** ParticleSystem
 */
 
-#include "ParticleSystem.hpp"
-#include "BroadcastEffect.hpp"
 #include <random>
 #include <algorithm>
 #include <cmath>
@@ -14,6 +12,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include "ParticleSystem.hpp"
+#include "BroadcastEffect.hpp"
 #include "../gameController/GameState.hpp"
 
 namespace Zappy {

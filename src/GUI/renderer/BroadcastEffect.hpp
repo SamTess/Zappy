@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "ParticleEffect.hpp"
 #include <memory>
+#include <vector>
+#include "ParticleEffect.hpp"
 
 class GameState;
 

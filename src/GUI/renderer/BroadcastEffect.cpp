@@ -5,7 +5,6 @@
 ** BroadcastEffect
 */
 
-#include "BroadcastEffect.hpp"
 #include <random>
 #include <algorithm>
 #include <cmath>
@@ -13,6 +12,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <vector>
+#include "BroadcastEffect.hpp"
 #include "../gameController/GameState.hpp"
 #include "EjectionAnimationManager.hpp"
 
