@@ -31,7 +31,7 @@ class AgentStateManager:
       return
     available_slots = AgentActionManager(self.agent).get_available_slots()
     print(f"Agent {self.agent.id}: fork phase: {available_slots} slots are available.")
-    if available_slots > minimum_players_for_upgrade:
+    if available_slots > minimum_players_for_upgrade + 6:
       self.agent.current_phase = "fill"
       return
 
@@ -64,7 +64,21 @@ class AgentStateManager:
 
     if have_enough_resources:
       print(f"Agent {self.agent.id}: required resources for upgrade are available. Enough players: {len(self.agent.other_agents)}")
-      self.agent.current_phase = "rally"
+      self.agent.current_phase = "get_food"
+
+
+  def _manage_get_food_phase(self):
+    if self.agent.last_known_inventory is None:
+      print(f"Agent {self.agent.id}: No inventory data available for get_food phase.")
+      return
+
+    food_amount = inventory_to_dict(self.agent.last_known_inventory).get("food", 0)
+    if food_amount < 30:
+      print(f"Agent {self.agent.id}: Not enough food ({food_amount}) to proceed with get_food phase.")
+      return
+
+    print(f"Agent {self.agent.id}: Enough food ({food_amount}) available. Proceeding to collect resources.")
+    self.agent.current_phase = "rally"
 
 
   def _manage_rally_phase(self):
@@ -139,6 +153,8 @@ class AgentStateManager:
         self._manage_fill_phase()
       elif self.agent.current_phase == "collect":
         self._manage_collect_phase()
+      elif self.agent.current_phase == "get_food":
+        self._manage_get_food_phase()
       elif self.agent.current_phase == "rally":
         self._manage_rally_phase()
       elif self.agent.current_phase == "set":

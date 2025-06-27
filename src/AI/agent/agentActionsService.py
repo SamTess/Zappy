@@ -60,7 +60,7 @@ class AgentActionManager:
       if surroundings is None or "ko" in surroundings:
         print(f"go_take_item: Failed to look around. Response: {surroundings}")
         return
-      closest_item_distance = zappy.get_closest_of_item(surroundings, item)
+      closest_item_distance, _ = zappy.get_closest_of_item(surroundings, item)
       if closest_item_distance != -1 or i > 4:
         break
       self.agent.send_command("Right")
@@ -75,7 +75,7 @@ class AgentActionManager:
       self.take_all_of_item_here(item)
       return
 
-    distance_to_item = zappy.get_closest_of_item(surroundings, item)
+    distance_to_item, _ = zappy.get_closest_of_item(surroundings, item)
 
     self.go_to_pos_with_distance(distance_to_item)
     self.take_all_of_item_here(item)

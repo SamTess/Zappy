@@ -2,7 +2,8 @@ import utils.encryption as encryption
 
 ####! BROADCAST SYSTEM:
 #? message format: "message <emitter_direction>, <encrypted_message>"
-#? encrypted_message format: "<message_type>-<sender_id>-<message>
+#? encrypted_message format: <team_key>-<message_type>-<sender_id>-<message>
+#? the team_key is used to filter messages from other teams
 #? message_type: "I" for inventory, "F" for fork query, "U" for ID change
 
 class BroadcastManager:
@@ -40,7 +41,7 @@ class BroadcastManager:
     decrypted_message = encryption.decrypt_message(broadcast_message)
 
     if decrypted_message is not None:
-      msg_parts = decrypted_message.split('-', 4)
+      msg_parts = decrypted_message.split('-', 5)
       if len(msg_parts) != 4:
         print(f"Invalid decrypted message format (expected 4 parts): {decrypted_message}")
         return
@@ -60,7 +61,7 @@ class BroadcastManager:
       try:
         sender_agent_id = int(sender_agent_id_str)
       except ValueError:
-        print(f"Invalid channel_id or sender_agent_id in decrypted message: {decrypted_message}")
+        print(f"Invalid sender_agent_id in decrypted message: {decrypted_message}")
         return
 
       if msg_type == "I":

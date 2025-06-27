@@ -30,13 +30,11 @@ class GetFoodBehavior(Behavior):
 
 class UpgradeBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    if not surroundings or not inventory:
-      print("UpgradeBehavior: Surroundings or inventory is None.")
+    res = self.agent.send_command("Incantation", 10)
+    if res is None or "ko" in res:
+      print(f"UpgradeBehavior: Failed to perform incantation. Response: {res}")
+      self.agent.current_phase = "fork"
       return
-
-    self.agent.send_command("Incantation")
-
-
 
 class GetMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):

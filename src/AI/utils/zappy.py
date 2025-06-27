@@ -45,7 +45,7 @@ def inventory_to_dict(inventory_str):
 def get_closest_of_item(surroundings_str, item):
   if not surroundings_str:
     print("get_closest_of_item: Surroundings data is empty or None.")
-    return -1
+    return -1, 0
 
   cleaned = surroundings_str.strip("[ ]")
   tiles = cleaned.split(", ")
@@ -65,7 +65,7 @@ def get_closest_of_item(surroundings_str, item):
   return -1, 0
 
 def go_get_item(surroundings, item):
-  distance_to_item = get_closest_of_item(surroundings, item)
+  distance_to_item, _ = get_closest_of_item(surroundings, item)
   if distance_to_item == 0:
     return "Take " + item
   elif distance_to_item == -1:
@@ -78,7 +78,8 @@ def get_best_available_resource(surroundings):
   best_priority = 0
 
   for resource in resources:
-    if get_closest_of_item(surroundings, resource) != -1:
+    distance, _ = get_closest_of_item(surroundings, resource)
+    if distance != -1:
       resource_priority = resources[resource]
       if resource_priority > best_priority:
         best_priority = resource_priority

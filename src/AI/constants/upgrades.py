@@ -1,5 +1,5 @@
 
-minimum_players_for_upgrade = 12
+minimum_players_for_upgrade = 8
 
 upgrades = {
     1 : {

@@ -30,6 +30,7 @@ class DecisionManager:
       "fork": {"all": ["Fork", "FoodBigDyson"]},
       "fill": {"all": ["FillTeam"]},
       "collect": {"miner": ["BigDyson"], "fighter": ["BigDyson"]},
+      "get_food": {"all": ["FoodDyson"]},
       "rally": { "all": ["TakeOneFoodHere", "JoinCaptain"]},
       "set": {"all": ["DropEveryMinerals"]},
       "upgrade": {"all": ["Upgrade"]},
