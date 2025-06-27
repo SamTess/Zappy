@@ -49,7 +49,8 @@ int connect_nbr_srv(game_t *game, char *team)
     return available_slots;
 }
 
-void connect_nbr(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void connect_nbr(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int available_slots;
 

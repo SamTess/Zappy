@@ -72,7 +72,7 @@ static char *get_string_to_send(float x, float y)
 }
 
 static void push_single_client(game_t *game, zappy_client_t *tmp,
-    char *msg, float *direction, zappy_client_t *clients)
+    float *direction)
 {
     int old_x = tmp->player->pos_x;
     int old_y = tmp->player->pos_y;
@@ -84,34 +84,35 @@ static void push_single_client(game_t *game, zappy_client_t *tmp,
     tmp->player->pos_x = new_x;
     tmp->player->pos_y = new_y;
     tile_add_player(&game->map[new_y][new_x], tmp->client->client_id);
-    send_ppo_command(game, clients, tmp->client->client_id);
-    write_command_output_buffer(tmp->client, msg);
 }
 
-int push_client(game_t *game, zappy_client_t *sender,
-    zappy_client_t *clients, float x, float y)
+static int push_client(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, float *coords)
 {
     zappy_client_t *tmp = clients;
     int old_x = sender->player->pos_x;
     int old_y = sender->player->pos_y;
-    char *msg = get_string_to_send(x, y);
+    char *msg = get_string_to_send(coords[0], coords[2]);
 
     if (msg == NULL)
         return 84;
-    while (tmp) {
+    for (; tmp; tmp = tmp->next) {
         if (tmp == sender || tmp->type == GRAPHICAL || !tmp->player) {
             tmp = tmp->next;
             continue;
         }
-        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y)
-            push_single_client(game, tmp, msg, (float[]){x, y}, clients);
-        tmp = tmp->next;
+        if (tmp->player->pos_x == old_x && tmp->player->pos_y == old_y){
+            push_single_client(game, tmp, coords);
+            send_ppo_command(game, clients, tmp->client->client_id);
+            write_command_output_buffer(tmp->client, msg);
+        }
     }
     free(msg);
     return 0;
 }
 
-static void push_eggs(game_t *game, int old_x, int old_y, zappy_client_t *clients)
+static void push_eggs(game_t *game, int old_x, int old_y,
+    zappy_client_t *clients)
 {
     egg_t *tmp_egg = game->eggs;
     egg_t *next_egg;
@@ -127,7 +128,8 @@ static void push_eggs(game_t *game, int old_x, int old_y, zappy_client_t *client
     }
 }
 
-void eject(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void eject(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     float x = 0;
     float y = 0;
@@ -136,7 +138,7 @@ void eject(game_t *game, zappy_client_t *client, zappy_client_t *clients, char *
         !clients || arr_len(buffer) != 1)
         return write_command_output_buffer(client->client, "ko\n");
     convert_rotation_to_vector(client->player, &x, &y);
-    if (push_client(game, client, clients, x, y) == 84)
+    if (push_client(game, client, clients, (float[]){x, y}) == 84)
         return write_command_output_buffer(client->client, "ko\n");
     push_eggs(game, client->player->pos_x, client->player->pos_y, clients);
     command_pex(game, client, clients);

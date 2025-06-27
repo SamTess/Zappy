@@ -12,7 +12,8 @@ typedef struct game_s game_t;
 struct zappy_client_s;
 typedef struct zappy_client_s zappy_client_t;
 
-typedef void (*cmd_func_t)(game_t *, zappy_client_t *, zappy_client_t *, char **);
+typedef void (*cmd_func_t)(game_t *, zappy_client_t *,
+    zappy_client_t *, char **);
 
 typedef struct pending_cmd_s {
     cmd_func_t func;

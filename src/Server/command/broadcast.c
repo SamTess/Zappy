@@ -112,7 +112,8 @@ static int send_broadcast_to_client(game_t *game, zappy_client_t *sender,
         sender->player->pos_x, game->parsed_info->width);
     source_rel_y = calculate_shortest_distance_y(receiver->player->pos_y,
         sender->player->pos_y, game->parsed_info->height);
-    direction = calculate_direction(receiver->player, source_rel_x, source_rel_y);
+    direction = calculate_direction(receiver->player,
+        source_rel_x, source_rel_y);
     snprintf(response, res_size, "message %d, %s\n", direction, message);
     write_command_output_buffer(receiver->client, response);
     free(response);

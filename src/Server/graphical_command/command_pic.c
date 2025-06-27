@@ -32,7 +32,8 @@ static char *format_pic_response(int x, int y, int level, tile_t *tile)
     return buffer;
 }
 
-void command_pic(game_t *game, zappy_client_t *clients, int x, int y, int level)
+void command_pic(game_t *game, zappy_client_t *clients,
+    int *coords, int level)
 {
     zappy_client_t *current = clients;
     char *buffer = NULL;
@@ -40,15 +41,16 @@ void command_pic(game_t *game, zappy_client_t *clients, int x, int y, int level)
 
     if (!game || !clients || !game->map || !game->parsed_info)
         return;
-    if (y < 0 || x < 0 || y >= game->parsed_info->height ||
-        x >= game->parsed_info->width)
+    if (coords[1] < 0 || coords[0] < 0 || coords[1] >=
+        game->parsed_info->height || coords[0] >= game->parsed_info->width)
         return;
-    tile = &game->map[y][x];
-    buffer = format_pic_response(x, y, level, tile);
+    tile = &game->map[coords[1]][coords[0]];
+    buffer = format_pic_response(coords[0], coords[1], level, tile);
     if (!buffer)
         return;
     while (current) {
-        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
             write_command_output_buffer(current->client, buffer);
         current = current->next;
     }

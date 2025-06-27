@@ -23,7 +23,8 @@ typedef struct client_s {
 } client_t;
 
 void send_message_to_all_graphic(zappy_client_t *clients, char *message);
-void send_map_info_to_one_client(game_t *game, zappy_client_t *clients, zappy_client_t *graphic_client);
+void send_map_info_to_one_client(game_t *game, zappy_client_t *clients,
+    zappy_client_t *graphic_client);
 void write_command_output_buffer(client_t *client, char *message);
 
 #endif /* !CLIENT_H_ */

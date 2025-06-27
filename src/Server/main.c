@@ -139,5 +139,7 @@ int main(int ac, char **av)
     server_loop(&zappy);
     free_all(zappy.server, zappy.game, zappy.clients, &parsed_info);
     close(zappy.server->s_fd);
+    free(zappy.game);
+    free(zappy.server);
     return 0;
 }

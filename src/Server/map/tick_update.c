@@ -14,7 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static bool tick_check(game_t *game, server_t *server, zappy_client_t *current, zappy_client_t *clients)
+static bool tick_check(game_t *game, server_t *server,
+    zappy_client_t *current, zappy_client_t *clients)
 {
     bool dead = false;
 
@@ -41,7 +42,8 @@ void update_game_tick(game_t *game, server_t *server, zappy_client_t *clients)
         if (current->player && current->player->pending_cmd &&
             current->player->busy_until <= game->current_tick)
             execute_pending_cmd(game, current, clients);
-        if (tick_check(game, server, current, clients) == false && current->player &&
+        if (tick_check(game, server, current, clients) == false
+            && current->player &&
             current->player->busy_until <= game->current_tick &&
             current->player->queue_size > 0)
             process_next_queued_command(game, server, current, clients);

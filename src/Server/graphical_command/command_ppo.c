@@ -32,7 +32,8 @@ static int calculate_ppo_buffer_size(zappy_client_t *client)
     if (!client || !client->player || !client->client)
         return 0;
     return snprintf(NULL, 0, "ppo #%d %d %d %d\n", client->client->client_id,
-        client->player->pos_x, client->player->pos_y, client->player->rotation);
+        client->player->pos_x, client->player->pos_y,
+        client->player->rotation);
 }
 
 static char *format_ppo_response(zappy_client_t *client)
@@ -47,15 +48,27 @@ static char *format_ppo_response(zappy_client_t *client)
     if (!buffer)
         return NULL;
     snprintf(buffer, size + 1, "ppo #%d %d %d %d\n", client->client->client_id,
-        client->player->pos_x, client->player->pos_y, client->player->rotation);
+        client->player->pos_x, client->player->pos_y,
+        client->player->rotation);
     return buffer;
+}
+
+static void send_command(zappy_client_t *clients, char *buffer)
+{
+    zappy_client_t *current = clients;
+
+    while (current) {
+        if (current->type == GRAPHICAL && current->client &&
+            current->is_fully_connected && current->client->client_id != -1)
+            write_command_output_buffer(current->client, buffer);
+        current = current->next;
+    }
 }
 
 bool send_ppo_command(game_t *game, zappy_client_t *clients, int id)
 {
     char *buffer = NULL;
     zappy_client_t *target = NULL;
-    zappy_client_t *current = NULL;
 
     if (!game || !clients)
         return false;
@@ -65,12 +78,7 @@ bool send_ppo_command(game_t *game, zappy_client_t *clients, int id)
     buffer = format_ppo_response(target);
     if (!buffer)
         return false;
-    current = clients;
-    while (current) {
-        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
-            write_command_output_buffer(current->client, buffer);
-        current = current->next;
-    }
+    send_command(clients, buffer);
     free(buffer);
     return true;
 }
@@ -83,7 +91,8 @@ void command_ppo(game_t *game, zappy_client_t *client,
     if (!game || !client || !client->client || !buffer || !clients ||
         client->type != GRAPHICAL || arr_len(buffer) != 2 ||
         sscanf(buffer[1], "#%d", &id) != 1 || id < 0 ||
-        !find_client_by_id(clients, id) || !send_ppo_command(game, clients, id)) {
+        !find_client_by_id(clients, id) ||
+        !send_ppo_command(game, clients, id)){
         return write_command_output_buffer(client->client, "sbp\n");
     }
 }

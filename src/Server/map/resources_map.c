@@ -25,7 +25,7 @@ static void shuffle_indices(int *indices, int total_tiles)
     }
 }
 
-static void distribute_one_resource(resource_dist_t *dist, int res, int total,
+static void distribute_one_resource(resource_dist_t *dist, int res,
     game_t *game, zappy_client_t *clients)
 {
     int idx;
@@ -33,7 +33,7 @@ static void distribute_one_resource(resource_dist_t *dist, int res, int total,
     int x;
     int total_tiles = dist->width * dist->height;
 
-    for (int i = 0; i < total; ++i) {
+    for (int i = 0; i < dist->total; ++i) {
         idx = dist->tile_indices[dist->tile_idx % total_tiles];
         y = idx / dist->width;
         x = idx % dist->width;
@@ -57,6 +57,7 @@ static int init_resource_dist(int width, int height,
     dist->width = width;
     dist->height = height;
     dist->tile_idx = 0;
+    dist->total = 0;
     return 0;
 }
 
@@ -74,12 +75,12 @@ void distribute_resources(game_t *game, zappy_client_t *clients)
         return;
     shuffle_indices(dist.tile_indices, total_tiles);
     for (int res = 0; res < COUNT; ++res) {
-        total = (int)(total_tiles * resource_densities[res] + 0.5);
-        if (total < 1)
-            total = 1;
-        game->total_resources[res] = total;
-        game->current_resources[res] = total;
-        distribute_one_resource(&dist, res, total, game, clients);
+        dist.total = (int)(total_tiles * resource_densities[res] + 0.5);
+        if (dist.total < 1)
+            dist.total = 1;
+        game->total_resources[res] = dist.total;
+        game->current_resources[res] = dist.total;
+        distribute_one_resource(&dist, res, game, clients);
     }
     free(dist.tile_indices);
 }
@@ -96,10 +97,10 @@ void respawn_resources(game_t *game, zappy_client_t *clients)
         return;
     shuffle_indices(dist.tile_indices, total_tiles);
     for (int res = 0; res < COUNT; ++res) {
-        missing = game->total_resources[res] - game->current_resources[res];
-        if (missing > 0) {
-            distribute_one_resource(&dist, res, missing, game, clients);
-            game->current_resources[res] += missing;
+        dist.total = game->total_resources[res] - game->current_resources[res];
+        if (dist.total > 0) {
+            distribute_one_resource(&dist, res, game, clients);
+            game->current_resources[res] += dist.total;
         }
     }
     send_smg_command(game, clients, "Resources respawned");

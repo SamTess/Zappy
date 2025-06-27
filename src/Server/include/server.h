@@ -14,7 +14,6 @@
     #include "tile.h"
     #include "egg.h"
 
-// Forward declarations
 typedef struct zappy_client_s zappy_client_t;
 typedef struct zappy_s zappy_t;
 
@@ -32,32 +31,30 @@ typedef struct server_s {
     poll_manager_t *poll_manager;
 } server_t;
 
-server_t *server_create(int port);
-void server_destroy(server_t *server);
-client_t *server_accept_client(server_t *server);
-void server_remove_client(server_t *server, client_t *client);
-char *server_read_from_client(server_t *server, client_t *client);
-void server_write_to_client(client_t *client, char *message);
-
-// Game logic and context-aware functions
 void update_game_tick(game_t *game, server_t *server, zappy_client_t *clients);
-void finish_incantation(game_t *game, zappy_client_t *client, zappy_client_t *clients);
+void finish_incantation(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients);
 void display_help(void);
 void remove_fd(server_t *server, zappy_client_t **clients, int fd);
-void add_fd(server_t *server, zappy_client_t **clients, int fd);
-void create_server(server_t *server, parsing_info_t *parsed_info, zappy_client_t **clients);
+void add_fd(zappy_client_t **clients, int fd);
+void create_server(server_t *server, parsing_info_t *parsed_info,
+    zappy_client_t **clients);
 void server_err(char *msg);
 void check_client(zappy_t *zappy);
 void create_map(game_t *game, parsing_info_t *parsed_info);
-void process_next_queued_command(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients);
+void process_next_queued_command(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients);
 void add_to_command_queue(zappy_client_t *client, char *command);
 void free_node(zappy_client_t *node);
 void init_server_eggs(game_t *game);
-void free_all(server_t *server, game_t *game, zappy_client_t *clients, parsing_info_t *parsed_info);
+void free_all(server_t *server, game_t *game, zappy_client_t *clients,
+    parsing_info_t *parsed_info);
 int count_team(game_t *game);
 void init_struct(zappy_client_t *new_c);
 int add_string_to_write_buffer(circular_buffer_t *cb, char *msg);
 void flush_client_write_buffer(client_t *client);
-zappy_client_t *find_client_by_socket(zappy_client_t *clients, server_t *server, int socket_fd);
+zappy_client_t *find_client_by_socket(zappy_client_t *clients,
+    server_t *server, int socket_fd);
+int init_zappy_client_struct(zappy_client_t *new_c);
 
 #endif  // SRC_SERVER_INCLUDE_SERVER_H_

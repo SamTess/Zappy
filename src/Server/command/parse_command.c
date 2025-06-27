@@ -20,7 +20,8 @@ command_data_t get_command_data(void)
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
         "Incantation", "Fork", "Broadcast", "msz", "bct", "mtc",
         "tna", "ppo", "plv", "pin", "sgt", "sst", NULL};
-    static void (*comm_func[])(game_t *, zappy_client_t *, zappy_client_t *, char **) =
+    static void (*comm_func[])(game_t *, zappy_client_t *, zappy_client_t *,
+        char **) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
         fork_c, broadcast, command_msz, command_bct, command_mtc,
@@ -37,27 +38,28 @@ command_data_t get_command_data(void)
 }
 
 static bool execute_graphical_command(game_t *game, zappy_client_t *user,
-    zappy_client_t *clients, char *buffer, int cmd_index)
+    zappy_client_t *clients, command_args_t *func_args)
 {
     command_data_t data = get_command_data();
-    char **args = str_to_word_arr(buffer, " ");
+    char **args = str_to_word_arr(*func_args->buffer, " ");
 
-    data.functions[cmd_index](game, user, clients, args);
+    data.functions[func_args->cmd_index](game, user, clients, args);
     free_arr(args);
     return true;
 }
 
 static bool execute_if_free(game_t *game, zappy_client_t *user,
-    zappy_client_t *clients, char *buffer, int cmd_index)
+    zappy_client_t *clients, command_args_t *args)
 {
     if (user->type == GRAPHICAL)
-        return execute_graphical_command(game, user, clients, buffer, cmd_index);
-    if (user->type == AI && user->player->busy_until <= game->current_tick) {
-        add_pending_cmd(user, game, buffer, cmd_index, clients);
+        return execute_graphical_command(game, user, clients,
+            args);
+    if (user->type == AI && user->player->busy_until <= game->current_tick){
+        add_pending_cmd(user, game, args, clients);
         return true;
     } else {
         if (user->player->queue_size < 10) {
-            add_to_command_queue(user, buffer);
+            add_to_command_queue(user, *args->buffer);
             return true;
         } else
             return true;
@@ -68,11 +70,15 @@ static bool find_and_execute(game_t *game, zappy_client_t *user,
     zappy_client_t *clients, char *buffer)
 {
     command_data_t data = get_command_data();
+    command_args_t args = {0};
 
     for (int i = 0; data.commands[i] != NULL; i++) {
         if (strncmp(buffer, data.commands[i], strlen(data.commands[i])) == 0 &&
-            user->type == data.accepted_types[i])
-            return execute_if_free(game, user, clients, buffer, i);
+            user->type == data.accepted_types[i]){
+            args.buffer = &buffer;
+            args.cmd_index = i;
+            return execute_if_free(game, user, clients, &args);
+        }
     }
     return false;
 }
@@ -159,7 +165,8 @@ static void check_and_clear_clogged_buffer(zappy_client_t *user)
         init_circular_buffer(&user->client->read_buffer);
 }
 
-void get_message(server_t *server, zappy_client_t *user, zappy_client_t *clients, game_t *game)
+void get_message(server_t *server, zappy_client_t *user,
+    zappy_client_t *clients, game_t *game)
 {
     if (!handle_socket_read(server, &clients, user))
         return;

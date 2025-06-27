@@ -50,7 +50,8 @@ static void free_tiles(game_t *game, int i, parsing_info_t *parsed_info)
 
 static void free_map(game_t *game, parsing_info_t *parsed_info)
 {
-    if (game->map && parsed_info && parsed_info->height > 0 && parsed_info->width > 0) {
+    if (game->map && parsed_info && parsed_info->height > 0
+        && parsed_info->width > 0) {
         for (int i = 0; i < parsed_info->height; i++) {
             free_tiles(game, i, parsed_info);
         }
@@ -83,7 +84,8 @@ static void free_poll_mana(server_t *server)
         free(server->poll_manager);
 }
 
-void free_all(server_t *server, game_t *game, zappy_client_t *clients, parsing_info_t *parsed_info)
+void free_all(server_t *server, game_t *game, zappy_client_t *clients,
+    parsing_info_t *parsed_info)
 {
     if (!server || !game)
         return;
@@ -94,6 +96,9 @@ void free_all(server_t *server, game_t *game, zappy_client_t *clients, parsing_i
         free_poll_mana(server);
     if (parsed_info)
         free_parsed_info(parsed_info);
-    if (game->parsed_info)
+    if (game->parsed_info){
         free_parsed_info(game->parsed_info);
+        free(game->parsed_info);
+    }
+    free(server->serv_add);
 }

@@ -25,7 +25,8 @@ void send_message_to_all_graphic(zappy_client_t *clients, char *message)
     }
 }
 
-void send_map_info_to_one_client(game_t *game, zappy_client_t *clients, zappy_client_t *graphic_client)
+void send_map_info_to_one_client(game_t *game, zappy_client_t *clients,
+    zappy_client_t *graphic_client)
 {
     char **tmp;
 

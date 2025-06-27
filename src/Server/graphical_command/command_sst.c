@@ -36,11 +36,22 @@ static int get_time_from_buffer(char *buffer)
     return time;
 }
 
+static void send_command(zappy_client_t *clients, char *response)
+{
+    zappy_client_t *current = clients;
+
+    while (current) {
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
+            write_command_output_buffer(current->client, response);
+        current = current->next;
+    }
+}
+
 void command_sst(game_t *game, zappy_client_t *client,
     zappy_client_t *clients, char **buffer)
 {
     int time;
-    zappy_client_t *current = NULL;
     char *response = NULL;
 
     if (!game || !client || !client->client || !clients || !buffer ||
@@ -53,11 +64,6 @@ void command_sst(game_t *game, zappy_client_t *client,
     if (!response)
         return write_command_output_buffer(client->client, "sbp\n");
     game->parsed_info->frequence = time;
-    current = clients;
-    while (current) {
-        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
-            write_command_output_buffer(current->client, response);
-        current = current->next;
-    }
+    send_command(clients, response);
     free(response);
 }

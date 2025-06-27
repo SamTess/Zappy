@@ -42,7 +42,8 @@ static void change_map_pos(game_t *game, zappy_client_t *client)
         client->client->client_id);
 }
 
-void forward(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void forward(game_t *game, zappy_client_t *client, zappy_client_t *clients,
+    char **buffer)
 {
     (void)clients;
     if (!game || !client || !client->client || !client->player ||

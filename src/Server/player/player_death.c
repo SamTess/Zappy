@@ -12,7 +12,8 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-void handle_player_death(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients)
+void handle_player_death(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients)
 {
     tile_t *tile;
 
@@ -30,7 +31,8 @@ void handle_player_death(game_t *game, server_t *server, zappy_client_t *client,
     remove_fd(server, &clients, client->client->client_fd);
 }
 
-bool check_player_starvation(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients)
+bool check_player_starvation(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients)
 {
     int food_amount = 0;
     bool dead = false;

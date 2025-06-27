@@ -34,7 +34,8 @@ static char *format_sgt_response(int time_unit)
     return buffer;
 }
 
-void command_sgt(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void command_sgt(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int time_unit;
     char *response;

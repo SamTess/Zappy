@@ -52,7 +52,8 @@ struct zappy_client_s;
 typedef struct zappy_client_s zappy_client_t;
 
 void init_player(player_t *player, char *player_team);
-void init_new_player_pos(game_t *game, zappy_client_t *new_client, zappy_client_t *clients);
+void init_new_player_pos(game_t *game, zappy_client_t *new_client,
+    zappy_client_t *clients);
 
 void init_inventory(player_t *player);
 void free_inventory(player_t *player);
@@ -64,7 +65,9 @@ char *get_inventory_content(player_t *player);
 char *get_resource_name(resource_type_t type);
 
 // Player lifecycle and death functions
-void handle_player_death(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients);
-bool check_player_starvation(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients);
+void handle_player_death(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients);
+bool check_player_starvation(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients);
 
 #endif /* !PLAYER_H_ */

@@ -76,6 +76,7 @@ SRC = 	help.c								\
 		graphical_command/command_seg.c		\
 		graphical_command/command_smg.c		\
 		network/array_function.c			\
+		network/array_function_bis.c			\
 
 MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))

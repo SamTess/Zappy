@@ -31,7 +31,8 @@ void send_msz_command(game_t *game, zappy_client_t *client)
     free(buffer);
 }
 
-void command_msz(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void command_msz(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     (void)clients;
     if (!game || !client || arr_len(buffer) != 1)

@@ -11,7 +11,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static int check_disconnect(int bytes_read, server_t *server, zappy_client_t **clients, zappy_client_t *user)
+static int check_disconnect(int bytes_read, server_t *server,
+    zappy_client_t **clients, zappy_client_t *user)
 {
     if (bytes_read <= 0){
         command_pdi(NULL, user, *clients);
@@ -21,7 +22,8 @@ static int check_disconnect(int bytes_read, server_t *server, zappy_client_t **c
     return 0;
 }
 
-bool handle_socket_read(server_t *server, zappy_client_t **clients, zappy_client_t *user)
+bool handle_socket_read(server_t *server, zappy_client_t **clients,
+    zappy_client_t *user)
 {
     char temp_read_storage[1024];
     int bytes_read;
@@ -104,7 +106,8 @@ void flush_client_write_buffer(client_t *client)
     free(temp);
 }
 
-bool can_connect(game_t *game, zappy_client_t *user, char *buffer, zappy_client_t *clients)
+bool can_connect(game_t *game, zappy_client_t *user, char *buffer,
+    zappy_client_t *clients)
 {
     if (!is_valid_team_name(buffer, game, user, clients)){
         write_command_output_buffer(user->client, "ko\n");

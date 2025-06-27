@@ -51,10 +51,11 @@ void free_node(zappy_client_t *node)
         free(node->client->client_poll);
         node->client->client_poll = NULL;
     }
-    if (node->type == AI && node->player) {
+    if (node->player) {
         cleanup_player_client(node);
         free(node->player);
         node->player = NULL;
     }
+    free(node->client);
     free(node);
 }

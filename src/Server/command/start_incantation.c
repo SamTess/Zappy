@@ -11,7 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static zappy_client_t *get_client_by_id_player(zappy_client_t *clients, int player_id)
+static zappy_client_t *get_client_by_id_player(zappy_client_t *clients,
+    int player_id)
 {
     zappy_client_t *tmp = clients;
 
@@ -54,7 +55,8 @@ static void set_busy_all(game_t *game, zappy_client_t *client,
         tmp_client = get_client_by_id_player(clients, tile->player_ids[i]);
         if (tmp_client && tmp_client->player &&
             tmp_client->player->level == client->player->level) {
-            tmp_client->player->incantation_leader_id = client->client->client_id;
+            tmp_client->player->incantation_leader_id =
+                client->client->client_id;
             set_busy_until(game, tmp_client, duration);
         }
     }
@@ -88,7 +90,8 @@ static int how_many_players_needed(int level)
     return required_players[level - 1];
 }
 
-bool can_start_incantation(game_t *game, zappy_client_t *client, zappy_client_t *clients)
+bool can_start_incantation(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients)
 {
     int required_players = 0;
     int prerequisite_level = client->player->level;
@@ -113,8 +116,8 @@ void start_incantation(game_t *game, zappy_client_t *client,
         return write_command_output_buffer(client->client, "ko\n");
     if (!can_start_incantation(game, client, clients))
         return write_command_output_buffer(client->client, "ko\n");
-    command_pic(game, clients, client->player->pos_x, client->player->pos_y,
-        client->player->level);
+    command_pic(game, clients, (int[]){client->player->pos_x,
+        client->player->pos_y}, client->player->level);
     set_busy_all(game, client, clients, 300);
     client->player->is_in_incantation = true;
     client->player->incantation_leader_id = client->client->client_id;

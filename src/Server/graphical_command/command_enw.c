@@ -40,7 +40,8 @@ void send_enw_command(game_t *game, zappy_client_t *clients,
     if (!buffer)
         return;
     while (current) {
-        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
             write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
@@ -60,6 +61,16 @@ static void send_enw_command_to_client(zappy_client_t *recipient, egg_t *egg)
     }
 }
 
+static void send_command_all(zappy_client_t *current, egg_t *egg)
+{
+    while (current) {
+        if (current->type == GRAPHICAL &&
+            current->client && current->is_fully_connected)
+            send_enw_command_to_client(current, egg);
+        current = current->next;
+    }
+}
+
 void send_enw_command_start(game_t *game, zappy_client_t *clients)
 {
     zappy_client_t *current;
@@ -70,11 +81,7 @@ void send_enw_command_start(game_t *game, zappy_client_t *clients)
     egg = game->eggs;
     while (egg) {
         current = clients;
-        while (current) {
-            if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
-                send_enw_command_to_client(current, egg);
-            current = current->next;
-        }
+        send_command_all(current, egg);
         egg = egg->next;
     }
 }

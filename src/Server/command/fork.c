@@ -25,7 +25,8 @@ static int get_next_egg_id(game_t *game)
     return max_id + 1;
 }
 
-void fork_c(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void fork_c(game_t *game, zappy_client_t *client, zappy_client_t *clients,
+    char **buffer)
 {
     egg_t *new_egg;
     int egg_id;

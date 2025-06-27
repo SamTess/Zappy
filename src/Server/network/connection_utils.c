@@ -26,6 +26,17 @@ int count_team(game_t *game)
     return i;
 }
 
+int init_zappy_client_struct(zappy_client_t *new_c)
+{
+    new_c->client = calloc(1, sizeof(client_t));
+    if (!new_c->client)
+        return -1;
+    new_c->client->client_poll = calloc(1, sizeof(struct pollfd));
+    if (!new_c->client->client_poll)
+        return -1;
+    return 0;
+}
+
 static void create_server_egg(game_t *n_game, int egg_id, int i)
 {
     int pos_x = rand() % n_game->parsed_info->width;
@@ -38,7 +49,8 @@ static void create_server_egg(game_t *n_game, int egg_id, int i)
     add_egg(n_game, n_egg);
 }
 
-zappy_client_t *find_client_by_socket(zappy_client_t *clients, server_t *server,int socket_fd)
+zappy_client_t *find_client_by_socket(zappy_client_t *clients,
+    server_t *server, int socket_fd)
 {
     zappy_client_t *temp = clients;
 

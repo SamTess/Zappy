@@ -51,7 +51,8 @@ static char *format_pin_response(zappy_client_t *client)
     return buffer;
 }
 
-void send_pin_command(game_t *game, zappy_client_t *clients, zappy_client_t *sender, zappy_client_t *recipient)
+void send_pin_command(game_t *game, zappy_client_t *clients,
+    zappy_client_t *sender, zappy_client_t *recipient)
 {
     char *buffer;
 
@@ -67,14 +68,16 @@ void send_pin_command(game_t *game, zappy_client_t *clients, zappy_client_t *sen
     }
 }
 
-void send_pin_to_all(game_t *game, zappy_client_t *clients, zappy_client_t *sender)
+void send_pin_to_all(game_t *game, zappy_client_t *clients,
+    zappy_client_t *sender)
 {
     zappy_client_t *current = clients;
 
     if (!game || !sender || !sender->player || !clients)
         return;
     while (current) {
-        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
             send_pin_command(game, clients, sender, current);
         current = current->next;
     }

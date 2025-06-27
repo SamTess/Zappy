@@ -27,25 +27,25 @@ void cleanup_pending(player_t *player)
     player->pending_cmd = NULL;
 }
 
-void add_pending_cmd(zappy_client_t *player, game_t *game, char *buffer, int cmd_index, zappy_client_t *clients)
+void add_pending_cmd(zappy_client_t *player, game_t *game,
+    command_args_t *args, zappy_client_t *clients)
 {
     command_data_t data = get_command_data();
     char **tmp = NULL;
 
     (void)clients;
-
-    if (cmd_index == 9) {
-        tmp = str_to_word_arr(buffer, " ");
+    if (args->cmd_index == 9) {
+        tmp = str_to_word_arr(*args->buffer, " ");
         start_incantation(game, player, clients, tmp);
         return free_arr(tmp);
     }
-    if (cmd_index == 10)
+    if (args->cmd_index == 10)
         command_pfk(game, player, clients);
-    player->player->pending_cmd->args = strdup(buffer);
-    player->player->pending_cmd->func = data.functions[cmd_index];
-    if (data.times[cmd_index] > 0)
+    player->player->pending_cmd->args = strdup(*args->buffer);
+    player->player->pending_cmd->func = data.functions[args->cmd_index];
+    if (data.times[args->cmd_index] > 0)
         player->player->busy_until =
-            game->current_tick + data.times[cmd_index];
+            game->current_tick + data.times[args->cmd_index];
 }
 
 void cleanup_player_queue(player_t *player)

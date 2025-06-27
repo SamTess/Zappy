@@ -65,7 +65,7 @@ void send_bct_to_all_graphical_clients(game_t *game,
         return;
     tile = &game->map[y][x];
     for (; current; current = current->next) {
-        if (current->type == GRAPHICAL)
+        if (current->type == GRAPHICAL && current->client->client_id != -1)
             send_bct_response(current->client, x, y, tile);
     }
 }
@@ -78,15 +78,17 @@ void send_mtc_to_all_graphical_clients(game_t *game,
     if (!game || !graphical_clients)
         return;
     for (; current; current = current->next) {
-        if (current->type == GRAPHICAL)
+        if (current->type == GRAPHICAL && current->client->client_id != -1)
             send_tile_content_to_one_client(game, graphical_clients, current);
     }
 }
 
-void send_tile_content_to_one_client(game_t *game, zappy_client_t *clients, zappy_client_t *client)
+void send_tile_content_to_one_client(game_t *game, zappy_client_t *clients,
+    zappy_client_t *client)
 {
     (void)clients;
-    if (!game || !client || !client->client || !game->map || !game->parsed_info)
+    if (!game || !client || !client->client || !game->map
+        || !game->parsed_info)
         return;
     for (int y = 0; y < game->parsed_info->height; y++) {
         for (int x = 0; x < game->parsed_info->width; x++) {
@@ -95,7 +97,8 @@ void send_tile_content_to_one_client(game_t *game, zappy_client_t *clients, zapp
     }
 }
 
-void command_bct(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void command_bct(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int x = 0;
     int y = 0;
@@ -112,7 +115,8 @@ void command_bct(game_t *game, zappy_client_t *client, zappy_client_t *clients, 
     send_bct_response(client->client, x, y, &game->map[y][x]);
 }
 
-void command_mtc(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void command_mtc(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     (void)clients;
     if (!game || !client || !client->client ||

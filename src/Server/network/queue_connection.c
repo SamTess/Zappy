@@ -21,14 +21,16 @@ void add_to_command_queue(zappy_client_t *client, char *command)
     client->player->queue_size++;
 }
 
-static void check_rebuild(bool was_full, zappy_client_t *client, server_t *server)
+static void check_rebuild(bool was_full, zappy_client_t *client,
+    server_t *server)
 {
     if (was_full && client->player->queue_size < 10 &&
         server && server->poll_manager)
         server->poll_manager->needs_rebuild = true;
 }
 
-void process_next_queued_command(game_t *game, server_t *server, zappy_client_t *client, zappy_client_t *clients)
+void process_next_queued_command(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients)
 {
     char *next_command;
     bool was_full;

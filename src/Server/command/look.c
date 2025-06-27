@@ -93,7 +93,8 @@ static int get_total_size(char ***level_tiles,
     return total;
 }
 
-static char *format_look(size_t total_len, char **level_tiles, player_t *player)
+static char *format_look(size_t total_len, char **level_tiles,
+    player_t *player)
 {
     char *res = malloc(sizeof(char) * total_len);
 
@@ -110,13 +111,14 @@ static char *format_look(size_t total_len, char **level_tiles, player_t *player)
     return res;
 }
 
-void look(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void look(game_t *game, zappy_client_t *client, zappy_client_t *clients,
+    char **buffer)
 {
     char **level_tiles = NULL;
     size_t total_len = 0;
     char *res;
-    (void)clients;
 
+    (void)clients;
     if (!game || !client || !client->player || arr_len(buffer) != 1)
         return write_command_output_buffer(client->client, "ko\n");
     total_len = get_total_size(&level_tiles, client->player, game);

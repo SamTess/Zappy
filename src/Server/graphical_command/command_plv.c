@@ -18,8 +18,7 @@ static int calculate_plv_buffer_size(zappy_client_t *client)
     if (!client || !client->player || !client->client)
         return 0;
     return snprintf(NULL, 0, "plv #%d %d\n",
-                client->client->client_id,
-                client->player->level);
+        client->client->client_id, client->player->level);
 }
 
 static char *format_plv_response(zappy_client_t *client)
@@ -34,12 +33,12 @@ static char *format_plv_response(zappy_client_t *client)
     if (!buffer)
         return NULL;
     snprintf(buffer, size + 1, "plv #%d %d\n",
-            client->client->client_id,
-            client->player->level);
+        client->client->client_id, client->player->level);
     return buffer;
 }
 
-void send_plv_command(game_t *game, zappy_client_t *clients, zappy_client_t *sender, zappy_client_t *recipient)
+void send_plv_command(game_t *game, zappy_client_t *clients,
+    zappy_client_t *sender, zappy_client_t *recipient)
 {
     char *buffer;
 
@@ -55,7 +54,8 @@ void send_plv_command(game_t *game, zappy_client_t *clients, zappy_client_t *sen
     }
 }
 
-void send_plv_to_all(game_t *game, zappy_client_t *clients, zappy_client_t *sender)
+void send_plv_to_all(game_t *game, zappy_client_t *clients,
+    zappy_client_t *sender)
 {
     zappy_client_t *current = clients;
 
@@ -63,7 +63,8 @@ void send_plv_to_all(game_t *game, zappy_client_t *clients, zappy_client_t *send
         return;
     while (current) {
         if (current->type == GRAPHICAL && current->client &&
-            current->is_fully_connected && current != sender)
+            current->is_fully_connected && current != sender
+            && current->client->client_id != -1)
             send_plv_command(game, clients, sender, current);
         current = current->next;
     }

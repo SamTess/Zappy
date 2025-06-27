@@ -29,17 +29,20 @@ static void send_one_tna_command(game_t *game, client_t *client,
     free(buffer);
 }
 
-void send_tna_command(game_t *game, zappy_client_t *clients, zappy_client_t *client)
+void send_tna_command(game_t *game, zappy_client_t *clients,
+    zappy_client_t *client)
 {
     (void)clients;
     if (!game || !client)
         return;
     for (int i = 0; game->parsed_info->names[i]; i++) {
-        send_one_tna_command(game, client->client, game->parsed_info->names[i]);
+        send_one_tna_command(game, client->client,
+            game->parsed_info->names[i]);
     }
 }
 
-void command_tna(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void command_tna(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     if (!game || !client || !buffer || !game->parsed_info ||
         !game->parsed_info->names || arr_len(buffer) != 1)

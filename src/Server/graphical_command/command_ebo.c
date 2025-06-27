@@ -37,7 +37,8 @@ void send_ebo_command(game_t *game, zappy_client_t *clients, int egg_id)
     if (!buffer)
         return;
     while (current) {
-        if (current->type == GRAPHICAL && current->client && current->is_fully_connected)
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
             write_command_output_buffer(current->client, buffer);
         current = current->next;
     }

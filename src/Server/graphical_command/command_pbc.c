@@ -32,14 +32,15 @@ void command_pbc(game_t *game, zappy_client_t *client,
     zappy_client_t *current = NULL;
     char *response = NULL;
 
-    if (!game || !client || !client->client || !client->player || !clients || !message)
+    if (!game || !client || !client->client
+        || !client->player || !clients || !message)
         return;
     response = format_pbc_response(client->client->client_id, message);
     if (!response)
         return;
     current = clients;
     for (; current != NULL; current = current->next) {
-        if (current->type == GRAPHICAL)
+        if (current->type == GRAPHICAL && current->client->client_id != -1)
             write_command_output_buffer(current->client, response);
     }
     free(response);

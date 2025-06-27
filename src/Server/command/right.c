@@ -30,7 +30,8 @@ static void change_rot(player_t *player)
     }
 }
 
-void right(game_t *game, zappy_client_t *client, zappy_client_t *clients, char **buffer)
+void right(game_t *game, zappy_client_t *client, zappy_client_t *clients,
+    char **buffer)
 {
     if (!game || !client || !client->client || !client->player ||
         !clients || arr_len(buffer) != 1)

@@ -44,7 +44,8 @@ static void handle_win(char *winner, game_t *game, zappy_client_t *clients)
     printf("%s team are the winner of this Zappy tournament\n", winner);
 }
 
-static void check_win(zappy_client_t *client, zappy_client_t *clients, game_t *game)
+static void check_win(zappy_client_t *client, zappy_client_t *clients,
+    game_t *game)
 {
     int count = 0;
     char *team_name = client->player->team_name;
@@ -61,15 +62,10 @@ static void check_win(zappy_client_t *client, zappy_client_t *clients, game_t *g
 }
 
 static void handle_incantation_success(zappy_client_t *client,
-    tile_t *tile, int old_level, zappy_client_t *clients, game_t *game)
+    zappy_client_t *clients, game_t *game)
 {
-    char *level_str;
+    char *level_str = malloc(20 * sizeof(char));
 
-    client->player->level++;
-    level_str = malloc(20 * sizeof(char));
-    if (client->player->incantation_leader_id == client->client->client_id)
-        remove_resources(tile, old_level + 1);
-    client->player->incantation_leader_id = -1;
     sprintf(level_str, "Current level: %d\n", client->player->level);
     write_command_output_buffer(client->client, level_str);
     free(level_str);
@@ -77,7 +73,8 @@ static void handle_incantation_success(zappy_client_t *client,
         check_win(client, clients, game);
 }
 
-void finish_incantation(game_t *game, zappy_client_t *client, zappy_client_t *clients)
+void finish_incantation(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients)
 {
     tile_t *tile = &game->map[client->player->pos_y][client->player->pos_x];
     int old_level;
@@ -91,7 +88,11 @@ void finish_incantation(game_t *game, zappy_client_t *client, zappy_client_t *cl
         command_pie(game, clients, client, 0);
         return handle_incantation_failure(client);
     }
-    handle_incantation_success(client, tile, old_level, NULL, game);
+    client->player->level++;
+    if (client->player->incantation_leader_id == client->client->client_id)
+        remove_resources(tile, old_level + 1);
+    client->player->incantation_leader_id = -1;
+    handle_incantation_success(client, clients, game);
     command_pie(game, clients, client, 0);
     send_plv_to_all(game, clients, client);
 }

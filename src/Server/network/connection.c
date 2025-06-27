@@ -17,7 +17,8 @@
 #include "../include/parsing.h"
 #include "../include/command.h"
 
-static bool remove_head_client(server_t *server, zappy_client_t **clients, int fd)
+static bool remove_head_client(server_t *server,
+    zappy_client_t **clients, int fd)
 {
     zappy_client_t *current = *clients;
 
@@ -31,7 +32,8 @@ static bool remove_head_client(server_t *server, zappy_client_t **clients, int f
     return true;
 }
 
-static bool remove_other_client(server_t *server, zappy_client_t *clients, int fd)
+static bool remove_other_client(server_t *server,
+    zappy_client_t *clients, int fd)
 {
     zappy_client_t *current = clients;
     zappy_client_t *prev = NULL;
@@ -64,11 +66,7 @@ static zappy_client_t *init_new_client(int fd)
 
     if (!new_c)
         return NULL;
-    new_c->client = calloc(1, sizeof(client_t));
-    if (!new_c->client)
-        return NULL;
-    new_c->client->client_poll = calloc(1, sizeof(struct pollfd));
-    if (!new_c->client->client_poll)
+    if (init_zappy_client_struct(new_c) == -1)
         return NULL;
     new_c->client->client_poll->fd = fd;
     new_c->client->client_poll->events = POLLIN;
@@ -85,13 +83,12 @@ static zappy_client_t *init_new_client(int fd)
     return new_c;
 }
 
-void add_fd(server_t *server, zappy_client_t **clients, int fd)
+void add_fd(zappy_client_t **clients, int fd)
 {
     static int next_id = 0;
     zappy_client_t *new_c = init_new_client(fd);
     zappy_client_t *current;
 
-    (void)server;
     if (*clients == NULL) {
         if (new_c == NULL)
             server_err("Server polling client init failed");
@@ -110,7 +107,8 @@ void add_fd(server_t *server, zappy_client_t **clients, int fd)
     current->next = new_c;
 }
 
-static void init_server_socket(server_t *server, parsing_info_t *parsed_info, zappy_client_t **clients)
+static void init_server_socket(server_t *server,
+    parsing_info_t *parsed_info, zappy_client_t **clients)
 {
     int opt = 1;
 
@@ -130,7 +128,7 @@ static void init_server_socket(server_t *server, parsing_info_t *parsed_info, za
         server_err("Connection bind failed");
     if (listen(server->s_fd, 1000) < 0)
         server_err("Connection listen failed");
-    add_fd(server, clients, server->s_fd);
+    add_fd(clients, server->s_fd);
 }
 
 static void init_server(server_t *server)
@@ -142,7 +140,8 @@ static void init_server(server_t *server)
     server->poll_manager = calloc(1, sizeof(poll_manager_t));
 }
 
-void create_server(server_t *server, parsing_info_t *parsed_info, zappy_client_t **clients)
+void create_server(server_t *server, parsing_info_t *parsed_info,
+    zappy_client_t **clients)
 {
     init_server(server);
     init_server_socket(server, parsed_info, clients);
