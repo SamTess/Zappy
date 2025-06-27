@@ -1,126 +1,126 @@
-# Architecture de l'Interface Utilisateur de Zappy GUI
+# Zappy GUI User Interface Architecture
 
-## Présentation générale
+## General Overview
 
-L'interface utilisateur (UI) du projet Zappy GUI a été développée en utilisant plusieurs patterns de conception avancés pour améliorer sa modularité, sa maintenabilité et son extensibilité. Cette architecture moderne permet une gestion efficace des fenêtres spécialisées et une interaction fluide avec le système de jeu.
+The user interface (UI) of the Zappy GUI project has been developed using several advanced design patterns to improve its modularity, maintainability and extensibility. This modern architecture allows efficient management of specialized windows and smooth interaction with the game system.
 
-## Hiérarchie des classes
+## Class Hierarchy
 
-Le système d'UI repose sur une hiérarchie de classes claire et extensible :
+The UI system is based on a clear and extensible class hierarchy:
 
 ```
 IUIWindow (Interface)
     |
-    +-- AUIWindow (Classe abstraite)
+    +-- AUIWindow (Abstract class)
             |
-            +-- TileInfoWindow      (Informations détaillées sur les tuiles)
-            +-- PlayerInfoWindow    (Statistiques et actions des joueurs)
-            +-- TimeInfoWindow      (Informations temporelles et performances)
-            +-- MenuWindow          (Configuration globale de l'application)
-            +-- MapInfoWindow       (Informations générales sur la carte)
-            +-- [fenêtres futures à ajouter facilement]
+            +-- TileInfoWindow      (Detailed tile information)
+            +-- PlayerInfoWindow    (Player statistics and actions)
+            +-- TimeInfoWindow      (Temporal information and performance)
+            +-- MenuWindow          (Global application configuration)
+            +-- MapInfoWindow       (General map information)
+            +-- [future windows to be added easily]
 ```
 
-### Composants principaux
+### Main Components
 
-1. **UserInterface** : Point d'entrée principal pour l'UI, coordonne toutes les interactions
-2. **UIWindowFactory** : Fabrique responsable de la création, gestion et coordination des fenêtres
-3. **IUIWindow** : Interface définissant le contrat strict pour toutes les fenêtres UI
-4. **AUIWindow** : Classe abstraite implémentant les comportements communs et la logique de base
-5. **Fenêtres spécialisées** : Classes concrètes pour chaque type de fenêtre avec fonctionnalités dédiées
-6. **UIContext** : Contexte partagé contenant les références aux services et données
-7. **UIDataProvider** : Fournisseur de données centralisé pour toutes les fenêtres
+1. **UserInterface**: Main entry point for UI, coordinates all interactions
+2. **UIWindowFactory**: Factory responsible for creation, management and coordination of windows
+3. **IUIWindow**: Interface defining the strict contract for all UI windows
+4. **AUIWindow**: Abstract class implementing common behaviors and basic logic
+5. **Specialized windows**: Concrete classes for each window type with dedicated functionalities
+6. **UIContext**: Shared context containing references to services and data
+7. **UIDataProvider**: Centralized data provider for all windows
 
-## Patterns de conception utilisés
+## Design Patterns Used
 
 ### Factory Pattern
 
-Le pattern Factory est utilisé de manière sophistiquée pour encapsuler la création et la gestion des différentes fenêtres. La classe `UIWindowFactory` est responsable de :
+The Factory pattern is used sophisticatedly to encapsulate the creation and management of different windows. The `UIWindowFactory` class is responsible for:
 
-**Fonctionnalités principales :**
-- Créer et initialiser toutes les instances des fenêtres
-- Fournir un accès centralisé et typé à toutes les fenêtres
-- Gérer le cycle de vie complet des fenêtres (création, mise à jour, destruction)
-- Coordonner les interactions entre fenêtres
-- Gérer les événements de souris et les sélections
+**Main functionalities:**
+- Create and initialize all window instances
+- Provide centralized and typed access to all windows
+- Manage the complete lifecycle of windows (creation, update, destruction)
+- Coordinate interactions between windows
+- Manage mouse events and selections
 
-**Avantages :**
-- Centralisation complète de la création des fenêtres
-- Facilité maximale pour ajouter de nouveaux types de fenêtres
-- Séparation claire des responsabilités entre création et utilisation
-- Gestion unifiée des dépendances entre fenêtres
+**Advantages:**
+- Complete centralization of window creation
+- Maximum ease for adding new window types
+- Clear separation of responsibilities between creation and usage
+- Unified management of dependencies between windows
 
-### Interface et Classe abstraite
+### Interface and Abstract Class
 
-L'utilisation combinée d'une interface (`IUIWindow`) et d'une classe abstraite (`AUIWindow`) permet de :
+The combined use of an interface (`IUIWindow`) and an abstract class (`AUIWindow`) allows:
 
-**Bénéfices de l'interface :**
-- Définir un contrat strict et non-négociable pour toutes les fenêtres
-- Garantir la cohérence des signatures de méthodes
-- Faciliter les tests unitaires avec des mocks
+**Interface benefits:**
+- Define a strict and non-negotiable contract for all windows
+- Guarantee consistency of method signatures
+- Facilitate unit testing with mocks
 
-**Bénéfices de la classe abstraite :**
-- Mutualiser du code commun (gestion de visibilité, positionnement, état)
-- Fournir des implémentations par défaut pour les comportements standards
-- Faciliter l'extensibilité avec un minimum de code dupliqué
+**Abstract class benefits:**
+- Share common code (visibility management, positioning, state)
+- Provide default implementations for standard behaviors
+- Facilitate extensibility with minimal code duplication
 
 ### Provider Pattern
 
-Le `UIDataProvider` centralise l'accès aux données de jeu :
-- **GameState** : État global du jeu
-- **Données temporelles** : Fréquence, temps de jeu, FPS
-- **Sélections** : Tuiles et joueurs sélectionnés
-- **Configuration** : Paramètres de l'interface utilisateur
+The `UIDataProvider` centralizes access to game data:
+- **GameState**: Global game state
+- **Temporal data**: Frequency, game time, FPS
+- **Selections**: Selected tiles and players
+- **Configuration**: User interface settings
 
-## Architecture détaillée des fenêtres
+## Detailed Window Architecture
 
 ### TileInfoWindow
-**Responsabilités :**
-- Affichage détaillé des informations de tuile sélectionnée
-- Visualisation des ressources présentes avec quantités
-- Liste des joueurs présents sur la tuile
-- Coordonnées et statistiques de la tuile
+**Responsibilities:**
+- Detailed display of selected tile information
+- Visualization of present resources with quantities
+- List of players present on the tile
+- Tile coordinates and statistics
 
 ### PlayerInfoWindow
-**Responsabilités :**
-- Informations complètes du joueur (niveau, orientation, équipe)
-- Inventaire détaillé avec toutes les ressources
-- Commandes interactives (suivi de joueur, informations étendues)
-- Historique des actions récentes
+**Responsibilities:**
+- Complete player information (level, orientation, team)
+- Detailed inventory with all resources
+- Interactive commands (player tracking, extended information)
+- Recent action history
 
 ### TimeInfoWindow
-**Responsabilités :**
-- Informations temporelles en temps réel (fréquence serveur, temps de jeu)
-- Métriques de performance (FPS, latence réseau)
-- Statistiques de simulation
-- Contrôles de vitesse de jeu
+**Responsibilities:**
+- Real-time temporal information (server frequency, game time)
+- Performance metrics (FPS, network latency)
+- Simulation statistics
+- Game speed controls
 
 ### MenuWindow
-**Responsabilités :**
-- Configuration audio (volume musique, effets sonores)
-- Paramètres de gameplay (vitesse, transparence UI)
-- Gestion de la visibilité des fenêtres
-- Réinitialisation des positions par défaut
-- Paramètres de rendu et d'affichage
+**Responsibilities:**
+- Audio configuration (music volume, sound effects)
+- Gameplay settings (speed, UI transparency)
+- Window visibility management
+- Default position reset
+- Rendering and display settings
 
 ### MapInfoWindow
-**Responsabilités :**
-- Informations générales sur la carte (dimensions, ressources totales)
-- Statistiques d'équipes et de joueurs
-- Vue d'ensemble du terrain de jeu
-- Contrôles de carte et de zoom
+**Responsibilities:**
+- General map information (dimensions, total resources)
+- Team and player statistics
+- Overview of the playing field
+- Map and zoom controls
 
-## Comment ajouter une nouvelle fenêtre
+## How to Add a New Window
 
-### 1. Créer la classe de fenêtre
+### 1. Create the window class
 ```cpp
-// NouvelleWindow.hpp
-class NouvelleWindow : public AUIWindow {
+// NewWindow.hpp
+class NewWindow : public AUIWindow {
 public:
-    NouvelleWindow(std::shared_ptr<IGuiLib> guiLib);
-    ~NouvelleWindow() = default;
+    NewWindow(std::shared_ptr<IGuiLib> guiLib);
+    ~NewWindow() = default;
     
-    // Méthodes spécifiques à cette fenêtre
+    // Methods specific to this window
     void setSpecificData(const SpecificData& data);
     
 protected:
@@ -128,129 +128,129 @@ protected:
     void updateSpecificData(std::shared_ptr<const GameState> gameState) override;
     
 private:
-    // Données spécifiques à cette fenêtre
+    // Data specific to this window
     SpecificData _specificData;
 };
 ```
 
-### 2. Implémenter les méthodes abstraites
+### 2. Implement the abstract methods
 ```cpp
-// NouvelleWindow.cpp
-void NouvelleWindow::renderContent() {
-    // Logique de rendu spécifique
-    _guiLib->DrawLabel(10, 30, 200, 20, "Contenu spécifique");
-    // ... autres éléments d'interface
+// NewWindow.cpp
+void NewWindow::renderContent() {
+    // Specific rendering logic
+    _guiLib->DrawLabel(10, 30, 200, 20, "Specific content");
+    // ... other interface elements
 }
 
-void NouvelleWindow::updateSpecificData(std::shared_ptr<const GameState> gameState) {
-    // Mise à jour des données spécifiques depuis l'état du jeu
+void NewWindow::updateSpecificData(std::shared_ptr<const GameState> gameState) {
+    // Update specific data from game state
     if (gameState) {
-        // Extraire et traiter les données nécessaires
+        // Extract and process necessary data
     }
 }
 ```
 
-### 3. Intégrer dans la factory
+### 3. Integrate into the factory
 ```cpp
-// Dans UIWindowFactory::createAllWindows()
-_windows["nouvelleWindow"] = std::make_shared<NouvelleWindow>(_guiLib);
-_windows["nouvelleWindow"]->setUIContext(_uiContext);
+// In UIWindowFactory::createAllWindows()
+_windows["newWindow"] = std::make_shared<NewWindow>(_guiLib);
+_windows["newWindow"]->setUIContext(_uiContext);
 ```
 
-### 4. Ajouter les méthodes d'accès
+### 4. Add access methods
 ```cpp
-// Dans UIWindowFactory.hpp
-std::shared_ptr<NouvelleWindow> getNouvelleWindow() const;
+// In UIWindowFactory.hpp
+std::shared_ptr<NewWindow> getNewWindow() const;
 
-// Dans UIWindowFactory.cpp
-std::shared_ptr<NouvelleWindow> UIWindowFactory::getNouvelleWindow() const {
-    return std::dynamic_pointer_cast<NouvelleWindow>(_windows.at("nouvelleWindow"));
+// In UIWindowFactory.cpp
+std::shared_ptr<NewWindow> UIWindowFactory::getNewWindow() const {
+    return std::dynamic_pointer_cast<NewWindow>(_windows.at("newWindow"));
 }
 ```
 
-## Interaction entre les fenêtres
+## Window Interaction
 
-### Système de communication
-Les fenêtres communiquent via plusieurs mécanismes :
+### Communication System
+Windows communicate through several mechanisms:
 
-**1. UIWindowFactory comme médiateur :**
-- Coordination centralisée des interactions
-- Propagation des sélections (tuiles, joueurs)
-- Synchronisation des états entre fenêtres
+**1. UIWindowFactory as mediator:**
+- Centralized coordination of interactions
+- Propagation of selections (tiles, players)
+- State synchronization between windows
 
-**2. Événements de sélection :**
+**2. Selection events:**
 ```cpp
-// Sélection de tuile
+// Tile selection
 void UIWindowFactory::setSelectedTile(int x, int y) {
     auto tileInfoWindow = getTileInfoWindow();
     if (tileInfoWindow) {
         tileInfoWindow->setSelectedTile(x, y);
     }
-    // Mise à jour d'autres fenêtres si nécessaire
+    // Update other windows if necessary
 }
 ```
 
-**3. UIContext partagé :**
-- Accès uniforme aux services (réseau, commandes)
-- Partage des données communes
-- Configuration globale accessible
+**3. Shared UIContext:**
+- Uniform access to services (network, commands)
+- Sharing of common data
+- Accessible global configuration
 
-## Gestion avancée des événements
+## Advanced Event Management
 
-### Système de gestion des événements souris
-Le système de gestion des événements est centralisé dans `UserInterface` et délégué intelligemment :
+### Mouse Event Management System
+The event management system is centralized in `UserInterface` and intelligently delegated:
 
-**1. Détection des interactions :**
+**1. Interaction detection:**
 ```cpp
 bool UserInterface::handleMouseEvents() {
     ZappyTypes::Vector2 mousePos = _guiLib->GetMousePosition();
     
-    // Vérification des interactions avec les fenêtres
+    // Check interactions with windows
     if (_windowFactory->handleMouseEvents(mousePos)) {
-        return true; // Événement consommé par l'UI
+        return true; // Event consumed by UI
     }
     
-    return false; // Événement libre pour la caméra/map
+    return false; // Event free for camera/map
 }
 ```
 
-**2. Glissement de fenêtres :**
-- Détection automatique des zones de titre
-- Gestion fluide du glissement avec contraintes
-- Sauvegarde des positions personnalisées
+**2. Window dragging:**
+- Automatic detection of title areas
+- Smooth dragging with constraints
+- Saving custom positions
 
-**3. Redimensionnement adaptatif :**
-- Ajustement automatique selon la résolution d'écran
-- Positions par défaut intelligentes
-- Réinitialisation facile aux valeurs d'origine
+**3. Adaptive resizing:**
+- Automatic adjustment according to screen resolution
+- Intelligent default positions
+- Easy reset to original values
 
-## Performance et optimisations
+## Performance and Optimizations
 
-### Rendu conditionnel
-- Rendu uniquement des fenêtres visibles
-- Mise à jour différentielle des données
-- Cache des calculs coûteux
+### Conditional Rendering
+- Rendering only visible windows
+- Differential data updates
+- Caching of expensive calculations
 
-### Gestion mémoire
-- Partage intelligent des ressources via smart pointers
-- Libération automatique des ressources inutilisées
-- Pool de fenêtres pour éviter les allocations répétées
+### Memory Management
+- Intelligent resource sharing via smart pointers
+- Automatic release of unused resources
+- Window pool to avoid repeated allocations
 
-## Extensibilité future
+## Future Extensibility
 
-### Points d'extension identifiés
-1. **Système de plugins** : Architecture prête pour des fenêtres sous forme de plugins
-2. **Thèmes personnalisables** : Support facile de thèmes visuels
-3. **Sauvegarde de configuration** : Persistance des paramètres utilisateur
-4. **Multi-écrans** : Support natif pour configurations multi-écrans
-5. **Internationalisation** : Architecture prête pour la traduction
+### Identified Extension Points
+1. **Plugin System**: Architecture ready for plugin-based windows
+2. **Customizable Themes**: Easy support for visual themes
+3. **Configuration Saving**: User settings persistence
+4. **Multi-screen**: Native support for multi-screen configurations
+5. **Internationalization**: Architecture ready for translation
 
-### Nouvelles fenêtres envisageables
-- **StatisticsWindow** : Graphiques et statistiques avancées
-- **DebugWindow** : Outils de débogage pour développeurs
-- **ReplayWindow** : Contrôles de replay et d'enregistrement
-- **ChatWindow** : Interface de chat entre spectateurs
+### Envisioned New Windows
+- **StatisticsWindow**: Graphs and advanced statistics
+- **DebugWindow**: Debug tools for developers
+- **ReplayWindow**: Replay and recording controls
+- **ChatWindow**: Chat interface between spectators
 
 ## Conclusion
 
-Cette architecture refactorisée et enrichie offre une base extrêmement solide et extensible pour l'interface utilisateur de Zappy GUI. Elle facilite non seulement l'ajout de nouvelles fonctionnalités, mais assure également une maintenabilité élevée et une séparation claire des responsabilités. La combinaison des patterns Factory, Provider et Observer crée un système cohérent et performant qui peut évoluer facilement avec les besoins futurs du projet.
+This refactored and enriched architecture provides an extremely solid and extensible foundation for the Zappy GUI user interface. It not only facilitates the addition of new features, but also ensures high maintainability and clear separation of responsibilities. The combination of Factory, Provider and Observer patterns creates a coherent and efficient system that can easily evolve with the future needs of the project.

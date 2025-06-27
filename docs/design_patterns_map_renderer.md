@@ -1,71 +1,71 @@
-# Design Patterns utilisés pour le rendu de la carte
+# Design Patterns Used for Map Rendering
 
-## Problématique
-Implémenter le rendu de la carte à partir des données serveur en utilisant une architecture flexible qui peut s'adapter à différents types de rendu et permettre de changer facilement les stratégies de visualisation.
+## Problem Statement
+Implement map rendering from server data using a flexible architecture that can adapt to different types of rendering and easily change visualization strategies.
 
-## Design Patterns implémentés
+## Implemented Design Patterns
 
 ### 1. Observer Pattern
-Le pattern Observer est utilisé pour réagir aux changements dans le `GraphicalContext`. Il permet de découpler la logique de mise à jour des données (dans `GraphicalContext`) de la logique d'affichage (dans `MapRenderer`).
+The Observer pattern is used to react to changes in the `GraphicalContext`. It allows decoupling the data update logic (in `GraphicalContext`) from the display logic (in `MapRenderer`).
 
-- `IGraphicalContextObserver` : Interface pour les observateurs
-- `MapRendererObserver` : Observateur concret qui adapte le rendu en fonction des changements
+- `IGraphicalContextObserver`: Interface for observers
+- `MapRendererObserver`: Concrete observer that adapts rendering based on changes
 
-Avantage : Mise à jour automatique du rendu lorsque les données changent, sans couplage fort entre les classes.
+Advantage: Automatic rendering updates when data changes, without strong coupling between classes.
 
 ### 2. Strategy Pattern
-Le pattern Strategy est utilisé pour encapsuler différentes approches de rendu de tuiles.
+The Strategy pattern is used to encapsulate different tile rendering approaches.
 
-- `ITileRenderStrategy` : Interface définissant le comportement commun
-- `SimpleTileRenderStrategy` : Implémentation pour le rendu simple (cubes)
-- `ModelTileRenderStrategy` : Implémentation pour le rendu avec modèles 3D
-- `DetailedTileRenderStrategy` : Implémentation pour le rendu détaillé avec visualisation des ressources
+- `ITileRenderStrategy`: Interface defining common behavior
+- `SimpleTileRenderStrategy`: Implementation for simple rendering (cubes)
+- `ModelTileRenderStrategy`: Implementation for rendering with 3D models
+- `DetailedTileRenderStrategy`: Implementation for detailed rendering with resource visualization
 
-Avantage : Permet de changer l'algorithme de rendu des tuiles à l'exécution, sans modifier le code client.
+Advantage: Allows changing the tile rendering algorithm at runtime, without modifying client code.
 
 ### 3. Factory Pattern
-Le pattern Factory est utilisé pour créer les différentes stratégies de rendu.
+The Factory pattern is used to create different rendering strategies.
 
-- `TileRenderStrategyFactory` : Fabrique qui crée les différentes stratégies
+- `TileRenderStrategyFactory`: Factory that creates different strategies
 
-Avantage : Centralise la logique de création et facilite le changement de stratégies.
+Advantage: Centralizes creation logic and facilitates strategy changes.
 
 ### 4. Bridge Pattern
-Le pattern Bridge est utilisé pour séparer l'abstraction (rendu de carte) de son implémentation (bibliothèque graphique).
+The Bridge pattern is used to separate abstraction (map rendering) from its implementation (graphics library).
 
-- `MapRenderer` : Abstraction qui utilise une implémentation
-- `IGraphicsLib` : Interface d'implémentation
+- `MapRenderer`: Abstraction that uses an implementation
+- `IGraphicsLib`: Implementation interface
 
-Avantage : Découplage entre le rendu logique et la bibliothèque graphique sous-jacente.
+Advantage: Decoupling between logical rendering and underlying graphics library.
 
 ### 5. Level of Detail (LOD) Pattern
-Le pattern Level of Detail est utilisé pour adapter le niveau de détail du rendu en fonction du niveau de zoom.
+The Level of Detail pattern is used to adapt rendering detail level based on zoom level.
 
-- Zoom éloigné : Utilisation des stratégies simples ou avec modèles pour une performance optimale
-- Zoom rapproché : Utilisation de la stratégie détaillée pour afficher les ressources individuellement
+- Distant zoom: Use of simple or model strategies for optimal performance
+- Close zoom: Use of detailed strategy to display resources individually
 
-Avantage : Optimise les performances tout en fournissant une expérience utilisateur riche.
+Advantage: Optimizes performance while providing a rich user experience.
 
-## Conception modulaire
+## Modular Design
 
-L'architecture permet:
-1. **Flexibilité** : Changer facilement l'apparence des tuiles sans modifier le code du renderer
-2. **Extensibilité** : Ajouter de nouvelles stratégies de rendu sans perturber le code existant
-3. **Réutilisabilité** : Les composants sont indépendants et peuvent être réutilisés dans d'autres parties de l'application
-4. **Découplage** : Le rendu est découplé de la logique de jeu et des données
-5. **Adaptabilité** : Le système s'adapte aux différentes échelles de carte et niveaux de zoom
+The architecture allows:
+1. **Flexibility**: Easily change tile appearance without modifying renderer code
+2. **Extensibility**: Add new rendering strategies without disturbing existing code
+3. **Reusability**: Components are independent and can be reused in other parts of the application
+4. **Decoupling**: Rendering is decoupled from game logic and data
+5. **Adaptability**: The system adapts to different map scales and zoom levels
 
-## Utilisation du ModelManager
+## ModelManager Usage
 
-Le `ModelManager` est intégré via le pattern Strategy, ce qui permet de:
+The `ModelManager` is integrated via the Strategy pattern, which allows:
 
-1. Utiliser des modèles 3D pour les tuiles quand c'est souhaité
-2. Conserver une implémentation simple par défaut
-3. Changer le modèle utilisé à l'exécution
+1. Using 3D models for tiles when desired
+2. Maintaining a simple default implementation
+3. Changing the model used at runtime
 
-Pour définir un rendu spécifique par ressource:
+To define specific rendering by resource:
 ```cpp
-// Exemple d'utilisation du ModelManager pour différents types de ressources
+// Example of using ModelManager for different resource types
 modelManager.loadModel("../assets/models/food.obj"); // ID 1
 mapRenderer.setResourceRenderStrategy(
    static_cast<int>(ResourceType::FOOD), 
@@ -73,53 +73,53 @@ mapRenderer.setResourceRenderStrategy(
 );
 ```
 
-## Visualisation détaillée des ressources
+## Detailed Resource Visualization
 
-Le système permet d'afficher les détails des ressources lorsque l'utilisateur zoom sur une zone:
+The system allows displaying resource details when the user zooms into an area:
 
-1. Les ressources sont visualisées comme de petits objets 3D sur les tuiles
-2. La quantité de chaque ressource est représentée visuellement
-3. Les joueurs et incantations sont clairement indiqués
-4. La transition entre les différents niveaux de détail est fluide
+1. Resources are visualized as small 3D objects on tiles
+2. The quantity of each resource is represented visually
+3. Players and incantations are clearly indicated
+4. The transition between different detail levels is smooth
 
-## Performance et optimisations
+## Performance and Optimizations
 
-Pour les cartes de grande taille:
-1. Le renderer ajuste automatiquement la taille des tuiles pour s'adapter
-2. La stratégie de rendu est simplifiée pour les tuiles éloignées
-3. Le système observe uniquement les tuiles qui changent pour minimiser les mises à jour
-4. Le niveau de détail adaptatif permet de maintenir des performances fluides
+For large maps:
+1. The renderer automatically adjusts tile size to fit
+2. The rendering strategy is simplified for distant tiles
+3. The system observes only tiles that change to minimize updates
+4. Adaptive level of detail maintains smooth performance
 
-## Exemple d'intégration
+## Integration Example
 
-Voici un exemple d'intégration du MapRenderer dans le GameLoop:
+Here's an example of integrating MapRenderer into the GameLoop:
 
 ```cpp
-// Dans GameLoop.hpp
+// In GameLoop.hpp
 private:
     // ...
     std::shared_ptr<GraphicalContext> m_context;
     std::shared_ptr<MapRenderer> m_mapRenderer;
     float m_currentZoomLevel;
 
-// Dans GameLoop.cpp
+// In GameLoop.cpp
 void GameLoop::setupComponents() {
-    // Initialisation du contexte graphique
+    // Initialize graphics context
     m_context = std::make_shared<GraphicalContext>();
     
-    // Obtenir l'instance du ModelManager
+    // Get ModelManager instance
     auto& modelManager = ModelManager::getInstance();
     
-    // Création du MapRenderer
+    // Create MapRenderer
     m_mapRenderer = std::make_shared<MapRenderer>(m_graphics, m_context, modelManager);
     m_mapRenderer->initialize();
     m_currentZoomLevel = 1.0f;
     
-    // Précharger quelques modèles pour les tuiles spéciales
+    // Preload some models for special tiles
     int foodModelId = modelManager.loadModel("../assets/models/food.obj");
     int crystalModelId = modelManager.loadModel("../assets/models/crystal.obj");
     
-    // Configurer des stratégies de rendu spécifiques pour certaines ressources
+    // Configure specific rendering strategies for certain resources
     m_mapRenderer->setResourceRenderStrategy(
         static_cast<int>(ResourceType::FOOD),
         m_mapRenderer->getStrategyFactory().createModelTileStrategy(foodModelId)
@@ -132,41 +132,41 @@ void GameLoop::setupComponents() {
 }
 
 void GameLoop::render() {
-    // Vérifier si l'utilisateur zoome/dézoome
+    // Check if user is zooming in/out
     float mouseWheel = m_graphics->GetMouseWheelMove();
     if (mouseWheel != 0.0f) {
-        // Mettre à jour le niveau de zoom
+        // Update zoom level
         m_currentZoomLevel += mouseWheel * 0.1f;
         m_currentZoomLevel = std::max(0.5f, std::min(5.0f, m_currentZoomLevel));
         m_mapRenderer->setZoomLevel(m_currentZoomLevel);
         
-        // Ajuster également la caméra
+        // Also adjust camera
         m_camera->setZoomLevel(m_currentZoomLevel);
     }
     
-    // Début du rendu
+    // Begin rendering
     m_graphics->BeginDrawing();
-    m_graphics->ClearBackground({20, 20, 40, 255}); // Fond bleu foncé
+    m_graphics->ClearBackground({20, 20, 40, 255}); // Dark blue background
     
     m_graphics->BeginMode3D(m_camera->getCamera());
     
-    // Rendu de la carte
+    // Render map
     m_mapRenderer->render();
     
     m_graphics->EndMode3D();
     
-    // Rendu de l'interface utilisateur
+    // Render user interface
     m_uiRenderer->render(m_graphics, m_gui);
     
     m_graphics->EndDrawing();
 }
 ```
 
-## Gestion des grandes cartes
+## Large Map Management
 
-Pour les cartes de grande taille, le système implémente plusieurs optimisations:
+For large maps, the system implements several optimizations:
 
-1. **Ajustement automatique de la taille** - Les tuiles sont redimensionnées automatiquement:
+1. **Automatic size adjustment** - Tiles are automatically resized:
 ```cpp
 void MapRendererObserver::onMapSizeChanged(int width, int height) {
     if (width > 20 || height > 20) {
@@ -177,9 +177,9 @@ void MapRendererObserver::onMapSizeChanged(int width, int height) {
 }
 ```
 
-2. **Frustum culling** - Option d'extension pour ne rendre que les tuiles visibles:
+2. **Frustum culling** - Extension option to render only visible tiles:
 ```cpp
-// Code potentiel pour le frustum culling (non implémenté dans la version actuelle)
+// Potential code for frustum culling (not implemented in current version)
 bool isTileVisible(int x, int y, const Camera3D& camera) {
     ZappyTypes::Vector3 position = {
         x * (tileSize + tileSpacing),

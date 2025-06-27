@@ -1,78 +1,78 @@
-# Implémentation du Rendu de Carte pour Zappy
+# Zappy Map Renderer Implementation
 
-## Résumé
+## Summary
 
-Le système de rendu de carte développé pour le projet Zappy utilise plusieurs patterns de conception pour créer une architecture modulaire, extensible et efficace. Le système affiche une grille 3D représentant la carte de jeu avec ses tuiles, ressources, joueurs et autres éléments avec un niveau de détail adaptatif.
+The map rendering system developed for the Zappy project uses several design patterns to create a modular, extensible and efficient architecture. The system displays a 3D grid representing the game map with its tiles, resources, players and other elements with adaptive level of detail.
 
-## Patterns de conception utilisés
+## Design Patterns Used
 
-1. **Observer Pattern** - Pour la communication entre le contexte graphique et le renderer
-2. **Strategy Pattern** - Pour différentes approches de rendu de tuiles selon le niveau de zoom
-3. **Factory Pattern** - Pour créer les stratégies de rendu appropriées
-4. **Bridge Pattern** - Pour découpler le rendu logique de l'implémentation graphique
-5. **Level of Detail (LOD) Pattern** - Pour adapter le niveau de détail selon le zoom et la distance
+1. **Observer Pattern** - For communication between the graphics context and the renderer
+2. **Strategy Pattern** - For different tile rendering approaches based on zoom level
+3. **Factory Pattern** - To create appropriate rendering strategies
+4. **Bridge Pattern** - To decouple logical rendering from graphics implementation
+5. **Level of Detail (LOD) Pattern** - To adapt detail level based on zoom and distance
 
-## Fonctionnalités clés
+## Key Features
 
-### Rendu adaptatif avancé
-- **Sélection automatique** du niveau de détail basé sur le zoom et la distance de la caméra
-- **Optimisation des performances** avec frustum culling pour les grandes cartes
-- **Ajustement dynamique** de la taille des tuiles selon la taille de la carte
-- **Rendu conditionnel** des éléments selon leur importance visuelle
+### Advanced Adaptive Rendering
+- **Automatic selection** of detail level based on camera zoom and distance
+- **Performance optimization** with frustum culling for large maps
+- **Dynamic adjustment** of tile size according to map size
+- **Conditional rendering** of elements based on their visual importance
 
-### Visualisation des ressources
-- **Représentation visuelle** distincte pour chaque type de ressource
-- **Indication des quantités** avec des systèmes de couleur et de taille
-- **Groupement intelligent** des ressources pour éviter l'encombrement visuel
-- **Animations subtiles** pour attirer l'attention sur les changements
+### Resource Visualization
+- **Distinct visual representation** for each resource type
+- **Quantity indication** with color and size systems
+- **Intelligent grouping** of resources to avoid visual clutter
+- **Subtle animations** to draw attention to changes
 
-### Support des modèles 3D
-- **Intégration complète** avec le ModelManager pour l'utilisation de modèles 3D
-- **Cache optimisé** des modèles pour éviter les rechargements
-- **Support multi-format** (.glb, .obj, etc.)
-- **Fallback automatique** vers le rendu procédural si les modèles ne sont pas disponibles
+### 3D Model Support
+- **Complete integration** with ModelManager for 3D model usage
+- **Optimized caching** of models to avoid reloading
+- **Multi-format support** (.glb, .obj, etc.)
+- **Automatic fallback** to procedural rendering if models are unavailable
 
-### Optimisations pour grandes cartes
-- **Ajustement automatique** de la taille des tuiles pour maintenir la lisibilité
-- **Système LOD** avec plusieurs niveaux de détail
-- **Culling spatial** pour ne rendre que les éléments visibles
-- **Batching** des appels de rendu pour améliorer les performances
+### Large Map Optimizations
+- **Automatic adjustment** of tile size to maintain readability
+- **LOD system** with multiple detail levels
+- **Spatial culling** to render only visible elements
+- **Batching** of render calls to improve performance
 
-## Fichiers modifiés/créés
+## Modified/Created Files
 
-### Fichiers principaux
-- `src/GUI/renderer/MapRenderer.hpp` - Interface et définitions du renderer
-- `src/GUI/renderer/MapRenderer.cpp` - Implémentation complète du système de rendu
-- `src/GUI/renderer/TileRender.cpp` - Rendu spécialisé des tuiles individuelles
+### Main Files
+- `src/GUI/renderer/MapRenderer.hpp` - Renderer interface and definitions
+- `src/GUI/renderer/MapRenderer.cpp` - Complete rendering system implementation
+- `src/GUI/renderer/TileRender.cpp` - Specialized individual tile rendering
 
-### Fichiers de support
-- `src/GUI/gameController/GameState.hpp` - Structures de données pour l'état du jeu
-- `src/GUI/gameController/GameState.cpp` - Méthodes d'accès aux données de jeu
-- `src/GUI/textureManager/ModelManager.cpp` - Gestion des modèles 3D
+### Support Files
+- `src/GUI/gameController/GameState.hpp` - Data structures for game state
+- `src/GUI/gameController/GameState.cpp` - Game data access methods
+- `src/GUI/textureManager/ModelManager.cpp` - 3D model management
 
 ### Documentation
-- `docs/design_patterns_map_renderer.md` - Documentation détaillée des patterns utilisés
-- `docs/map_renderer_implementation.md` - Ce document d'implémentation
+- `docs/design_patterns_map_renderer.md` - Detailed documentation of used patterns
+- `docs/map_renderer_implementation.md` - This implementation document
 
-## Critères d'acceptation
+## Acceptance Criteria
 
-Tous les critères d'acceptation de l'issue ont été satisfaits avec des améliorations :
+All issue acceptance criteria have been satisfied with improvements:
 
-- ✅ **Toute la carte est visible** : Le système affiche correctement l'ensemble de la carte avec ajustement automatique
-- ✅ **Les tuiles ne se chevauchent pas** : L'espacement est géré avec le paramètre tileSpacing et des algorithmes de placement
-- ✅ **Le rendu reste fluide pour les grandes cartes** : 
-  - Ajustement automatique et intelligent de la taille des tuiles
-  - Système de Level of Detail (LOD) avec multiple niveaux
-  - Optimisations de rendu avancées (culling, batching)
-  - Maintien de 60+ FPS même sur des cartes 100x100
+- ✅ **Entire map is visible**: The system correctly displays the entire map with automatic adjustment
+- ✅ **Tiles do not overlap**: Spacing is managed with the tileSpacing parameter and placement algorithms
+- ✅ **Rendering remains fluid for large maps**: 
+  - Automatic and intelligent tile size adjustment
+  - Level of Detail (LOD) system with multiple levels
+  - Advanced rendering optimizations (culling, batching)
+  - Maintaining 60+ FPS even on 100x100 maps
 
-## Architecture technique
+## Technical Architecture
 
-### Classe MapRenderer
+### MapRenderer Class
 ```cpp
 class MapRenderer {
 public:
-    // Méthodes principales
+    // Main methods
     void initialize();
     void render();
     void renderWithSelection(int selectedTileX, int selectedTileY, int selectedPlayerId);
@@ -83,33 +83,33 @@ public:
     void setTileSpacing(float spacing);
     
 private:
-    // Méthodes de rendu spécialisées
+    // Specialized rendering methods
     void renderTile(int x, int y, const std::shared_ptr<const ITile>& tile);
     void renderPlayers(const std::vector<std::shared_ptr<const IPlayer>>& players);
     void renderResources(int x, int y, const std::shared_ptr<const ITile>& tile);
     void renderSelectionHighlight(int x, int y);
     
-    // Optimisations
+    // Optimizations
     bool isInViewFrustum(int x, int y) const;
     float calculateLODLevel(int x, int y) const;
     void updateVisibilityCache();
 };
 ```
 
-### Système de niveaux de détail
+### Level of Detail System
 ```cpp
 enum class LODLevel {
-    HIGH,    // Rendu complet avec tous les détails
-    MEDIUM,  // Rendu simplifié sans petits détails
-    LOW,     // Rendu basique uniquement
-    MINIMAL  // Rendu ultra-simplifié pour les tuiles très distantes
+    HIGH,    // Full rendering with all details
+    MEDIUM,  // Simplified rendering without small details
+    LOW,     // Basic rendering only
+    MINIMAL  // Ultra-simplified rendering for very distant tiles
 };
 ```
 
-## Tests et validation
+## Testing and Validation
 
-### Programme de test
-Un programme de test complet a été fourni pour vérifier le bon fonctionnement du système :
+### Test Program
+A complete test program has been provided to verify the system's proper functioning:
 
 ```bash
 cd src/GUI
@@ -117,51 +117,51 @@ make
 ./zappy_gui -p 4242 -h localhost
 ```
 
-**Contrôles de test :**
-- **Molette de souris** : Zoom avant/arrière pour tester le système LOD
-- **WASD** : Déplacement de caméra pour tester le culling
-- **Clic souris** : Sélection de tuiles et joueurs
-- **Interface** : Modification des paramètres de rendu en temps réel
+**Test Controls:**
+- **Mouse wheel**: Zoom in/out to test LOD system
+- **WASD**: Camera movement to test culling
+- **Mouse click**: Tile and player selection
+- **Interface**: Real-time rendering parameter modification
 
-### Métriques de performance
-- **FPS cible** : 60+ FPS maintenu même sur cartes 100x100
-- **Mémoire** : Utilisation optimisée avec cache intelligent
-- **Latence** : Réponse immédiate aux interactions utilisateur
-- **Scalabilité** : Support testé jusqu'à 1000 joueurs simultanés
+### Performance Metrics
+- **Target FPS**: 60+ FPS maintained even on 100x100 maps
+- **Memory**: Optimized usage with intelligent caching
+- **Latency**: Immediate response to user interactions
+- **Scalability**: Support tested up to 1000 simultaneous players
 
-## Extensions possibles
+## Possible Extensions
 
-### Améliorations visuelles
-1. **Frustum culling avancé** : Optimisation pour ne rendre que les tuiles visibles dans la caméra
-2. **Animations de ressources** : Ajout d'animations pour les ressources sur les tuiles
-3. **Effets visuels** : Particules ou effets pour les sorts et événements spéciaux
-4. **Transitions fluides** : Animation lors du changement d'états des tuiles
+### Visual Improvements
+1. **Advanced frustum culling**: Optimization to render only tiles visible in camera
+2. **Resource animations**: Adding animations for resources on tiles
+3. **Visual effects**: Particles or effects for spells and special events
+4. **Smooth transitions**: Animation during tile state changes
 
-### Optimisations supplémentaires
-1. **Rendu instancié** : Groupement des objets similaires pour un rendu plus efficace
-2. **Occlusion culling** : Masquage des objets cachés par d'autres
-3. **Streaming de données** : Chargement progressif pour les très grandes cartes
-4. **Multi-threading** : Parallélisation des calculs de rendu
+### Additional Optimizations
+1. **Instanced rendering**: Grouping similar objects for more efficient rendering
+2. **Occlusion culling**: Hiding objects concealed by others
+3. **Data streaming**: Progressive loading for very large maps
+4. **Multi-threading**: Parallelization of rendering calculations
 
-### Fonctionnalités avancées
-1. **Mini-carte** : Vue d'ensemble navigable de la carte complète
-2. **Modes de visualisation** : Différents modes (ressources, joueurs, équipes, etc.)
-3. **Filtres visuels** : Possibilité de masquer/afficher certains éléments
-4. **Enregistrement** : Capture d'écran et enregistrement vidéo du rendu
+### Advanced Features
+1. **Mini-map**: Navigable overview of the complete map
+2. **Visualization modes**: Different modes (resources, players, teams, etc.)
+3. **Visual filters**: Ability to hide/show certain elements
+4. **Recording**: Screenshot and video recording of rendering
 
-## Considérations de maintenance
+## Maintenance Considerations
 
-### Code modulaire
-- **Séparation claire** entre logique de rendu et données de jeu
-- **Interfaces bien définies** pour faciliter les modifications
-- **Documentation complète** de toutes les méthodes publiques
+### Modular Code
+- **Clear separation** between rendering logic and game data
+- **Well-defined interfaces** to facilitate modifications
+- **Complete documentation** of all public methods
 
-### Extensibilité
-- **Architecture plugin-ready** pour ajouter de nouveaux types de rendu
-- **Configuration externalisée** via fichiers de configuration
-- **API stable** pour les développements futurs
+### Extensibility
+- **Plugin-ready architecture** to add new rendering types
+- **Externalized configuration** via configuration files
+- **Stable API** for future developments
 
-### Performance monitoring
-- **Métriques intégrées** pour surveiller les performances
-- **Profiling automatique** des opérations coûteuses
-- **Logs détaillés** pour le débogage des problèmes de performance
+### Performance Monitoring
+- **Integrated metrics** to monitor performance
+- **Automatic profiling** of expensive operations
+- **Detailed logs** for debugging performance issues
