@@ -25,7 +25,7 @@ static int check_disconnect(int bytes_read, server_t *server,
 bool handle_socket_read(server_t *server, zappy_client_t **clients,
     zappy_client_t *user)
 {
-    char temp_read_storage[1024];
+    char temp_read_storage[4096];
     int bytes_read;
 
     bytes_read = read(user->client->client_fd,

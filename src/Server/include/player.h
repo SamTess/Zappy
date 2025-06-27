@@ -11,7 +11,6 @@
     #include "tile.h"
     #include "pending_cmd.h"
 
-// Forward declarations
 typedef struct game_s game_t;
 typedef struct server_s server_t;
 typedef struct zappy_client_s zappy_client_t;
@@ -64,7 +63,6 @@ int how_many_in_inventory(player_t *player, resource_type_t type);
 char *get_inventory_content(player_t *player);
 char *get_resource_name(resource_type_t type);
 
-// Player lifecycle and death functions
 void handle_player_death(game_t *game, server_t *server,
     zappy_client_t *client, zappy_client_t *clients);
 bool check_player_starvation(game_t *game, server_t *server,

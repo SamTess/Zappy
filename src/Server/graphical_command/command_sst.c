@@ -19,9 +19,8 @@ static char *format_sst_response(int time)
     int size = snprintf(NULL, 0, "sst %d\n", time);
 
     buffer = malloc(size + 1);
-    if (!buffer) {
+    if (!buffer)
         return NULL;
-    }
     snprintf(buffer, size + 1, "sst %d\n", time);
     return buffer;
 }
@@ -30,9 +29,8 @@ static int get_time_from_buffer(char *buffer)
 {
     int time = 0;
 
-    if (sscanf(buffer, "%d", &time) != 1 || time <= 0) {
+    if (sscanf(buffer, "%d", &time) != 1 || time <= 0)
         return -1;
-    }
     return time;
 }
 

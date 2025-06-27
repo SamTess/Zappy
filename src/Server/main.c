@@ -115,12 +115,6 @@ static void set_rdm_seed(void)
     srand((unsigned int)(seed & 0xFFFFFFFF));
 }
 
-/**
- * @brief Main function for the zappy server
- * @param argc Number of arguments
- * @param argv Array of arguments
- * @return 0 on success, 84 on error
- */
 int main(int ac, char **av)
 {
     parsing_info_t parsed_info;
