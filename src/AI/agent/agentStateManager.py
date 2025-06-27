@@ -38,6 +38,9 @@ class AgentStateManager:
 
   def _manage_fill_phase(self):
     available_slots = AgentActionManager(self.agent).get_available_slots()
+    if available_slots is None:
+      print(f"Agent {self.agent.id}: fill phase: available_slots is None. Cannot proceed.")
+      return
     print(f"Agent {self.agent.id}: fill phase: {available_slots} slots are available.")
     if available_slots <= 0:
       self.agent.current_phase = "collect"
