@@ -48,7 +48,7 @@ static void send_bct_response(client_t *client, int x, int y, tile_t *tile)
     char *buffer = get_buffer_bct_command(x, y, tile);
 
     if (buffer) {
-        write_command_output_buffer(client, buffer);
+        write_command_output(client->client_fd, buffer);
         free(buffer);
     }
 }
@@ -115,7 +115,7 @@ void command_bct(game_t *game, zappy_client_t *client,
     send_bct_response(client->client, x, y, &game->map[y][x]);
 }
 
-void command_mtc(game_t *game, zappy_client_t *client,
+void command_mct(game_t *game, zappy_client_t *client,
     zappy_client_t *clients, char **buffer)
 {
     (void)clients;

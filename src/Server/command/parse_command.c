@@ -18,13 +18,13 @@ command_data_t get_command_data(void)
 {
     static const char *comm_char[] = {"Forward", "Right", "Left",
         "Inventory", "Look", "Eject", "Connect_nbr", "Take", "Set",
-        "Incantation", "Fork", "Broadcast", "msz", "bct", "mtc",
+        "Incantation", "Fork", "Broadcast", "msz", "bct", "mct",
         "tna", "ppo", "plv", "pin", "sgt", "sst", NULL};
     static void (*comm_func[])(game_t *, zappy_client_t *, zappy_client_t *,
         char **) =
         {forward, right, left, inventory, look, eject,
         connect_nbr, take_object, set_object, start_incantation,
-        fork_c, broadcast, command_msz, command_bct, command_mtc,
+        fork_c, broadcast, command_msz, command_bct, command_mct,
         command_tna, command_ppo, command_plv, command_pin,
         command_sgt, command_sst, NULL};
     static int comm_times[] = {7, 7, 7, 1, 7, 7, 0, 7, 7, 300, 42, 7, 0,

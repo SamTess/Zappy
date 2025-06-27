@@ -27,7 +27,7 @@ void send_msz_command(game_t *game, zappy_client_t *client)
         return;
     snprintf(buffer, size + 1, "msz %d %d\n",
             game->parsed_info->width, game->parsed_info->height);
-    write_command_output_buffer(client->client, buffer);
+    write_command_output(client->client->client_fd, buffer);
     free(buffer);
 }
 

@@ -14,7 +14,7 @@ void command_msz(game_t *game, zappy_client_t *client,
     zappy_client_t *clients, char **buffer);
 void command_bct(game_t *game, zappy_client_t *client,
     zappy_client_t *clients, char **buffer);
-void command_mtc(game_t *game, zappy_client_t *client,
+void command_mct(game_t *game, zappy_client_t *client,
     zappy_client_t *clients, char **buffer);
 void command_tna(game_t *game, zappy_client_t *client,
     zappy_client_t *clients, char **buffer);
