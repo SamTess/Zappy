@@ -55,6 +55,6 @@ maps
 
 
 __pycache__/
-zappy_ref-v3.0.0
+zappy_ref-v*
 
 .env
