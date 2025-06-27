@@ -14,21 +14,20 @@
 #include "../networkCommandManager/NetworkCommandManager.hpp"
 
 class TileContentMessageHandler : public IMessageHandler {
-public:
-    TileContentMessageHandler(std::shared_ptr<GameState> gameState,
-        std::shared_ptr<NetworkCommandManager> networkManager);
-    ~TileContentMessageHandler() = default;
+    public:
+        TileContentMessageHandler(std::shared_ptr<GameState> gameState,
+            std::shared_ptr<NetworkCommandManager> networkManager);
+        ~TileContentMessageHandler() = default;
 
-    void handleMessage(std::shared_ptr<IMessageData> data) override;
-    MessageType getMessageType() const override { return MessageType::TileContent; }
+        void handleMessage(std::shared_ptr<IMessageData> data) override;
+        MessageType getMessageType() const override { return MessageType::TileContent; }
 
-private:
-    std::shared_ptr<GameState> _gameState;
-    std::shared_ptr<NetworkCommandManager> _networkManager;
+    private:
+        std::shared_ptr<GameState> _gameState;
+        std::shared_ptr<NetworkCommandManager> _networkManager;
 
-    // Méthodes d'aide pour refactoriser handleMessage
-    void handleUninitializedMap();
-    void updateTileContent(std::shared_ptr<TileContentData> tileData);
+        void handleUninitializedMap();
+        void updateTileContent(std::shared_ptr<TileContentData> tileData);
 };
 
 #endif /* !TILE_CONTENT_MESSAGE_HANDLER_HPP_ */

@@ -24,7 +24,6 @@ void PlayerInfoMessageHandler::handleMessage(std::shared_ptr<IMessageData> data)
 
     if (handlePlayerValidation(playerData, existingPlayer))
         return;
-
     handleMissingTeamInfo(playerData, existingPlayer);
     if (handleExistingPlayerWithValidOrientation(playerData, existingPlayer, playerId))
         return;
@@ -34,9 +33,8 @@ void PlayerInfoMessageHandler::handleMessage(std::shared_ptr<IMessageData> data)
 
 bool PlayerInfoMessageHandler::handlePlayerValidation(std::shared_ptr<PlayerInfoData> playerData,
     std::shared_ptr<const IPlayer> existingPlayer) {
-    if (!existingPlayer && playerData->getTeamName().empty()) {
+    if (!existingPlayer && playerData->getTeamName().empty())
         return _validator->validateAndRequestPlayerInfo(playerData->getId());
-    }
     return false;
 }
 
@@ -76,7 +74,6 @@ void PlayerInfoMessageHandler::processPlayerDeath(std::shared_ptr<const IPlayer>
         _gameState->getMapWidth(), _gameState->getMapHeight());
     _animationManager->startDeathAnimation(playerId, playerWorldPos, existingPlayer->getTeamName());
     _gameState->removePlayer(playerId);
-
     if (_soundManager->isSfxEnabled())
         _soundManager->playDeathSound();
 }

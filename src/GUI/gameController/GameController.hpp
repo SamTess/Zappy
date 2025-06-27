@@ -16,16 +16,12 @@
 #include "../GUI/shared/IGraphicsLib.hpp"
 #include "../shared/Message.hpp"
 #include "../shared/commands/ICommandExecutor.hpp"
-
-// Managers
 #include "messageHandlers/MessageHandlerRegistry.hpp"
 #include "animationManager/AnimationManager.hpp"
 #include "soundManager/SoundManager.hpp"
 #include "networkCommandManager/NetworkCommandManager.hpp"
 #include "playerValidationManager/PlayerValidationManager.hpp"
 #include "graphicsManager/GraphicsManager.hpp"
-
-// Message Handlers
 #include "messageHandlers/MapSizeMessageHandler.hpp"
 #include "messageHandlers/TileContentMessageHandler.hpp"
 #include "messageHandlers/PlayerInfoMessageHandler.hpp"

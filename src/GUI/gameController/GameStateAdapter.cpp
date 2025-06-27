@@ -47,7 +47,7 @@ void GameStateAdapter::setMapSize(int width, int height) {
 void GameStateAdapter::updateTileResources(int x, int y, int food, int linemate, int deraumere,
     int sibur, int mendiane, int phiras, int thystame) {
     _gameStateManager->getMapManager()->updateTileResources(x, y, food, linemate, deraumere,
-                                                            sibur, mendiane, phiras, thystame);
+        sibur, mendiane, phiras, thystame);
 }
 
 void GameStateAdapter::setTileIncantationState(int x, int y, bool isIncantating) {

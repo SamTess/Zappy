@@ -16,11 +16,10 @@
     #include "../commands/INetworkCommandSender.hpp"
 
 class IUINotifier {
-public:
-    virtual ~IUINotifier() = default;
-    virtual void notifyConnectionStatus(bool connected) = 0;
-    virtual void setCommandSender(std::shared_ptr<INetworkCommandSender> sender) = 0;
-    virtual void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) = 0;
+    public:
+        virtual ~IUINotifier() = default;
+        virtual void setCommandSender(std::shared_ptr<INetworkCommandSender> sender) = 0;
+        virtual void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) = 0;
 };
 
 #endif /* IUINOTIFIER_HPP_ */

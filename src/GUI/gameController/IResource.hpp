@@ -22,8 +22,7 @@ class IResource : public IRenderable {
         virtual bool isEmpty() const = 0;
         virtual const std::string& getName() const = 0;
         virtual void renderResource(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-            const ZappyTypes::Vector3& position,
-            float tileSize) const = 0;
+            const ZappyTypes::Vector3& position, float tileSize) const = 0;
 };
 
 #endif /* !IRESSOURCES_HPP_ */

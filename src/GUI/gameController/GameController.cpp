@@ -62,9 +62,8 @@ void GameController::setEntityFactory(std::shared_ptr<EntityFactoryManager> fact
 
 void GameController::setGraphics(std::shared_ptr<IGraphicsLib> graphics) {
     _graphicsManager->setGraphics(graphics);
-    if (_soundManager) {
+    if (_soundManager)
         _soundManager->setGraphics(graphics);
-    }
 }
 
 void GameController::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {

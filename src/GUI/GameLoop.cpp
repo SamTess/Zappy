@@ -124,7 +124,7 @@ int GameLoop::run() {
         Zappy::DeathAnimationManager::getInstance().render(_graphics);
         _graphics->EndCamera3D();
         updateGameData();
-        updateAudioSettings(); // Appliquer les changements audio
+        updateAudioSettings();
         if (_gameController)
             auto gameState = _gameController->getGameState();
         _userInterface->render();

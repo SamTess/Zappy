@@ -18,8 +18,7 @@
 class PlayerExpulsionMessageHandler : public IMessageHandler {
     public:
         PlayerExpulsionMessageHandler(std::shared_ptr<GameState> gameState,
-                                    std::shared_ptr<PlayerValidationManager> validator,
-                                    std::shared_ptr<AnimationManager> animationManager);
+            std::shared_ptr<PlayerValidationManager> validator, std::shared_ptr<AnimationManager> animationManager);
         ~PlayerExpulsionMessageHandler() = default;
 
         void handleMessage(std::shared_ptr<IMessageData> data) override;

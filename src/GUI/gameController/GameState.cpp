@@ -51,7 +51,7 @@ void GameState::setMapSize(int width, int height) {
 }
 
 void GameState::updateTileResources(int x, int y, int food, int linemate, int deraumere,
-                                     int sibur, int mendiane, int phiras, int thystame) {
+    int sibur, int mendiane, int phiras, int thystame) {
     _adapter->updateTileResources(x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame);
 }
 

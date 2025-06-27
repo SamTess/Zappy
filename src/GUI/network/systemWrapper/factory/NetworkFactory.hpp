@@ -16,10 +16,10 @@ namespace Network {
 namespace Implementation {
 
 class NetworkFactory : public INetworkFactory {
-public:
-    std::unique_ptr<ISocket> createTcpSocket() override;
-    std::unique_ptr<INetworkAddress> createAddress(const std::string& host, int port) override;
-    std::unique_ptr<IPoller> createPoller() override;
+    public:
+        std::unique_ptr<ISocket> createTcpSocket() override;
+        std::unique_ptr<INetworkAddress> createAddress(const std::string& host, int port) override;
+        std::unique_ptr<IPoller> createPoller() override;
 };
 
 std::unique_ptr<INetworkFactory> createNetworkFactory();

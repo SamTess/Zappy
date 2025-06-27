@@ -60,8 +60,7 @@ void UIWindowFactory::createAllWindows(int, int,
         {"playerInfo", {10, 500}, {400, 300}, false},
         {"mapInfo", {1520, 540}, {400, 300}, false},
         {"timeInfo", {1450, 10}, {250, 150}, false},
-        {"menu", {10, 10}, {40, 40}, true}
-    };
+        {"menu", {10, 10}, {40, 40}, true}};
     for (const auto& config : windowConfigs) {
         createWindow(config.id, config.position, config.dimensions, config.initiallyVisible);
     }

@@ -33,10 +33,7 @@ class IPlayer : public IGameEntity {
         virtual ZappyTypes::Vector3 getInterpolatedPosition() const = 0;
         virtual bool isMoving() const = 0;
         virtual void renderPlayer(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-            const ZappyTypes::Vector3& position,
-            float tileSize,
-            int playerIndex = 0,
-            int totalPlayers = 1) const = 0;
+            const ZappyTypes::Vector3& position, float tileSize, int playerIndex = 0, int totalPlayers = 1) const = 0;
 };
 
 #endif /* !IPLAYER_HPP_ */

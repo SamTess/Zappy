@@ -18,23 +18,22 @@
 #include "IUINotifier.hpp"
 
 class ComponentCoordinator : public ICommandExecutor, public std::enable_shared_from_this<ComponentCoordinator> {
-public:
-    ComponentCoordinator() = default;
-    ~ComponentCoordinator() = default;
+    public:
+        ComponentCoordinator() = default;
+        ~ComponentCoordinator() = default;
 
-    void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
-    void setGameController(std::shared_ptr<IGameController> gameController);
-    void setUINotifier(std::shared_ptr<IUINotifier> uiNotifier);
-    void executeCommand(std::shared_ptr<ICommand> command);
-    void setupConnections();
+        void setNetworkManager(std::shared_ptr<NetworkManager> networkManager);
+        void setGameController(std::shared_ptr<IGameController> gameController);
+        void setUINotifier(std::shared_ptr<IUINotifier> uiNotifier);
+        void executeCommand(std::shared_ptr<ICommand> command);
+        void setupConnections();
 
-private:
-    std::weak_ptr<NetworkManager> _networkManager;
-    std::weak_ptr<IGameController> _gameController;
-    std::weak_ptr<IUINotifier> _uiNotifier;
+    private:
+        std::weak_ptr<NetworkManager> _networkManager;
+        std::weak_ptr<IGameController> _gameController;
+        std::weak_ptr<IUINotifier> _uiNotifier;
 
-    void onMessageReceived(const Message& message);
-    void onConnectionStatusChanged(bool connected);
+        void onMessageReceived(const Message& message);
 };
 
 #endif /* !COMPONENT_COORDINATOR_HPP_ */

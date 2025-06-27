@@ -33,7 +33,8 @@ void ComponentCoordinator::setupConnections() {
             this->onMessageReceived(message);
         });
         nm->setConnectionCallback([this](bool connected) {
-            this->onConnectionStatusChanged(connected);
+            (void)connected;
+            // this->onConnectionStatusChanged(connected);
         });
     }
     if (auto gc = _gameController.lock())
@@ -48,9 +49,4 @@ void ComponentCoordinator::setupConnections() {
 void ComponentCoordinator::onMessageReceived(const Message& message) {
     if (auto gc = _gameController.lock())
         gc->processMessage(message);
-}
-
-void ComponentCoordinator::onConnectionStatusChanged(bool connected) {
-    if (auto ui = _uiNotifier.lock())
-        ui->notifyConnectionStatus(connected);
 }

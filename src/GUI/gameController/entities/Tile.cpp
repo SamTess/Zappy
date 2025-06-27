@@ -31,14 +31,15 @@ const std::array<int, 7>& Tile::getResources() const {
 
 int Tile::getResourceQuantity(ResourceType type) const {
     int index = static_cast<int>(type);
-    return (index >= 0 && index < 7) ? _resources[index] : 0;
+    if (index >= 0 && index < 7)
+        return _resources[index];
+    return 0;
 }
 
 void Tile::setResourceQuantity(ResourceType type, int quantity) {
     int index = static_cast<int>(type);
-    if (index >= 0 && index < 7) {
+    if (index >= 0 && index < 7)
         _resources[index] = std::max(0, quantity);
-    }
 }
 
 const std::vector<int>& Tile::getPlayerIds() const {
@@ -58,29 +59,21 @@ void Tile::setIncantating(bool incantating) {
 }
 
 void Tile::addPlayer(int playerId) {
-    if (std::find(_playerIds.begin(), _playerIds.end(), playerId) == _playerIds.end()) {
+    if (std::find(_playerIds.begin(), _playerIds.end(), playerId) == _playerIds.end())
         _playerIds.push_back(playerId);
-    }
 }
 
 void Tile::removePlayer(int playerId) {
-    _playerIds.erase(
-        std::remove(_playerIds.begin(), _playerIds.end(), playerId),
-        _playerIds.end()
-    );
+    _playerIds.erase(std::remove(_playerIds.begin(), _playerIds.end(), playerId), _playerIds.end());
 }
 
 void Tile::addEgg(int eggId) {
-    if (std::find(_eggIds.begin(), _eggIds.end(), eggId) == _eggIds.end()) {
+    if (std::find(_eggIds.begin(), _eggIds.end(), eggId) == _eggIds.end())
         _eggIds.push_back(eggId);
-    }
 }
 
 void Tile::removeEgg(int eggId) {
-    _eggIds.erase(
-        std::remove(_eggIds.begin(), _eggIds.end(), eggId),
-        _eggIds.end()
-    );
+    _eggIds.erase(std::remove(_eggIds.begin(), _eggIds.end(), eggId), _eggIds.end());
 }
 
 void Tile::updateFromProtocol(const TileContentData& data) {
@@ -98,8 +91,8 @@ void Tile::updateFromProtocol(const TileContentData& data) {
 void Tile::render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     const ZappyTypes::Vector3& position,
     float tileSize) const {
+    (void)tileSize;
     if (!graphicsLib)
         return;
-    (void)tileSize;
     ModelManager::getInstance().drawModel(ISLAND, position, 1);
 }

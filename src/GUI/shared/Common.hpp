@@ -63,7 +63,6 @@ namespace Colors {
     static inline constexpr ZappyTypes::Color Z_RAYWHITE   = { 245, 245, 245, 255 };
 } // namespace Colors
 
-// Constantes pour les touches du clavier
 enum KeyboardKey {
     Z_KEY_NULL = 0,
     Z_KEY_APOSTROPHE = 39,

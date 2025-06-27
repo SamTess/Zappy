@@ -19,45 +19,43 @@
 namespace GUI {
 
 class UIDataProvider : public IUIDataProvider, public IUISettingsProvider {
-public:
-    explicit UIDataProvider(std::shared_ptr<const GameState> gameState);
-    virtual ~UIDataProvider() = default;
+    public:
+        explicit UIDataProvider(std::shared_ptr<const GameState> gameState);
+        virtual ~UIDataProvider() = default;
 
-    void updateGameState(std::shared_ptr<const GameState> gameState);
-    void updateTimeData(float gameTime, int frequency, int gameTick);
-    int getMapWidth() const override;
-    int getMapHeight() const override;
-    float getGameTime() const override;
-    int getFrequency() const override;
-    int getGameTick() const override;
-    bool isMapInitialized() const override;
-    bool isGameEnded() const override;
-    const std::string& getWinningTeam() const override;
-    std::shared_ptr<const ITile> getTile(int x, int y) const override;
-    int getResourceQuantity(int x, int y, ResourceType resourceType) const override;
-    std::vector<int> getPlayersOnTile(int x, int y) const override;
-    std::vector<int> getEggsOnTile(int x, int y) const override;
-    std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const override;
-    std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const override;
-    bool isPlayerOnTile(int x, int y, int playerId) const override;
-    std::vector<int> getPlayerIds() const override;
-    const std::vector<std::string>& getTeamNames() const override;
-    std::vector<int> calculateTotalResources() const override;
-    std::map<std::string, int> getTeamPlayerCounts() const override;
-    std::map<std::string, std::vector<int>> getTeamResourceTotals() const override;
+        void updateGameState(std::shared_ptr<const GameState> gameState);
+        void updateTimeData(float gameTime, int frequency, int gameTick);
+        int getMapWidth() const override;
+        int getMapHeight() const override;
+        float getGameTime() const override;
+        int getFrequency() const override;
+        int getGameTick() const override;
+        bool isMapInitialized() const override;
+        bool isGameEnded() const override;
+        const std::string& getWinningTeam() const override;
+        std::shared_ptr<const ITile> getTile(int x, int y) const override;
+        int getResourceQuantity(int x, int y, ResourceType resourceType) const override;
+        std::vector<int> getPlayersOnTile(int x, int y) const override;
+        std::vector<int> getEggsOnTile(int x, int y) const override;
+        std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const override;
+        std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const override;
+        bool isPlayerOnTile(int x, int y, int playerId) const override;
+        std::vector<int> getPlayerIds() const override;
+        const std::vector<std::string>& getTeamNames() const override;
+        std::vector<int> calculateTotalResources() const override;
+        std::map<std::string, int> getTeamPlayerCounts() const override;
+        std::map<std::string, std::vector<int>> getTeamResourceTotals() const override;
+        bool getSfxEnabled() const override;
+        void setSfxEnabled(bool enabled) override;
+        float getMusicVolume() const override;
+        void setMusicVolume(float volume) override;
 
-    // IUISettingsProvider interface
-    bool getSfxEnabled() const override;
-    void setSfxEnabled(bool enabled) override;
-    float getMusicVolume() const override;
-    void setMusicVolume(float volume) override;
-
-private:
-    std::shared_ptr<const GameState> _gameState;
-    float _cachedGameTime = 0.0f;
-    int _cachedFrequency = 100;
-    int _cachedGameTick = 0;
-    bool isValidGameState() const;
+    private:
+        std::shared_ptr<const GameState> _gameState;
+        float _cachedGameTime = 0.0f;
+        int _cachedFrequency = 100;
+        int _cachedGameTick = 0;
+        bool isValidGameState() const;
 };
 
 } // namespace GUI

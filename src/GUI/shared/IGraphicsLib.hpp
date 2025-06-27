@@ -62,7 +62,7 @@ public:
     virtual ZappyTypes::Vector2 GetMousePosition() = 0;
     virtual float GetMouseWheelMove() = 0;
 
-    // Audio (optionnel)
+    // Audio
     virtual void PlaySound(const std::string& path) = 0;
     virtual void StopSound() = 0;
     virtual void SetSoundVolume(float volume) = 0;

@@ -72,7 +72,7 @@ int MapManager::getResourceQuantity(int x, int y, ResourceType resourceType) con
 }
 
 void MapManager::updateTileResources(int x, int y, int food, int linemate, int deraumere,
-                                   int sibur, int mendiane, int phiras, int thystame) {
+    int sibur, int mendiane, int phiras, int thystame) {
     if (!isValidCoordinates(x, y))
         return;
     auto& tile = _tiles[y][x];

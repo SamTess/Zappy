@@ -91,9 +91,8 @@ void UserInterface::handleUIMouseInteraction(const ZappyTypes::Vector2& mousePos
 
 void UserInterface::startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition) {
     bool startedDragging = _windowFactory->handleWindowDragging(mousePosition);
-    if (startedDragging) {
+    if (startedDragging)
         _isDragging = true;
-    }
 }
 
 void UserInterface::handleDragEndIfNeeded() {
@@ -114,12 +113,6 @@ bool UserInterface::hasHandledMouseEvent() const {
 
 std::shared_ptr<GUI::IUIWindow> UserInterface::getWindow(const std::string& windowId) {
     return _windowFactory->getWindow(windowId);
-}
-
-void UserInterface::notifyConnectionStatus(bool connected) {
-    if (!connected) {
-        // Optionnel : gestion UI quand la connexion est perdue
-    }
 }
 
 void UserInterface::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {

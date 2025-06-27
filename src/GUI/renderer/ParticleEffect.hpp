@@ -25,7 +25,7 @@ struct Particle {
     bool active;
 
     Particle() : position{0, 0, 0}, velocity{0, 0, 0}, acceleration{0, 0, 0},
-                 color{255, 255, 255, 255}, life(0), maxLife(1.0f), size(1.0f), active(false) {}
+        color{255, 255, 255, 255}, life(0), maxLife(1.0f), size(1.0f), active(false) {}
 };
 
 enum class ParticleType {

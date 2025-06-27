@@ -27,7 +27,6 @@ class UserInterface : public IUINotifier {
         void updateTimeData(float gameTime, int frequency, int gameTick);
         void setSelectedTile(int x, int y);
         void setSelectedPlayer(int playerId);
-        void notifyConnectionStatus(bool connected) override;
         void setCommandSender(std::shared_ptr<INetworkCommandSender> sender) override;
         void setCommandExecutor(std::shared_ptr<ICommandExecutor> executor);
         bool toggleWindowVisibility(const std::string& windowId, bool visible);

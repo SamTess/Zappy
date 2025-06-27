@@ -13,15 +13,15 @@
 #include "../GameState.hpp"
 
 class TeamNameMessageHandler : public IMessageHandler {
-public:
-    explicit TeamNameMessageHandler(std::shared_ptr<GameState> gameState);
-    ~TeamNameMessageHandler() = default;
+    public:
+        explicit TeamNameMessageHandler(std::shared_ptr<GameState> gameState);
+        ~TeamNameMessageHandler() = default;
 
-    void handleMessage(std::shared_ptr<IMessageData> data) override;
-    MessageType getMessageType() const override { return MessageType::TeamName; }
+        void handleMessage(std::shared_ptr<IMessageData> data) override;
+        MessageType getMessageType() const override { return MessageType::TeamName; }
 
-private:
-    std::shared_ptr<GameState> _gameState;
+    private:
+        std::shared_ptr<GameState> _gameState;
 };
 
 #endif /* !TEAM_NAME_MESSAGE_HANDLER_HPP_ */

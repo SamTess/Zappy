@@ -141,7 +141,10 @@ bool TcpSocket::hasData() const {
     if (!isConnected())
         return false;
     pfd = {_fd, POLLIN, 0};
-    return poll(&pfd, 1, 0) > 0 && (pfd.revents & POLLIN);
+    int result = poll(&pfd, 1, 0);
+    if (result > 0)
+        return (pfd.revents & POLLIN);
+    return false;
 }
 
 bool TcpSocket::setNonBlocking() {

@@ -15,26 +15,26 @@
 #include "HeaderMessage.hpp"
 
 class Message {
-public:
-    Message();
-    Message(const std::string& header, const std::string& data, std::shared_ptr<IMessageData> structuredData = nullptr);
-    ~Message() = default;
+    public:
+        Message();
+        Message(const std::string& header, const std::string& data, std::shared_ptr<IMessageData> structuredData = nullptr);
+        ~Message() = default;
 
-    void setMessage(const std::string &data);
-    void setHeader(const std::string &header);
-    void setData(const std::string &data);
-    void setData(std::shared_ptr<IMessageData> data);
-    const std::string &getMessage() const;
-    const std::string &getHeader() const;
-    const std::string &getData() const;
-    bool hasStructuredData() const;
-    std::shared_ptr<IMessageData> getStructuredData() const { return _structuredData; }
+        void setMessage(const std::string &data);
+        void setHeader(const std::string &header);
+        void setData(const std::string &data);
+        void setData(std::shared_ptr<IMessageData> data);
+        const std::string &getMessage() const;
+        const std::string &getHeader() const;
+        const std::string &getData() const;
+        bool hasStructuredData() const;
+        std::shared_ptr<IMessageData> getStructuredData() const { return _structuredData; }
 
-private:
-    std::string _messageString;
-    std::string _messageHeader;
-    std::string _messageData;
-    std::shared_ptr<IMessageData> _structuredData;
+    private:
+        std::string _messageString;
+        std::string _messageHeader;
+        std::string _messageData;
+        std::shared_ptr<IMessageData> _structuredData;
 };
 
 #endif /* !MESSAGE_HPP_ */

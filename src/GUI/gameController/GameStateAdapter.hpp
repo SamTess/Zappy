@@ -32,7 +32,7 @@ class GameStateAdapter {
         int getResourceQuantity(int x, int y, ResourceType resourceType) const;
         void setMapSize(int width, int height);
         void updateTileResources(int x, int y, int food, int linemate, int deraumere,
-                                int sibur, int mendiane, int phiras, int thystame);
+            int sibur, int mendiane, int phiras, int thystame);
         void setTileIncantationState(int x, int y, bool isIncantating);
         bool isPlayerOnTile(int x, int y, int playerId) const;
         std::vector<int> getPlayersOnTile(int x, int y) const;

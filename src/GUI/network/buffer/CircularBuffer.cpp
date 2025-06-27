@@ -79,9 +79,8 @@ void CircularBuffer::clear() {
 bool CircularBuffer::hasLine() const {
     size_t currentTail = _tail;
     for (size_t i = 0; i < _size; ++i) {
-        if (_buffer[currentTail] == '\n') {
+        if (_buffer[currentTail] == '\n')
             return true;
-        }
         currentTail = nextIndex(currentTail);
     }
     return false;

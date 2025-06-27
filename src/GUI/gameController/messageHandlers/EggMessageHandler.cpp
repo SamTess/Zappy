@@ -9,7 +9,7 @@
 #include "EggMessageHandler.hpp"
 
 EggMessageHandler::EggMessageHandler(std::shared_ptr<GameState> gameState,
-                                   std::shared_ptr<PlayerValidationManager> validator)
+    std::shared_ptr<PlayerValidationManager> validator)
     : _gameState(gameState), _validator(validator) {}
 
 void EggMessageHandler::handleMessage(std::shared_ptr<IMessageData> data) {
@@ -50,7 +50,6 @@ void EggMessageHandler::handleEggDeath(std::shared_ptr<EggData> eggData) {
 }
 
 void EggMessageHandler::handleEggLaying(std::shared_ptr<EggData> eggData) {
-    if (_validator->validateAndRequestPlayerInfo(eggData->getPlayerId())) {
+    if (_validator->validateAndRequestPlayerInfo(eggData->getPlayerId()))
         return;
-    }
 }

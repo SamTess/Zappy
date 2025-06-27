@@ -78,9 +78,8 @@ void Player::updateFromProtocol(const PlayerInfoData& data) {
     }
     if (data.getLevel() >= _level)
         _level = data.getLevel();
-    if (!data.getTeamName().empty()) {
+    if (!data.getTeamName().empty())
         _teamName = data.getTeamName();
-    }
     _isAlive = data.isAlive();
 }
 
@@ -113,8 +112,7 @@ float Player::getLastRotation() const {
 }
 
 void Player::render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-            const ZappyTypes::Vector3& position,
-            float tileSize) const {
+    const ZappyTypes::Vector3& position, float tileSize) const {
     renderPlayer(graphicsLib, position, tileSize, 0, 1);
 }
 
@@ -156,20 +154,17 @@ float Player::orientationToRotationDegrees(int orientation) const {
 }
 
 ZappyTypes::Color Player::generateTeamColor() const {
-    if (_teamName.empty()) {
+    if (_teamName.empty())
         return {255, 255, 255, 255};
-    }
     int asciiSum = 0;
-    for (char c : _teamName) {
+    for (char c : _teamName)
         asciiSum += static_cast<int>(c);
-    }
     int red = (asciiSum * 7) % 256;
     int green = (asciiSum * 13) % 256;
     int blue = (asciiSum * 17) % 256;
     return {static_cast<unsigned char>(red),
             static_cast<unsigned char>(green),
-            static_cast<unsigned char>(blue),
-            255};
+            static_cast<unsigned char>(blue), 255};
 }
 
 void Player::updateAnimation(float deltaTime) {
@@ -183,9 +178,8 @@ void Player::updateAnimation(float deltaTime) {
 }
 
 ZappyTypes::Vector3 Player::getInterpolatedPosition() const {
-    if (!_isMoving) {
+    if (!_isMoving)
         return {static_cast<float>(_x), 0.0f, static_cast<float>(_y)};
-    }
     float t = _movementProgress;
     t = 1.0f - (1.0f - t) * (1.0f - t);
     float interpolatedX = _startX + ((_targetX - _startX) * t);
