@@ -5,24 +5,23 @@
 ** map_creation
 */
 #include "../include/tile.h"
-#include "../include/server.h"
+#include "../include/game.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
 
-void create_map(server_t *server, parsing_info_t *parsed_info)
+void create_map(game_t *game, parsing_info_t *parsed_info)
 {
-    server->map = malloc(sizeof(tile_t *) * parsed_info->height);
-    if (server->map == NULL)
+    game->map = malloc(sizeof(tile_t *) * parsed_info->height);
+    if (game->map == NULL)
         parsing_error("Map allocation failed", parsed_info);
     for (int y = 0; y < parsed_info->height; y++) {
-        server->map[y] = malloc(sizeof(tile_t) * parsed_info->width);
-        if (server->map[y] == NULL)
+        game->map[y] = malloc(sizeof(tile_t) * parsed_info->width);
+        if (game->map[y] == NULL)
             parsing_error("Tile allocation failed", parsed_info);
         for (int x = 0; x < parsed_info->width; x++) {
-            tile_init(&server->map[y][x]);
+            tile_init(&game->map[y][x]);
         }
     }
-    distribute_resources(server->map, server,
-        server->total_resources, server->current_resources);
+    distribute_resources(game, NULL);
 }

@@ -20,7 +20,7 @@ static void free_player_queue(player_t *player)
     player->command_queue = NULL;
 }
 
-static void cleanup_player_client(client_t *current_client)
+static void cleanup_player_client(zappy_client_t *current_client)
 {
     player_t *player;
 
@@ -43,20 +43,19 @@ static void cleanup_player_client(client_t *current_client)
     }
 }
 
-void free_node(client_t *node, server_t *server)
+void free_node(zappy_client_t *node)
 {
     if (!node)
         return;
-    if (node->type == GRAPHICAL)
-        remove_graphic_client(server, node);
-    if (node->client_poll) {
-        free(node->client_poll);
-        node->client_poll = NULL;
+    if (node->client->client_poll) {
+        free(node->client->client_poll);
+        node->client->client_poll = NULL;
     }
     if (node->player) {
         cleanup_player_client(node);
         free(node->player);
         node->player = NULL;
     }
+    free(node->client);
     free(node);
 }

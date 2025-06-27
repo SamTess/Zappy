@@ -17,63 +17,64 @@
 #include "../include/parsing.h"
 #include "../include/command.h"
 
-static bool remove_head_client(server_t *server, int fd)
+static bool remove_head_client(server_t *server,
+    zappy_client_t **clients, int fd)
 {
-    client_t *current = server->client;
+    zappy_client_t *current = *clients;
 
-    if (current->client_fd != fd)
+    if (current->client->client_fd != fd)
         return false;
-    if (current->client_fd == server->s_fd)
+    if (current->client->client_fd == server->s_fd)
         return true;
-    server->client = current->next;
-    free_node(current, server);
+    *clients = current->next;
+    free_node(current);
     server->nfds -= 1;
     return true;
 }
 
-static bool remove_other_client(server_t *server, int fd)
+static bool remove_other_client(server_t *server,
+    zappy_client_t *clients, int fd)
 {
-    client_t *current = server->client;
-    client_t *prev = NULL;
+    zappy_client_t *current = clients;
+    zappy_client_t *prev = NULL;
 
-    while (current != NULL && current->client_fd != fd) {
+    while (current != NULL && current->client->client_fd != fd) {
         prev = current;
         current = current->next;
     }
     if (current == NULL)
         return false;
     prev->next = current->next;
-    free_node(current, server);
+    free_node(current);
     server->nfds -= 1;
     return true;
 }
 
-void remove_fd(server_t *server, int fd)
+void remove_fd(server_t *server, zappy_client_t **clients, int fd)
 {
-    if (server->client == NULL)
+    if (*clients == NULL)
         return;
-    if (remove_head_client(server, fd))
+    if (remove_head_client(server, clients, fd))
         return;
-    remove_other_client(server, fd);
+    remove_other_client(server, *clients, fd);
     close(fd);
 }
 
-static client_t *init_new_client(int fd)
+static zappy_client_t *init_new_client(int fd)
 {
-    client_t *new_c = calloc(1, sizeof(client_t));
+    zappy_client_t *new_c = calloc(1, sizeof(zappy_client_t));
 
     if (!new_c)
         return NULL;
-    new_c->client_poll = calloc(1, sizeof(struct pollfd));
-    if (!new_c->client_poll)
+    if (init_zappy_client_struct(new_c) == -1)
         return NULL;
-    new_c->client_poll->fd = fd;
-    new_c->client_poll->events = POLLIN;
-    new_c->client_poll->revents = 0;
+    new_c->client->client_poll->fd = fd;
+    new_c->client->client_poll->events = POLLIN;
+    new_c->client->client_poll->revents = 0;
     new_c->next = NULL;
-    new_c->client_fd = fd;
-    new_c->client_add = NULL;
-    new_c->client_id = -1;
+    new_c->client->client_fd = fd;
+    new_c->client->client_add = NULL;
+    new_c->client->client_id = -1;
     new_c->player = calloc(1, sizeof(player_t));
     if (new_c->player == NULL)
         return NULL;
@@ -82,31 +83,32 @@ static client_t *init_new_client(int fd)
     return new_c;
 }
 
-void add_fd(server_t *server, int fd)
+void add_fd(zappy_client_t **clients, int fd)
 {
     static int next_id = 0;
-    client_t *new_c = init_new_client(fd);
-    client_t *current;
+    zappy_client_t *new_c = init_new_client(fd);
+    zappy_client_t *current;
 
-    if (server->client == NULL) {
+    if (*clients == NULL) {
         if (new_c == NULL)
             server_err("Server polling client init failed");
-        server->client = new_c;
-        new_c->client_id = -1;
+        new_c->client->client_id = -1;
+        *clients = new_c;
         return;
     }
     if (new_c == NULL)
         return;
-    current = server->client;
+    current = *clients;
     while (current->next != NULL) {
         current = current->next;
     }
-    new_c->client_id = next_id;
+    new_c->client->client_id = next_id;
     next_id++;
     current->next = new_c;
 }
 
-static void init_server_socket(server_t *server, parsing_info_t *parsed_info)
+static void init_server_socket(server_t *server,
+    parsing_info_t *parsed_info, zappy_client_t **clients)
 {
     int opt = 1;
 
@@ -126,62 +128,21 @@ static void init_server_socket(server_t *server, parsing_info_t *parsed_info)
         server_err("Connection bind failed");
     if (listen(server->s_fd, 1000) < 0)
         server_err("Connection listen failed");
-    add_fd(server, server->s_fd);
+    add_fd(clients, server->s_fd);
 }
 
-static void copy_names(server_t *server, parsing_info_t *parsed_info)
-{
-    int i = 0;
-
-    for (; parsed_info->names[i] != NULL; i++){
-    }
-    server->parsed_info->names = calloc(i + 1, sizeof(char *));
-    if (server->parsed_info->names == NULL)
-        server_err("Malloc failed for parsing info names copy into server");
-    for (int j = 0; parsed_info->names[j] != NULL; j++){
-        server->parsed_info->names[j] = strdup(parsed_info->names[j]);
-    }
-    server->parsed_info->names[i] = NULL;
-}
-
-static void init_server_resources(server_t *server)
-{
-    server->total_resources = malloc(sizeof(int) * COUNT);
-    server->current_resources = malloc(sizeof(int) * COUNT);
-    if (server->total_resources == NULL || server->current_resources == NULL)
-        server_err("Malloc failed for allocating resource counters");
-    for (int i = 0; i < COUNT; i++) {
-        server->total_resources[i] = 0;
-        server->current_resources[i] = 0;
-    }
-}
-
-static void init_server(server_t *server, parsing_info_t *parsed_info)
+static void init_server(server_t *server)
 {
     server->nfds = 0;
-    server->client = NULL;
-    server->graphical_clients = NULL;
     server->s_fd = 0;
     server->serv_add = NULL;
-    server->current_tick = 0;
-    server->map = NULL;
-    server->parsed_info = malloc(sizeof(parsing_info_t));
-    if (server->parsed_info == NULL)
-        server_err("Malloc failed for allocating parsed_info in server");
-    server->parsed_info->port = parsed_info->port;
-    server->parsed_info->width = parsed_info->width;
-    server->parsed_info->height = parsed_info->height;
-    server->parsed_info->client_nb = parsed_info->client_nb;
-    server->parsed_info->frequence = parsed_info->frequence;
-    server->eggs = NULL;
     server->should_run = true;
     server->poll_manager = calloc(1, sizeof(poll_manager_t));
-    init_server_resources(server);
-    copy_names(server, parsed_info);
 }
 
-void create_server(server_t *server, parsing_info_t *parsed_info)
+void create_server(server_t *server, parsing_info_t *parsed_info,
+    zappy_client_t **clients)
 {
-    init_server(server, parsed_info);
-    init_server_socket(server, parsed_info);
+    init_server(server);
+    init_server_socket(server, parsed_info, clients);
 }

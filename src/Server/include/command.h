@@ -8,79 +8,77 @@
 #ifndef COMMAND_H_
     #define COMMAND_H_
     #define MAX_LIFE_AFTER_FOOD 126
-    #include "server.h"
     #include <stdbool.h>
-    #include "client.h"
+    #include "game.h"
+    #include "zappy.h"
+    #include "graphical_commands.h"
+
+typedef struct command_args_s {
+    char **buffer;
+    int cmd_index;
+} command_args_t;
 
 typedef struct command_data_s {
     const char **commands;
-    void (**functions)(server_t *, client_t *, char **);
+    void (**functions)(game_t *, zappy_client_t *, zappy_client_t *, char **);
     int *times;
     enum client_type_e *accepted_types;
 } command_data_t;
 
-resource_type_t determine_type(char *resource_string);
+void forward(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void right(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void left(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer);
+void inventory(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void look(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void eject(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void connect_nbr(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void take_object(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void set_object(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void fork_c(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void broadcast(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void start_incantation(game_t *game, zappy_client_t *sender,
+    zappy_client_t *clients, char **buffer);
+void finish_incantation(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients);
 
-void process_next_queued_command(server_t *server, client_t *client);
+int connect_nbr_srv(game_t *game, char *team);
+bool can_connect(game_t *game, zappy_client_t *user, char *buffer,
+    zappy_client_t *clients);
+zappy_client_t *find_client_by_id(zappy_client_t *clients, int id);
+void write_command_output_buffer(client_t *client, char *msg);
+void handle_player_death(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients);
+bool check_player_starvation(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients);
+bool can_start_incantation(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients);
+char *check_rota_tiles(player_t *player, game_t *game, int i, int j);
+void add_pending_cmd(zappy_client_t *player, game_t *game,
+    command_args_t *args, zappy_client_t *clients);
+void cleanup_pending(player_t *player);
+char **str_to_word_arr(char *str, char *delim);
+bool handle_socket_read(server_t *server, zappy_client_t **clients,
+    zappy_client_t *user);
+void write_command_output(int client_fd, char *msg);
+resource_type_t determine_type(char *resource_string);
+command_data_t get_command_data(void);
+void process_next_queued_command(game_t *game, server_t *server,
+    zappy_client_t *client, zappy_client_t *clients);
 void cleanup_player_queue(player_t *player);
 char *tile_to_str(tile_t *tile);
-void get_message(server_t *server, client_t *user);
-void execute_com(server_t *server, client_t *user, char *buffer);
-void write_command_output(int client_fd, char *msg);
-void forward(server_t *server, client_t *client, char **buffer);
-void right(server_t *server, client_t *client, char **buffer);
-void left(server_t *server, client_t *client, char **buffer);
-void inventory(server_t *server, client_t *client, char **buffer);
-void look(server_t *server, client_t *client, char **buffer);
-void eject(server_t *server, client_t *client, char **buffer);
-void connect_nbr(server_t *server, client_t *client, char **buffer);
-void take_object(server_t *server, client_t *client, char **buffer);
-void set_object(server_t *server, client_t *client, char **buffer);
-void fork_c(server_t *server, client_t *client, char **buffer);
-void broadcast(server_t *server, client_t *user, char **buffer);
-int connect_nbr_srv(server_t *server, char *team);
-bool can_connect(server_t *server, client_t *user, char *buffer);
-client_t *find_client_by_id(server_t *server, int id);
-void write_command_output_buffer(client_t *client, char *msg);
-
-// Death and starvation management functions
-void handle_player_death(server_t *server, client_t *client);
-bool check_player_starvation(server_t *server, client_t *client);
-void start_incantation(server_t *server, client_t *client, char **buffer);
-void finish_incantation(server_t *server, client_t *client);
-bool can_start_incantation(server_t *server, client_t *client);
-command_data_t get_command_data(void);
-char *check_rota_tiles(client_t *user, server_t *server, int i, int j);
-void add_pending_cmd(client_t *user, server_t *server,
-    char *buffer, int cmd_index);
-void cleanup_pending(player_t *player);
-
-// client graphical commands
-void command_msz(server_t *server, client_t *client, char **buffer);
-void command_bct(server_t *server, client_t *client, char **buffer);
-void command_mtc(server_t *server, client_t *client, char **buffer);
-void command_tna(server_t *server, client_t *client, char **buffer);
-void command_ppo(server_t *server, client_t *client, char **buffer);
-void command_plv(server_t *server, client_t *client, char **buffer);
-void command_pie(server_t *server, int x, int y, int result);
-void command_pex(server_t *server, client_t *client);
-void command_pin(server_t *server, client_t *client, char **buffer);
-void command_pfk(server_t *server, client_t *client);
-void command_pdr(server_t *server, client_t *client,
-    resource_type_t resource_type);
-void command_pgt(server_t *server, client_t *client,
-    resource_type_t resource_type);
-void send_enw_command(server_t *server, client_t *client, int egg_id);
-void command_sst(server_t *server, client_t *client, char **buffer);
-void command_pdi(server_t *server, client_t *client);
-void send_enw_command_start(server_t *server);
-
-// send to all graphical clients
-void send_mtc_to_all_graphical_clients(server_t *server);
-void send_bct_to_all_graphical_clients(server_t *server, int x, int y);
-void send_pnw_command_to_all(server_t *server, client_t *client);
-
-
-char **str_to_word_arr(char *str, char *delim);
-bool handle_socket_read(client_t *user, server_t *server);
+void get_message(server_t *server, zappy_client_t *user,
+    zappy_client_t *clients, game_t *game);
+void execute_com(game_t *game, zappy_client_t *user,
+    zappy_client_t *clients, char *buffer);
 #endif /* !COMMAND_H_ */

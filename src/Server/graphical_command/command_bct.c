@@ -5,14 +5,11 @@
 ** command_bct
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
-#include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 static int calculate_size_bct_command(int x, int y, tile_t *tile)
 {
@@ -46,75 +43,86 @@ static char *get_buffer_bct_command(int x, int y, tile_t *tile)
     return buffer;
 }
 
-static void send_bct_command(server_t *server, client_t *client, int x, int y)
+static void send_bct_response(client_t *client, int x, int y, tile_t *tile)
 {
-    tile_t *tile = NULL;
-    char *buffer = NULL;
+    char *buffer = get_buffer_bct_command(x, y, tile);
 
-    if (!server || !client ||
-        x < 0 || y < 0 ||
-        y >= server->parsed_info->height || x >= server->parsed_info->width)
-        return;
-    tile = &server->map[y][x];
-    buffer = get_buffer_bct_command(x, y, tile);
-    write_command_output_buffer(client, buffer);
-    free(buffer);
-}
-
-void send_bct_to_all_graphical_clients(server_t *server, int x, int y)
-{
-    graphical_client_t *current = server->graphical_clients;
-
-    if (!server || !server->graphical_clients)
-        return;
-    while (current) {
-        send_bct_command(server, current->client, x, y);
-        current = current->next;
+    if (buffer) {
+        write_command_output_buffer(client, buffer);
+        free(buffer);
     }
 }
 
-void send_mtc_to_all_graphical_clients(server_t *server)
+void send_bct_to_all_graphical_clients(game_t *game,
+    zappy_client_t *graphical_clients, int x, int y)
 {
-    graphical_client_t *current = server->graphical_clients;
+    zappy_client_t *current = graphical_clients;
+    tile_t *tile;
 
-    if (!server || !server->graphical_clients)
+    if (!game || !graphical_clients || !game->map || !game->parsed_info ||
+        x < 0 || y < 0 || y >= game->parsed_info->height ||
+        x >= game->parsed_info->width)
         return;
-    while (current) {
-        send_tile_content_to_one_client(server, current->client);
-        current = current->next;
+    tile = &game->map[y][x];
+    for (; current; current = current->next) {
+        if (current->type == GRAPHICAL && current->client->client_id != -1)
+            send_bct_response(current->client, x, y, tile);
     }
 }
 
-void send_tile_content_to_one_client(server_t *server, client_t *client)
+void send_mtc_to_all_graphical_clients(game_t *game,
+    zappy_client_t *graphical_clients)
 {
-    if (!server || !client || !server->graphical_clients)
+    zappy_client_t *current = graphical_clients;
+
+    if (!game || !graphical_clients)
         return;
-    for (int y = 0; y < server->parsed_info->height; y++) {
-        for (int x = 0; x < server->parsed_info->width; x++) {
-            send_bct_command(server, client, x, y);
+    for (; current; current = current->next) {
+        if (current->type == GRAPHICAL && current->client->client_id != -1)
+            send_tile_content_to_one_client(game, graphical_clients, current);
+    }
+}
+
+void send_tile_content_to_one_client(game_t *game, zappy_client_t *clients,
+    zappy_client_t *client)
+{
+    (void)clients;
+    if (!game || !client || !client->client || !game->map
+        || !game->parsed_info)
+        return;
+    for (int y = 0; y < game->parsed_info->height; y++) {
+        for (int x = 0; x < game->parsed_info->width; x++) {
+            send_bct_response(client->client, x, y, &game->map[y][x]);
         }
     }
 }
 
-void command_bct(server_t *server, client_t *client, char **buffer)
+void command_bct(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int x = 0;
     int y = 0;
 
-    if (!server || !client || !buffer || !server->graphical_clients ||
-        arr_len(buffer) != 3 || sscanf(buffer[1], "%d", &x) != 1 ||
+    (void)clients;
+    if (!game || !client || !client->client ||
+        client->type != GRAPHICAL || arr_len(buffer) != 3 ||
+        sscanf(buffer[1], "%d", &x) != 1 ||
         sscanf(buffer[2], "%d", &y) != 1 ||
-        x < 0 || y < 0 ||
-        y >= server->parsed_info->height ||
-        x >= server->parsed_info->width)
-        return write_command_output_buffer(client, "sbp\n");
-    send_bct_command(server, client, x, y);
+        !game->map || !game->parsed_info || x < 0 || y < 0 ||
+        y >= game->parsed_info->height ||
+        x >= game->parsed_info->width)
+        return write_command_output_buffer(client->client, "sbp\n");
+    send_bct_response(client->client, x, y, &game->map[y][x]);
 }
 
-void command_mtc(server_t *server, client_t *client, char **buffer)
+void command_mtc(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
-    if (!server || !client || !server->graphical_clients
-        || arr_len(buffer) != 1)
-        return write_command_output_buffer(client, "sbp\n");
-    send_tile_content_to_one_client(server, client);
+    (void)clients;
+    if (!game || !client || !client->client ||
+        client->type != GRAPHICAL || arr_len(buffer) != 1) {
+        write_command_output_buffer(client->client, "sbp\n");
+        return;
+    }
+    send_tile_content_to_one_client(game, clients, client);
 }

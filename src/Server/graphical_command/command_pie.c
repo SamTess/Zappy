@@ -5,14 +5,13 @@
 ** command_pie
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-static char *get_pie_buffer(int x, int y, int result)
+static char *format_pie_response(int x, int y, int result)
 {
     char *buffer = NULL;
     int size = 0;
@@ -25,19 +24,22 @@ static char *get_pie_buffer(int x, int y, int result)
     return buffer;
 }
 
-void command_pie(server_t *server, int x, int y, int result)
+void command_pie(game_t *game, zappy_client_t *clients,
+    zappy_client_t *client, int result)
 {
-    client_t *current = NULL;
+    zappy_client_t *current = clients;
     char *buffer = NULL;
 
-    if (!server || !server->graphical_clients)
+    if (!game || !clients)
         return;
-    buffer = get_pie_buffer(x, y, result);
+    buffer = format_pie_response(client->player->pos_x,
+        client->player->pos_y, result);
     if (!buffer)
         return;
-    current = server->client;
     while (current) {
-        write_command_output_buffer(current, buffer);
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
+            write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);

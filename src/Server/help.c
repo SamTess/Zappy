@@ -6,10 +6,8 @@
 */
 
 #include <stdio.h>
+#include "include/server.h"
 
-/**
- * @brief Display the help message for the server
- */
 void display_help(void)
 {
     printf("USAGE: ./zappy_server -p port -x width -y height -n name1 "
