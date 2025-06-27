@@ -5,8 +5,8 @@
 ** GameController
 */
 
-#ifndef REFACTORED_GAME_CONTROLLER_HPP_
-#define REFACTORED_GAME_CONTROLLER_HPP_
+#ifndef GAME_CONTROLLER_HPP_
+#define GAME_CONTROLLER_HPP_
 
 #include <memory>
 #include "GameState.hpp"
@@ -61,4 +61,4 @@ class GameController : public IGameController {
         void registerMessageHandlers();
 };
 
-#endif /* !REFACTORED_GAME_CONTROLLER_HPP_ */
+#endif /* !GAME_CONTROLLER_HPP_ */
