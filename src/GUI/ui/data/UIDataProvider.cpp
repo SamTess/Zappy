@@ -205,9 +205,6 @@ void UIDataProvider::setSfxEnabled(bool enabled) {
     auto mutableGameState = std::const_pointer_cast<GameState>(_gameState);
     if (mutableGameState) {
         mutableGameState->setSfxEnabled(enabled);
-        std::cout << "DEBUG: SFX mis à " << (enabled ? "activé" : "désactivé") << std::endl;
-    } else {
-        std::cout << "DEBUG: Échec du cast vers GameState mutable" << std::endl;
     }
 }
 
@@ -220,7 +217,6 @@ float UIDataProvider::getMusicVolume() const {
 void UIDataProvider::setMusicVolume(float volume) {
     if (!isValidGameState())
         return;
-    // Cast away const pour permettre la modification
     auto mutableGameState = std::const_pointer_cast<GameState>(_gameState);
     if (mutableGameState) {
         mutableGameState->setMusicVolume(volume);
