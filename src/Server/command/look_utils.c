@@ -9,10 +9,11 @@
 
 static char *check_up(player_t *player, int i, int j, game_t *game)
 {
-    int y = (player->pos_y - i + game->parsed_info->height)
-        % game->parsed_info->height;
-    int x = (player->pos_x - i + j + game->parsed_info->width)
-        % game->parsed_info->width;
+    int offset = j - i;
+    int y = (player->pos_y - i +
+        game->parsed_info->height) % game->parsed_info->height;
+    int x = (player->pos_x + offset +
+        game->parsed_info->width) % game->parsed_info->width;
     char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
@@ -22,9 +23,11 @@ static char *check_up(player_t *player, int i, int j, game_t *game)
 
 static char *check_down(player_t *player, int i, int j, game_t *game)
 {
-    int y = (player->pos_y + i) % game->parsed_info->height;
-    int x = (player->pos_x + i - j + game->parsed_info->width)
-        % game->parsed_info->width;
+    int offset = j - i;
+    int y = (player->pos_y + i) %
+        game->parsed_info->height;
+    int x = (player->pos_x - offset +
+        game->parsed_info->width) % game->parsed_info->width;
     char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
@@ -34,9 +37,11 @@ static char *check_down(player_t *player, int i, int j, game_t *game)
 
 static char *check_left(player_t *player, int i, int j, game_t *game)
 {
-    int y = (player->pos_y + j) % game->parsed_info->height;
-    int x = (player->pos_x - i + game->parsed_info->width)
-        % game->parsed_info->width;
+    int offset = j - i;
+    int y = (player->pos_y + offset +
+        game->parsed_info->height) % game->parsed_info->height;
+    int x = (player->pos_x - i +
+        game->parsed_info->width) % game->parsed_info->width;
     char *res = tile_to_str(&game->map[y][x]);
 
     if (!res)
@@ -46,8 +51,9 @@ static char *check_left(player_t *player, int i, int j, game_t *game)
 
 static char *check_right(player_t *player, int i, int j, game_t *game)
 {
-    int y = (player->pos_y - j + game->parsed_info->height)
-        % game->parsed_info->height;
+    int offset = j - i;
+    int y = (player->pos_y - offset +
+        game->parsed_info->height) % game->parsed_info->height;
     int x = (player->pos_x + i) % game->parsed_info->width;
     char *res = tile_to_str(&game->map[y][x]);
 
@@ -71,14 +77,14 @@ char *check_rota_tiles(player_t *player, game_t *game, int i, int j)
     case UP:
         res = check_up(player, i, j, game);
         break;
+    case RIGHT:
+        res = check_right(player, i, j, game);
+        break;
     case DOWN:
         res = check_down(player, i, j, game);
         break;
     case LEFT:
         res = check_left(player, i, j, game);
-        break;
-    case RIGHT:
-        res = check_right(player, i, j, game);
         break;
     default:
         res = strdup("");
