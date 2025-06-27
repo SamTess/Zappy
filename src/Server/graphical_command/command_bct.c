@@ -48,7 +48,7 @@ static void send_bct_response(client_t *client, int x, int y, tile_t *tile)
     char *buffer = get_buffer_bct_command(x, y, tile);
 
     if (buffer) {
-        write_command_output(client, buffer);
+        write_command_output(client->client_fd, buffer);
         free(buffer);
     }
 }
