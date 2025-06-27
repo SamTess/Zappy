@@ -117,3 +117,15 @@ class AgentActionManager:
       self.agent.send_command("Right")
       self.agent.send_command("Forward")
       return 2
+
+  def get_available_slots(self):
+      slots_available = self.agent.send_command("Connect_nbr")
+      if slots_available is None or "ko" in slots_available:
+        print(f"ForkAgentBehavior: Failed to get available slots. Response: {slots_available}")
+        return None
+      try:
+        slots_available = int(slots_available)
+        return slots_available
+      except ValueError:
+        print(f"ForkAgentBehavior: Invalid slots_available value: {slots_available}")
+        return None

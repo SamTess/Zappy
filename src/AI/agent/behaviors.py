@@ -205,14 +205,8 @@ class FillTeamBehavior(Behavior):
         break
 
 
-class StartCollectingBehavior(Behavior):
-  def execute(self, surroundings=None, inventory=None):
-    self.agent.current_phase = "collecting"
-
-
 class ForkBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if self.agent.is_original:
       self.agent.send_command("Fork")
-
-    print("Fork command sent.")
+      print(f"Agent {self.agent.id}: Fork command sent.")

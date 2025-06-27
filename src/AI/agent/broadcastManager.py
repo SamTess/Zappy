@@ -55,7 +55,7 @@ class BroadcastManager:
       if self.agent.first_message_processing:
         self.agent.is_original = False
         self.agent.first_message_processing = False
-
+        print(f"Agent {self.agent.id}: First message processed, not original agent.")
 
       try:
         sender_agent_id = int(sender_agent_id_str)

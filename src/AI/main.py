@@ -7,13 +7,13 @@ from parser.paringArgsClass import parseArgs
 
 if __name__ == "__main__":
   args = parseArgs()
-  num_agents = 10
   port = args.getPort()
   ip = args.getMachine()
   team = args.getName()
   performance = args.getPerformance()
 
-  print(f"Starting {num_agents} agents for team {team} on {ip}:{port}")
+  print(f"Starting the first agent of the team {team} on {ip}:{port}")
+
   if performance:
     print("Performance mode enabled")
 
