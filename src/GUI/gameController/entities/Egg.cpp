@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Egg - Implémentation des méthodes pour les œufs
+** Egg
 */
 
 #include "Egg.hpp"
@@ -45,9 +45,7 @@ void Egg::render(const std::shared_ptr<IGraphicsLib>& graphicsLib,
 }
 
 void Egg::renderEgg(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-    const ZappyTypes::Vector3& position,
-    float tileSize,
-    int stackIndex) const {
+    const ZappyTypes::Vector3& position, float tileSize, int stackIndex) const {
     if (!graphicsLib)
         return;
     ZappyTypes::Vector3 eggPos = position;
@@ -55,6 +53,5 @@ void Egg::renderEgg(const std::shared_ptr<IGraphicsLib>& graphicsLib,
     eggPos.y = position.y + 0.5f + (stackIndex * eggHeight * 0.8f);
     eggPos.x -= tileSize * 0.18f;
     eggPos.z -= tileSize * -0.8f;
-
     ModelManager::getInstance().drawModel(TRIPY_TROPHY, eggPos, 0.25f);
 }

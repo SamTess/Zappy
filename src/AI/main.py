@@ -20,7 +20,7 @@ if __name__ == "__main__":
   signal.signal(signal.SIGINT, mutliprocessing.signal_handler)
   signal.signal(signal.SIGTERM, mutliprocessing.signal_handler)
 
-  mutliprocessing.run_agent(ip, port, team, 0, performance)
+  mutliprocessing.run_agent(ip, port, team, performance)
 
   print("IA started successfully!")
 

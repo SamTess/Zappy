@@ -5,28 +5,53 @@
 ** command_sgt
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void command_sgt(server_t *server, client_t *client, char **buffer)
+static int get_time_unit(game_t *game)
 {
-    char *tmp = NULL;
-    int size = 0;
+    if (game && game->parsed_info)
+        return game->parsed_info->frequence;
+    return -1;
+}
 
-    if (!server || !client || !server->graphical_clients ||
-        arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "spb\n");
-    tmp = NULL;
-    size = snprintf(NULL, 0, "sgt %d\n", server->parsed_info->frequence);
-    tmp = malloc(size + 1);
-    if (!tmp)
+static char *format_sgt_response(int time_unit)
+{
+    char *buffer;
+    int size;
+
+    if (time_unit <= 0)
+        return NULL;
+    size = snprintf(NULL, 0, "sgt %d\n", time_unit);
+    buffer = malloc(size + 1);
+    if (!buffer)
+        return NULL;
+    snprintf(buffer, size + 1, "sgt %d\n", time_unit);
+    return buffer;
+}
+
+void command_sgt(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
+{
+    int time_unit;
+    char *response;
+
+    (void)clients;
+    if (!game || !client || !client->client ||
+        client->type != GRAPHICAL || arr_len(buffer) != 1) {
+        write_command_output_buffer(client->client, "sbp\n");
         return;
-    snprintf(tmp, size + 1, "sgt %d\n", server->parsed_info->frequence);
-    write_command_output(client->client_fd, tmp);
-    free(tmp);
+    }
+    time_unit = get_time_unit(game);
+    response = format_sgt_response(time_unit);
+    if (!response) {
+        write_command_output_buffer(client->client, "sbp\n");
+        return;
+    }
+    write_command_output_buffer(client->client, response);
+    free(response);
 }

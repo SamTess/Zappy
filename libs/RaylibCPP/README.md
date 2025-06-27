@@ -47,7 +47,7 @@ int main() {
 
 This library is designed to be dynamically loaded via Zappy's DLLoader system.
 
-- Implements the `IGraphicsLib` interface (see `src/Shared/IGraphicsLib.hpp`).
+- Implements the `IGraphicsLib` interface (see `src/GUI/shared/IGraphicsLib.hpp`).
 - Exports the following function for dynamic integration :
 
 ```cpp

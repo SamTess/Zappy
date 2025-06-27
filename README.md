@@ -94,12 +94,49 @@ Documentation détaillée disponible dans [docs/ui_architecture.md](docs/ui_arch
 
 ## 🔧 Prérequis
 
-To compile and run Zappy, you will need:
+Pour compiler et exécuter Zappy, vous aurez besoin de :
 
-- C/C++ compiler (GCC or Clang)
-- Python 3.x
-- Make
-- Graphic development libraries (for the GUI client)
+### Prérequis système
+- **Compilateur C/C++** (GCC 9.0+ ou Clang 10.0+)
+- **Python 3.8+** avec pip3
+- **Make 4.0+**
+- **Git** (pour les sous-modules et Raylib)
+- **CMake** (pour la compilation de Raylib depuis les sources si nécessaire)
+
+### Installation automatique des dépendances
+```bash
+# Installation automatique de toutes les dépendances
+make install_requirements
+```
+
+Cette commande installe automatiquement :
+- Raylib (via APT ou compilation depuis GitHub)
+- Dépendances Python pour l'IA (cryptography, dotenv)
+- Initialisation des sous-modules Git
+
+### Dépendances système pour Raylib
+Le projet nécessite les bibliothèques suivantes pour l'interface graphique :
+- **OpenGL** : `libgl1-mesa-dev`
+- **X11** : `libx11-dev`, `libxrandr-dev`, `libxinerama-dev`, `libxcursor-dev`, `libxi-dev`, `libxext-dev`
+- **Outils de build** : `build-essential`, `cmake`, `pkg-config`
+
+```bash
+# Installation manuelle des dépendances système (Ubuntu/Debian)
+sudo apt update
+sudo apt install -y build-essential cmake git pkg-config
+sudo apt install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev
+sudo apt install -y libxcursor-dev libxi-dev libxext-dev
+```
+
+### Dépendances Python pour l'IA
+Le fichier `src/AI/requirements.txt` contient :
+- **cryptography** : Chiffrement AES pour les communications sécurisées entre agents
+- **dotenv** : Gestion des variables d'environnement
+
+```bash
+# Installation manuelle (si make install_requirements échoue)
+cd src/AI && pip3 install -r requirements.txt
+```
 
 ## 💻 Installation
 
@@ -165,6 +202,15 @@ make zappy_ai
 - **Interface** : Real-time information panels on teams and resources
 
 ### Start the AI
+
+#### Prerequisite
+Before starting the AI, ensure you have activated the Python virtual environment:
+(This step is crucial to ensure the AI has access to the required Python packages. The 'make install_requirements' can only setup the virtual environment, but you need to activate it to use it.)
+```bash
+source venv/bin/activate
+```
+
+#### Start command
 
 ```bash
 ./zappy_ai -p <port> -n <team name> [-h <host>]

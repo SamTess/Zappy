@@ -6,16 +6,19 @@
 */
 
 #include "../include/player.h"
-#include "../include/server.h"
+#include "../include/game.h"
+#include "../include/zappy.h"
 #include "../include/graphical_commands.h"
+#include "../include/egg.h"
+#include "../include/tile.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-static egg_t *find_egg_for_team(server_t *server, char *team_name)
+static egg_t *find_egg_for_team(game_t *game, char *team_name)
 {
-    egg_t *current = server->eggs;
+    egg_t *current = game->eggs;
 
     if (team_name == NULL)
         return NULL;
@@ -28,30 +31,40 @@ static egg_t *find_egg_for_team(server_t *server, char *team_name)
     return NULL;
 }
 
+static int add_player_egg_team(game_t *game,
+    zappy_client_t *new_client, zappy_client_t *clients)
+{
+    egg_t *team_egg = find_egg_for_team(game, new_client->player->team_name);
+
+    if (team_egg != NULL) {
+        new_client->player->pos_x = team_egg->pos_x;
+        new_client->player->pos_y = team_egg->pos_y;
+        tile_add_player(&game->map[team_egg->pos_y][team_egg->pos_x],
+            new_client->client->client_id);
+        send_ebo_command(game, clients, team_egg->egg_id);
+        remove_egg(game, team_egg->egg_id,
+            &game->map[team_egg->pos_y][team_egg->pos_x]);
+        return 0;
+    }
+    return -1;
+}
+
 //! The second update of client position is a fallback maybe
 //! need more error handling
-void init_new_player_pos(server_t *server, client_t *new_client)
+void init_new_player_pos(game_t *game, zappy_client_t *new_client,
+    zappy_client_t *clients)
 {
-    int random_x = rand() % server->parsed_info->width;
-    int random_y = rand() % server->parsed_info->height;
-    egg_t *team_egg;
+    int random_x = rand() % game->parsed_info->width;
+    int random_y = rand() % game->parsed_info->height;
 
     if (new_client->player->team_name != NULL) {
-        team_egg = find_egg_for_team(server, new_client->player->team_name);
-        if (team_egg != NULL) {
-            new_client->player->pos_x = team_egg->pos_x;
-            new_client->player->pos_y = team_egg->pos_y;
-            tile_add_player(&server->map[team_egg->pos_y][team_egg->pos_x],
-                new_client->client_id);
-            send_ebo_command(server, team_egg->egg_id);
-            remove_egg(server, team_egg->egg_id,
-                &server->map[team_egg->pos_y][team_egg->pos_x]);
+        if (add_player_egg_team(game, new_client, clients) == 0)
             return;
-        }
     }
     new_client->player->pos_x = random_x;
     new_client->player->pos_y = random_y;
-    tile_add_player(&server->map[random_y][random_x], new_client->client_id);
+    tile_add_player(&game->map[random_y][random_x],
+        new_client->client->client_id);
 }
 
 static void init_pending(player_t *player)

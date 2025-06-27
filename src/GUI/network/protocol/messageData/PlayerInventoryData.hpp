@@ -13,9 +13,9 @@
 class PlayerInventoryData : public IMessageData {
     public:
         PlayerInventoryData() : _id(0), _x(0), _y(0), _food(0), _linemate(0), _deraumere(0),
-                            _sibur(0), _mendiane(0), _phiras(0), _thystame(0) {}
+            _sibur(0), _mendiane(0), _phiras(0), _thystame(0) {}
         PlayerInventoryData(int id, int x, int y, int food, int linemate, int deraumere,
-                        int sibur, int mendiane, int phiras, int thystame)
+            int sibur, int mendiane, int phiras, int thystame)
             : _id(id), _x(x), _y(y), _food(food), _linemate(linemate), _deraumere(deraumere),
             _sibur(sibur), _mendiane(mendiane), _phiras(phiras), _thystame(thystame) {}
         MessageType getType() const override { return MessageType::PlayerInventory; }

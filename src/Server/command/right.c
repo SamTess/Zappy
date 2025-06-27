@@ -5,43 +5,44 @@
 ** right
 */
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 
-static void change_rot(client_t *client)
+static void change_rot(player_t *player)
 {
-    switch (client->player->rotation) {
+    switch (player->rotation) {
     case RIGHT:
-        client->player->rotation = DOWN;
+        player->rotation = DOWN;
         break;
     case DOWN:
-        client->player->rotation = LEFT;
+        player->rotation = LEFT;
         break;
     case LEFT:
-        client->player->rotation = UP;
+        player->rotation = UP;
         break;
     case UP:
-        client->player->rotation = RIGHT;
+        player->rotation = RIGHT;
         break;
     default:
         break;
     }
 }
 
-void right(server_t *server, client_t *client, char **buffer)
+void right(game_t *game, zappy_client_t *client, zappy_client_t *clients,
+    char **buffer)
 {
-    if (!client)
-        return;
-    if (!server || !client->player || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "ko\n");
+    if (!game || !client || !client->client || !client->player ||
+        !clients || arr_len(buffer) != 1)
+        return write_command_output_buffer(client->client, "ko\n");
     if (client->player->rotation != RIGHT && client->player->rotation != DOWN
         && client->player->rotation != LEFT
         && client->player->rotation != UP) {
         perror("Unexpected right rotation");
-        return write_command_output(client->client_fd, "ko\n");
+        return write_command_output_buffer(client->client, "ko\n");
     }
-    change_rot(client);
-    send_ppo_command(server, client->client_id);
-    write_command_output(client->client_fd, "ok\n");
+    change_rot(client->player);
+    send_ppo_command(game, clients, client->client->client_id);
+    write_command_output_buffer(client->client, "ok\n");
 }

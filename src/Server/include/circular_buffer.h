@@ -8,7 +8,7 @@
 #ifndef CIRCULAR_BUFFER_H_
     #define CIRCULAR_BUFFER_H_
     #define BUFFER_SIZE 8192
-    #define MAX_STORABLE_CMD_LENGTH (BUFFER_SIZE - 1)
+    #define MAX_CMD_LENGTH (BUFFER_SIZE - 1)
 
 typedef struct circular_buffer_s {
     char buffer[BUFFER_SIZE];

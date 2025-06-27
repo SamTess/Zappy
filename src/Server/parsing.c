@@ -147,10 +147,8 @@ static void check_args(char **av, int i, parsing_info_t *parsed_info)
     }
     if (check_other_flags(av, i, parsed_info) == 1)
         return;
-    if (av[i][0] == '-'){
-        display_help();
-        exit(84);
-    }
+    if (av[i][0] == '-')
+        parsing_error("Unknown parameter", parsed_info);
 }
 
 void parse_args(int ac, char **av, parsing_info_t *parsed_info)

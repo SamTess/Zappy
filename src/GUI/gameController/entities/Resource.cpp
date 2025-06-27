@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** Resource - Implémentation des méthodes pour les ressources
+** Resource
 */
 
 #include "Resource.hpp"
@@ -60,11 +60,9 @@ void Resource::updateName() {
 }
 
 void Resource::renderResource(const std::shared_ptr<IGraphicsLib>& graphicsLib,
-    const ZappyTypes::Vector3& position,
-    float tileSize) const {
+    const ZappyTypes::Vector3& position, float tileSize) const {
     if (!graphicsLib || _quantity <= 0)
         return;
-
     const ModelType colorRessources[] = {
         LA_VACA_SATURNO,
         TRULIMERO_TRULICINA,
@@ -88,16 +86,13 @@ void Resource::renderResource(const std::shared_ptr<IGraphicsLib>& graphicsLib,
         return;
     ModelType resourceColor = colorRessources[resourceIndex];
     float indicatorSize = tileSize * 0.2f;
-    // float spacing = tileSize * 0.4f;
     ZappyTypes::Vector3 indicatorPos = position;
     indicatorPos.y = position.y + 0.5f;
-
     float resourceSpacing = tileSize * 0.3f;
     float totalWidth = 6 * resourceSpacing;
     float startOffsetX = -totalWidth / 2.0f;
     indicatorPos.x = position.x + startOffsetX + resourceIndex * resourceSpacing;
     indicatorPos.z = position.z - 0.7f;
-
     for (int i = 0; i < _quantity; ++i) {
         ZappyTypes::Vector3 cubePos = indicatorPos;
         cubePos.y += i * indicatorSize * 1.2f;

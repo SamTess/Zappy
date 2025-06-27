@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameLoop UI Implementation
+** GameLoopUI
 */
 
 #include <iostream>
@@ -20,150 +20,129 @@
 #include "GameLoop.hpp"
 #include "gameController/GameState.hpp"
 
-/**
- * Met à jour les données de jeu et le GameState
- */
 void GameLoop::updateGameData() {
     static auto lastTime = std::chrono::high_resolution_clock::now();
     auto currentTime = std::chrono::high_resolution_clock::now();
     float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
     lastTime = currentTime;
-    m_gameTime += deltaTime;
-    m_gameTick++;
-    if (m_gameController) {
-        m_gameController->updateBroadcasts(deltaTime);
-        m_gameController->updateAnimations(deltaTime);
-        auto gameState = m_gameController->getGameState();
+    _gameTime += deltaTime;
+    _gameTick++;
+    if (_gameController) {
+        _gameController->updateAnimations(deltaTime);
+        auto gameState = _gameController->getGameState();
         if (gameState && gameState->isMapInitialized()) {
-            m_mapWidth = gameState->getMapWidth();
-            m_mapHeight = gameState->getMapHeight();
-            m_frequency = gameState->getTimeUnit();
+            _mapWidth = gameState->getMapWidth();
+            _mapHeight = gameState->getMapHeight();
+            _frequency = gameState->getTimeUnit();
+        }
+        if (_userInterface) {
+            _userInterface->updateDataFromGameState(gameState);
+            _userInterface->updateTimeData(_gameTime, _frequency, _gameTick);
         }
     }
-    if (!m_userInterface->hasHandledMouseEvent() &&
-        !m_userInterface->isMouseOverUI() &&
-        m_graphics->IsMouseButtonPressed(0)) {
-        ZappyTypes::Vector2 mousePos = m_graphics->GetMousePosition();
+    if (_userInterface && _graphics &&
+        !_userInterface->hasHandledMouseEvent() &&
+        !_userInterface->isMouseOverUI() &&
+        _graphics->IsMouseButtonPressed(0)) {
+        ZappyTypes::Vector2 mousePos = _graphics->GetMousePosition();
         auto playerId = std::make_shared<int>(0);
         if (performPlayerSelection(mousePos, playerId)) {
             handlePlayerSelection(*playerId);
         } else {
             auto tileX = std::make_shared<int>(0);
             auto tileY = std::make_shared<int>(0);
-            if (performTileSelection(mousePos, tileX, tileY)) {
+            if (performTileSelection(mousePos, tileX, tileY))
                 handleTileSelection(*tileX, *tileY);
-            }
         }
     }
 }
 
-/**
- * Gère la sélection d'une case par l'utilisateur
- */
 void GameLoop::handleTileSelection(int x, int y) {
-    if (x < 0 || y < 0 || x >= m_mapWidth || y >= m_mapHeight)
+    if (x < 0 || y < 0 || x >= _mapWidth || y >= _mapHeight)
         return;
-    m_userInterface->setSelectedTile(x, y);
-    if (m_gameController) {
-        auto gameState = m_gameController->getGameState();
+    _userInterface->setSelectedTile(x, y);
+    if (_gameController) {
+        auto gameState = _gameController->getGameState();
         auto tile = gameState->getTile(x, y);
-        m_selectedTile.x = x;
-        m_selectedTile.y = y;
-        m_selectedTile.selected = true;
-        m_selectedPlayer.selected = false;
+        _selectedTile.x = x;
+        _selectedTile.y = y;
+        _selectedTile.selected = true;
+        _selectedPlayer.selected = false;
     }
 }
 
-/**
- * Gère la sélection d'un joueur par l'utilisateur
- */
 void GameLoop::handlePlayerSelection(int playerId) {
     if (playerId < 0)
         return;
-    m_userInterface->setSelectedPlayer(playerId);
-    m_selectedPlayer.playerId = playerId;
-    m_selectedPlayer.selected = true;
-    m_selectedTile.selected = false;
+    _userInterface->setSelectedPlayer(playerId);
+    _selectedPlayer.playerId = playerId;
+    _selectedPlayer.selected = true;
+    _selectedTile.selected = false;
 }
 
-/**
- * Convertit les coordonnées du monde 3D en coordonnées de tuiles
- */
+
 bool GameLoop::worldToTileCoordinates(ZappyTypes::Vector3 worldPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY) {
-    if (m_mapWidth <= 0 || m_mapHeight <= 0)
+    if (_mapWidth <= 0 || _mapHeight <= 0)
         return false;
     float tileSize = 1.0f;
     float spacing = 1.5f;
-    if (m_mapWidth > 20 || m_mapHeight > 20) {
-        tileSize = 10.0f / std::max(m_mapWidth, m_mapHeight);
-        spacing = tileSize * 0.1f;
+    if (_mapRenderer) {
+        tileSize = _mapRenderer->getTileSize();
+        spacing = _mapRenderer->getTileSpacing();
+    } else {
+        if (_mapWidth > 20 || _mapHeight > 20) {
+            tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
+            spacing = tileSize * 1.5f;
+        }
     }
-    float mapCenterX = m_mapWidth / 2.0f;
-    float mapCenterY = m_mapHeight / 2.0f;
+    float mapCenterX = _mapWidth / 2.0f;
+    float mapCenterY = _mapHeight / 2.0f;
     float x = (worldPos.x / (tileSize + spacing)) + mapCenterX - 0.5f;
     float y = (worldPos.z / (tileSize + spacing)) + mapCenterY - 0.5f;
     *tileX = static_cast<int>(std::round(x));
     *tileY = static_cast<int>(std::round(y));
-    return (*tileX >= 0 && *tileX < m_mapWidth && *tileY >= 0 && *tileY < m_mapHeight);
-}
-
-/**
- * Effectue un ray casting pour la sélection de tuiles 3D
- */
-bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY) {
-    if (!m_graphics)
-        return false;
-    ZappyTypes::Vector3 cameraPos = m_graphics->GetCameraPosition();
-    ZappyTypes::Vector3 rayDirection = m_graphics->ScreenToWorldRay(screenPos);
-    ZappyTypes::Vector3 planePoint = {0.0f, 0.0f, 0.0f};
-    ZappyTypes::Vector3 planeNormal = {0.0f, 1.0f, 0.0f};
-    ZappyTypes::Vector3 intersectionPoint;
-    if (m_graphics->RayPlaneIntersection(cameraPos, rayDirection,
-        planePoint, planeNormal, intersectionPoint))
-        return worldToTileCoordinates(intersectionPoint, tileX, tileY);
+    if (*tileX >= 0 && *tileX < _mapWidth && *tileY >= 0 && *tileY < _mapHeight)
+        return true;
     return false;
 }
 
-/**
- * Calcule la distance entre un rayon 3D et un point
- */
+bool GameLoop::performTileSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> tileX, std::shared_ptr<int> tileY) {
+    if (!_graphics)
+        return false;
+    ZappyTypes::Vector3 cameraPos = _graphics->GetCameraPosition();
+    ZappyTypes::Vector3 rayDirection = _graphics->ScreenToWorldRay(screenPos);
+    ZappyTypes::Vector3 planePoint = {0.0f, 0.0f, 0.0f};
+    ZappyTypes::Vector3 planeNormal = {0.0f, 1.0f, 0.0f};
+    auto intersectionPoint = _graphics->RayPlaneIntersection(cameraPos, rayDirection,
+        planePoint, planeNormal);
+    if (intersectionPoint.has_value())
+        return worldToTileCoordinates(intersectionPoint.value(), tileX, tileY);
+    return false;
+}
+
 float GameLoop::calculateRayToPointDistance(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection, ZappyTypes::Vector3 point) {
-    ZappyTypes::Vector3 rayToPoint = {
-        point.x - rayOrigin.x,
-        point.y - rayOrigin.y,
-        point.z - rayOrigin.z
-    };
+    ZappyTypes::Vector3 rayToPoint = {point.x - rayOrigin.x, point.y - rayOrigin.y, point.z - rayOrigin.z};
     float dotProduct = rayToPoint.x * rayDirection.x + rayToPoint.y * rayDirection.y + rayToPoint.z * rayDirection.z;
-    ZappyTypes::Vector3 closestPointOnRay = {
-        rayOrigin.x + dotProduct * rayDirection.x,
-        rayOrigin.y + dotProduct * rayDirection.y,
-        rayOrigin.z + dotProduct * rayDirection.z
-    };
-    ZappyTypes::Vector3 diff = {
-        point.x - closestPointOnRay.x,
-        point.y - closestPointOnRay.y,
-        point.z - closestPointOnRay.z
-    };
+    ZappyTypes::Vector3 closestPointOnRay = {rayOrigin.x + dotProduct * rayDirection.x, rayOrigin.y + dotProduct * rayDirection.y, rayOrigin.z + dotProduct * rayDirection.z};
+    ZappyTypes::Vector3 diff = {point.x - closestPointOnRay.x, point.y - closestPointOnRay.y, point.z - closestPointOnRay.z};
     return std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 }
 
-/**
- * Calcule la position 3D d'un joueur basée sur sa position sur la tuile
- */
 ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int playerY, int playerIndex, int totalPlayers) {
     float tileSize = 1.0f;
     float spacing = 1.5f;
-    if (m_mapWidth > 20 || m_mapHeight > 20) {
-        tileSize = 10.0f / std::max(m_mapWidth, m_mapHeight);
-        spacing = tileSize * 0.1f;
+    if (_mapRenderer) {
+        tileSize = _mapRenderer->getTileSize();
+        spacing = _mapRenderer->getTileSpacing();
+    } else {
+        if (_mapWidth > 20 || _mapHeight > 20) {
+            tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
+            spacing = tileSize * 1.5f;
+        }
     }
-    float mapCenterX = m_mapWidth / 2.0f;
-    float mapCenterY = m_mapHeight / 2.0f;
-    ZappyTypes::Vector3 playerPos = {
-        (playerX - mapCenterX + 0.5f) * (tileSize + spacing),
-        0.55f,
-        (playerY - mapCenterY + 0.5f) * (tileSize + spacing)
-    };
+    float mapCenterX = _mapWidth / 2.0f;
+    float mapCenterY = _mapHeight / 2.0f;
+    ZappyTypes::Vector3 playerPos = {(playerX - mapCenterX + 0.5f) * (tileSize + spacing), 0.55f, (playerY - mapCenterY + 0.5f) * (tileSize + spacing)};
     if (totalPlayers > 1) {
         float stackHeight = 1.1f;
         playerPos.y += playerIndex * stackHeight;
@@ -171,22 +150,29 @@ ZappyTypes::Vector3 GameLoop::calculatePlayerWorldPosition(int playerX, int play
     return playerPos;
 }
 
-/**
- * Effectue la sélection d'un joueur en 3D avec ray casting précis
- */
 bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared_ptr<int> playerId) {
-    if (!m_gameController || !m_graphics)
+    if (!_gameController || !_graphics)
         return false;
-    auto gameState = m_gameController->getGameState();
+    auto gameState = _gameController->getGameState();
     if (!gameState || !gameState->isMapInitialized())
         return false;
-    ZappyTypes::Vector3 cameraPos = m_graphics->GetCameraPosition();
-    ZappyTypes::Vector3 rayDirection = m_graphics->ScreenToWorldRay(screenPos);
+    ZappyTypes::Vector3 cameraPos = _graphics->GetCameraPosition();
+    ZappyTypes::Vector3 rayDirection = _graphics->ScreenToWorldRay(screenPos);
     float minDistance = std::numeric_limits<float>::max();
     int closestPlayerId = -1;
     bool foundPlayer = false;
-    for (int y = 0; y < m_mapHeight; ++y) {
-        for (int x = 0; x < m_mapWidth; ++x) {
+    float maxSelectionDistance = 0.5f;
+    if (_mapRenderer) {
+        float tileSize = _mapRenderer->getTileSize();
+        maxSelectionDistance = tileSize * 0.6f;
+    } else {
+        if (_mapWidth > 20 || _mapHeight > 20) {
+            float tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
+            maxSelectionDistance = tileSize * 0.6f;
+        }
+    }
+    for (int y = 0; y < _mapHeight; ++y) {
+        for (int x = 0; x < _mapWidth; ++x) {
             auto playerIds = gameState->getPlayersOnTile(x, y);
             if (playerIds.empty())
                 continue;
@@ -194,7 +180,6 @@ bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared
                 int currentPlayerId = playerIds[i];
                 ZappyTypes::Vector3 playerWorldPos = calculatePlayerWorldPosition(x, y, i, playerIds.size());
                 float distance = calculateRayToPointDistance(cameraPos, rayDirection, playerWorldPos);
-                const float maxSelectionDistance = 1.0f;
                 if (distance < maxSelectionDistance && distance < minDistance) {
                     minDistance = distance;
                     closestPlayerId = currentPlayerId;
@@ -211,27 +196,18 @@ bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared
 }
 
 void GameLoop::onMapSizeChanged(int width, int height) {
-    m_mapWidth = width;
-    m_mapHeight = height;
-    m_camera->setMapDimensions(width, height);
+    _mapWidth = width;
+    _mapHeight = height;
     updateCameraForMapSize();
 }
 
 void GameLoop::onTileChanged(int x, int y, const std::shared_ptr<const ITile>& tile) {
-    if (m_gameController && tile) {
-        auto gameState = m_gameController->getGameState();
-        if (gameState && gameState->isMapInitialized()) {
-            auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
-            const auto& resources = tile->getResources();
-            mutableGameState->updateTileResources(x, y,
-                resources[0],  // food
-                resources[1],  // linemate
-                resources[2],  // deraumere
-                resources[3],  // sibur
-                resources[4],  // mendiane
-                resources[5],  // phiras
-                resources[6]   // thystame
-            );
-        }
+    if (!_gameController || !tile)
+        return;
+    auto gameState = _gameController->getGameState();
+    if (gameState && gameState->isMapInitialized()) {
+        auto mutableGameState = std::const_pointer_cast<GameState>(gameState);
+        const auto& res = tile->getResources();
+        mutableGameState->updateTileResources(x, y, res[0], res[1], res[2], res[3], res[4], res[5], res[6]);
     }
 }

@@ -5,29 +5,41 @@
 ** command_ebo
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
+#include "../include/client.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void send_ebo_command(server_t *server, int egg_id)
+static char *format_ebo_response(int egg_id)
 {
-    graphical_client_t *current = NULL;
     char *buffer;
     int size;
 
-    if (!server || !server->graphical_clients)
-        return;
     size = snprintf(NULL, 0, "ebo #%d\n", egg_id);
     buffer = malloc(size + 1);
     if (!buffer)
-        return write_command_output(current->client->client_fd, "ko\n");
-    sprintf(buffer, "ebo #%d\n", egg_id);
-    current = server->graphical_clients;
+        return NULL;
+    snprintf(buffer, size + 1, "ebo #%d\n", egg_id);
+    return buffer;
+}
+
+void send_ebo_command(game_t *game, zappy_client_t *clients, int egg_id)
+{
+    zappy_client_t *current = clients;
+    char *buffer;
+
+    (void)game;
+    if (!clients)
+        return;
+    buffer = format_ebo_response(egg_id);
+    if (!buffer)
+        return;
     while (current) {
-        write_command_output(current->client->client_fd, buffer);
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
+            write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);

@@ -6,6 +6,7 @@
 */
 #include "../include/command.h"
 #include "../include/parsing.h"
+#include "../include/zappy.h"
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -26,24 +27,25 @@ void cleanup_pending(player_t *player)
     player->pending_cmd = NULL;
 }
 
-void add_pending_cmd(client_t *user, server_t *server,
-    char *buffer, int cmd_index)
+void add_pending_cmd(zappy_client_t *player, game_t *game,
+    command_args_t *args, zappy_client_t *clients)
 {
     command_data_t data = get_command_data();
     char **tmp = NULL;
 
-    if (cmd_index == 9) {
-        tmp = str_to_word_arr(buffer, " ");
-        start_incantation(server, user, tmp);
+    (void)clients;
+    if (args->cmd_index == 9) {
+        tmp = str_to_word_arr(*args->buffer, " ");
+        start_incantation(game, player, clients, tmp);
         return free_arr(tmp);
     }
-    if (cmd_index == 10)
-        command_pfk(server, user);
-    user->player->pending_cmd->args = strdup(buffer);
-    user->player->pending_cmd->func = data.functions[cmd_index];
-    if (data.times[cmd_index] > 0)
-        user->player->busy_until =
-            server->current_tick + data.times[cmd_index];
+    if (args->cmd_index == 10)
+        command_pfk(game, player, clients);
+    player->player->pending_cmd->args = strdup(*args->buffer);
+    player->player->pending_cmd->func = data.functions[args->cmd_index];
+    if (data.times[args->cmd_index] > 0)
+        player->player->busy_until =
+            game->current_tick + data.times[args->cmd_index];
 }
 
 void cleanup_player_queue(player_t *player)
@@ -146,4 +148,13 @@ void write_command_output(int client_fd, char *msg)
     pfd.fd = client_fd;
     pfd.events = POLLOUT;
     write_with_poll(client_fd, &pfd, msg, strlen(msg));
+}
+
+void write_command_output_buffer(client_t *client, char *msg)
+{
+    if (!client || !validate_client_fd(client->client_fd))
+        return;
+    if (add_string_to_write_buffer(&client->write_buffer, msg) == -1)
+        return write_command_output(client->client_fd, msg);
+    client->need_write = true;
 }

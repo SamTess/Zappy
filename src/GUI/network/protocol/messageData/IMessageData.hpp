@@ -26,9 +26,9 @@ enum class MessageType {
 };
 
 class IMessageData {
-public:
-    virtual ~IMessageData() = default;
-    virtual MessageType getType() const = 0;
+    public:
+        virtual ~IMessageData() = default;
+        virtual MessageType getType() const = 0;
 };
 
 #endif /* !IMESSAGE_DATA_HPP_ */

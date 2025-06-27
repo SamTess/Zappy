@@ -5,21 +5,20 @@
 ** command_pin
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static int calculate_size_pin_command(client_t *client)
+static int calculate_size_pin_command(zappy_client_t *client)
 {
-    if (!client || !client->player)
+    if (!client || !client->player || !client->client)
         return 0;
     return snprintf(NULL, 0, "pin #%d %d %d %d %d %d %d %d %d %d\n",
-        client->client_id,
+        client->client->client_id,
         client->player->pos_x,
         client->player->pos_y,
         client->player->inventory[FOOD],
@@ -31,7 +30,7 @@ static int calculate_size_pin_command(client_t *client)
         client->player->inventory[THYSTAME]);
 }
 
-static char *get_buffer_pin_command(client_t *client)
+static char *format_pin_response(zappy_client_t *client)
 {
     int size = calculate_size_pin_command(client);
     char *buffer = malloc(size + 1);
@@ -39,7 +38,7 @@ static char *get_buffer_pin_command(client_t *client)
     if (!buffer)
         return NULL;
     snprintf(buffer, size + 1, "pin #%d %d %d %d %d %d %d %d %d %d\n",
-            client->client_id,
+            client->client->client_id,
             client->player->pos_x,
             client->player->pos_y,
             client->player->inventory[FOOD],
@@ -52,42 +51,52 @@ static char *get_buffer_pin_command(client_t *client)
     return buffer;
 }
 
-void send_pin_command(server_t *server, client_t *client, client_t *recipient)
+void send_pin_command(game_t *game, zappy_client_t *clients,
+    zappy_client_t *sender, zappy_client_t *recipient)
 {
-    char *buffer = get_buffer_pin_command(client);
+    char *buffer;
 
-    (void)server;
-    if (!buffer || !server->graphical_clients)
+    (void)game;
+    (void)clients;
+    if (!sender || !sender->player || !sender->client ||
+        !recipient || !recipient->client)
         return;
-    write_command_output(recipient->client_fd, buffer);
-    free(buffer);
+    buffer = format_pin_response(sender);
+    if (buffer) {
+        write_command_output_buffer(recipient->client, buffer);
+        free(buffer);
+    }
 }
 
-void send_pin_to_all(server_t *server, client_t *client)
+void send_pin_to_all(game_t *game, zappy_client_t *clients,
+    zappy_client_t *sender)
 {
-    graphical_client_t *current = server->graphical_clients;
+    zappy_client_t *current = clients;
 
-    if (!server || !client || !server->graphical_clients)
+    if (!game || !sender || !sender->player || !clients)
         return;
     while (current) {
-        send_pin_command(server, client, current->client);
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
+            send_pin_command(game, clients, sender, current);
         current = current->next;
     }
 }
 
-void command_pin(server_t *server, client_t *client, char **buffer)
+void command_pin(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
-    client_t *recipient = NULL;
+    zappy_client_t *target = NULL;
     int id = -1;
 
-    if (!server || !client || !server->graphical_clients ||
-        arr_len(buffer) != 2 ||
-        sscanf(buffer[1], "#%d\n", &id) != 1 || id < 0)
-        return write_command_output(client->client_fd, "sbp\n");
-    recipient = find_client_by_id(server, id);
-    if (!recipient || recipient->type != AI) {
-        write_command_output(client->client_fd, "sbp\n");
+    if (!game || !client || !client->client || !clients ||
+        client->type != GRAPHICAL || arr_len(buffer) != 2 ||
+        sscanf(buffer[1], "#%d", &id) != 1 || id < 0)
+        return write_command_output_buffer(client->client, "sbp\n");
+    target = find_client_by_id(clients, id);
+    if (!target || target->type != AI) {
+        write_command_output_buffer(client->client, "sbp\n");
         return;
     }
-    send_pin_command(server, recipient, client);
+    send_pin_command(game, clients, target, client);
 }

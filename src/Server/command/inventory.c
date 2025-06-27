@@ -6,18 +6,23 @@
 */
 
 #include "../include/command.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/player.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void inventory(server_t *server, client_t *client, char **buffer)
+void inventory(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     char *content;
 
-    if (!server || !client || !client->player || arr_len(buffer) != 1)
-        return write_command_output(client->client_fd, "ko\n");
+    (void)game;
+    (void)clients;
+    if (!client || !client->client || !client->player || arr_len(buffer) != 1)
+        return write_command_output_buffer(client->client, "ko\n");
     content = get_inventory_content(client->player);
-    write_command_output(client->client_fd, content);
+    write_command_output_buffer(client->client, content);
     free(content);
 }

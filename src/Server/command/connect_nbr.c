@@ -5,14 +5,16 @@
 ** connect_nbr
 */
 #include "../include/command.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static int count_team_eggs(server_t *server, char *team_name)
+static int count_team_eggs(game_t *game, char *team_name)
 {
-    egg_t *current = server->eggs;
+    egg_t *current = game->eggs;
     egg_t *next;
     int count = 0;
 
@@ -25,19 +27,21 @@ static int count_team_eggs(server_t *server, char *team_name)
     return count;
 }
 
-static void format_response(int available_slots, client_t *client)
+static void format_response(int available_slots, zappy_client_t *client)
 {
     size_t res_size = snprintf(NULL, 0, "%d\n", available_slots) + 1;
     char *response = malloc(sizeof(char) * res_size);
 
+    if (!response || !client || !client->client)
+        return;
     snprintf(response, res_size, "%d\n", available_slots);
-    write_command_output(client->client_fd, response);
+    write_command_output_buffer(client->client, response);
     free(response);
 }
 
-int connect_nbr_srv(server_t *server, char *team)
+int connect_nbr_srv(game_t *game, char *team)
 {
-    int team_eggs = count_team_eggs(server, team);
+    int team_eggs = count_team_eggs(game, team);
     int available_slots = team_eggs;
 
     if (available_slots < 0)
@@ -45,15 +49,17 @@ int connect_nbr_srv(server_t *server, char *team)
     return available_slots;
 }
 
-void connect_nbr(server_t *server, client_t *client, char **buffer)
+void connect_nbr(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     int available_slots;
 
-    if (!client || !client->player || !client->player->team_name ||
-        arr_len(buffer) != 1) {
-        write_command_output(client->client_fd, "ko\n");
+    (void)clients;
+    if (!game || !client || !client->client || !client->player ||
+        !client->player->team_name || arr_len(buffer) != 1) {
+        write_command_output_buffer(client->client, "ko\n");
         return;
     }
-    available_slots = connect_nbr_srv(server, client->player->team_name);
+    available_slots = connect_nbr_srv(game, client->player->team_name);
     format_response(available_slots, client);
 }

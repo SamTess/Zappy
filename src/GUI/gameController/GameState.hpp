@@ -2,94 +2,76 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameState - Store passif des données de jeu
+** GameState
 */
 
 #ifndef GAME_STATE_HPP_
 #define GAME_STATE_HPP_
 
-#include <map>
-#include <vector>
 #include <memory>
+#include <vector>
+#include <map>
 #include <string>
-#include <array>
-#include <mutex>
-#include <deque>
-#include "IBroadcast.hpp"
-#include "IGameEntity.hpp"
-#include "GameEntitiesAll.hpp"
+#include "GameStateAdapter.hpp"
+#include "gameState/GameStateManager.hpp"
 #include "EntityFactory.hpp"
 #include "../network/protocol/messageData/MessageDataAll.hpp"
 
-
 class GameState {
-public:
-    GameState();
-    explicit GameState(std::shared_ptr<EntityFactoryManager> factory);
-    ~GameState() = default;
-    int getMapWidth() const;
-    int getMapHeight() const;
-    bool isMapInitialized() const;
-    std::shared_ptr<const ITile> getTile(int x, int y) const;
-    std::shared_ptr<ITile> getTileMutable(int x, int y);
-    int getResourceQuantity(int x, int y, ResourceType resourceType) const;
-    ResourceType getDominantResourceType(int x, int y) const;
-    std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const;
-    std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const;
-    bool isPlayerOnTile(int x, int y, int playerId) const;
-    std::vector<int> getPlayersOnTile(int x, int y) const;
-    std::shared_ptr<const IEgg> getEggInfo(int eggId) const;
-    std::vector<int> getEggsOnTile(int x, int y) const;
-    const std::vector<std::string>& getTeamNames() const;
-    int getTimeUnit() const;
-    bool isGameEnded() const;
-    const std::string& getWinningTeam() const;
+    public:
+        GameState();
+        explicit GameState(std::shared_ptr<EntityFactoryManager> factory);
+        ~GameState() = default;
 
-    std::vector<int> getPlayerIds() const;
+        int getMapWidth() const;
+        int getMapHeight() const;
+        bool isMapInitialized() const;
+        std::shared_ptr<const ITile> getTile(int x, int y) const;
+        std::shared_ptr<ITile> getTileMutable(int x, int y);
+        int getResourceQuantity(int x, int y, ResourceType resourceType) const;
+        void setMapSize(int width, int height);
+        void updateTileResources(int x, int y, int food, int linemate, int deraumere,
+            int sibur, int mendiane, int phiras, int thystame);
+        void setTileIncantationState(int x, int y, bool isIncantating);
+        bool isPlayerOnTile(int x, int y, int playerId) const;
+        std::vector<int> getPlayersOnTile(int x, int y) const;
+        std::vector<int> getEggsOnTile(int x, int y) const;
 
-    void setMapSize(int width, int height);
-    void updateTileResources(int x, int y, int food, int linemate, int deraumere,
-                            int sibur, int mendiane, int phiras, int thystame);
-    void setTileIncantationState(int x, int y, bool isIncantating);
-    void addOrUpdatePlayer(const PlayerInfoData& playerData);
-    void removePlayer(int playerId);
-    void updatePlayerInventory(const PlayerInventoryData& inventoryData);
-    void movePlayer(int playerId, int newX, int newY);
-    void addEgg(const EggData& eggData);
-    void removeEgg(int eggId);
-    void setTeamNames(const std::vector<std::string>& teamNames);
-    void setTimeUnit(int timeUnit);
-    void setGameEnded(bool ended, const std::string& winningTeam = "");
-    std::map<int, std::shared_ptr<IPlayer>> getPlayers() const;
+        std::shared_ptr<const IPlayer> getPlayerInfo(int playerId) const;
+        std::shared_ptr<const IPlayerInventory> getPlayerInventory(int playerId) const;
+        std::vector<int> getPlayerIds() const;
+        const std::map<int, std::shared_ptr<IPlayer>> getPlayers() const;
+        void addOrUpdatePlayer(const PlayerInfoData& playerData);
+        void removePlayer(int playerId);
+        void updatePlayerInventory(const PlayerInventoryData& inventoryData);
+        void movePlayer(int playerId, int newX, int newY);
 
-    void addBroadcast(int playerId, const std::string& team, const std::string& message);
-    void updateBroadcasts(float deltaTime);
-    std::vector<std::shared_ptr<const IBroadcast>> getBroadcasts() const;
-    size_t getPlayerCount() const;
-    std::vector<std::vector<std::shared_ptr<ITile>>> getTiles() const;
+        std::shared_ptr<const IEgg> getEggInfo(int eggId) const;
+        void addEgg(const EggData& eggData);
+        void removeEgg(int eggId);
 
-private:
-    bool isValidCoordinates(int x, int y) const;
-    void addPlayerToTile(int playerId, int x, int y);
-    void removePlayerFromTile(int playerId, int x, int y);
-    void addEggToTile(int eggId, int x, int y);
-    void removeEggFromTile(int eggId, int x, int y);
+        const std::vector<std::string>& getTeamNames() const;
+        void setTeamNames(const std::vector<std::string>& teamNames);
+        int getTimeUnit() const;
+        void setTimeUnit(int timeUnit);
+        bool isGameEnded() const;
+        const std::string& getWinningTeam() const;
+        void setGameEnded(bool ended, const std::string& winningTeam = "");
 
-    mutable std::mutex _mutex;
-    int _mapWidth = 0;
-    int _mapHeight = 0;
-    bool _isMapInitialized = false;
-    std::vector<std::vector<std::shared_ptr<ITile>>> _tiles;
-    std::map<int, std::shared_ptr<IPlayer>> _players;
-    std::map<int, std::shared_ptr<IPlayerInventory>> _inventories;
-    std::map<int, std::shared_ptr<IEgg>> _eggs;
-    std::vector<std::string> _teamNames;
-    int _timeUnit = 100;
-    bool _gameEnded = false;
-    std::string _winningTeam;
-    std::deque<std::shared_ptr<IBroadcast>> _broadcasts;
-    const size_t _maxBroadcasts = 20;
-    std::shared_ptr<EntityFactoryManager> _entityFactory;
+        bool getSfxEnabled() const;
+        void setSfxEnabled(bool enabled);
+        float getMusicVolume() const;
+        void setMusicVolume(float volume);
+
+        std::shared_ptr<IGameStateManager> getGameStateManager() const;
+        std::shared_ptr<IMapManager> getMapManager() const;
+        std::shared_ptr<IPlayerManager> getPlayerManager() const;
+        std::shared_ptr<IGameStatusManager> getGameStatusManager() const;
+        std::shared_ptr<IGameSettingsManager> getGameSettingsManager() const;
+
+    private:
+        std::unique_ptr<GameStateAdapter> _adapter;
+        std::shared_ptr<GameStateManager> _gameStateManager;
 };
 
 #endif /* !GAME_STATE_HPP_ */

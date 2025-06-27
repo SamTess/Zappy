@@ -57,18 +57,18 @@ static char *format_str_resources(char *names,
 }
 
 static int check_resources(char *names, int resources,
-    int first_resource, char *res)
+    int *first_resource, char *res)
 {
     char *temp;
 
     if (resources > 0) {
         temp = format_str_resources(names, resources,
-            first_resource, res);
+            *first_resource, res);
         if (!temp)
             return -1;
         strcat(res, temp);
         free(temp);
-        first_resource = 0;
+        *first_resource = 0;
     }
     return 0;
 }
@@ -85,7 +85,8 @@ static char *add_resources(int *resources)
         return NULL;
     res[0] = '\0';
     for (int i = 0; i < COUNT; ++i) {
-        if (check_resources(names[i], resources[i], first_resource, res) == -1)
+        if (check_resources(names[i],
+            resources[i], &first_resource, res) == -1)
             return NULL;
     }
     return res;

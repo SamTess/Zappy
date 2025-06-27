@@ -11,13 +11,13 @@ child_pids = []
 shutdown_flag = threading.Event()
 
 
-def run_agent(ip, port, team, agent_id, performance):
+def run_agent(ip, port, team, performance):
   try:
-    agent = Agent(ip, port, team, agent_id, performance)
+    agent = Agent(ip, port, team, performance)
     agents.append(agent)
     agent.start()
   except Exception as e:
-    print(f"Agent {agent_id} failed: {e}")
+    print(f"Agent failed: {e}")
     os._exit(1)
 
 
@@ -64,21 +64,21 @@ def cleanup_handler():
     signal_handler(signal.SIGTERM, None)
 
 
-def fork_agent(ip, port, team, i, performance):
+def fork_agent(ip, port, team, performance):
   pid = os.fork()
   if pid == 0:
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
 
     try:
-      run_agent(ip, port, team, i, performance)
+      run_agent(ip, port, team, performance)
     except Exception as e:
-      print(f"Agent {i} crashed: {e}")
+      print(f"Agent crashed: {e}")
     finally:
       os._exit(0)
   else:
     child_pids.append(pid)
-    print(f"Started agent {i} with PID {pid}")
+    print(f"Started agent with PID {pid}")
     sleep(0.01)
 
 

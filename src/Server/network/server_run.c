@@ -8,67 +8,63 @@
 #include "../include/command.h"
 #include "../include/player.h"
 #include "../include/pending_cmd_utils.h"
+#include "../include/zappy.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
-client_t *find_client_by_socket(server_t *server, int socket_fd)
-{
-    client_t *temp;
-
-    if (!server || !server->client)
-        return NULL;
-    temp = server->client;
-    if (temp && temp->client_fd == server->s_fd)
-        temp = temp->next;
-    while (temp) {
-        if (temp->client_fd == socket_fd)
-            return temp;
-        temp = temp->next;
-    }
-    printf("Error: Could not find client for socket %d\n", socket_fd);
-    return NULL;
-}
-
-static void new_connection(server_t *server)
+static void new_connection(server_t *server, zappy_client_t **clients)
 {
     struct sockaddr_in client_addr;
     socklen_t addr_len = sizeof(client_addr);
     int client_fd;
-    client_t *new_client;
+    zappy_client_t *new_client;
 
     memset(&client_addr, 0, sizeof(client_addr));
     client_fd = accept(server->s_fd, (struct sockaddr *)&client_addr,
         &addr_len);
     if (client_fd < 0)
         return;
-    add_fd(server, client_fd);
+    add_fd(clients, client_fd);
     server->nfds += 1;
-    new_client = find_client_by_socket(server, client_fd);
-    if (new_client != NULL)
-        write_command_output(new_client->client_fd, "WELCOME\n");
+    new_client = find_client_by_socket(*clients, server, client_fd);
+    if (new_client != NULL && new_client->client != NULL)
+        write_command_output(new_client->client->client_fd, "WELCOME\n");
 }
 
-static void check_new_connection(server_t *server)
+static void check_new_connection(server_t *server, zappy_client_t **clients)
 {
-    if (server->client->client_poll->revents & POLLIN)
-        new_connection(server);
+    if ((*clients)->client->client_poll->revents & POLLIN)
+        new_connection(server, clients);
 }
 
-static void check_client_message(server_t *server)
+static void pollin_pollout_client(zappy_client_t *temp,
+    zappy_t *zappy, int temp_fd)
 {
-    client_t *temp = server->client;
-    client_t *next = NULL;
+    if (temp->client->client_poll->revents & POLLIN)
+        get_message(zappy->server, temp, zappy->clients, zappy->game);
+    if (find_client_by_socket(zappy->clients, zappy->server, temp_fd) != NULL
+        && temp->client->client_poll->revents & POLLOUT
+        && temp->client->need_write)
+        flush_client_write_buffer(temp->client);
+}
+
+static void check_client_message(zappy_t *zappy)
+{
+    zappy_client_t *temp = zappy->clients;
+    zappy_client_t *next = NULL;
+    int temp_fd;
 
     if (temp != NULL)
         temp = temp->next;
     while (temp != NULL) {
         next = temp->next;
-        if (temp->client_poll != NULL && temp->client_poll->revents != 0
-            && (temp->client_poll->revents & POLLIN))
-                get_message(server, temp);
+        temp_fd = temp->client->client_fd;
+        if (temp->client->client_poll != NULL
+            && temp->client->client_poll->revents != 0)
+            pollin_pollout_client(temp, zappy, temp_fd);
         temp = next;
     }
 }
@@ -91,51 +87,57 @@ static int setup_poll_manager(poll_manager_t *poll_mana, int size)
     return 0;
 }
 
-static void smart_polling(client_t *current, poll_manager_t *poll_mana,
-    server_t *server, int i)
+static void smart_polling(zappy_client_t *current, poll_manager_t *poll_mana,
+    game_t *game, int i)
 {
     if (current->type == GRAPHICAL) {
-        poll_mana->fds[i].events = POLLIN;
+        poll_mana->fds[i].events |= POLLIN;
     } else if (current->player &&
-        current->player->busy_until > server->current_tick &&
+        current->player->busy_until > game->current_tick &&
         current->player->queue_size >= 10) {
         poll_mana->fds[i].events = 0;
     } else
-        poll_mana->fds[i].events = POLLIN;
+        poll_mana->fds[i].events |= POLLIN;
+    if (current->client->need_write)
+        poll_mana->fds[i].events |= POLLOUT;
 }
 
-static void fill_poll_array(server_t *server, poll_manager_t *poll_mana)
+static void fill_poll_array(server_t *server, game_t *game,
+    zappy_client_t **clients, poll_manager_t *poll_mana)
 {
-    client_t *current = server->client;
+    zappy_client_t *current = *clients;
     int size = server->nfds + 1;
 
-    poll_mana->fds[0] = *(current->client_poll);
+    poll_mana->fds[0] = *(current->client->client_poll);
     current = current->next;
     for (int i = 1; i < size && current != NULL; i++) {
-        poll_mana->fds[i] = *(current->client_poll);
-        smart_polling(current, poll_mana, server, i);
+        poll_mana->fds[i] = *(current->client->client_poll);
+        smart_polling(current, poll_mana, game, i);
         current = current->next;
     }
     poll_mana->needs_rebuild = false;
 }
 
-static void poll_client(server_t *server, poll_manager_t *poll_mana)
+static void poll_client(zappy_t *zappy)
 {
-    client_t *current = server->client;
-    int size = server->nfds + 1;
+    zappy_client_t *current = zappy->clients;
+    int size = zappy->server->nfds + 1;
 
-    current->client_poll->revents = poll_mana->fds[0].revents;
-    check_new_connection(server);
+    current->client->client_poll->revents =
+        zappy->server->poll_manager->fds[0].revents;
+    check_new_connection(zappy->server, &zappy->clients);
     current = current->next;
     for (int i = 1; i < size && current != NULL; i++) {
-        current->client_poll->revents = poll_mana->fds[i].revents;
+        current->client->client_poll->revents =
+            zappy->server->poll_manager->fds[i].revents;
         current = current->next;
     }
-    if (server->nfds > 0)
-        check_client_message(server);
+    if (zappy->server->nfds > 0)
+        check_client_message(zappy);
 }
 
-static void handle_game_tick(server_t *server)
+static void handle_game_tick(game_t *game, server_t *server,
+    zappy_client_t *clients)
 {
     static struct timeval last_tick = {0, 0};
     struct timeval current_time;
@@ -144,23 +146,24 @@ static void handle_game_tick(server_t *server)
     gettimeofday(&current_time, NULL);
     time_diff = (current_time.tv_sec - last_tick.tv_sec) * 1000 +
         (current_time.tv_usec - last_tick.tv_usec) / 1000;
-    if (time_diff >= (1000 / server->parsed_info->frequence)) {
-        update_game_tick(server);
+    if (time_diff >= (1000 / game->parsed_info->frequence)) {
+        update_game_tick(game, server, clients);
         last_tick = current_time;
     }
 }
 
-void check_client(server_t *server)
+void check_client(zappy_t *zappy)
 {
-    int size = server->nfds + 1;
+    int size = zappy->server->nfds + 1;
     int temp = 0;
 
-    temp = setup_poll_manager(server->poll_manager, size);
-    if (temp == -1 || !server->poll_manager->fds)
+    temp = setup_poll_manager(zappy->server->poll_manager, size);
+    if (temp == -1 || !zappy->server->poll_manager->fds)
         return;
-    handle_game_tick(server);
-    if (server->poll_manager->needs_rebuild)
-        fill_poll_array(server, server->poll_manager);
-    if (poll(server->poll_manager->fds, size, 10) > 0)
-        poll_client(server, server->poll_manager);
+    handle_game_tick(zappy->game, zappy->server, zappy->clients);
+    if (zappy->server->poll_manager->needs_rebuild)
+        fill_poll_array(zappy->server, zappy->game,
+            &zappy->clients, zappy->server->poll_manager);
+    if (poll(zappy->server->poll_manager->fds, size, 10) > 0)
+        poll_client(zappy);
 }

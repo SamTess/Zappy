@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** TcpSocket implementation
+** TcpSocket
 */
 #pragma once
 
@@ -14,33 +14,28 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Implémentation concrète d'un socket TCP
- */
 class TcpSocket : public ISocket {
-private:
-    int _fd;
-    bool _connected;
-    std::unique_ptr<NetworkAddress> _address;
-    friend class SocketPoller;
+    public:
+        TcpSocket();
+        ~TcpSocket() override;
 
-    int getFileDescriptor() const;
-    void createSocket();
-    void performConnect();
-    void cleanup();
-    bool isValidDescriptor() const;
+        bool connect(const std::string& host, int port) override;
+        bool isConnected() const override;
+        void disconnect() override;
+        bool send(const std::string& data) override;
+        std::string receive() override;
+        bool hasData() const override;
+        bool setNonBlocking() override;
+        int getFileDescriptor() const;
+    private:
+        int _fd;
+        bool _connected;
+        std::unique_ptr<NetworkAddress> _address;
 
-public:
-    TcpSocket();
-    ~TcpSocket() override;
-
-    bool connect(const std::string& host, int port) override;
-    bool isConnected() const override;
-    void disconnect() override;
-    bool send(const std::string& data) override;
-    std::string receive() override;
-    bool hasData() const override;
-    bool setNonBlocking() override;
+        void createSocket();
+        void performConnect();
+        void cleanup();
+        bool isValidDescriptor() const;
 };
 
 } // namespace implementation

@@ -1,18 +1,16 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy Main Makefile
+## Zappy
 ## File description:
-## Main Makefile orchestrating all components
+## Makefile
 ##
 
-# Binary names
 SERVER_NAME=zappy_server
 GUI_NAME=zappy_gui
 AI_NAME=zappy_ai
 UNIT_TESTS_NAME=unit_tests
 FUNCTIONAL_TESTS_NAME=functional_tests
 
-# Directories
 SERVER_DIR=src/Server
 GUI_DIR=src/GUI
 AI_DIR=src/AI
@@ -22,10 +20,8 @@ DOCS_DIR=docs
 PLUGINS_DIR=plugins
 LIBS_DIR=libs
 
-# Documentation
 DOCS_NAME=ZappyDocumation
 
-# Colors and animations
 RED=\033[31m
 GREEN=\033[32m
 YELLOW=\033[33m
@@ -37,7 +33,7 @@ BOLD=\033[1m
 RESET=\033[0m
 BG_BLACK=\033[40m
 
-all: display_banner check_submodules
+all: display_banner
 	@echo "$(CYAN)[$(BOLD)BUILDING$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de tous les composants...$(RESET)"
 	@sleep 0.3
@@ -72,7 +68,6 @@ coverage: display_banner
 	@echo "$(CYAN)╚═════════════════════════════════════════════════════════\
 	════╝$(RESET)"
 
-# Display a fancy banner for the build process
 display_banner:
 	@clear
 	@echo "$(CYAN)╔═══════════════════════════════════════════╗$(RESET)"
@@ -126,12 +121,63 @@ debug:
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Compilation\
 	 en mode debug terminée !$(RESET)"
 
+install_requirements: install_ai check_raylib check_submodules
+	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
+	 installées avec succès !$(RESET)"
+	@echo ""
+	@echo "$(CYAN)╔═══════════════════════════════════════════\
+	══════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(GREEN)$(BOLD)            \
+	        🚨 IMPORTANT 🚨                       $(RESET) $(CYAN)║$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(YELLOW)$(BOLD)       \
+	       POUR ACTIVER L'ENVIRONNEMENT:             \
+	  $(RESET) $(CYAN)║$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(GREEN)$(BOLD)      \
+	         source venv/bin/activate              \
+	     $(RESET) $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚════════════════════════════════\
+	═════════════════════════════╝$(RESET)"
+	@echo ""
+
 install_ai:
 	@echo "$(CYAN)[$(BOLD)INSTALL$(RESET)$(CYAN)]$(RESET) $(BOLD)Installation\
 	 des dépendances IA...$(RESET)"
 	@$(MAKE) -C $(AI_DIR) install
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
 	 IA installées avec succès !$(RESET)"
+
+check_raylib:
+	@echo "$(CYAN)[$(BOLD)DEP$(RESET)$(CYAN)]$(RESET) $(BOLD)Vérification de \
+	la présence de raylib...$(RESET)"
+	@if ! pkg-config --exists raylib; then \
+		echo "$(YELLOW)[$(BOLD)WARNING$(RESET)$(YELLOW)]$(RESET) $(BOLD)raylib \
+	non trouvé, tentative d'installation via APT...$(RESET)"; \
+		sudo apt update && sudo apt install -y libraylib-dev; \
+		if ! pkg-config --exists raylib; then \
+			echo "$(YELLOW)[$(BOLD)WARNING$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)raylib introuvable via APT, installation depuis GitHub...$(RESET)"; \
+			git clone https://github.com/raysan5/raylib.git \
+	$(LIBS_DIR)/raylib_src; \
+			cd $(LIBS_DIR)/raylib_src && mkdir -p build && \
+	cd build && cmake -DBUILD_SHARED_LIBS=ON \
+	-DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && make \
+	&& sudo make install && sudo ldconfig; \
+			if pkg-config --exists raylib; then \
+				echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)raylib installé avec succès depuis GitHub.$(RESET)"; \
+			else \
+				echo "$(RED)[$(BOLD)ERROR$(RESET)$(RED)]$(RESET) \
+	$(BOLD)Échec d'installation de raylib.$(RESET)"; \
+				exit 1; \
+			fi; \
+		else \
+			echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)raylib installé avec succès via APT.$(RESET)"; \
+		fi; \
+	else \
+		echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)raylib déjà présent.$(RESET)"; \
+	fi
 
 check_submodules:
 	@echo "$(CYAN)[$(BOLD)SUBMODULES$(RESET)$(CYAN)]$(RESET) \
@@ -287,4 +333,4 @@ style_cpp: fclean
 .PHONY: all zappy_server zappy_gui zappy_ai tests tests_run \
 debug install_ai init check_submodules clean fclean re coverage \
 docs docusaurus-build docusaurus-serve docusaurus-start docusaurus-deploy \
-style style_cpp test_network_gui
+style style_cpp test_network_gui install_requirements
