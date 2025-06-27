@@ -40,7 +40,6 @@ class EjectionAnimationManager {
         bool isPlayerBeingEjected(int playerId) const;
         ZappyTypes::Vector3 getPlayerAnimationPosition(int playerId) const;
         ZappyTypes::Vector3 convertTileToWorldPosition(int tileX, int tileY, int mapWidth, int mapHeight) const;
-        void cleanup();
         void setAnimationDuration(float duration) { defaultAnimationDuration = duration; }
         void setParticleIntensity(int intensity) { particleIntensity = intensity; }
 

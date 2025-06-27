@@ -21,10 +21,6 @@ DeathAnimationManager& DeathAnimationManager::getInstance() {
     return instance;
 }
 
-void DeathAnimationManager::startDeathAnimation(int playerId, const ZappyTypes::Vector3& position) {
-    startDeathAnimation(playerId, position, "Unknown");
-}
-
 void DeathAnimationManager::startDeathAnimation(int playerId, const ZappyTypes::Vector3& position, const std::string& teamName) {
     activeAnimations.erase(playerId);
     auto animation = std::make_shared<DeathAnimation>();
@@ -121,34 +117,8 @@ void DeathAnimationManager::render(const std::shared_ptr<IGraphicsLib>& graphics
         teamColor.a = static_cast<unsigned char>(255 * fadeRatio);
         ZappyTypes::Vector3 rotationAxis = {1.0f, 0.0f, 0.0f};
         float rotationAngle = animation->rotation.x;
-        ModelManager::getInstance().drawModelEx(LABUBU, animation->currentPosition, rotationAxis, rotationAngle, animation->scale, teamColor);
+        ModelManager::getInstance().drawModelEx(LABUBU, animation->currentPosition, rotationAxis, rotationAngle, 0.4f, teamColor);
     }
-}
-
-bool DeathAnimationManager::isPlayerInDeathAnimation(int playerId) const {
-    auto it = activeAnimations.find(playerId);
-
-    return it != activeAnimations.end() && it->second && it->second->active;
-}
-
-ZappyTypes::Vector3 DeathAnimationManager::getPlayerDeathPosition(int playerId) const {
-    auto it = activeAnimations.find(playerId);
-
-    if (it != activeAnimations.end() && it->second && it->second->active)
-        return it->second->currentPosition;
-    return {0.0f, 0.0f, 0.0f};
-}
-
-ZappyTypes::Vector3 DeathAnimationManager::getPlayerDeathRotation(int playerId) const {
-    auto it = activeAnimations.find(playerId);
-
-    if (it != activeAnimations.end() && it->second && it->second->active)
-        return it->second->rotation;
-    return {0.0f, 0.0f, 0.0f};
-}
-
-void DeathAnimationManager::cleanup() {
-    activeAnimations.clear();
 }
 
 void DeathAnimationManager::removeFinishedAnimations() {

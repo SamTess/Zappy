@@ -39,11 +39,7 @@ void EjectionAnimationManager::update(float deltaTime) {
         if (!animation.active)
             continue;
         animation.timeElapsed += deltaTime;
-        if (!animation.particlesCreated) {
-            ParticleSystem::getInstance().createPlayerEjectionEffect(
-                animation.startPosition, animation.direction);
-            animation.particlesCreated = true;
-        }
+        animation.particlesCreated = true;
         if (animation.timeElapsed >= animation.duration)
             animation.active = false;
     }
@@ -96,10 +92,6 @@ ZappyTypes::Vector3 EjectionAnimationManager::convertTileToWorldPosition(int til
     ZappyTypes::Vector3 result = {(static_cast<float>(tileX) - mapWidth / 2.0f + 0.5f) * (tileSize + spacing), 0.5f,
         (static_cast<float>(tileY) - mapHeight / 2.0f + 0.5f) * (tileSize + spacing)};
     return result;
-}
-
-void EjectionAnimationManager::cleanup() {
-    activeAnimations.clear();
 }
 
 void EjectionAnimationManager::removeCompletedAnimations() {
