@@ -33,7 +33,7 @@ BOLD=\033[1m
 RESET=\033[0m
 BG_BLACK=\033[40m
 
-all: display_banner check_raylib check_submodules
+all: display_banner
 	@echo "$(CYAN)[$(BOLD)BUILDING$(RESET)$(CYAN)]$(RESET) $(BOLD)Compilation \
 	de tous les composants...$(RESET)"
 	@sleep 0.3
@@ -122,6 +122,24 @@ debug:
 	@$(MAKE) -C $(AI_DIR) debug
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Compilation\
 	 en mode debug terminée !$(RESET)"
+
+install_requirements: install_ai check_raylib check_submodules
+	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
+	 installées avec succès !$(RESET)"
+	@echo ""
+	@echo "$(CYAN)╔═══════════════════════════════════════════\
+	══════════════════╗$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(GREEN)$(BOLD)            \
+	        🚨 IMPORTANT 🚨                       $(RESET) $(CYAN)║$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(YELLOW)$(BOLD)       \
+	       POUR ACTIVER L'ENVIRONNEMENT:             \
+	  $(RESET) $(CYAN)║$(RESET)"
+	@echo "$(CYAN)║  $(BG_BLACK)$(GREEN)$(BOLD)      \
+	         source venv/bin/activate              \
+	     $(RESET) $(CYAN)║$(RESET)"
+	@echo "$(CYAN)╚════════════════════════════════\
+	═════════════════════════════╝$(RESET)"
+	@echo ""
 
 install_ai:
 	@echo "$(CYAN)[$(BOLD)INSTALL$(RESET)$(CYAN)]$(RESET) $(BOLD)Installation\
@@ -317,4 +335,4 @@ style_cpp: fclean
 .PHONY: all zappy_server zappy_gui zappy_ai tests tests_run \
 debug install_ai init check_submodules clean fclean re coverage \
 docs docusaurus-build docusaurus-serve docusaurus-start docusaurus-deploy \
-style style_cpp test_network_gui
+style style_cpp test_network_gui install_requirements

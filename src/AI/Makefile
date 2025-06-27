@@ -71,10 +71,21 @@ check_python:
 install:
 	@echo "$(BLUE)[$(BOLD)INSTALL$(RESET)$(BLUE)]$(RESET) $(BOLD)Installation \
 	des dépendances...$(RESET)"
-	@pip3 install --upgrade pip
-	@pip3 install wheel setuptools
+	@echo "$(YELLOW)[$(BOLD)ENV$(RESET)$(YELLOW)]$(RESET) \
+	$(BOLD)Création de l'environnement virtuel Python...$(RESET)"
+	@python3 -m venv ../../venv || (echo "$(RED)[$(BOLD)ERROR\
+	$(RESET)$(RED)]$(RESET) $(BOLD)Impossible de créer \
+	l'environnement virtuel.$(RESET)" && exit 1)
+	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) \
+	$(BOLD)Environnement virtuel créé avec succès.$(RESET)"
+	@echo "$(BLUE)[$(BOLD)INFO$(RESET)$(BLUE)]$(RESET) \
+	$(BOLD)Activation de l'environnement virtuel...$(RESET)"
+	@. ../../venv/bin/activate && \
+	pip3 install --upgrade pip && \
+	pip3 install wheel setuptools && \
+	pip3 install -r requirements.txt
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances \
-	installées.$(RESET)"
+	installées dans l'environnement virtuel.$(RESET)"
 
 clean:
 	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
