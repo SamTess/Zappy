@@ -424,9 +424,8 @@ ZappyTypes::Vector3 RayLib::ScreenToWorldRay(ZappyTypes::Vector2 screenPos) {
     return {0.0f, 0.0f, -1.0f};
 }
 
-bool RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection,
-    ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal,
-    ZappyTypes::Vector3& intersectionPoint) {
+std::optional<ZappyTypes::Vector3> RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vector3 rayDirection,
+    ZappyTypes::Vector3 planePoint, ZappyTypes::Vector3 planeNormal) {
     Vector3 origin = TypeAdapter::ToRaylib(rayOrigin);
     Vector3 direction = TypeAdapter::ToRaylib(rayDirection);
     Vector3 point = TypeAdapter::ToRaylib(planePoint);
@@ -435,14 +434,13 @@ bool RayLib::RayPlaneIntersection(ZappyTypes::Vector3 rayOrigin, ZappyTypes::Vec
     normal = Vector3Normalize(normal);
     float denominator = Vector3DotProduct(direction, normal);
     if (fabsf(denominator) < 0.0001f)
-        return false;
+        return std::nullopt;
     Vector3 pointToOrigin = Vector3Subtract(point, origin);
     float t = Vector3DotProduct(pointToOrigin, normal) / denominator;
     if (t < 0)
-        return false;
+        return std::nullopt;
     Vector3 intersection = Vector3Add(origin, Vector3Scale(direction, t));
-    intersectionPoint = TypeAdapter::FromRaylib(intersection);
-    return true;
+    return TypeAdapter::FromRaylib(intersection);
 }
 
 int RayLib::GetFPS() {

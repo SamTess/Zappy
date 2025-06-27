@@ -21,6 +21,7 @@ ParsingCLI::~ParsingCLI() {
 int ParsingCLI::getPort() const {
     return _port;
 }
+
 const std::string &ParsingCLI::getMachine() const {
     return _machine;
 }

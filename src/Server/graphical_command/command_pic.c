@@ -5,14 +5,13 @@
 ** command_pic
 */
 
-#include "../include/server.h"
-#include "../include/client.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-static char *get_pic_buffer(int x, int y, int level, tile_t *tile)
+static char *format_pic_response(int x, int y, int level, tile_t *tile)
 {
     int size = 0;
     char *buffer = NULL;
@@ -33,24 +32,26 @@ static char *get_pic_buffer(int x, int y, int level, tile_t *tile)
     return buffer;
 }
 
-void command_pic(server_t *server, int x, int y, int level)
+void command_pic(game_t *game, zappy_client_t *clients,
+    int *coords, int level)
 {
-    graphical_client_t *current = NULL;
+    zappy_client_t *current = clients;
     char *buffer = NULL;
     tile_t *tile = NULL;
 
-    if (!server || !server->graphical_clients)
+    if (!game || !clients || !game->map || !game->parsed_info)
         return;
-    if (y < 0 || x < 0 || y >= server->parsed_info->height
-        || x >= server->parsed_info->width)
+    if (coords[1] < 0 || coords[0] < 0 || coords[1] >=
+        game->parsed_info->height || coords[0] >= game->parsed_info->width)
         return;
-    tile = &server->map[y][x];
-    buffer = get_pic_buffer(x, y, level, tile);
+    tile = &game->map[coords[1]][coords[0]];
+    buffer = format_pic_response(coords[0], coords[1], level, tile);
     if (!buffer)
         return;
-    current = server->graphical_clients;
     while (current) {
-        write_command_output_buffer(current->client, buffer);
+        if (current->type == GRAPHICAL && current->client
+            && current->is_fully_connected && current->client->client_id != -1)
+            write_command_output_buffer(current->client, buffer);
         current = current->next;
     }
     free(buffer);

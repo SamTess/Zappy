@@ -17,7 +17,6 @@ class NetworkThread {
     public:
         NetworkThread();
         ~NetworkThread();
-
         void start(const std::function<void()>& threadFunction);
         void stop();
         bool isRunning() const;

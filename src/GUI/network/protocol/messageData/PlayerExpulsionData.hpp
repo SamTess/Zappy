@@ -15,7 +15,6 @@ class PlayerExpulsionData : public IMessageData {
         explicit PlayerExpulsionData(int playerId) : _playerId(playerId) {}
 
         MessageType getType() const override { return MessageType::PlayerExpulsion; }
-
         int getPlayerId() const { return _playerId; }
         void setPlayerId(int value) { _playerId = value; }
 

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** User Interface implementation using the factory pattern
+** UserInterface
 */
 
 #include <algorithm>
@@ -13,59 +13,51 @@
 #include <iomanip>
 #include <chrono>
 #include "UserInterface.hpp"
+#include "context/UIContext.hpp"
+#include "windows/timeInfo/TimeInfoWindow.hpp"
 #include "../gameController/GameState.hpp"
 
 namespace GUI {
 
 UserInterface::UserInterface(std::shared_ptr<IGuiLib> guiLib)
-    : m_guiLib(guiLib),
-      m_screenWidth(1920),
-      m_screenHeight(1080),
-      m_isDragging(false),
-      m_mouseCapture(false) {
-    m_windowFactory = std::make_shared<UIWindowFactory>(guiLib);
+   : _guiLib(guiLib), _screenWidth(1920), _screenHeight(1080),
+     _isDragging(false), _mouseCapture(false) {
+    _windowFactory = std::make_shared<UIWindowFactory>(guiLib);
 }
 
 void UserInterface::initialize(int screenWidth, int screenHeight) {
-    m_screenWidth = screenWidth;
-    m_screenHeight = screenHeight;
-    m_windowFactory->createAllWindows(screenWidth, screenHeight);
-    m_isDragging = false;
+    _screenWidth = screenWidth;
+    _screenHeight = screenHeight;
+    _windowFactory->createAllWindows(screenWidth, screenHeight, _windowFactory);
+    auto uiContext = std::make_shared<UIContext>(_windowFactory, _commandSender);
+    _windowFactory->setUIContext(uiContext);
+    _isDragging = false;
 }
 
 void UserInterface::render() {
-    m_windowFactory->renderAllWindows();
+    _windowFactory->renderAllWindows(_windowFactory);
 }
 
-void UserInterface::updateDataFromGameState(
-    std::shared_ptr<const GameState> gameState,
-    int mapWidth,
-    int mapHeight,
-    float gameTime,
-    int frequency,
-    int gameTick
-) {
-    m_windowFactory->updateAllWindows(gameState, mapWidth, mapHeight, gameTime, frequency, gameTick);
+void UserInterface::updateDataFromGameState(std::shared_ptr<const GameState> gameState) {
+    _windowFactory->updateAllWindows(gameState);
+}
+
+void UserInterface::updateTimeData(float gameTime, int frequency, int gameTick) {
+    auto timeInfoWindow = std::dynamic_pointer_cast<GUI::TimeInfoWindow>(getWindow("timeInfo"));
+    (void)timeInfoWindow;
+    _windowFactory->updateTimeData(gameTime, frequency, gameTick);
 }
 
 void UserInterface::setSelectedTile(int x, int y) {
-    m_windowFactory->setSelectedTile(x, y);
+    _windowFactory->setSelectedTile(x, y);
 }
 
 void UserInterface::setSelectedPlayer(int playerId) {
-    m_windowFactory->setSelectedPlayer(playerId);
-}
-
-void UserInterface::setNetworkManager(std::shared_ptr<NetworkManager> networkManager) {
-    m_windowFactory->setNetworkManager(networkManager);
-}
-
-void UserInterface::setViewMode(int mode) {
-    m_windowFactory->setViewMode(mode);
+    _windowFactory->setSelectedPlayer(playerId);
 }
 
 bool UserInterface::toggleWindowVisibility(const std::string& windowId, bool visible) {
-    auto window = m_windowFactory->getWindow(windowId);
+    auto window = _windowFactory->getWindow(windowId);
     if (window) {
         window->setVisible(visible);
         return true;
@@ -74,54 +66,62 @@ bool UserInterface::toggleWindowVisibility(const std::string& windowId, bool vis
 }
 
 bool UserInterface::handleMouseEvents() {
-    ZappyTypes::Vector2 mousePosition = m_guiLib->GetMousePosition();
-    m_mouseCapture = false;
+    ZappyTypes::Vector2 mousePosition = _guiLib->GetMousePosition();
+    _mouseCapture = false;
     bool mouseOverUI = isMouseOverUI();
     if (mouseOverUI) {
-        m_mouseCapture = true;
+        _mouseCapture = true;
         handleUIMouseInteraction(mousePosition);
     }
     handleDragEndIfNeeded();
-    return m_mouseCapture;
+    return _mouseCapture;
 }
 
 void UserInterface::handleUIMouseInteraction(const ZappyTypes::Vector2& mousePosition) {
-    if (m_guiLib->IsMouseButtonPressed(0) && !m_isDragging)
+    if (_guiLib->IsMouseButtonPressed(0) && !_isDragging)
         startDraggingIfPossible(mousePosition);
-    else if (m_guiLib->IsMouseButtonDown(0) && m_isDragging)
-        m_windowFactory->updateWindowDragging(mousePosition);
-    if (m_guiLib->IsMouseButtonPressed(0) ||
-        m_guiLib->IsMouseButtonReleased(0) ||
-        m_guiLib->IsMouseButtonDown(0)) {
-        m_mouseCapture = true;
+    else if (_guiLib->IsMouseButtonDown(0) && _isDragging)
+        _windowFactory->updateWindowDragging(mousePosition);
+    if (_guiLib->IsMouseButtonPressed(0) ||
+        _guiLib->IsMouseButtonReleased(0) ||
+        _guiLib->IsMouseButtonDown(0)) {
+        _mouseCapture = true;
     }
 }
 
 void UserInterface::startDraggingIfPossible(const ZappyTypes::Vector2& mousePosition) {
-    bool startedDragging = m_windowFactory->handleWindowDragging(mousePosition);
-    if (startedDragging) {
-        m_isDragging = true;
-    }
+    bool startedDragging = _windowFactory->handleWindowDragging(mousePosition);
+    if (startedDragging)
+        _isDragging = true;
 }
 
 void UserInterface::handleDragEndIfNeeded() {
-    if (!m_guiLib->IsMouseButtonDown(0) && m_isDragging) {
-        m_windowFactory->stopWindowDragging();
-        m_isDragging = false;
+    if (!_guiLib->IsMouseButtonDown(0) && _isDragging) {
+        _windowFactory->stopWindowDragging();
+        _isDragging = false;
     }
 }
 
 bool UserInterface::isMouseOverUI() const {
-    ZappyTypes::Vector2 mousePosition = m_guiLib->GetMousePosition();
-    return m_windowFactory->isMouseOverWindow(mousePosition);
+    ZappyTypes::Vector2 mousePosition = _guiLib->GetMousePosition();
+    return _windowFactory->isMouseOverWindow(mousePosition);
 }
 
 bool UserInterface::hasHandledMouseEvent() const {
-    return m_mouseCapture;
+    return _mouseCapture;
 }
 
 std::shared_ptr<GUI::IUIWindow> UserInterface::getWindow(const std::string& windowId) {
-    return m_windowFactory->getWindow(windowId);
+    return _windowFactory->getWindow(windowId);
+}
+
+void UserInterface::setCommandSender(std::shared_ptr<INetworkCommandSender> sender) {
+    _commandSender = sender;
+    _windowFactory->setCommandSender(sender);
+}
+
+void UserInterface::setCommandExecutor(std::shared_ptr<ICommandExecutor> executor) {
+    _windowFactory->setCommandExecutor(executor);
 }
 
 } // namespace GUI

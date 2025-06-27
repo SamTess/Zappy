@@ -15,7 +15,7 @@
 
 class TcpConnection {
     public:
-        explicit TcpConnection(size_t initialBufferSize = 4096);
+        explicit TcpConnection();
         ~TcpConnection();
 
         void connect(const std::string &host, int port);
@@ -28,9 +28,7 @@ class TcpConnection {
 
     private:
         std::unique_ptr<Network::ISocket> _socket;
-        std::unique_ptr<Network::IBuffer> _recvBuffer;
         std::unique_ptr<Network::INetworkFactory> _networkFactory;
-        size_t _initialBufferSize;
 
         void createAndConfigureSocket();
         void performConnect(const std::string &host, int port);

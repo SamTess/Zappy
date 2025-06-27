@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** NetworkFactory implementation
+** NetworkFactory
 */
 
 #include <string>
@@ -22,10 +22,6 @@ std::unique_ptr<INetworkAddress> NetworkFactory::createAddress(const std::string
 
 std::unique_ptr<IPoller> NetworkFactory::createPoller() {
     return std::make_unique<SocketPoller>();
-}
-
-std::unique_ptr<IBuffer> NetworkFactory::createBuffer(size_t size) {
-    return std::make_unique<Buffer>(size);
 }
 
 std::unique_ptr<INetworkFactory> createNetworkFactory() {

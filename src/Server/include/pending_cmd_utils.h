@@ -7,9 +7,10 @@
 
 #ifndef PENDING_CMD_UTILS_H_
     #define PENDING_CMD_UTILS_H_
-    #include "server.h"
-    #include "client.h"
+    #include "game.h"
+    #include "zappy.h"
 
-void execute_pending_cmd(server_t *server, client_t *client);
+void execute_pending_cmd(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients);
 
 #endif /* !PENDING_CMD_UTILS_H_ */

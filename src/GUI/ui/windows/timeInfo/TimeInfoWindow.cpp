@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400
 ** File description:
-** TimeInfoWindow implementation
+** TimeInfoWindow
 */
 
 #include <iomanip>
@@ -16,50 +16,41 @@ TimeInfoWindow::TimeInfoWindow(std::shared_ptr<IGuiLib> guiLib)
     : AUIWindow(guiLib, "Informations temporelles") {
 }
 
-void TimeInfoWindow::renderContent() {
-    float yOffset = m_position.y + 30;
-
-    // Affichage des FPS
+float TimeInfoWindow::renderFpsInfo(float yOffset) {
     std::stringstream fpsInfo;
-    fpsInfo << "FPS: " << m_fps;
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        fpsInfo.str()
-    );
-    yOffset += 25;
+    fpsInfo << "FPS: " << _fps;
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, fpsInfo.str());
+    return yOffset + 25;
+}
 
+float TimeInfoWindow::renderTimeInfo(float yOffset) {
+    if (!_dataProvider)
+        return yOffset;
     std::stringstream timeInfo;
-    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << m_gameTime;
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        timeInfo.str()
-    );
-    yOffset += 25;
+    timeInfo << "Temps: " << std::fixed << std::setprecision(2) << _dataProvider->getGameTime() << " s";
+    _guiLib->DrawLabel( _position.x + 10, yOffset, _dimensions.x - 20,
+        20, timeInfo.str());
+    return yOffset + 25;
+}
+
+float TimeInfoWindow::renderFrequencyInfo(float yOffset) {
+    if (!_dataProvider)
+        return yOffset;
     std::stringstream freqInfo;
-    freqInfo << "Fréquence: " << m_frequency << " Hz";
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        freqInfo.str()
-    );
-    yOffset += 25;
-    std::stringstream tickInfo;
-    tickInfo << "Tick: " << m_gameTick;
-    m_guiLib->DrawLabel(
-        m_position.x + 10,
-        yOffset,
-        m_dimensions.x - 20,
-        20,
-        tickInfo.str()
-    );
+    freqInfo << "Fréquence: " << _dataProvider->getFrequency() << " /s";
+    _guiLib->DrawLabel(_position.x + 10, yOffset, _dimensions.x - 20,
+        20, freqInfo.str());
+    return yOffset + 25;
+}
+
+void TimeInfoWindow::renderContent() {
+    float yOffset = _position.y + 30;
+    yOffset = renderFpsInfo(yOffset);
+    if (_dataProvider) {
+        yOffset = renderTimeInfo(yOffset);
+        yOffset = renderFrequencyInfo(yOffset);
+    }
 }
 
 } // namespace GUI

@@ -13,7 +13,7 @@
 class TileContentData : public IMessageData {
     public:
         TileContentData(int x, int y, int food, int linemate, int deraumere,
-                    int sibur, int mendiane, int phiras, int thystame)
+            int sibur, int mendiane, int phiras, int thystame)
             : _x(x), _y(y), _food(food), _linemate(linemate), _deraumere(deraumere),
             _sibur(sibur), _mendiane(mendiane), _phiras(phiras), _thystame(thystame) {}
         MessageType getType() const override { return MessageType::TileContent; }

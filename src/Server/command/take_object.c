@@ -6,7 +6,8 @@
 */
 
 #include "../include/command.h"
-#include "../include/graphical_commands.h"
+#include "../include/zappy.h"
+#include "../include/game.h"
 #include "../include/parsing.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,32 +33,34 @@ resource_type_t determine_type(char *resource_string)
     return COUNT;
 }
 
-static void update_resources(server_t *server, client_t *client,
+static void update_resources(game_t *game, zappy_client_t *client,
     resource_type_t type)
 {
-    server->map[client->player->pos_y]
+    game->map[client->player->pos_y]
     [client->player->pos_x].resources[type]--;
-    server->current_resources[type]--;
+    game->current_resources[type]--;
 }
 
-void take_object(server_t *server, client_t *client, char **buffer)
+void take_object(game_t *game, zappy_client_t *client,
+    zappy_client_t *clients, char **buffer)
 {
     resource_type_t type;
 
-    if (!server || !client || !client->player || arr_len(buffer) != 2)
-        return write_command_output_buffer(client, "ko\n");
+    if (!game || !client || !client->client || !client->player ||
+        !clients || arr_len(buffer) != 2)
+        return write_command_output_buffer(client->client, "ko\n");
     type = determine_type(buffer[1]);
     if (type == COUNT)
-        return write_command_output_buffer(client, "ko\n");
-    if (server->map[client->player->pos_y]
+        return write_command_output_buffer(client->client, "ko\n");
+    if (game->map[client->player->pos_y]
         [client->player->pos_x].resources[type] > 0) {
-        update_resources(server, client, type);
+        update_resources(game, client, type);
         add_item_to_inventory(client->player, type, 1);
-        command_pgt(server, client, type);
-        send_bct_to_all_graphical_clients(server, client->player->pos_x,
+        command_pgt(game, client, clients, type);
+        send_bct_to_all_graphical_clients(game, clients, client->player->pos_x,
             client->player->pos_y);
-        send_pin_to_all(server, client);
-        write_command_output_buffer(client, "ok\n");
+        send_pin_to_all(game, clients, client);
+        write_command_output_buffer(client->client, "ok\n");
     } else
-        write_command_output_buffer(client, "ko\n");
+        write_command_output_buffer(client->client, "ko\n");
 }

@@ -1,18 +1,18 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy Server Makefile
+## Zappy
 ## File description:
-## Builds the Zappy server binary
+## Makefile
 ##
 
-# Binary name
 NAME = ../../zappy_server
 BUILD_DIR = ../../build/Server
 
 MAIN = main.c
-# Source files
+
 SRC = 	help.c								\
 		free.c								\
+		zappy.c								\
 		parsing_err.c						\
 		parsing.c							\
 		network/connection_err.c			\
@@ -75,23 +75,21 @@ SRC = 	help.c								\
 		graphical_command/command_seg.c		\
 		graphical_command/command_smg.c		\
 		network/array_function.c			\
+		network/array_function_bis.c		\
 
 MAIN_OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(MAIN))
 OBJ = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SRC))
 DEP = $(patsubst %.c, $(BUILD_DIR)/%.d, $(SRC))
 
-# Directories
 INCLUDE_DIR = include
 
-# Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -I$(INCLUDE_DIR)
 LDFLAGS = -lm
 DEBUG_FLAGS = -g3 -ggdb
 COVERAGE_FLAGS = --coverage
 
-# Colors and animations
 RED = \033[31m
 GREEN = \033[32m
 YELLOW = \033[33m
@@ -102,23 +100,19 @@ WHITE = \033[37m
 BOLD = \033[1m
 RESET = \033[0m
 
-# Animation frames
 COMPILE_MSG = "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)"
 LINKING_MSG = "$(GREEN)[$(BOLD)LINKING$(RESET)$(GREEN)]$(RESET)"
 SUCCESS_MSG = "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET)"
 BG_BLACK = \033[40m
 
-# Main target
 all: setup_dirs display_banner $(NAME)
 
-# Create the necessary build directories
 setup_dirs:
 	@mkdir -p $(BUILD_DIR)/player
 	@mkdir -p $(BUILD_DIR)/network
 	@mkdir -p $(BUILD_DIR)/map
 	@mkdir -p ../../build
 
-# Display a fancy banner for the build process
 display_banner:
 	@clear
 	@echo "$(CYAN)╔═══════════════════════════════════════════╗$(RESET)"
@@ -130,7 +124,6 @@ display_banner:
 	du serveur Zappy...$(RESET)"
 	@sleep 0.3
 
-# Build the server
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo ""
 	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Liaison \
@@ -158,7 +151,6 @@ $(NAME): $(OBJ) $(MAIN_OBJ)
 	utilisé !$(RESET)      $(CYAN)║$(RESET)"
 	@echo "$(CYAN)╚════════════════════════════════════════════╝$(RESET)"
 
-# Rule for object files
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo -n "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)\
@@ -166,13 +158,11 @@ $(BUILD_DIR)/%.o: %.c
 	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 	@echo "$(GREEN)✓$(RESET)"
 
-# Debug build
 debug: CFLAGS += $(DEBUG_FLAGS)
 debug: clean all
 	@echo "$(MAGENTA)[$(BOLD)DEBUG$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
 	debug activé !$(RESET)"
 
-# Coverage build for tests
 coverage: CFLAGS += $(COVERAGE_FLAGS)
 coverage: LDFLAGS += $(COVERAGE_FLAGS)
 coverage: clean all
@@ -185,7 +175,6 @@ coverage: clean all
 	@echo "$(CYAN)╚═════════════════════════════════════════\
 	═════╝$(RESET)"
 
-# Clean object files
 clean:
 	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
 	$(BOLD)Suppression des fichiers objets...$(RESET)"
@@ -202,7 +191,6 @@ clean:
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage effectué !$(RESET)       "
 
-# Clean everything (including binary)
 fclean: clean
 	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) \
 	$(BOLD)Suppression du binaire...$(RESET)"
@@ -212,10 +200,8 @@ fclean: clean
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage complet effectué !$(RESET)"
 
-# Clean and rebuild
 re: fclean all
 
-# Include dependency files
 -include $(DEP)
 -include $(MAIN_DEP)
 

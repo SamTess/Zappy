@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** NetworkAddress implementation
+** NetworkAddress
 */
 
 #include "NetworkAddress.hpp"

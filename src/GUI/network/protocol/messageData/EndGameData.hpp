@@ -17,9 +17,7 @@ class EndGameData : public IMessageData {
             : _teamName(teamName) {}
 
         MessageType getType() const override { return MessageType::EndGame; }
-
         const std::string& getTeamName() const { return _teamName; }
-
         void setTeamName(const std::string& value) { _teamName = value; }
 
     private:

@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** SocketPoller implementation
+** SocketPoller
 */
 
 #include "SocketPoller.hpp"
@@ -14,7 +14,7 @@ namespace Network {
 namespace Implementation {
 
 SocketPoller::SocketPoller() {
-    _pollfds.reserve(32);
+    _pollfds.reserve(1);
 }
 
 void SocketPoller::addSocket(int fd, int events) {

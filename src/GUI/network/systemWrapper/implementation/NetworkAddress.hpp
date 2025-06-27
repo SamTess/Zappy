@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400 Zappy
 ** File description:
-** NetworkAddress implementation
+** NetworkAddress
 */
 
 #pragma once
@@ -15,26 +15,21 @@
 namespace Network {
 namespace Implementation {
 
-/**
- * @brief Implémentation concrète d'une adresse réseau
- */
 class NetworkAddress : public INetworkAddress {
-private:
-    std::string _host;
-    int _port;
-    sockaddr_in _addr;
-    friend class TcpSocket;
+    public:
+        NetworkAddress(const std::string& host, int port);
 
-    const sockaddr* getSockAddr() const;
-    socklen_t getAddrSize() const;
-    void resolveAddress();
+        std::string getHost() const override;
+        int getPort() const override;
+        std::string toString() const override;
+        const sockaddr* getSockAddr() const;
+        socklen_t getAddrSize() const;
 
-public:
-    NetworkAddress(const std::string& host, int port);
-
-    std::string getHost() const override;
-    int getPort() const override;
-    std::string toString() const override;
+    private:
+        std::string _host;
+        sockaddr_in _addr;
+        int _port;
+        void resolveAddress();
 };
 
 } // namespace implementation
