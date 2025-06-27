@@ -28,7 +28,6 @@ class TimeInfoWindow : public AUIWindow {
         float renderFpsInfo(float yOffset);
         float renderTimeInfo(float yOffset);
         float renderFrequencyInfo(float yOffset);
-        float renderTickInfo(float yOffset);
 };
 
 } // namespace GUI
