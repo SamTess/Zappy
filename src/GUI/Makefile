@@ -1,45 +1,37 @@
 ##
 ## EPITECH PROJECT, 2025
-## Zappy GUI Makefile
+## Zappy
 ## File description:
-## Builds the Zappy graphical interface binary
+## Makefile
 ##
 
-# Binary name
 NAME = ../../zappy_gui
 BUILD_DIR = ../../build/GUI
 
 MAIN = main.cpp
-# Source files
+
 SRC = parsing/ParsingCLI.cpp \
-      gameController/GameController.cpp \
-	  gameController/GameState.cpp \
 	  shared/exception/AException.cpp \
-	  network/buffer/MessageQueue.cpp \
 	  network/buffer/CircularBuffer.cpp \
 	  network/connection/TcpConnection.cpp \
 	  network/networkThread/NetworkThread.cpp \
-	  network/protocol/Message.cpp \
+	  shared/Message.cpp \
 	  network/protocol/ProtocolParser.cpp \
 	  network/systemWrapper/implementation/TcpSocket.cpp \
 	  network/systemWrapper/implementation/NetworkAddress.cpp \
 	  network/systemWrapper/implementation/SocketPoller.cpp \
-	  network/systemWrapper/implementation/Buffer.cpp \
 	  network/systemWrapper/factory/NetworkFactory.cpp \
 	  network/networkManager/NetworkManager.cpp \
-	  textureManager/TextureManager.cpp \
 	  textureManager/ModelManager.cpp \
 	  renderer/Renderer.cpp \
 	  renderer/Skybox.cpp \
 	  renderer/MapRenderer.cpp \
-	  renderer/UIRenderer.cpp \
+	  renderer/AParticleEffect.cpp \
+	  renderer/BroadcastEffect.cpp \
 	  renderer/ParticleSystem.cpp \
 	  renderer/EjectionAnimationManager.cpp \
 	  renderer/DeathAnimationManager.cpp \
-	  renderer/strategies/DetailedTileRenderStrategy.cpp \
-	  renderer/strategies/ModelTileRenderStrategy.cpp \
-	  renderer/strategies/SimpleTileRenderStrategy.cpp \
-	  renderer/strategies/TileRenderStrategyFactory.cpp \
+	  renderer/TileRender.cpp \
 	  cameraController/CameraController.cpp \
 	  GameLoop.cpp \
 	  GameLoopUI.cpp \
@@ -48,40 +40,63 @@ SRC = parsing/ParsingCLI.cpp \
 	  ui/windows/AUIWindow.cpp \
 	  ui/windows/tileInfo/TileInfoWindow.cpp \
 	  ui/windows/playerInfo/PlayerInfoWindow.cpp \
-	  ui/windows/mapInfo/MapInfoWindow.cpp \
-	  ui/windows/controls/ControlsWindow.cpp \
 	  ui/windows/timeInfo/TimeInfoWindow.cpp \
 	  ui/windows/menu/MenuWindow.cpp \
+	  ui/windows/mapInfo/MapInfoWindow.cpp \
+	  ui/data/UIDataProvider.cpp \
+	  ui/context/UIContext.cpp \
+	  gameController/GameState.cpp \
+	  gameController/GameStateAdapter.cpp \
+	  gameController/GameController.cpp \
 	  gameController/EntityFactory.cpp \
 	  gameController/entities/Player.cpp \
 	  gameController/entities/Egg.cpp \
 	  gameController/entities/Resource.cpp \
 	  gameController/entities/Tile.cpp \
-	  gameController/entities/PlayerInventory.cpp
+	  gameController/entities/PlayerInventory.cpp \
+	  gameController/animationManager/AnimationManager.cpp \
+	  gameController/graphicsManager/GraphicsManager.cpp \
+	  gameController/messageHandlers/BroadcastMessageHandler.cpp \
+	  gameController/messageHandlers/MapSizeMessageHandler.cpp \
+	  gameController/messageHandlers/TileContentMessageHandler.cpp \
+	  gameController/messageHandlers/PlayerInfoMessageHandler.cpp \
+	  gameController/messageHandlers/PlayerExpulsionMessageHandler.cpp \
+	  gameController/messageHandlers/PlayerInventoryMessageHandler.cpp \
+	  gameController/messageHandlers/TeamNameMessageHandler.cpp \
+	  gameController/messageHandlers/MessageHandlerRegistry.cpp \
+	  gameController/networkCommandManager/NetworkCommandManager.cpp \
+	  gameController/playerValidationManager/PlayerValidationManager.cpp \
+	  gameController/soundManager/SoundManager.cpp \
+	  gameController/gameState/GameStateManager.cpp \
+	  gameController/gameState/GameStatusManager.cpp \
+	  gameController/gameState/GameSettingsManager.cpp \
+	  gameController/mapManager/MapManager.cpp \
+	  gameController/playerManager/PlayerManager.cpp \
+	  gameController/messageHandlers/TimeUnitMessageHandler.cpp \
+	  gameController/messageHandlers/IncantationMessageHandler.cpp \
+	  gameController/messageHandlers/IncantationEndMessageHandler.cpp \
+	  gameController/messageHandlers/EggMessageHandler.cpp \
+	  gameController/messageHandlers/EndGameMessageHandler.cpp \
+	  shared/services/ComponentCoordinator.cpp
 
 MAIN_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(MAIN))
 MAIN_DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(MAIN))
 OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(SRC))
 DEP = $(patsubst %.cpp, $(BUILD_DIR)/%.d, $(SRC))
 
-# Exclude test_dlloader from main build but keep it for specific targets
 TEST_SRC = test_dlloader.cpp
 TEST_OBJ = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(TEST_SRC))
 
-# Directories
 INCLUDE_DIRS = -I. -I../../libs -I../../src/Shared -I../../libs/RaylibCPP \
 	-I../../libs/RayGUICPP
 
-# Libraries
 LIBS = -L../../build -lraylib -lraylib_cpp -lraygui_cpp -lm -lpthread -ldl
 
-# Compiler and flags
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -Werror $(INCLUDE_DIRS) -fPIC
 LDFLAGS = $(LIBS)
 DEBUG_FLAGS = -g3 -ggdb
 
-# Colors and animations
 RED = \033[31m
 GREEN = \033[32m
 YELLOW = \033[33m
@@ -93,16 +108,13 @@ BOLD = \033[1m
 RESET = \033[0m
 BG_BLACK = \033[40m
 
-# Animation frames for compilation progress
 COMPILE_MSG = "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)"
 LINKING_MSG = "$(GREEN)[$(BOLD)LINKING$(RESET)$(GREEN)]$(RESET)"
 SUCCESS_MSG = "$(GREEN)[$(BOLD)SUCCESS$(RESET)$(GREEN)]$(RESET)"
 RAINBOW = "$(RED)Z$(YELLOW)a$(GREEN)p$(CYAN)p$(BLUE)y$(MAGENTA) GUI$(RESET)"
 
-# Main target
 all: setup_dirs display_banner $(NAME)
 
-# Create the necessary build directories
 setup_dirs:
 	@mkdir -p $(BUILD_DIR)/parsing
 	@mkdir -p $(BUILD_DIR)/shared/exception
@@ -119,9 +131,10 @@ setup_dirs:
 	@mkdir -p $(BUILD_DIR)/ui/windows/controls
 	@mkdir -p $(BUILD_DIR)/ui/windows/timeInfo
 	@mkdir -p $(BUILD_DIR)/ui/windows/menu
+	@mkdir -p $(BUILD_DIR)/ui/data
+	@mkdir -p $(BUILD_DIR)/ui/context
 	@mkdir -p ../../build
 
-# Display a fancy banner for the build process
 display_banner:
 	@clear
 	@echo "$(CYAN)╔═════════════════════════════════════╗$(RESET)"
@@ -133,7 +146,6 @@ display_banner:
 	de l'interface graphique...$(RESET)"
 	@sleep 0.3
 
-# Build the GUI
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo ""
 	@echo "$(GREEN)[$(BOLD)BUILDING$(RESET)$(GREEN)]$(RESET) $(BOLD)Liaison \
@@ -161,7 +173,6 @@ $(NAME): $(OBJ) $(MAIN_OBJ)
 	prête !$(RESET)      $(CYAN)║$(RESET)"
 	@echo "$(CYAN)╚═════════════════════════════════════════╝$(RESET)"
 
-# Test DLLoader build
 test_dlloader: setup_dirs $(TEST_OBJ) $(filter-out $(BUILD_DIR)/main.o, $(OBJ))
 	@echo "$(LINKING_MSG) $(BOLD)Création du programme de test \
 	DLLoader...$(RESET)"
@@ -169,7 +180,6 @@ test_dlloader: setup_dirs $(TEST_OBJ) $(filter-out $(BUILD_DIR)/main.o, $(OBJ))
 	$(filter-out $(BUILD_DIR)/main.o, $(OBJ)) $(LDFLAGS)
 	@echo "$(SUCCESS_MSG) $(BOLD)Test DLLoader compilé avec succès$(RESET)"
 
-# Rule for object files
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@echo -n "$(BLUE)[$(BOLD)COMPILING$(RESET)$(BLUE)]$(RESET)\
@@ -177,13 +187,11 @@ $(BUILD_DIR)/%.o: %.cpp
 	@$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 	@echo "$(GREEN)✓$(RESET)"
 
-# Debug build
 debug: CXXFLAGS += $(DEBUG_FLAGS)
 debug: clean all
 	@echo "$(MAGENTA)[$(BOLD)DEBUG$(RESET)$(MAGENTA)]$(RESET) $(BOLD)Mode \
 	debug activé !$(RESET)"
 
-# Coverage build for tests
 coverage: CXXFLAGS += --coverage -fprofile-arcs -ftest-coverage
 coverage: LDFLAGS += --coverage -lgcov
 coverage: clean all
@@ -196,7 +204,6 @@ coverage: clean all
 	@echo "$(CYAN)╚══════════════════════════════════════════\
 	═══════════╝$(RESET)"
 
-# Clean object files
 clean:
 	@echo "$(YELLOW)[$(BOLD)CLEANING$(RESET)$(YELLOW)]$(RESET) \
 	$(BOLD)Suppression des fichiers objets...$(RESET)"
@@ -213,7 +220,6 @@ clean:
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage effectué !$(RESET)       "
 
-# Clean everything (including binary)
 fclean: clean
 	@echo "$(RED)[$(BOLD)FULL CLEAN$(RESET)$(RED)]$(RESET) \
 	$(BOLD)Suppression du binaire...$(RESET)"
@@ -224,10 +230,8 @@ fclean: clean
 	@echo "$(GREEN)[$(BOLD)DONE$(RESET)$(GREEN)]$(RESET) \
 	$(BOLD)Nettoyage complet effectué !$(RESET)"
 
-# Clean and rebuild
 re: fclean all
 
-# Include dependency files
 -include $(DEP)
 -include $(MAIN_DEP)
 

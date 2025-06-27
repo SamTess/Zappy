@@ -2,374 +2,179 @@
 ** EPITECH PROJECT, 2025
 ** Zappy
 ** File description:
-** GameState implementation
+** GameState
 */
 
-#include "GameState.hpp"
-#include <iostream>
-#include <algorithm>
-#include <memory>
-#include <deque>
-#include <vector>
-#include <map>
-#include <string>
 #include <utility>
-#include "entities/Broadcast.hpp"
+#include <map>
+#include <vector>
+#include <string>
+#include <memory>
+#include "GameState.hpp"
 
 GameState::GameState() {
-    _isMapInitialized = false;
-    _entityFactory = std::make_shared<EntityFactoryManager>();
+    _gameStateManager = std::make_shared<GameStateManager>();
+    _adapter = std::make_unique<GameStateAdapter>(_gameStateManager);
 }
 
-GameState::GameState(std::shared_ptr<EntityFactoryManager> factory)
-    : _entityFactory(std::move(factory)) {
-    _isMapInitialized = false;
+GameState::GameState(std::shared_ptr<EntityFactoryManager> factory) {
+    _gameStateManager = std::make_shared<GameStateManager>(std::move(factory));
+    _adapter = std::make_unique<GameStateAdapter>(_gameStateManager);
 }
 
 int GameState::getMapWidth() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    return _mapWidth;
+    return _adapter->getMapWidth();
 }
 
 int GameState::getMapHeight() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    return _mapHeight;
+    return _adapter->getMapHeight();
 }
 
 bool GameState::isMapInitialized() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    return _isMapInitialized;
+    return _adapter->isMapInitialized();
 }
 
 std::shared_ptr<const ITile> GameState::getTile(int x, int y) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return nullptr;
-    return _tiles[y][x];
+    return _adapter->getTile(x, y);
 }
 
 std::shared_ptr<ITile> GameState::getTileMutable(int x, int y) {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return nullptr;
-    return _tiles[y][x];
+    return _adapter->getTileMutable(x, y);
 }
 
 int GameState::getResourceQuantity(int x, int y, ResourceType resourceType) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return 0;
-    auto tile = _tiles[y][x];
-    return tile ? tile->getResourceQuantity(resourceType) : 0;
-}
-
-ResourceType GameState::getDominantResourceType(int x, int y) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return ResourceType::FOOD;
-
-    auto tile = _tiles[y][x];
-    return tile ? tile->getDominantResourceType() : ResourceType::FOOD;
-}
-
-std::shared_ptr<const IPlayer> GameState::getPlayerInfo(int playerId) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto it = _players.find(playerId);
-
-    return (it != _players.end()) ? it->second : nullptr;
-}
-
-std::shared_ptr<const IPlayerInventory> GameState::getPlayerInventory(int playerId) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    auto it = _inventories.find(playerId);
-    return (it != _inventories.end()) ? it->second : nullptr;
-}
-
-bool GameState::isPlayerOnTile(int x, int y, int playerId) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return false;
-    auto tile = _tiles[y][x];
-    if (!tile)
-        return false;
-    const auto& playerIds = tile->getPlayerIds();
-    return std::find(playerIds.begin(), playerIds.end(), playerId) != playerIds.end();
-}
-
-std::vector<int> GameState::getPlayersOnTile(int x, int y) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    if (!isValidCoordinates(x, y))
-        return {};
-    auto tile = _tiles[y][x];
-    return tile ? tile->getPlayerIds() : std::vector<int>{};
-}
-
-std::shared_ptr<const IEgg> GameState::getEggInfo(int eggId) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto it = _eggs.find(eggId);
-
-    return (it != _eggs.end()) ? it->second : nullptr;
-}
-
-std::vector<int> GameState::getEggsOnTile(int x, int y) const {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return {};
-    auto tile = _tiles[y][x];
-    return tile ? tile->getEggIds() : std::vector<int>{};
-}
-
-const std::vector<std::string>& GameState::getTeamNames() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    return _teamNames;
-}
-
-int GameState::getTimeUnit() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    return _timeUnit;
-}
-
-bool GameState::isGameEnded() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    return _gameEnded;
-}
-
-const std::string& GameState::getWinningTeam() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    return _winningTeam;
-}
-
-std::vector<int> GameState::getPlayerIds() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    std::vector<int> playerIds;
-    playerIds.reserve(_players.size());
-    for (const auto& pair : _players) {
-        playerIds.push_back(pair.first);
-    }
-    return playerIds;
+    return _adapter->getResourceQuantity(x, y, resourceType);
 }
 
 void GameState::setMapSize(int width, int height) {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (_isMapInitialized)
-        return;
-    _mapWidth = width;
-    _mapHeight = height;
-    _tiles.resize(_mapHeight, std::vector<std::shared_ptr<ITile>>(_mapWidth));
-    for (int y = 0; y < _mapHeight; ++y) {
-        for (int x = 0; x < _mapWidth; ++x) {
-            _tiles[y][x] = _entityFactory->getFactory().createTile(x, y);
-        }
-    }
-    _isMapInitialized = true;
+    _adapter->setMapSize(width, height);
 }
 
 void GameState::updateTileResources(int x, int y, int food, int linemate, int deraumere,
     int sibur, int mendiane, int phiras, int thystame) {
-    std::lock_guard<std::mutex> lock(_mutex);
-
-    if (!isValidCoordinates(x, y))
-        return;
-    auto& tile = _tiles[y][x];
-    if (tile) {
-        TileContentData tileData(x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame);
-        tile->updateFromProtocol(tileData);
-    }
+    _adapter->updateTileResources(x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame);
 }
 
 void GameState::setTileIncantationState(int x, int y, bool isIncantating) {
-    std::lock_guard<std::mutex> lock(_mutex);
+    _adapter->setTileIncantationState(x, y, isIncantating);
+}
 
-    if (!isValidCoordinates(x, y))
-        return;
-    auto& tile = _tiles[y][x];
-    if (tile) {
-        tile->setIncantating(isIncantating);
-    }
+bool GameState::isPlayerOnTile(int x, int y, int playerId) const {
+    return _adapter->isPlayerOnTile(x, y, playerId);
+}
+
+std::vector<int> GameState::getPlayersOnTile(int x, int y) const {
+    return _adapter->getPlayersOnTile(x, y);
+}
+
+std::vector<int> GameState::getEggsOnTile(int x, int y) const {
+    return _adapter->getEggsOnTile(x, y);
+}
+
+std::shared_ptr<const IPlayer> GameState::getPlayerInfo(int playerId) const {
+    return _adapter->getPlayerInfo(playerId);
+}
+
+std::shared_ptr<const IPlayerInventory> GameState::getPlayerInventory(int playerId) const {
+    return _adapter->getPlayerInventory(playerId);
+}
+
+std::vector<int> GameState::getPlayerIds() const {
+    return _adapter->getPlayerIds();
+}
+
+const std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() const {
+    return _adapter->getPlayers();
 }
 
 void GameState::addOrUpdatePlayer(const PlayerInfoData& playerData) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    int playerId = playerData.getId();
-
-    if (_players.find(playerId) != _players.end()) {
-        const auto& oldPlayer = _players[playerId];
-        int oldX = oldPlayer->getX();
-        int oldY = oldPlayer->getY();
-        _players[playerId]->updateFromProtocol(playerData);
-        if (oldX != playerData.getX() || oldY != playerData.getY()) {
-            removePlayerFromTile(playerId, oldX, oldY);
-            addPlayerToTile(playerId, playerData.getX(), playerData.getY());
-        }
-    } else {
-        _players[playerId] = _entityFactory->getFactory().createPlayer(playerData);
-        addPlayerToTile(playerId, playerData.getX(), playerData.getY());
-    }
+    _adapter->addOrUpdatePlayer(playerData);
 }
 
 void GameState::removePlayer(int playerId) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto it = _players.find(playerId);
-
-    if (it != _players.end()) {
-        const auto& player = it->second;
-        removePlayerFromTile(playerId, player->getX(), player->getY());
-        _players.erase(it);
-        _inventories.erase(playerId);
-    }
+    _adapter->removePlayer(playerId);
 }
 
 void GameState::updatePlayerInventory(const PlayerInventoryData& inventoryData) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    int playerId = inventoryData.getId();
-    auto it = _inventories.find(playerId);
-    if (it != _inventories.end()) {
-        it->second->updateFromProtocol(inventoryData);
-    } else {
-        _inventories[playerId] = _entityFactory->getFactory().createPlayerInventory(inventoryData);
-    }
+    _adapter->updatePlayerInventory(inventoryData);
 }
 
 void GameState::movePlayer(int playerId, int newX, int newY) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto it = _players.find(playerId);
+    _adapter->movePlayer(playerId, newX, newY);
+}
 
-    if (it != _players.end()) {
-        auto& player = it->second;
-        removePlayerFromTile(playerId, player->getX(), player->getY());
-        player->setPosition(newX, newY);
-        addPlayerToTile(playerId, newX, newY);
-    }
+std::shared_ptr<const IEgg> GameState::getEggInfo(int eggId) const {
+    return _adapter->getEggInfo(eggId);
 }
 
 void GameState::addEgg(const EggData& eggData) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    int eggId = eggData.getEggId();
-
-    _eggs[eggId] = _entityFactory->getFactory().createEgg(eggData);
-    addEggToTile(eggId, eggData.getX(), eggData.getY());
+    _adapter->addEgg(eggData);
 }
 
 void GameState::removeEgg(int eggId) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto it = _eggs.find(eggId);
+    _adapter->removeEgg(eggId);
+}
 
-    if (it != _eggs.end()) {
-        const auto& egg = it->second;
-        removeEggFromTile(eggId, egg->getX(), egg->getY());
-        _eggs.erase(it);
-    }
+const std::vector<std::string>& GameState::getTeamNames() const {
+    return _adapter->getTeamNames();
 }
 
 void GameState::setTeamNames(const std::vector<std::string>& teamNames) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    _teamNames.insert(_teamNames.end(), teamNames.begin(), teamNames.end());
+    _adapter->setTeamNames(teamNames);
+}
+
+int GameState::getTimeUnit() const {
+    return _adapter->getTimeUnit();
 }
 
 void GameState::setTimeUnit(int timeUnit) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    _timeUnit = timeUnit;
+    _adapter->setTimeUnit(timeUnit);
+}
+
+bool GameState::isGameEnded() const {
+    return _adapter->isGameEnded();
+}
+
+const std::string& GameState::getWinningTeam() const {
+    return _adapter->getWinningTeam();
 }
 
 void GameState::setGameEnded(bool ended, const std::string& winningTeam) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    _gameEnded = ended;
-    _winningTeam = winningTeam;
+    _adapter->setGameEnded(ended, winningTeam);
 }
 
-void GameState::addBroadcast(int playerId, const std::string& team, const std::string& message) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    auto newBroadcast = _entityFactory != nullptr ?
-        _entityFactory->createBroadcast(team, message, playerId) :
-        std::make_shared<Broadcast>(team, message, playerId);
-
-    _broadcasts.push_back(newBroadcast);
-    while (_broadcasts.size() > _maxBroadcasts) {
-        _broadcasts.pop_front();
-    }
+bool GameState::getSfxEnabled() const {
+    return _adapter->getSfxEnabled();
 }
 
-void GameState::updateBroadcasts(float deltaTime) {
-    std::lock_guard<std::mutex> lock(_mutex);
-    for (auto it = _broadcasts.begin(); it != _broadcasts.end();) {
-        (*it)->updateTimeLeft(deltaTime);
-        if ((*it)->getTimeLeft() <= 0.0f) {
-            it = _broadcasts.erase(it);
-        } else {
-            ++it;
-        }
-    }
+void GameState::setSfxEnabled(bool enabled) {
+    _adapter->setSfxEnabled(enabled);
 }
 
-std::vector<std::shared_ptr<const IBroadcast>> GameState::getBroadcasts() const {
-    std::lock_guard<std::mutex> lock(_mutex);
-    std::vector<std::shared_ptr<const IBroadcast>> result;
-    result.reserve(_broadcasts.size());
-    for (const auto& broadcast : _broadcasts) {
-        result.push_back(broadcast);
-    }
-    return result;
+float GameState::getMusicVolume() const {
+    return _adapter->getMusicVolume();
 }
 
-bool GameState::isValidCoordinates(int x, int y) const {
-    return (x >= 0 && x < _mapWidth && y >= 0 && y < _mapHeight);
+void GameState::setMusicVolume(float volume) {
+    _adapter->setMusicVolume(volume);
 }
 
-void GameState::addPlayerToTile(int playerId, int x, int y) {
-    if (!isValidCoordinates(x, y))
-        return;
-    auto& tile = _tiles[y][x];
-    if (tile) {
-        tile->addPlayer(playerId);
-    }
+std::shared_ptr<IGameStateManager> GameState::getGameStateManager() const {
+    return _gameStateManager;
 }
 
-void GameState::removePlayerFromTile(int playerId, int x, int y) {
-    if (!isValidCoordinates(x, y))
-        return;
-    auto& tile = _tiles[y][x];
-    if (tile) {
-        tile->removePlayer(playerId);
-    }
+std::shared_ptr<IMapManager> GameState::getMapManager() const {
+    return _gameStateManager->getMapManager();
 }
 
-void GameState::addEggToTile(int eggId, int x, int y) {
-    if (!isValidCoordinates(x, y))
-        return;
-    auto& tile = _tiles[y][x];
-    if (tile) {
-        tile->addEgg(eggId);
-    }
+std::shared_ptr<IPlayerManager> GameState::getPlayerManager() const {
+    return _gameStateManager->getPlayerManager();
 }
 
-void GameState::removeEggFromTile(int eggId, int x, int y) {
-    if (!isValidCoordinates(x, y))
-        return;
-    auto& tile = _tiles[y][x];
-    if (tile) {
-        tile->removeEgg(eggId);
-    }
+std::shared_ptr<IGameStatusManager> GameState::getGameStatusManager() const {
+    return _gameStateManager->getGameStatusManager();
 }
 
-std::map<int, std::shared_ptr<IPlayer>> GameState::getPlayers() const {
-    return _players;
-}
-
-size_t GameState::getPlayerCount() const {
-    return _players.size();
-}
-
-std::vector<std::vector<std::shared_ptr<ITile>>> GameState::getTiles() const {
-    return _tiles;
+std::shared_ptr<IGameSettingsManager> GameState::getGameSettingsManager() const {
+    return _gameStateManager->getGameSettingsManager();
 }

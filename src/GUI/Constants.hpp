@@ -9,12 +9,11 @@
 
 #include <string>
 #include <vector>
-#include "../Shared/Common.hpp"
+#include "../GUI/shared/Common.hpp"
 
 const int DEFAULT_WIDTH = 1920;
 const int DEFAULT_HEIGHT = 1080;
 const char DEFAULT_TITLE[] = "Zappy GUI";
-const int NUM_RANDOM_MODELS = 20;
 
 enum KeyboardKey {
     KEY_NULL            = 0,

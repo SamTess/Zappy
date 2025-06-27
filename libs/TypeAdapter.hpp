@@ -8,7 +8,7 @@
 #pragma once
 
 #include <raylib.h>
-#include "../src/Shared/Common.hpp"
+#include "../src/GUI/shared/Common.hpp"
 
 namespace TypeAdapter {
     inline ::Vector2 ToRaylib(const ZappyTypes::Vector2& vec) {

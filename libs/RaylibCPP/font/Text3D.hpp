@@ -9,7 +9,7 @@
 #include <raylib.h>
 #include <string>
 #include <memory>
-#include "../../src/Shared/Common.hpp"
+#include "../../src/GUI/shared/Common.hpp"
 #include "text3d/Text3DCore.hpp"
 
 namespace raylibcpp {
