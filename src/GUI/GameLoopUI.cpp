@@ -161,14 +161,14 @@ bool GameLoop::performPlayerSelection(ZappyTypes::Vector2 screenPos, std::shared
     float minDistance = std::numeric_limits<float>::max();
     int closestPlayerId = -1;
     bool foundPlayer = false;
-    float maxSelectionDistance = 1.0f;
+    float maxSelectionDistance = 0.5f;
     if (_mapRenderer) {
         float tileSize = _mapRenderer->getTileSize();
-        maxSelectionDistance = tileSize * 2.0f;
+        maxSelectionDistance = tileSize * 0.6f;
     } else {
         if (_mapWidth > 20 || _mapHeight > 20) {
             float tileSize = 10.0f / std::max(_mapWidth, _mapHeight);
-            maxSelectionDistance = tileSize * 2.0f;
+            maxSelectionDistance = tileSize * 0.6f;
         }
     }
     for (int y = 0; y < _mapHeight; ++y) {
