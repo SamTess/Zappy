@@ -68,10 +68,8 @@ void UIContext::notifyPlayerSelection(int playerId) {
 }
 
 void UIContext::executeNetworkCommand(const std::string& command) {
-    if (!_commandSender) {
-        logSecurityWarning("executeNetworkCommand", "No command sender available");
+    if (!_commandSender)
         return;
-    }
     if (command.empty() || command.size() > 1024) {
         logSecurityWarning("executeNetworkCommand", "Invalid command format");
         return;
