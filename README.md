@@ -8,8 +8,8 @@
 <div align="center">
   <img src="https://img.shields.io/badge/language-C%2FC%2B%2B%2FPython-blue" alt="Languages">
   <img src="https://img.shields.io/badge/protocol-TCP%2FIP-orange" alt="Protocol">
-  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey" alt="Platform">
-  <img src="https://img.shields.io/badge/version-1.0.0-green" alt="Version">
+  <img src="https://img.shields.io/badge/platform-Linux-lightgrey" alt="Platform">
+  <img src="https://img.shields.io/badge/version-4.0.0-green" alt="Version">
 </div>
 
 <div align="center">
@@ -156,81 +156,87 @@ make zappy_ai
 
 ## 🚀 Usage
 
-### Start the server
+### Démarrer le serveur
 
 ```bash
-./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq> [options]
+./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq>
 ```
 
-**Required parameters:**
-- `-p <port>` : Server listening port
-- `-x <width>` : Map width (minimum 10)
-- `-y <height>` : Map height (minimum 10) 
-- `-n <team1> [team2] ...` : Team names (separated by spaces)
-- `-c <max_clients>` : Maximum number of clients per team
-- `-f <freq>` : Server frequency (time units per second)
+**Paramètres obligatoires :**
+- `-p <port>` : Port d'écoute du serveur
+- `-x <width>` : Largeur de la carte (minimum 10)
+- `-y <height>` : Hauteur de la carte (minimum 10)
+- `-n <team1> [team2] ...` : Noms des équipes (séparés par des espaces)
+- `-c <max_clients>` : Nombre maximum de clients par équipe
+- `-f <freq>` : Fréquence du serveur (unités de temps par seconde)
 
-**Optional parameters:**
-- `--auto-start on|off` : Automatic game start (default: off)
-- `--display-eggs true|false` : Egg visibility (default: true)
-- `--game_duration <time>` : Game duration in seconds
-- `-v` or `--verbose` : Verbose mode for debugging
+**Paramètres optionnels :**
+- `--auto-start on|off` : Démarrage automatique (par défaut: off)
+- `--display-eggs true|false` : Affichage des œufs dans les logs (par défaut: false)
+- `-v` ou `--verbose` : Mode verbeux pour plus de logs
+- `--game_duration <time>` : Durée maximale de la partie en secondes
 
-**Example:**
+**Exemple :**
 ```bash
-./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 team3 -c 5 -f 100 --auto-start on --display-eggs true
+./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 team3 -c 5 -f 100 --auto-start on
 ```
 
-### Start the graphical interface
+### Démarrer l'interface graphique
 
 ```bash
 ./zappy_gui -p <port> -h <host>
 ```
 
-**Parameters:**
-- `-p <port>` : Server port
-- `-h <host>` : Server address (default: localhost)
+**Paramètres :**
+- `-p <port>` : Port du serveur
+- `-h <host>` : Adresse du serveur (par défaut : localhost)
 
-**Example:**
+**Exemple :**
 ```bash
 ./zappy_gui -p 4242 -h localhost
 ```
 
-**Interface controls:**
-- **Camera** : Left click + drag to rotate, mouse wheel to zoom
-- **View** : WASD keys to move the camera
-- **Interface** : Real-time information panels on teams and resources
+**Contrôles de l'interface :**
+- **Caméra** : Clic gauche + glisser pour tourner, molette pour zoomer
+- **Vue** : Touches WASD pour déplacer la caméra
+- **Interface** : Panneaux d'information en temps réel sur les équipes et ressources
+- **Sélection** : Clic sur une tuile ou un joueur pour afficher les détails
+- **Menu** : Accès aux paramètres audio, visuels et de jeu
 
-### Start the AI
+### Démarrer l'IA
 
-#### Prerequisite
-Before starting the AI, ensure you have activated the Python virtual environment:
-(This step is crucial to ensure the AI has access to the required Python packages. The 'make install_requirements' can only setup the virtual environment, but you need to activate it to use it.)
+#### Prérequis
+Avant de démarrer l'IA, assurez-vous d'avoir activé l'environnement virtuel Python :
 ```bash
 source venv/bin/activate
 ```
 
-#### Start command
+#### Commande de démarrage
 
 ```bash
-./zappy_ai -p <port> -n <team name> [-h <host>]
+./zappy_ai -p <port> -n <team name> [-h <host>] [--performance]
 ```
 
-**Parameters:**
-- `-p <port>` : Server port
-- `-n <team>` : Team name
-- `-h <host>` : Server address (optional, default: localhost)
+**Paramètres :**
+- `-p <port>` : Port du serveur
+- `-n <team>` : Nom de l'équipe
+- `-h <host>` : Adresse du serveur (optionnel, par défaut : localhost)
+- `--performance` : Mode performance pour les simulations (optionnel)
 
-**Example:**
+**Exemple :**
 ```bash
-./zappy_ai -p 4242 -n team1
+./zappy_ai -p 4242 -n team1 --performance
 ```
 
-**AI behaviors:**
-- **Resource collection** : Automatic exploration and optimized collection
-- **Inter-agent communication** : Coordination via encrypted broadcast
-- **Evolution** : Automatic performance of incantations to level up
-- **Adaptive strategy** : Behavior change according to context
+**Comportements de l'IA :**
+- **Collecte automatique** : Exploration et collecte optimisée des ressources
+- **Communication inter-agents** : Coordination via broadcast chiffré
+- **Évolution** : Exécution automatique des incantations pour monter de niveau
+- **Stratégie adaptative** : Changement de comportement selon le contexte
+- **Gestion intelligente** : Optimisation des trajets et gestion des priorités
+
+#### Multi-agents
+Le système lance automatiquement plusieurs agents pour l'équipe spécifiée. Le nombre d'agents est configurable dans le code (par défaut : 10 agents par équipe).
 
 ## 📦 Components
 
@@ -286,31 +292,80 @@ Autonomous bots developed in Python with a modular and scalable architecture.
 
 ### Server
 
-The server is the central component that manages :
-- The game map and resources
-- Client connections (AI and GUI)
-- Game logic and rules
-- Time and event management
-- Communication protocol
-- Elevation rituals and player evolution
+Le serveur Zappy est développé en C pour des performances optimales et gère :
 
-### Graphical Interface
+**Fonctionnalités principales :**
+- Gestion de la carte du jeu et des ressources avec distribution automatique
+- Connexions multiples (clients IA et interface graphique) via TCP/IP
+- Logique du jeu et application des règles de l'univers virtuel
+- Gestionnaire de temps avec système de ticks configurables
+- Protocoles de communication textuels distincts pour IA et GUI
+- Rituels d'élévation avec vérification des conditions et coordination des joueurs
+- Système de ponte d'œufs et génération de nouveaux agents
 
-The graphical interface offers :
-- Real-time visualization of the game map
-- Display of players and their inventories
-- Visualization of resources on each tile
-- Event tracking (incantations, reproductions, etc.)
-- Interactive controls for navigation and observation
+**Architecture modulaire :**
+- `network/` : Gestion des connexions TCP/IP et communication
+- `map/` : Système de carte avec tuiles et ressources
+- `player/` : Gestion des joueurs, inventaires et actions
+- `command/` : Processeur de commandes avec file d'attente
+- `buffer/` : Système de buffers circulaires pour la communication
+- `graphical_command/` : Commandes spécialisées pour l'interface graphique
 
-### Artificial Intelligence
+### Interface Graphique
 
-The AI of the clients includes :
-- Perception modules for environment analysis
-- Strategic decision-making algorithms
-- Resource management and planning
-- Communication and coordination between agents
-- Strategies for elevation rituals
+L'interface graphique est développée en C++ avec Raylib et offre :
+
+**Visualisation 3D avancée :**
+- Rendu en temps réel de la carte du jeu avec système de niveaux de détail (LOD)
+- Affichage des joueurs avec modèles 3D animés et orientations
+- Visualisation des ressources sur chaque tuile avec indicateurs visuels
+- Système de caméra libre avec contrôles fluides et transitions
+- Effets visuels pour les événements spéciaux (incantations, éjections, morts)
+- Skybox et éclairage 3D pour une immersion accrue
+
+**Interface utilisateur modulaire :**
+- Système de fenêtres basé sur le pattern Factory (`UIWindowFactory`)
+- Panneaux d'information spécialisés (joueurs, tuiles, équipes, temps)
+- Contrôles interactifs pour la navigation et l'observation
+- Système de logging des événements en temps réel
+- Menu de configuration avec paramètres audio et visuels
+- Architecture extensible permettant l'ajout facile de nouvelles fenêtres
+
+**Système de chargement dynamique :**
+- DLLoader pour les bibliothèques graphiques et d'interface
+- Support des plugins avec interfaces `IGraphicsLib` et `IGuiLib`
+- Gestion des textures et modèles 3D avec cache optimisé
+
+### Intelligence Artificielle
+
+L'IA des clients développée en Python comprend :
+
+**Architecture comportementale adaptative :**
+- Machine à états hiérarchique avec transitions intelligentes
+- Modules de perception pour l'analyse de l'environnement (`Look`, `Inventory`)
+- Algorithmes de prise de décision basés sur la priorité des objectifs
+- Système de gestion des ressources avec optimisation des trajets
+- Coordination multi-agents via communication chiffrée AES
+
+**Stratégies et comportements :**
+- Exploration intelligente avec cartographie interne de l'univers
+- Collecte optimisée des ressources avec évitement des conflits
+- Stratégies de regroupement pour les rituels d'élévation
+- Comportements d'urgence en cas de famine ou de danger
+- Système de rôles dynamiques (mineur, combattant, reproducteur)
+
+**Communication et collaboration :**
+- Protocole de broadcast sécurisé entre agents de la même équipe
+- Échange d'informations sur les positions des ressources
+- Coordination pour les rituels d'incantation multi-joueurs
+- Système de chiffrement des messages pour éviter l'espionnage
+
+**Fonctionnalités avancées :**
+- Algorithme de pathfinding A* optimisé pour les cartes toriques
+- Représentation interne du monde avec mise à jour temps réel
+- Gestion intelligente du temps et des priorités d'actions
+- Système de logging complet pour l'analyse et le débogage
+- Mode performance pour les simulations à grande échelle
 
 ## 🚀 Releases
 

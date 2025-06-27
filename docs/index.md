@@ -10,21 +10,31 @@ Zappy simulates a virtual world where agents controlled by artificial intelligen
 
 ### Main Components
 
-- **[Server](src/Server/README.md)** - The core of the system managing game logic, written in C for optimal performance
-- **[Graphical Interface](src/GUI/README.md)** - Real-time 3D visualization developed in C++ with Raylib
-- **[Artificial Intelligence](src/AI/README.md)** - Autonomous agents developed in Python with adaptive behaviors
-- **[Shared Libraries](src/Shared/README.md)** - Dynamic loading system and common interfaces
+- **[Server](src/Server/server_documentation.md)** - Modular C game engine with advanced network management, asynchronous command system, and performance optimizations
+- **[Graphical Interface](src/GUI/gui_documentation.md)** - Sophisticated 3D visualization in C++ with dynamic loading system (DLLoader), adaptive LOD rendering, and modular user interface
+- **[Artificial Intelligence](src/AI/ai_documentation.md)** - Autonomous Python agents with adaptive behaviors, AES encrypted communication, and advanced optimization algorithms
+- **[Shared Libraries](src/Shared/DLLoader.md)** - Dynamic loading system with Factory Pattern and robust error handling
 
 ### Technical Architecture
 
-The project uses a client-server architecture with TCP/IP communication:
+The project uses an advanced client-server architecture with secure TCP/IP communication and specialized protocols:
 
 ```
-┌─────────────┐    TCP/IP     ┌──────────────┐    TCP/IP     ┌──────────────┐
-│   Clients   │◄─────────────►│   Server    │◄─────────────►│  Interface   │
-│     IA      │   Commands     │    Zappy     │  Game data   │  Graphical   │
-│  (Python)   │   Responses    │     (C)      │  Events      │   (C++)      │
-└─────────────┘               └──────────────┘               └──────────────┘
+┌─────────────────┐    TCP/IP     ┌────────────────────┐    TCP/IP     ┌──────────────────┐
+│   AI Clients    │◄─────────────►│    Zappy Server    │◄─────────────►│  GUI Interface   │
+│   (Python)      │   Commands     │        (C)         │  3D Data      │     (C++)        │
+│ • Behaviors     │   Responses    │ • Game Engine      │  Events       │ • 3D Rendering   │
+│ • Communication │   Encrypted    │ • Network Mgmt     │  Real-time    │ • UI Interface   │
+│ • Algorithms    │   AES-256      │ • Database         │  Optimized    │ • DLLoader       │
+└─────────────────┘               └────────────────────┘               └──────────────────┘
+              ▲                              │                              ▲
+              │                              ▼                              │
+     ┌─────────────────┐              ┌─────────────────┐              ┌─────────────────┐
+     │ Multi-Agents    │              │ World State     │              │ Visualization   │
+     │ • Coordination  │              │ • Toric Map     │              │ • Visual Effects│
+     │ • Strategies    │              │ • Resources     │              │ • Animations    │
+     │ • Adaptation    │              │ • Players       │              │ • Performance   │
+     └─────────────────┘              └─────────────────┘              └─────────────────┘
 ```
 
 ## Documentation Structure
@@ -37,23 +47,21 @@ The project uses a client-server architecture with TCP/IP communication:
 ### Technical Documentation
 
 #### Main Components
-- **[Server Documentation](src/Server/README.md)** - Architecture, API, and server implementation
-- **[AI Documentation](src/AI/README.md)** - Intelligent agents, behaviors, and strategies
-- **[GUI Documentation](src/GUI/README.md)** - 3D graphical interface and rendering system
-- **[Shared Documentation](src/Shared/README.md)** - Dynamic library loading system
-
+- **[Server Documentation](src/Server/server_documentation.md)** - Modular architecture, network API, game engine implementation, ritual management
+- **[AI Documentation](src/AI/ai_documentation.md)** - Intelligent agents, adaptive behaviors, secure communication, optimization algorithms
 #### Libraries and Tools
-- **[RaylibCPP](libs/RaylibCPP/README.md)** - Modern C++ wrapper for Raylib
-- **[RayGUICPP](libs/RayGUICPP/README.md)** - User interface with RayGUI
-- **[raygui History](libs/RayGUICPP/raygui_history.md)** - Evolution of the raygui library
+- **[RaylibCPP](libs/RaylibCPP/raylibcpp_documentation.md)** - Modern C++ wrapper for Raylib with RAII management and object-oriented design
+- **[RayGUICPP](libs/RayGUICPP/rayguicpp_documentation.md)** - User interface with RayGUI, Factory and Provider patterns
+- **[raygui History](libs/RayGUICPP/raygui_history.md)** - Evolution and versions of the raygui library
 
 ### Communication Protocols
-- **[Server-AI Protocol](docs/protocol_server_ai.md)** - Communication between server and AI agents
-- **[Server-GUI Protocol](docusaurus/docs/protocols/server-gui.md)** - Communication for graphical display
+- **[Server-AI Protocol](protocol_server_ai.md)** - Communication between server and AI agents with detailed commands, error handling, and examples
+- **[Server-GUI Protocol](docusaurus/docs/protocols/server-gui.md)** - Communication for real-time graphical display with optimizations
+- **[UI Architecture](ui_architecture.md)** - Design patterns for user interface, class hierarchy, extensibility
 
 ### Advanced Documentation
-- **[Design Patterns](docs/design_patterns_map_renderer.md)** - Patterns used in the rendering engine
-- **[Rendering Implementation](docs/map_renderer_implementation.md)** - Technical details of the rendering system
+- **[Design Patterns](design_patterns_map_renderer.md)** - Patterns used in the rendering engine with implementation examples
+- **[Rendering Implementation](map_renderer_implementation.md)** - Technical details of the rendering system, LOD optimizations, performance metrics
 
 ## Interactive Documentation
 
