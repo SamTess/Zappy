@@ -162,6 +162,7 @@ jobs:
           echo "- **Binaires**: zappy_server, zappy_gui, zappy_ai" >> $changelog_file
           echo "- **Bibliothèques**: libgui.a, libserver.a, libraylib_cpp.a, libraygui_cpp.a" >> $changelog_file
           echo "- **Plugins**: libraygui.so, libraylibcpp.so" >> $changelog_file
+          echo "- **Assets**: Modèles 3D, textures et musiques" >> $changelog_file
           echo "- **Documentation**: Guide d'utilisation et API" >> $changelog_file
           
           # Lire le contenu et l'encoder pour GitHub
@@ -181,8 +182,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: calculate-version
-    outputs:
-      artifact_name: ${{ steps.upload.outputs.artifact_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -314,6 +313,15 @@ jobs:
           # Copier la documentation
           echo "📖 Copie de la documentation..."
           cp README.md "$release_dir/"
+          
+          # Copier les assets
+          echo "🎨 Copie des assets..."
+          if [ -d "./assets" ]; then
+            cp -r "./assets" "$release_dir/"
+            echo "✅ Répertoire assets copié"
+          else
+            echo "⚠️ Répertoire assets introuvable"
+          fi
           
           # Créer un script d'installation
           cat > "$release_dir/install.sh" << 'EOF'
