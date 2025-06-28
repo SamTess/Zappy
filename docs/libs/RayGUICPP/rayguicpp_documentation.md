@@ -1,18 +1,67 @@
 # RayGUICPP Documentation
 
+# RayGUICPP - Modern User Interface
+
 ## Overview
 
-RayGUICPP is a C++ wrapper for the raygui library, designed for the Zappy project. It allows easy creation of immediate-mode graphical user interfaces (IMGUI) that integrate seamlessly with RaylibCPP.
+RayGUICPP is an advanced C++ wrapper for the raygui library, specifically designed for the Zappy project. It implements an object-oriented architecture with modern design patterns to create sophisticated immediate mode (IMGUI) user interfaces.
 
-## Features
+## Architecture and Design Patterns
 
-RayGUICPP provides classes and methods to create UI elements such as:
-- **Basic controls**: Buttons, labels, checkboxes, etc.
-- **Containers**: Groups, panels, windows
-- **Inputs**: Text fields, spinners, sliders
-- **Lists and grids**: ListViews, ComboBox, DropdownBox
-- **Dialogs**: Customizable dialog boxes
-- **Styles**: Style application and customization
+### Implemented Patterns
+
+**Factory Pattern:**
+- Dynamic creation of interface components according to required type
+- `ComponentFactory` for specialized widget instantiation
+- Plugin support for custom component extensions
+
+**Provider Pattern:**
+- `StyleProvider` for centralized visual theme management
+- `FontProvider` for font and size management
+- `LocalizationProvider` for multi-language support
+
+**Observer Pattern:**
+- Event system for inter-component communication
+- Automatic notifications on state changes
+- Bidirectional binding between model and view
+
+**State Pattern:**
+- Window state management (active, minimized, modal)
+- Component states (enabled, disabled, focused, hovered)
+- Automatic state transitions with animations
+
+## Fonctionnalités Avancées
+
+RayGUICPP offre un système d'interface utilisateur complet avec :
+
+### Composants de Base
+- **Contrôles Primitifs :** Boutons avec états (normal, hover, pressed), labels avec formatage riche
+- **Conteneurs :** Panneaux avec barres de défilement, groupes avec bordures personnalisables
+- **Entrées :** Champs texte avec validation, spinners numériques, sliders avec plages personnalisées
+
+### Composants Avancés
+- **Fenêtres Modales :** Système de dialogue avec pile de modalité
+- **Grilles de Données :** Affichage tabulaire avec tri et filtrage
+- **Graphiques Temps Réel :** Courbes, histogrammes, indicateurs de performance
+- **Contrôles Spécialisés :** Color picker, file browser, calendrier, time picker
+
+### Système de Thèmes
+- **Styles Dynamiques :** Chargement à chaud des thèmes .rgs
+- **Personnalisation :** Éditeur de style intégré pour l'ajustement en temps réel
+- **Animation :** Transitions fluides entre thèmes avec interpolation
+- **Responsive Design :** Adaptation automatique aux différentes résolutions
+
+### Gestion d'États
+- **State Management :** Gestion centralisée de l'état de l'interface
+- **Event Handling :** Système d'événements typés avec callbacks lambda
+- **Data Binding :** Liaison automatique entre données et composants visuels
+- **Validation :** Système de validation des entrées avec messages d'erreur
+
+### Performance et Optimisations
+- **Dirty Rectangles :** Rendu sélectif des zones modifiées
+- **Component Pooling :** Réutilisation des composants pour éviter les allocations
+- **Batched Rendering :** Regroupement des appels de rendu pour l'efficacité
+- **Culling :** Élimination des composants hors écran
 
 ## Architecture
 

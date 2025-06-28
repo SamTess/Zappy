@@ -3,66 +3,177 @@
 ## Overview
 
 The Zappy graphical interface is responsible for 3D visualization of the game environment, allowing real-time observation of:
-- The terrain and its resources
-- Players and their actions
-- Game events (incantations, egg hatching, etc.)
+- The terrain and its resources with visual indicators
+- Players and their actions with animated 3D models
+- Game events (incantations, egg hatching, battles, etc.)
+- Team statistics and temporal information
+- Visual effects and specialized animations
 
-## Architecture
+## Advanced Architecture
 
-The GUI is developed in C++ and uses a modular architecture based on dynamic library loading (DLLoader):
+The graphical interface is developed in C++ and uses a modular architecture based on dynamic library loading (DLLoader):
 
-- **Core**: Main loop, event management, coordinator
-- **NetworkManager**: Communication with the server
-- **Renderer**: 3D and 2D graphical display
-- **CameraController**: Camera management and views
-- **GUI Components**: User interface elements
+### Main Components
+- **GameLoop**: Main game loop with event handling
+- **NetworkManager**: Bidirectional communication with the server
+- **Renderer**: 3D rendering pipeline with visual effects support
+- **MapRenderer**: Specialized map rendering with levels of detail (LOD)
+- **CameraController**: Advanced camera management with smooth transitions
+- **UserInterface**: Modular user interface system
+- **GameController**: Component coordination and state management
 
-## Dynamic Loading System (DLLoader)
+### Dynamic Loading System (DLLoader)
 
-The GUI uses a dynamic library loading system to allow the use of different graphical implementations:
-- Interface `IGraphicsLib`: Defines the expected functions for graphic libraries
-- Interface `IGuiLib`: Defines the expected functions for user interface libraries
-- Manager `LibraryManager`: Allows dynamic loading of libraries
+The graphical interface uses a dynamic loading system allowing the use of different graphics implementations:
 
-This system enables easy switching of graphic implementations without modifying the main code.
+**Main interfaces:**
+- **IGraphicsLib**: Defines expected functions for graphics libraries
+- **IGuiLib**: Defines expected functions for user interface libraries
+- **LibraryManager**: Enables dynamic library loading
 
-## Server Communication
+**Advantages:**
+- Easy switching between graphics implementations
+- Modularity without modifying main code
+- Support for custom graphics plugins
 
-The GUI communicates with the server via a specific protocol described in the "GUI Protocol" documentation. The main commands include:
-- Map and cell information
-- Player status (position, orientation, level)
-- Available resources
-- Events (incantations, hatchings, etc.)
+### User Interface Architecture
 
-## 3D Visualization
+The user interface system is based on several design patterns:
 
-The interface uses RaylibCPP for 3D rendering with the following features:
-- Rendering of the map as a 3D grid
-- 3D models for players and resources
-- Free camera or tracking modes
-- Visual effects for special events
+**Factory Pattern (`UIWindowFactory`):**
+- Centralized creation of specialized windows
+- UI component lifecycle management
+- Easy extension for new window types
 
-## User Interface
+**Class hierarchy:**
+```
+IUIWindow (Interface)
+    |
+    +-- AUIWindow (Abstract class)
+            |
+            +-- TileInfoWindow      (Tile information)
+            +-- PlayerInfoWindow    (Player information)
+            +-- TimeInfoWindow      (Temporal information)
+            +-- MenuWindow          (Main menu)
+            +-- MapInfoWindow       (Map information)
+```
+
+## Communication with the server
+
+The graphical interface communicates with the server via a specialized protocol:
+
+### GUI Commands
+- **Identification**: `GRAPHIC\n` to identify as a graphical client
+- **Initial information**: Automatic reception of complete game state
+- **Temporal control**: `sst T\n` to modify server frequency
+- **Specific requests**: `pin #\n`, `ppo #\n`, `plv #\n` for player information
+
+### Server notifications
+- **Map**: `msz X Y\n`, `bct X Y q0 q1 q2 q3 q4 q5 q6\n`
+- **Players**: `pnw # X Y O L N\n`, `ppo # X Y O\n`, `plv # L\n`
+- **Events**: `pic X Y L #1 #2 ...\n`, `pie X Y R\n`, `pex #\n`
+- **Teams**: `tna N\n`, `seg N\n`
+
+## Advanced 3D Visualization
+
+The interface uses RaylibCPP for sophisticated 3D rendering:
+
+### Rendering features
+- **3D Map**: Map rendering as 3D grid with automatic adjustment
+- **3D Models**: Players and resources with custom models (.glb)
+- **Camera System**: Free camera with intuitive controls and tracking modes
+- **Visual Effects**: Particles, animations and special effects for events
+- **Lighting**: Dynamic lighting system with skybox
+- **Optimizations**: Level of Detail (LOD) and frustum culling for large maps
+
+### Visual Effects System
+- **ParticleSystem**: Particle manager for special effects
+- **EjectionAnimationManager**: Player ejection animations
+- **DeathAnimationManager**: Death animations with visual effects
+- **BroadcastEffect**: Visual effects for broadcast messages
+
+## Complete User Interface
 
 The user interface uses RayGUICPP and offers:
-- Information on selected players
-- Real-time game statistics
-- Visualization configuration
-- Camera options
+
+### Specialized windows
+- **TileInfoWindow**: Detailed information on selected tiles
+- **PlayerInfoWindow**: Complete player statistics with commands
+- **TimeInfoWindow**: Temporal information and real-time FPS
+- **MenuWindow**: Audio, visual, and game configuration
+- **MapInfoWindow**: General information on map and teams
+
+### Interactive features
+- **Selection**: Click on tiles and players to display information
+- **Camera controls**: Intuitive rotation, zoom, and movement
+- **Real-time configuration**: Parameter modification without restart
+- **Player tracking**: Automatic tracking of specific players
+
+## Resource Management
+
+### TextureManager and ModelManager
+- **Optimized cache**: Loading and caching of textures and models
+- **Supported formats**: Support for .glb, .jpg, .png formats
+- **Memory management**: Automatic release of unused resources
+
+### Game assets
+- **3D Models**: Collection of models for players and objects
+- **Textures**: Skybox and terrain textures
+- **Audio**: Background music and sound effects
 
 ## Compilation and Execution
 
+### Build
 ```bash
-# Compilation
+# Complete compilation
 make -C src/GUI
 
-# Execution
+# Special modes
+make -C src/GUI debug      # Debug mode with symbols
+make -C src/GUI coverage   # Code coverage
+make -C src/GUI clean      # Cleanup
+```
+
+### Dependencies
+- **Raylib**: 3D graphics library
+- **OpenGL**: Accelerated graphics rendering
+- **System libraries**: X11, pthread, dl, m
+
+### Execution
+```bash
 ./zappy_gui -p <port> -h <host>
 ```
 
+**Interface controls:**
+- **Camera**: Left click + drag for rotation, mouse wheel for zoom
+- **Movement**: WASD keys for camera movement
+- **Selection**: Click on elements to display information
+- **Interface**: Resizable and repositionable windows
+
 ## Important Files
-- `main.cpp` : Program entry point
-- `GameLoop.cpp` : Main game loop
-- `network/networkManager/NetworkManager.cpp` : Network communication management
-- `renderer/Renderer.cpp` : Graphic rendering
-- `cameraController/CameraController.cpp` : Camera control
+
+### Main structure
+- `main.cpp`: Entry point with argument parsing
+- `GameLoop.cpp`: Main game loop and coordination
+- `GameLoopUI.cpp`: Game loop user interface
+
+### Network and communication
+- `network/networkManager/NetworkManager.cpp`: Server communication management
+- `network/protocol/ProtocolParser.cpp`: GUI protocol parser
+- `network/buffer/CircularBuffer.cpp`: Communication buffers
+
+### Rendering and graphics
+- `renderer/Renderer.cpp`: Main rendering engine
+- `renderer/MapRenderer.cpp`: Specialized map rendering
+- `renderer/Skybox.cpp`: Skybox management
+- `renderer/ParticleSystem.cpp`: Particle system
+
+### User interface
+- `ui/UserInterface.cpp`: Main user interface
+- `ui/UIWindowFactory.cpp`: Window factory
+- `ui/windows/*/`: Specialized windows
+
+### Controls and management
+- `cameraController/CameraController.cpp`: Advanced camera control
+- `gameController/GameController.cpp`: Component coordination
+- `textureManager/ModelManager.cpp`: 3D model management

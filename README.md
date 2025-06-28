@@ -8,8 +8,8 @@
 <div align="center">
   <img src="https://img.shields.io/badge/language-C%2FC%2B%2B%2FPython-blue" alt="Languages">
   <img src="https://img.shields.io/badge/protocol-TCP%2FIP-orange" alt="Protocol">
-  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey" alt="Platform">
-  <img src="https://img.shields.io/badge/version-1.0.0-green" alt="Version">
+  <img src="https://img.shields.io/badge/platform-Linux-lightgrey" alt="Platform">
+  <img src="https://img.shields.io/badge/version-4.0.0-green" alt="Version">
 </div>
 
 <div align="center">
@@ -33,8 +33,8 @@
 
 - [Overview](#-overview)
 - [Architecture](#-architecture)
-- [Interface utilisateur](#-interface-utilisateur)
-- [Prérequis](#-prérequis)
+- [User Interface](#-user-interface)
+- [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Components](#-components)
@@ -73,68 +73,68 @@ The components communicate via TCP/IP network protocols:
 └────────┘                          └──────────┘
 ```
 
-## 💎 Interface Utilisateur
+## 💎 User Interface
 
-L'interface utilisateur du GUI a été conçue selon les principes de conception orientée objet avancés :
+The GUI user interface has been designed following advanced object-oriented design principles:
 
-- **Pattern Factory** : Utilisation de `UIWindowFactory` pour la création et gestion des fenêtres
-- **Hiérarchie de classes** : Organisation autour de l'interface `IUIWindow` et la classe abstraite `AUIWindow`
-- **Modularité** : Chaque type de fenêtre est encapsulé dans sa propre classe spécialisée
+- **Factory Pattern**: Use of `UIWindowFactory` for window creation and management
+- **Class Hierarchy**: Organization around the `IUIWindow` interface and `AUIWindow` abstract class
+- **Modularity**: Each window type is encapsulated in its own specialized class
 
-Types de fenêtres disponibles :
-- Journaux (`LogsWindow`) - affiche les messages système et événements
-- Informations sur les tuiles (`TileInfoWindow`) - détails sur les cases sélectionnées
-- Informations sur les joueurs (`PlayerInfoWindow`) - statistiques des joueurs
-- Diffusions (`BroadcastsWindow`) - messages entre les joueurs
-- Contrôles (`ControlsWindow`) - options de contrôle de la caméra et du jeu
-- Informations temporelles (`TimeInfoWindow`) - statistiques de temps et fréquence
-- Menu (`MenuWindow`) - paramètres globaux de l'application
+Available window types:
+- Logs (`LogsWindow`) - displays system messages and events
+- Tile Information (`TileInfoWindow`) - details on selected tiles
+- Player Information (`PlayerInfoWindow`) - player statistics
+- Broadcasts (`BroadcastsWindow`) - messages between players
+- Controls (`ControlsWindow`) - camera and game control options
+- Time Information (`TimeInfoWindow`) - time and frequency statistics
+- Menu (`MenuWindow`) - global application settings
 
-Documentation détaillée disponible dans [docs/ui_architecture.md](docs/ui_architecture.md).
+Detailed documentation available in [docs/ui_architecture.md](docs/ui_architecture.md).
 
-## 🔧 Prérequis
+## 🔧 Prerequisites
 
-Pour compiler et exécuter Zappy, vous aurez besoin de :
+To compile and run Zappy, you will need:
 
-### Prérequis système
-- **Compilateur C/C++** (GCC 9.0+ ou Clang 10.0+)
-- **Python 3.8+** avec pip3
+### System Requirements
+- **C/C++ Compiler** (GCC 9.0+ or Clang 10.0+)
+- **Python 3.8+** with pip3
 - **Make 4.0+**
-- **Git** (pour les sous-modules et Raylib)
-- **CMake** (pour la compilation de Raylib depuis les sources si nécessaire)
+- **Git** (for submodules and Raylib)
+- **CMake** (for compiling Raylib from sources if necessary)
 
-### Installation automatique des dépendances
+### Automatic dependency installation
 ```bash
-# Installation automatique de toutes les dépendances
+# Automatic installation of all dependencies
 make install_requirements
 ```
 
-Cette commande installe automatiquement :
-- Raylib (via APT ou compilation depuis GitHub)
-- Dépendances Python pour l'IA (cryptography, dotenv)
-- Initialisation des sous-modules Git
+This command automatically installs:
+- Raylib (via APT or compilation from GitHub)
+- Python dependencies for AI (cryptography, dotenv)
+- Git submodule initialization
 
-### Dépendances système pour Raylib
-Le projet nécessite les bibliothèques suivantes pour l'interface graphique :
-- **OpenGL** : `libgl1-mesa-dev`
-- **X11** : `libx11-dev`, `libxrandr-dev`, `libxinerama-dev`, `libxcursor-dev`, `libxi-dev`, `libxext-dev`
-- **Outils de build** : `build-essential`, `cmake`, `pkg-config`
+### System dependencies for Raylib
+The project requires the following libraries for the graphical interface:
+- **OpenGL**: `libgl1-mesa-dev`
+- **X11**: `libx11-dev`, `libxrandr-dev`, `libxinerama-dev`, `libxcursor-dev`, `libxi-dev`, `libxext-dev`
+- **Build tools**: `build-essential`, `cmake`, `pkg-config`
 
 ```bash
-# Installation manuelle des dépendances système (Ubuntu/Debian)
+# Manual installation of system dependencies (Ubuntu/Debian)
 sudo apt update
 sudo apt install -y build-essential cmake git pkg-config
 sudo apt install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev
 sudo apt install -y libxcursor-dev libxi-dev libxext-dev
 ```
 
-### Dépendances Python pour l'IA
-Le fichier `src/AI/requirements.txt` contient :
-- **cryptography** : Chiffrement AES pour les communications sécurisées entre agents
-- **dotenv** : Gestion des variables d'environnement
+### Python dependencies for AI
+The `src/AI/requirements.txt` file contains:
+- **cryptography**: AES encryption for secure communications between agents
+- **dotenv**: Environment variable management
 
 ```bash
-# Installation manuelle (si make install_requirements échoue)
+# Manual installation (if make install_requirements fails)
 cd src/AI && pip3 install -r requirements.txt
 ```
 
@@ -159,26 +159,26 @@ make zappy_ai
 ### Start the server
 
 ```bash
-./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq> [options]
+./zappy_server -p <port> -x <width> -y <height> -n <team names> -c <max clients> -f <freq>
 ```
 
 **Required parameters:**
-- `-p <port>` : Server listening port
-- `-x <width>` : Map width (minimum 10)
-- `-y <height>` : Map height (minimum 10) 
-- `-n <team1> [team2] ...` : Team names (separated by spaces)
-- `-c <max_clients>` : Maximum number of clients per team
-- `-f <freq>` : Server frequency (time units per second)
+- `-p <port>`: Server listening port
+- `-x <width>`: Map width (minimum 10)
+- `-y <height>`: Map height (minimum 10)
+- `-n <team1> [team2] ...`: Team names (separated by spaces)
+- `-c <max_clients>`: Maximum number of clients per team
+- `-f <freq>`: Server frequency (time units per second)
 
 **Optional parameters:**
-- `--auto-start on|off` : Automatic game start (default: off)
-- `--display-eggs true|false` : Egg visibility (default: true)
-- `--game_duration <time>` : Game duration in seconds
-- `-v` or `--verbose` : Verbose mode for debugging
+- `--auto-start on|off`: Automatic start (default: off)
+- `--display-eggs true|false`: Display eggs in logs (default: false)
+- `-v` or `--verbose`: Verbose mode for more logs
+- `--game_duration <time>`: Maximum game duration in seconds
 
 **Example:**
 ```bash
-./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 team3 -c 5 -f 100 --auto-start on --display-eggs true
+./zappy_server -p 4242 -x 20 -y 20 -n team1 team2 team3 -c 5 -f 100 --auto-start on
 ```
 
 ### Start the graphical interface
@@ -188,8 +188,8 @@ make zappy_ai
 ```
 
 **Parameters:**
-- `-p <port>` : Server port
-- `-h <host>` : Server address (default: localhost)
+- `-p <port>`: Server port
+- `-h <host>`: Server address (default: localhost)
 
 **Example:**
 ```bash
@@ -197,15 +197,16 @@ make zappy_ai
 ```
 
 **Interface controls:**
-- **Camera** : Left click + drag to rotate, mouse wheel to zoom
-- **View** : WASD keys to move the camera
-- **Interface** : Real-time information panels on teams and resources
+- **Camera**: Left click + drag to rotate, mouse wheel to zoom
+- **View**: WASD keys to move the camera
+- **Interface**: Real-time information panels on teams and resources
+- **Selection**: Click on a tile or player to display details
+- **Menu**: Access to audio, visual, and game settings
 
 ### Start the AI
 
-#### Prerequisite
-Before starting the AI, ensure you have activated the Python virtual environment:
-(This step is crucial to ensure the AI has access to the required Python packages. The 'make install_requirements' can only setup the virtual environment, but you need to activate it to use it.)
+#### Prerequisites
+Before starting the AI, make sure to activate the Python virtual environment:
 ```bash
 source venv/bin/activate
 ```
@@ -213,24 +214,29 @@ source venv/bin/activate
 #### Start command
 
 ```bash
-./zappy_ai -p <port> -n <team name> [-h <host>]
+./zappy_ai -p <port> -n <team name> [-h <host>] [--performance]
 ```
 
 **Parameters:**
-- `-p <port>` : Server port
-- `-n <team>` : Team name
-- `-h <host>` : Server address (optional, default: localhost)
+- `-p <port>`: Server port
+- `-n <team>`: Team name
+- `-h <host>`: Server address (optional, default: localhost)
+- `--performance`: Performance mode for simulations (optional)
 
 **Example:**
 ```bash
-./zappy_ai -p 4242 -n team1
+./zappy_ai -p 4242 -n team1 --performance
 ```
 
 **AI behaviors:**
-- **Resource collection** : Automatic exploration and optimized collection
-- **Inter-agent communication** : Coordination via encrypted broadcast
-- **Evolution** : Automatic performance of incantations to level up
-- **Adaptive strategy** : Behavior change according to context
+- **Automatic collection**: Optimized exploration and resource collection
+- **Inter-agent communication**: Coordination via encrypted broadcast
+- **Evolution**: Automatic execution of incantations to level up
+- **Adaptive strategy**: Behavior change according to context
+- **Intelligent management**: Route optimization and priority management
+
+#### Multi-agents
+The system automatically launches multiple agents for the specified team. The number of agents is configurable in the code (default: 10 agents per team).
 
 ## 📦 Components
 
@@ -286,31 +292,80 @@ Autonomous bots developed in Python with a modular and scalable architecture.
 
 ### Server
 
-The server is the central component that manages :
-- The game map and resources
-- Client connections (AI and GUI)
-- Game logic and rules
-- Time and event management
-- Communication protocol
-- Elevation rituals and player evolution
+The Zappy server is developed in C for optimal performance and manages:
+
+**Main features:**
+- Game map and resource management with automatic distribution
+- Multiple connections (AI clients and graphical interface) via TCP/IP
+- Game logic and application of virtual universe rules
+- Time manager with configurable tick system
+- Distinct textual communication protocols for AI and GUI
+- Elevation rituals with condition verification and player coordination
+- Egg laying system and new agent generation
+
+**Modular architecture:**
+- `network/`: TCP/IP connection management and communication
+- `map/`: Map system with tiles and resources
+- `player/`: Player management, inventories and actions
+- `command/`: Command processor with queue
+- `buffer/`: Circular buffer system for communication
+- `graphical_command/`: Specialized commands for graphical interface
 
 ### Graphical Interface
 
-The graphical interface offers :
-- Real-time visualization of the game map
-- Display of players and their inventories
-- Visualization of resources on each tile
-- Event tracking (incantations, reproductions, etc.)
+The graphical interface is developed in C++ with Raylib and offers:
+
+**Advanced 3D visualization:**
+- Real-time rendering of the game map with level of detail (LOD) system
+- Player display with animated 3D models and orientations
+- Resource visualization on each tile with visual indicators
+- Free camera system with smooth controls and transitions
+- Visual effects for special events (incantations, ejections, deaths)
+- Skybox and 3D lighting for increased immersion
+
+**Modular user interface:**
+- Window system based on Factory pattern (`UIWindowFactory`)
+- Specialized information panels (players, tiles, teams, time)
 - Interactive controls for navigation and observation
+- Real-time event logging system
+- Configuration menu with audio and visual settings
+- Extensible architecture allowing easy addition of new windows
+
+**Dynamic loading system:**
+- DLLoader for graphics and interface libraries
+- Plugin support with `IGraphicsLib` and `IGuiLib` interfaces
+- Texture and 3D model management with optimized cache
 
 ### Artificial Intelligence
 
-The AI of the clients includes :
-- Perception modules for environment analysis
-- Strategic decision-making algorithms
-- Resource management and planning
-- Communication and coordination between agents
-- Strategies for elevation rituals
+The AI for clients developed in Python includes:
+
+**Adaptive behavioral architecture:**
+- Hierarchical state machine with intelligent transitions
+- Perception modules for environment analysis (`Look`, `Inventory`)
+- Decision-making algorithms based on objective priority
+- Resource management system with route optimization
+- Multi-agent coordination via AES encrypted communication
+
+**Strategies and behaviors:**
+- Intelligent exploration with internal universe mapping
+- Optimized resource collection with conflict avoidance
+- Grouping strategies for elevation rituals
+- Emergency behaviors in case of famine or danger
+- Dynamic role system (miner, fighter, breeder)
+
+**Communication and collaboration:**
+- Secure broadcast protocol between agents of the same team
+- Information exchange on resource positions
+- Coordination for multi-player incantation rituals
+- Message encryption system to avoid espionage
+
+**Advanced features:**
+- A* pathfinding algorithm optimized for toric maps
+- Internal world representation with real-time updates
+- Intelligent time and action priority management
+- Complete logging system for analysis and debugging
+- Performance mode for large-scale simulations
 
 ## 🚀 Releases
 

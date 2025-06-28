@@ -1,153 +1,153 @@
-# 🚀 CI/CD Release Workflow pour Zappy
+# 🚀 CI/CD Release Workflow for Zappy
 
-Ce document explique comment utiliser le workflow GitHub Actions pour créer des releases automatiques du projet Zappy.
+This document explains how to use the GitHub Actions workflow to create automatic releases of the Zappy project.
 
-## 📋 Vue d'ensemble
+## 📋 Overview
 
-Le workflow de release permet de :
-- Générer automatiquement des versions sémantiques
-- Compiler tous les composants du projet
-- Créer des packages de release
-- Publier sur GitHub Releases
-- Générer un changelog automatique
+The release workflow allows you to:
+- Automatically generate semantic versions
+- Compile all project components
+- Create release packages
+- Publish on GitHub Releases
+- Generate automatic changelog
 
-## 🎯 Types de versioning
+## 🎯 Versioning Types
 
-Le système suit le **versioning sémantique** (SemVer) avec le format `v{MAJOR}.{MINOR}.{PATCH}` :
+The system follows **semantic versioning** (SemVer) with the format `v{MAJOR}.{MINOR}.{PATCH}`:
 
-### 🆕 Nouvelle version (MAJOR)
-- **Option** : `nouvelle-version`
-- **Effet** : `v1.2.3` → `v2.0.0`
-- **Usage** : Changements majeurs, breaking changes
-- **Exemple** : Refonte complète de l'architecture, changements d'API incompatibles
+### 🆕 New version (MAJOR)
+- **Option**: `nouvelle-version`
+- **Effect**: `v1.2.3` → `v2.0.0`
+- **Usage**: Major changes, breaking changes
+- **Example**: Complete architecture refactor, incompatible API changes
 
-### ✨ Nouvelle feature (MINOR)
-- **Option** : `nouvelle-feature`
-- **Effet** : `v1.2.3` → `v1.3.0`
-- **Usage** : Nouvelles fonctionnalités compatibles
-- **Exemple** : Nouveau mode de jeu, nouvelles commandes IA, améliorations GUI
+### ✨ New feature (MINOR)
+- **Option**: `nouvelle-feature`
+- **Effect**: `v1.2.3` → `v1.3.0`
+- **Usage**: New compatible features
+- **Example**: New game mode, new AI commands, GUI improvements
 
-### 🐛 Résolution de bug (PATCH)
-- **Option** : `resolution-bug`
-- **Effet** : `v1.2.3` → `v1.2.4`
-- **Usage** : Corrections de bugs, améliorations mineures
-- **Exemple** : Correction de crashes, optimisations de performance
+### 🐛 Bug resolution (PATCH)
+- **Option**: `resolution-bug`
+- **Effect**: `v1.2.3` → `v1.2.4`
+- **Usage**: Bug fixes, minor improvements
+- **Example**: Crash fixes, performance optimizations
 
-## 🚀 Comment créer une release
+## 🚀 How to create a release
 
-### 1. Accéder au workflow
-1. Aller sur GitHub → onglet **Actions**
-2. Sélectionner le workflow **🚀 Release Zappy**
-3. Cliquer sur **Run workflow**
+### 1. Access the workflow
+1. Go to GitHub → **Actions** tab
+2. Select the **🚀 Release Zappy** workflow
+3. Click on **Run workflow**
 
-### 2. Configurer la release
-- **Branch** : Sélectionner la branche (généralement `main`)
-- **Type de version** : Choisir parmi :
+### 2. Configure the release
+- **Branch**: Select the branch (usually `main`)
+- **Version type**: Choose from:
   - `nouvelle-version` (MAJOR)
   - `nouvelle-feature` (MINOR)
   - `resolution-bug` (PATCH)
-- **Pré-release** : Cocher si c'est une version de test
+- **Pre-release**: Check if it's a test version
 
-### 3. Déclencher la release
-Cliquer sur **Run workflow** pour lancer le processus.
+### 3. Trigger the release
+Click on **Run workflow** to start the process.
 
-## 📦 Contenu des releases
+## 📦 Release Contents
 
-Chaque release contient :
+Each release contains:
 
 ### 🗂️ Archive `zappy-vX.Y.Z.tar.gz`
 ```
 zappy-vX.Y.Z/
-├── zappy_server          # Serveur de jeu (C)
-├── zappy_gui            # Interface graphique (C++)
-├── zappy_ai             # Client IA (Python)
-├── lib/                 # Bibliothèques statiques
+├── zappy_server          # Game server (C)
+├── zappy_gui            # Graphical interface (C++)
+├── zappy_ai             # AI client (Python)
+├── lib/                 # Static libraries
 │   ├── libgui.a
 │   ├── libserver.a
 │   ├── libraylib_cpp.a
 │   └── libraygui_cpp.a
-├── plugins/             # Bibliothèques dynamiques
+├── plugins/             # Dynamic libraries
 │   ├── libraygui.so
 │   └── libraylibcpp.so
 ├── README.md           # Documentation
-├── install.sh          # Script d'installation
-└── VERSION             # Numéro de version
+├── install.sh          # Installation script
+└── VERSION             # Version number
 ```
 
-### 📋 Script d'installation
+### 📋 Installation script
 ```bash
-# Rendre le script exécutable
+# Make the script executable
 chmod +x install.sh
 
-# Installer Zappy sur le système
+# Install Zappy on the system
 sudo ./install.sh
 ```
 
-## 🔧 Fonctionnement technique
+## 🔧 Technical Operation
 
-### 1. 🔐 Vérification des permissions
-- Contrôle des droits de création de release
-- Validation de l'utilisateur et du repository
+### 1. 🔐 Permission verification
+- Release creation rights control
+- User and repository validation
 
-### 2. 📊 Calcul de version
-- Récupération du dernier tag sémantique
-- Calcul automatique de la nouvelle version
-- Gestion du cas de première release (`v0.0.0` → `v1.0.0`)
+### 2. 📊 Version calculation
+- Latest semantic tag retrieval
+- Automatic new version calculation
+- First release case handling (`v0.0.0` → `v1.0.0`)
 
 ### 3. 🏗️ Compilation
-- Installation des dépendances système
-- Compilation de tous les composants :
-  - Serveur C avec Make
-  - GUI C++ avec raylib
-  - Client IA Python
-- Vérification de l'intégrité des binaires
+- System dependencies installation
+- Compilation of all components:
+  - C server with Make
+  - C++ GUI with raylib
+  - Python AI client
+- Binary integrity verification
 
-### 4. 📦 Package
-- Création d'une archive complète
-- Inclusion de tous les binaires et bibliothèques
-- Génération du script d'installation
-- Création du changelog automatique
+### 4. 📦 Packaging
+- Complete archive creation
+- Inclusion of all binaries and libraries
+- Installation script generation
+- Automatic changelog creation
 
 ### 5. 🚀 Publication
-- Création du tag Git
-- Publication sur GitHub Releases
-- Upload de l'archive
-- Génération des notes de release
+- Git tag creation
+- GitHub Releases publication
+- Archive upload
+- Release notes generation
 
-## 📝 Changelog automatique
+## 📝 Automatic Changelog
 
-Le changelog est généré automatiquement et contient :
-- Type de release et description
-- Liste des commits depuis la dernière version
-- Contenu de la release
-- Instructions d'installation
+The changelog is automatically generated and contains:
+- Release type and description
+- List of commits since last version
+- Release content
+- Installation instructions
 
-### Exemple de changelog
+### Changelog example
 ```markdown
 ## 🎮 Zappy v1.2.0
 
-### 📅 Date de release: 12/06/2025 à 14:30
+### 📅 Release date: 12/06/2025 at 14:30
 
-### ✨ Nouvelle fonctionnalité
-Cette version ajoute de nouvelles fonctionnalités tout en maintenant la compatibilité.
+### ✨ New feature
+This version adds new features while maintaining compatibility.
 
-### 📋 Changements
-- Ajout du mode spectateur dans la GUI
-- Amélioration de l'IA avec de nouveaux algorithmes
-- Optimisation des performances réseau
-- Correction de bugs mineurs
+### 📋 Changes
+- Added spectator mode in GUI
+- Improved AI with new algorithms
+- Network performance optimization
+- Minor bug fixes
 
-### 📦 Contenu de la release
-- **Binaires**: zappy_server, zappy_gui, zappy_ai
-- **Bibliothèques**: libgui.a, libserver.a, libraylib_cpp.a, libraygui_cpp.a
+### 📦 Release content
+- **Binaries**: zappy_server, zappy_gui, zappy_ai
+- **Libraries**: libgui.a, libserver.a, libraylib_cpp.a, libraygui_cpp.a
 - **Plugins**: libraygui.so, libraylibcpp.so
-- **Documentation**: Guide d'utilisation et API
+- **Documentation**: Usage guide and API
 ```
 
-## ⚙️ Configuration avancée
+## ⚙️ Advanced Configuration
 
-### Variables d'environnement
-Le workflow utilise plusieurs variables configurables :
+### Environment variables
+The workflow uses several configurable variables:
 
 ```yaml
 env:
@@ -157,70 +157,70 @@ env:
 ```
 
 ### Timeouts
-- Build total : 20 minutes
-- Installation dépendances : 10 minutes
-- Compilation : 15 minutes
+- Total build: 20 minutes
+- Dependencies installation: 10 minutes
+- Compilation: 15 minutes
 
-### Artefacts
-- Rétention : 90 jours
-- Format : tar.gz compressé
-- Upload automatique sur GitHub
+### Artifacts
+- Retention: 90 days
+- Format: compressed tar.gz
+- Automatic upload to GitHub
 
-## 🐛 Dépannage
+## 🐛 Troubleshooting
 
-### Erreurs communes
+### Common errors
 
-#### ❌ Binaire non trouvé
+#### ❌ Binary not found
 ```
-❌ Binaire zappy_server introuvable
+❌ Binary zappy_server not found
 ```
-**Solution** : Vérifier que la compilation s'est bien déroulée dans le Makefile
+**Solution**: Check that compilation went well in the Makefile
 
-#### ❌ Bibliothèque manquante
+#### ❌ Missing library
 ```
-⚠️ Bibliothèque statique libgui.a introuvable
+⚠️ Static library libgui.a not found
 ```
-**Solution** : S'assurer que `make all` compile toutes les bibliothèques
+**Solution**: Ensure that `make all` compiles all libraries
 
-#### ❌ Permissions insuffisantes
+#### ❌ Insufficient permissions
 ```
 Error: Resource not accessible by integration
 ```
-**Solution** : Vérifier les permissions du token GitHub dans les settings du repo
+**Solution**: Check GitHub token permissions in repository settings
 
-### Logs de débogage
-Chaque étape du workflow produit des logs détaillés :
-- 🔍 Vérification des permissions
-- 📊 Calcul de version avec détails
-- 🏗️ Logs de compilation complets
-- ✅ Vérification des binaires et bibliothèques
-- 📦 Contenu de l'archive de release
+### Debug logs
+Each workflow step produces detailed logs:
+- 🔍 Permission verification
+- 📊 Version calculation with details
+- 🏗️ Complete compilation logs
+- ✅ Binary and library verification
+- 📦 Release archive content
 
-## 🎯 Bonnes pratiques
+## 🎯 Best Practices
 
-### Avant de créer une release
-1. **Tester localement** : `make all && make tests_run`
-2. **Vérifier les changements** : Revoir les commits depuis la dernière version
-3. **Choisir le bon type** : Évaluer l'impact des changements
-4. **Documenter** : Mettre à jour README.md si nécessaire
+### Before creating a release
+1. **Test locally**: `make all && make tests_run`
+2. **Check changes**: Review commits since last version
+3. **Choose the right type**: Evaluate the impact of changes
+4. **Document**: Update README.md if necessary
 
-### Gestion des versions
-- **PATCH** : Pour les hotfixes urgents
-- **MINOR** : Pour les sprints/itérations normales  
-- **MAJOR** : Pour les milestones importantes
+### Version management
+- **PATCH**: For urgent hotfixes
+- **MINOR**: For normal sprints/iterations
+- **MAJOR**: For important milestones
 
 ### Timing
-- Éviter les releases en fin de semaine
-- Préférer les heures ouvrées pour le support
-- Tester les pré-releases avant les releases finales
+- Avoid releases at end of week
+- Prefer business hours for support
+- Test pre-releases before final releases
 
 ## 📞 Support
 
-En cas de problème avec le workflow de release :
-1. Consulter les logs dans l'onglet Actions
-2. Vérifier la configuration dans `.github/workflows/release.yml`
-3. Contacter l'équipe de développement
+In case of issues with the release workflow:
+1. Check logs in the Actions tab
+2. Verify configuration in `.github/workflows/release.yml`
+3. Contact the development team
 
 ---
 
-*Ce workflow a été conçu pour automatiser et standardiser le processus de release du projet Zappy tout en maintenant la qualité et la traçabilité.*
+*This workflow was designed to automate and standardize the release process of the Zappy project while maintaining quality and traceability.*

@@ -1,3 +1,10 @@
+
+/* Taille par défaut des icônes SVG */
+.featureSvg {
+  height: 200px;
+  width: 200px;
+}
+
 /* Responsive design pour les fonctionnalités */
 @media screen and (max-width: 966px) {
   .features {
