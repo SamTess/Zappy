@@ -4,6 +4,8 @@ from agent.agentActionsService import AgentActionManager
 from constants.upgrades import get_total_upgrade_resources, minimum_players_for_upgrade
 import utils.zappy as zappy
 
+
+
 class Behavior(ABC):
   def __init__(self, agent):
     self.agent = agent
@@ -12,10 +14,12 @@ class Behavior(ABC):
     pass
 
 
+
 class NoActionBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     sleep(0.1)
     return
+
 
 
 class GetFoodBehavior(Behavior):
@@ -23,14 +27,14 @@ class GetFoodBehavior(Behavior):
     AgentActionManager(self.agent).go_take_item("food")
 
 
+
 class UpgradeBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    if not surroundings or not inventory:
-      print("UpgradeBehavior: Surroundings or inventory is None.")
+    res = self.agent.send_command("Incantation", 10)
+    if res is None or "ko" in res:
+      print(f"UpgradeBehavior: Failed to perform incantation. Response: {res}")
+      self.agent.current_phase = "fork"
       return
-
-    self.agent.send_command("Incantation")
-
 
 class GetMineralsBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
@@ -40,10 +44,12 @@ class GetMineralsBehavior(Behavior):
     AgentActionManager(self.agent).go_take_item(zappy.get_best_available_resource(surroundings))
 
 
+
 class DysonBehavior(Behavior):
   def __init__(self, agent):
     super().__init__(agent)
     self.current_index = 0
+
 
   def execute(self, surroundings=None, inventory=None):
     self.current_index += 1
@@ -61,10 +67,12 @@ class DysonBehavior(Behavior):
       self.current_index = 0
 
 
+
 class FoodDysonBehavior(Behavior):
   def __init__(self, agent):
     super().__init__(agent)
     self.current_index = 0
+
 
   def execute(self, surroundings=None, inventory=None):
     self.current_index += 1
@@ -82,6 +90,7 @@ class FoodDysonBehavior(Behavior):
       self.current_index = 0
 
 from random import choice
+
 class BigDysonBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     for _ in range(self.agent.map_size_x):
@@ -92,14 +101,17 @@ class BigDysonBehavior(Behavior):
     self.agent.send_command(choice(["Right", "Left", "Forward"]))
 
 
+
 class FoodBigDysonBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
-    for _ in range(self.agent.map_size_x):
+    for _ in range(5):
       self.agent.send_command("Forward")
       AgentActionManager(self.agent).take_all_of_item_here("food")
     self.agent.send_command(choice(["Right", "Left", "Forward"]))
     self.agent.send_command("Forward")
+    AgentActionManager(self.agent).take_all_of_item_here("food")
     self.agent.send_command(choice(["Right", "Left", "Forward"]))
+
 
 
 class GetFoodAndMineralsBehavior(Behavior):
@@ -112,6 +124,7 @@ class GetFoodAndMineralsBehavior(Behavior):
       GetFoodBehavior(self.agent).execute(surroundings, inventory)
     else:
       GetMineralsBehavior(self.agent).execute(surroundings, inventory)
+
 
 
 class JoinTeamMatesBehavior(Behavior):
@@ -135,6 +148,37 @@ class JoinTeamMatesBehavior(Behavior):
       return
 
 
+
+class JoinCaptainBehavior(Behavior):
+  def execute(self, surroundings=None, inventory=None):
+    if not self.agent.other_agents:
+      print("JoinTeamMatesBehavior: No other agents known.")
+      return
+
+    try:
+      if self.agent.is_original:
+        print(f"Agent {self.agent.id}: Is the captain, not moving.")
+        return
+
+      captain_id = None
+      for agent_id, agent_info in self.agent.other_agents.items():
+        if agent_info.get("is_captain", False):
+          captain_id = agent_id
+          break
+
+      if captain_id is None:
+        print(f"Agent {self.agent.id}: No captain found in other agents.")
+        return
+      print(f"Agent {self.agent.id}: Found captain with ID {captain_id}.")
+
+      self.agent.other_agents[captain_id]["direction"] = AgentActionManager(self.agent).got_to_dir(self.agent.other_agents[captain_id]["direction"])
+
+    except (ValueError, TypeError) as e:
+      print(f"JoinTeamMatesBehavior: Error processing agent IDs: {e}")
+      return
+
+
+
 class TakeEverythingHereBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if not surroundings:
@@ -142,6 +186,7 @@ class TakeEverythingHereBehavior(Behavior):
       return
 
     AgentActionManager(self.agent).take_everything_here()
+
 
 
 class TakeAllFoodHereBehavior(Behavior):
@@ -153,9 +198,11 @@ class TakeAllFoodHereBehavior(Behavior):
     AgentActionManager(self.agent).take_all_of_item_here("food")
 
 
+
 class TakeOneFoodHereBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     self.agent.send_command("Take food")
+
 
 
 class DropEveryMineralsBehavior(Behavior):
@@ -173,6 +220,7 @@ class DropEveryMineralsBehavior(Behavior):
         self.agent.send_command(f"Set {mineral}")
 
 
+
 class DropAllFoodBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if not inventory:
@@ -184,6 +232,7 @@ class DropAllFoodBehavior(Behavior):
       amount = inventory_dict["food"]
       for _ in range(amount):
         self.agent.send_command("Set food")
+
 
 
 class FillTeamBehavior(Behavior):
@@ -205,14 +254,9 @@ class FillTeamBehavior(Behavior):
         break
 
 
-class StartCollectingBehavior(Behavior):
-  def execute(self, surroundings=None, inventory=None):
-    self.agent.current_phase = "collecting"
-
 
 class ForkBehavior(Behavior):
   def execute(self, surroundings=None, inventory=None):
     if self.agent.is_original:
       self.agent.send_command("Fork")
-
-    print("Fork command sent.")
+      print(f"Agent {self.agent.id}: Fork command sent.")

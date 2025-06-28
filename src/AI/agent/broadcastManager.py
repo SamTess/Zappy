@@ -2,7 +2,8 @@ import utils.encryption as encryption
 
 ####! BROADCAST SYSTEM:
 #? message format: "message <emitter_direction>, <encrypted_message>"
-#? encrypted_message format: "<message_type>-<sender_id>-<message>
+#? encrypted_message format: <team_key>-<message_type>-<sender_id>-<message>
+#? the team_key is used to filter messages from other teams
 #? message_type: "I" for inventory, "F" for fork query, "U" for ID change
 
 class BroadcastManager:
@@ -40,7 +41,7 @@ class BroadcastManager:
     decrypted_message = encryption.decrypt_message(broadcast_message)
 
     if decrypted_message is not None:
-      msg_parts = decrypted_message.split('-', 4)
+      msg_parts = decrypted_message.split('-', 5)
       if len(msg_parts) != 4:
         print(f"Invalid decrypted message format (expected 4 parts): {decrypted_message}")
         return
@@ -55,12 +56,12 @@ class BroadcastManager:
       if self.agent.first_message_processing:
         self.agent.is_original = False
         self.agent.first_message_processing = False
-
+        print(f"Agent {self.agent.id}: First message processed, not original agent.")
 
       try:
         sender_agent_id = int(sender_agent_id_str)
       except ValueError:
-        print(f"Invalid channel_id or sender_agent_id in decrypted message: {decrypted_message}")
+        print(f"Invalid sender_agent_id in decrypted message: {decrypted_message}")
         return
 
       if msg_type == "I":
@@ -69,6 +70,8 @@ class BroadcastManager:
         self._handle_fork_query_message(sender_agent_id, sender_agent_direction, payload)
       elif msg_type == "U":
         self._handle_id_change_message(sender_agent_id, sender_agent_direction, payload)
+      elif msg_type == "C":
+        self._handle_captain_message(sender_agent_id, sender_agent_direction, payload)
       else:
         print(f"Unknown message type: {msg_type} in decrypted message: {decrypted_message}")
 
@@ -111,6 +114,17 @@ class BroadcastManager:
       return
     except Exception as e:
       print(f"Error updating agent ID: {e}")
+      return
+
+
+  def _handle_captain_message(self, sender_agent_id, sender_agent_direction, message):
+    if not hasattr(self.agent, 'update_captain'):
+      print("Agent is missing 'update_captain' method for handling captain messages.")
+      return
+    try:
+      self.agent.update_captain(sender_agent_id, sender_agent_direction)
+    except Exception as e:
+      print(f"Error updating captain: {e}")
       return
 
 
