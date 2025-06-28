@@ -101,80 +101,80 @@ typedef struct tile_s {
 ### Egg (`egg_t`)
 ```c
 typedef struct egg_s {
-    int id;                    // Identifiant unique de l'œuf
-    int pos_x, pos_y;         // Position de ponte
-    char *team_name;          // Équipe associée
-    struct egg_s *next;       // Liste chaînée
+    int id;                    // Unique egg identifier
+    int pos_x, pos_y;         // Spawning position
+    char *team_name;          // Associated team
+    struct egg_s *next;       // Linked list
 } egg_t;
 ```
 
-## Gestion des rituels d'incantation
+## Incantation Ritual Management
 
-Les rituels d'incantation sont des mécanismes complexes nécessitant :
+Incantation rituals are complex mechanisms requiring:
 
-### Conditions d'élévation
-Pour chaque niveau, des prérequis spécifiques :
-- **Niveau 1→2** : 1 joueur, 1 linemate
-- **Niveau 2→3** : 1 joueur, 1 linemate, 1 deraumere, 1 sibur
-- **Niveau 3→4** : 2 joueurs, 2 linemate, 1 sibur, 1 phiras
-- **Niveau 4→5** : 2 joueurs, 1 linemate, 1 deraumere, 2 sibur, 1 phiras
-- **Niveau 5→6** : 4 joueurs, 1 linemate, 2 deraumere, 1 sibur, 1 mendiane
-- **Niveau 6→7** : 4 joueurs, 1 linemate, 2 deraumere, 3 sibur, 1 phiras
-- **Niveau 7→8** : 6 joueurs, 2 linemate, 2 deraumere, 2 sibur, 2 mendiane, 2 phiras, 1 thystame
+### Elevation Conditions
+For each level, specific prerequisites:
+- **Level 1→2**: 1 player, 1 linemate
+- **Level 2→3**: 1 player, 1 linemate, 1 deraumere, 1 sibur
+- **Level 3→4**: 2 players, 2 linemate, 1 sibur, 1 phiras
+- **Level 4→5**: 2 players, 1 linemate, 1 deraumere, 2 sibur, 1 phiras
+- **Level 5→6**: 4 players, 1 linemate, 2 deraumere, 1 sibur, 1 mendiane
+- **Level 6→7**: 4 players, 1 linemate, 2 deraumere, 3 sibur, 1 phiras
+- **Level 7→8**: 6 players, 2 linemate, 2 deraumere, 2 sibur, 2 mendiane, 2 phiras, 1 thystame
 
-### Processus d'incantation
-1. **Vérification** : Présence des ressources et joueurs nécessaires
-2. **Démarrage** : Notification `pic X Y L #1 #2 ...` aux clients graphiques
-3. **Durée** : 300 ticks de temps d'exécution
-4. **Finalisation** : Montée de niveau et notification `pie X Y R`
+### Incantation Process
+1. **Verification**: Presence of required resources and players
+2. **Startup**: Notification `pic X Y L #1 #2 ...` to graphical clients
+3. **Duration**: 300 ticks of execution time
+4. **Finalization**: Level up and notification `pie X Y R`
 
-## Performances et optimisations
+## Performance and Optimizations
 
-### Métriques supportées
-Le serveur peut gérer :
-- **100+ clients simultanés** sur du matériel moderne
-- **1000+ ticks/seconde** pour des jeux rapides
-- **Latence < 1ms** pour les commandes locales
-- **Mémoire < 100MB** pour des cartes de taille standard
+### Supported Metrics
+The server can handle:
+- **100+ simultaneous clients** on modern hardware
+- **1000+ ticks/second** for fast-paced games
+- **Latency < 1ms** for local commands
+- **Memory < 100MB** for standard-sized maps
 
-### Optimisations implémentées
-- **Polling non-bloquant** avec `poll()` pour les I/O réseau
-- **Files de commandes** pour le traitement asynchrone
-- **Gestion mémoire optimisée** avec pools d'objets
-- **Cache de la carte** pour éviter les recalculs fréquents
-- **Buffers circulaires** pour la communication efficace
+### Implemented Optimizations
+- **Non-blocking polling** with `poll()` for network I/O
+- **Command queues** for asynchronous processing
+- **Optimized memory management** with object pools
+- **Map caching** to avoid frequent recalculations
+- **Circular buffers** for efficient communication
 
-## Compilation et exécution
+## Compilation and Execution
 
-### Construction
+### Build
 ```bash
 cd src/Server
-make                    # Construction standard
-make debug             # Construction avec symboles de debug
-make coverage          # Construction avec instrumentation de couverture
-make clean             # Nettoyage des fichiers objets
+make                    # Standard build
+make debug             # Build with debug symbols
+make coverage          # Build with coverage instrumentation
+make clean             # Clean object files
 ```
 
-### Paramètres de lancement
+### Launch Parameters
 ```bash
 ./zappy_server -p <port> -x <width> -y <height> -n <teams> -c <clients> -f <freq>
 ```
 
-**Options avancées :**
-- `--auto-start on|off` : Démarrage automatique
-- `--display-eggs true|false` : Affichage des œufs
-- `-v, --verbose` : Mode verbeux
-- `--game_duration <time>` : Durée maximale de partie
+**Advanced Options:**
+- `--auto-start on|off` : Automatic startup
+- `--display-eggs true|false` : Egg display
+- `-v, --verbose` : Verbose mode
+- `--game_duration <time>` : Maximum game duration
 
-## Fichiers importants
+## Important Files
 
-### Structure des sources
-- `main.c` : Point d'entrée du serveur avec gestion des signaux
-- `zappy.c` : Initialisation et configuration du serveur
-- `parsing.c` : Analyse des arguments de ligne de commande
-- `network/server_run.c` : Boucle principale et gestion des clients
-- `network/connection.c` : Gestion des connexions TCP/IP
-- `map/map_creation.c` : Création et initialisation de la carte
-- `player/player_init.c` : Initialisation et gestion des joueurs
-- `command/parse_command.c` : Parsing et exécution des commandes
-- `buffer/circular_buffer.c` : Système de buffers circulaires
+### Source Structure
+- `main.c` : Server entry point with signal handling
+- `zappy.c` : Server initialization and configuration
+- `parsing.c` : Command line argument parsing
+- `network/server_run.c` : Main loop and client management
+- `network/connection.c` : TCP/IP connection management
+- `map/map_creation.c` : Map creation and initialization
+- `player/player_init.c` : Player initialization and management
+- `command/parse_command.c` : Command parsing and execution
+- `buffer/circular_buffer.c` : Circular buffer system

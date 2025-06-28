@@ -1,235 +1,235 @@
-# 📖 Exemples d'utilisation du workflow de release
+# 📖 Release Workflow Usage Examples
 
-Ce document présente des exemples concrets d'utilisation du workflow de release pour différents scénarios.
+This document provides concrete examples of using the release workflow for different scenarios.
 
-## 🎯 Scénarios de release
+## 🎯 Release Scenarios
 
-### Scénario 1: Première release du projet
+### Scenario 1: First Project Release
 
-**Situation** : Le projet Zappy est terminé et prêt pour sa première release publique.
+**Situation**: The Zappy project is completed and ready for its first public release.
 
-**Action** :
-- Type de version : `nouvelle-version`
-- Pré-release : Non
+**Action**:
+- Version type: `nouvelle-version`
+- Pre-release: No
 
-**Résultat** :
-- Version générée : `v1.0.0` (si aucun tag n'existe)
-- Changelog automatique avec description complète du projet
-- Archive complète avec tous les composants
+**Result**:
+- Generated version: `v1.0.0` (if no tag exists)
+- Automatic changelog with complete project description
+- Complete archive with all components
 
-### Scénario 2: Ajout d'une nouvelle fonctionnalité
+### Scenario 2: Adding a New Feature
 
-**Situation** : L'équipe a ajouté un mode spectateur dans la GUI et de nouvelles commandes pour l'IA.
+**Situation**: The team has added a spectator mode in the GUI and new commands for the AI.
 
-**Action** :
-- Type de version : `nouvelle-feature`
-- Pré-release : Non
+**Action**:
+- Version type: `nouvelle-feature`
+- Pre-release: No
 
-**Résultat** :
-- Version générée : `v1.0.0` → `v1.1.0`
-- Changelog avec liste des nouvelles fonctionnalités
-- Compatibilité maintenue avec les versions précédentes
+**Result**:
+- Generated version: `v1.0.0` → `v1.1.0`
+- Changelog with list of new features
+- Maintained compatibility with previous versions
 
-### Scénario 3: Correction de bugs critiques
+### Scenario 3: Critical Bug Fixes
 
-**Situation** : Des bugs de crash ont été corrigés dans le serveur et la GUI.
+**Situation**: Crash bugs have been fixed in the server and GUI.
 
-**Action** :
-- Type de version : `resolution-bug`
-- Pré-release : Non
+**Action**:
+- Version type: `resolution-bug`
+- Pre-release: No
 
-**Résultat** :
-- Version générée : `v1.1.0` → `v1.1.1`
-- Changelog focalisé sur les corrections
-- Release rapide pour les utilisateurs affectés
+**Result**:
+- Generated version: `v1.1.0` → `v1.1.1`
+- Changelog focused on fixes
+- Quick release for affected users
 
-### Scénario 4: Refonte majeure de l'architecture
+### Scenario 4: Major Architecture Refactor
 
-**Situation** : L'équipe a réécrit le serveur avec une nouvelle architecture et changé l'API.
+**Situation**: The team has rewritten the server with a new architecture and changed the API.
 
-**Action** :
-- Type de version : `nouvelle-version`
-- Pré-release : Non
+**Action**:
+- Version type: `nouvelle-version`
+- Pre-release: No
 
-**Résultat** :
-- Version générée : `v1.1.1` → `v2.0.0`
-- Changelog avec avertissement sur les breaking changes
-- Documentation des migrations nécessaires
+**Result**:
+- Generated version: `v1.1.1` → `v2.0.0`
+- Changelog with breaking changes warning
+- Documentation of necessary migrations
 
-### Scénario 5: Version de test avant release
+### Scenario 5: Test Version Before Release
 
-**Situation** : L'équipe veut tester une nouvelle version avant la release officielle.
+**Situation**: The team wants to test a new version before the official release.
 
-**Action** :
-- Type de version : `nouvelle-feature`
-- Pré-release : **Oui**
+**Action**:
+- Version type: `nouvelle-feature`
+- Pre-release: **Yes**
 
-**Résultat** :
-- Version générée : `v1.1.0` → `v1.2.0-pre`
-- Marquée comme pré-release sur GitHub
-- Tests par les early adopters
+**Result**:
+- Generated version: `v1.1.0` → `v1.2.0-pre`
+- Marked as pre-release on GitHub
+- Testing by early adopters
 
-## 📋 Guide pas à pas
+## 📋 Step-by-Step Guide
 
-### Étapes détaillées pour créer une release
+### Detailed Steps to Create a Release
 
-1. **Préparation**
+1. **Preparation**
    ```bash
-   # Vérifier l'état du projet
+   # Check project status
    git status
    git pull origin main
    
-   # Tester la compilation
+   # Test compilation
    make clean && make all
    make tests_run
    ```
 
-2. **Accès au workflow**
-   - Aller sur GitHub
-   - Cliquer sur l'onglet "Actions"
-   - Trouver "🚀 Release Zappy"
-   - Cliquer sur "Run workflow"
+2. **Access Workflow**
+   - Go to GitHub
+   - Click on "Actions" tab
+   - Find "🚀 Release Zappy"
+   - Click "Run workflow"
 
 3. **Configuration**
-   - **Branch** : Sélectionner `main` (ou la branche de release)
-   - **Type de version** : Choisir selon le scénario
-   - **Pré-release** : Cocher si nécessaire
+   - **Branch**: Select `main` (or release branch)
+   - **Version type**: Choose according to scenario
+   - **Pre-release**: Check if necessary
 
-4. **Suivi de l'exécution**
-   - Observer les logs en temps réel
-   - Vérifier chaque étape :
+4. **Monitor Execution**
+   - Watch logs in real-time
+   - Verify each step:
      - ✅ Permissions
-     - ✅ Calcul de version
+     - ✅ Version calculation
      - ✅ Compilation
-     - ✅ Création d'archive
+     - ✅ Archive creation
      - ✅ Publication
 
-5. **Vérification post-release**
-   - Vérifier la page des releases
-   - Télécharger et tester l'archive
-   - Valider le changelog
+5. **Post-release Verification**
+   - Check releases page
+   - Download and test archive
+   - Validate changelog
 
-## 🔢 Exemples de calcul de version
+## 🔢 Version Calculation Examples
 
-| Version actuelle | Type de release | Nouvelle version | Utilisation |
-|------------------|-----------------|------------------|-------------|
-| `v0.0.0` | `nouvelle-version` | `v1.0.0` | Première release |
-| `v1.0.0` | `nouvelle-feature` | `v1.1.0` | Nouvelle fonctionnalité |
-| `v1.1.0` | `resolution-bug` | `v1.1.1` | Correction de bug |
+| Current Version | Release Type | New Version | Use Case |
+|-----------------|--------------|-------------|----------|
+| `v0.0.0` | `nouvelle-version` | `v1.0.0` | First release |
+| `v1.0.0` | `nouvelle-feature` | `v1.1.0` | New feature |
+| `v1.1.0` | `resolution-bug` | `v1.1.1` | Bug fix |
 | `v1.5.3` | `nouvelle-version` | `v2.0.0` | Breaking change |
-| `v2.1.7` | `nouvelle-feature` | `v2.2.0` | Feature compatible |
+| `v2.1.7` | `nouvelle-feature` | `v2.2.0` | Compatible feature |
 
-## 📦 Contenu type d'une release
+## 📦 Typical Release Content
 
 ### Archive `zappy-v1.2.0.tar.gz`
 ```
 📁 zappy-v1.2.0/
-├── 🔧 zappy_server      # Serveur de jeu (Linux x64)
-├── 🎨 zappy_gui         # Interface graphique
-├── 🤖 zappy_ai          # Client IA Python
-├── 📁 lib/              # Bibliothèques statiques
+├── 🔧 zappy_server      # Game server (Linux x64)
+├── 🎨 zappy_gui         # Graphical interface
+├── 🤖 zappy_ai          # Python AI client
+├── 📁 lib/              # Static libraries
 │   ├── libgui.a
 │   ├── libserver.a
 │   ├── libraylib_cpp.a
 │   └── libraygui_cpp.a
-├── 📁 plugins/          # Bibliothèques dynamiques
+├── 📁 plugins/          # Dynamic libraries
 │   ├── libraygui.so
 │   └── libraylibcpp.so
 ├── 📋 README.md         # Documentation
-├── ⚙️ install.sh        # Script d'installation
-└── 🏷️ VERSION          # Numéro de version
+├── ⚙️ install.sh        # Installation script
+└── 🏷️ VERSION          # Version number
 ```
 
-### Installation automatique
+### Automatic Installation
 ```bash
-# Décompresser
+# Extract
 tar -xzf zappy-v1.2.0.tar.gz
 cd zappy-v1.2.0
 
-# Installer
+# Install
 sudo ./install.sh
 
-# Utiliser
+# Use
 zappy_server -p 4242 -x 20 -y 20 -n team1 team2 -c 5 -f 100
 zappy_gui -p 4242 -h localhost
 zappy_ai -p 4242 -n team1
 ```
 
-## 🕒 Timeline type d'une release
+## 🕒 Typical Release Timeline
 
 ```
-⏰ 00:00 - Déclenchement du workflow
-├── 00:01 - Vérification des permissions ✅
-├── 00:02 - Calcul de la nouvelle version ✅
-├── 00:03 - Installation des dépendances (⏳ 10 min)
-├── 00:13 - Compilation du projet (⏳ 5 min)
-├── 00:18 - Vérification des binaires ✅
-├── 00:19 - Création de l'archive ✅
-├── 00:20 - Upload des artefacts ✅
-├── 00:21 - Création du tag Git ✅
-└── 00:22 - Publication de la release ✅ 🎉
+⏰ 00:00 - Workflow trigger
+├── 00:01 - Permission verification ✅
+├── 00:02 - New version calculation ✅
+├── 00:03 - Dependencies installation (⏳ 10 min)
+├── 00:13 - Project compilation (⏳ 5 min)
+├── 00:18 - Binary verification ✅
+├── 00:19 - Archive creation ✅
+├── 00:20 - Artifacts upload ✅
+├── 00:21 - Git tag creation ✅
+└── 00:22 - Release publication ✅ 🎉
 ```
 
-## 🚨 Gestion des erreurs courantes
+## 🚨 Common Error Management
 
-### Erreur: "Binaire non trouvé"
+### Error: "Binary not found"
 ```
-❌ Binaire zappy_server introuvable
+❌ Binary zappy_server not found
 ```
-**Solution** : Vérifier le Makefile du serveur, s'assurer que la compilation produit le bon nom de binaire.
+**Solution**: Check server Makefile, ensure compilation produces the correct binary name.
 
-### Erreur: "Tag déjà existant"
+### Error: "Tag already exists"
 ```
 ❌ Tag v1.2.0 already exists
 ```
-**Solution** : Le tag existe déjà, choisir un type de version approprié ou supprimer le tag si nécessaire.
+**Solution**: Tag already exists, choose appropriate version type or delete tag if necessary.
 
-### Erreur: "Permissions insuffisantes"
+### Error: "Insufficient permissions"
 ```
 ❌ Resource not accessible by integration
 ```
-**Solution** : Vérifier les permissions du token GitHub dans les settings du repository.
+**Solution**: Check GitHub token permissions in repository settings.
 
-### Erreur: "Dépendance manquante"
+### Error: "Missing dependency"
 ```
 ❌ Package libraylib-dev not found
 ```
-**Solution** : Ajouter la dépendance manquante dans la section d'installation du workflow.
+**Solution**: Add missing dependency in workflow installation section.
 
-## 📈 Bonnes pratiques
+## 📈 Best Practices
 
-### Timing des releases
-- **PATCH** : Immédiatement pour les hotfixes critiques
-- **MINOR** : En fin de sprint/itération (hebdomadaire/bimensuel)
-- **MAJOR** : En fin de milestone (mensuel/trimestriel)
+### Release Timing
+- **PATCH**: Immediately for critical hotfixes
+- **MINOR**: At end of sprint/iteration (weekly/biweekly)
+- **MAJOR**: At end of milestone (monthly/quarterly)
 
 ### Communication
-- Annoncer les releases majeures à l'avance
-- Documenter les breaking changes
-- Fournir des guides de migration si nécessaire
+- Announce major releases in advance
+- Document breaking changes
+- Provide migration guides if necessary
 
-### Tests
-- Toujours tester localement avant la release
-- Utiliser les pré-releases pour les tests utilisateurs
-- Maintenir une suite de tests automatisés
+### Testing
+- Always test locally before release
+- Use pre-releases for user testing
+- Maintain automated test suite
 
 ### Documentation
-- Tenir à jour le README.md
-- Documenter les nouvelles APIs
-- Fournir des exemples d'utilisation
+- Keep README.md up to date
+- Document new APIs
+- Provide usage examples
 
-## 🎯 Métriques de succès
+## 🎯 Success Metrics
 
-Une release réussie doit avoir :
-- ✅ Compilation sans erreur
-- ✅ Tous les binaires générés
-- ✅ Tests unitaires passants
-- ✅ Archive complète créée
-- ✅ Tag Git créé correctement
-- ✅ Release GitHub publiée
-- ✅ Changelog informatif
-- ✅ Téléchargement fonctionnel
+A successful release should have:
+- ✅ Error-free compilation
+- ✅ All binaries generated
+- ✅ Passing unit tests
+- ✅ Complete archive created
+- ✅ Git tag created correctly
+- ✅ GitHub release published
+- ✅ Informative changelog
+- ✅ Functional download
 
 ---
 
-*Ces exemples couvrent les cas d'usage les plus courants du workflow de release Zappy. Pour des situations spécifiques, consulter la documentation complète dans `docs/release-workflow.md`.*
+*These examples cover the most common use cases of the Zappy release workflow. For specific situations, consult the complete documentation in `docs/release-workflow.md`.*
