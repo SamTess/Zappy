@@ -142,7 +142,7 @@ CLIENT: team1\n
 SERVER: 0\n
 SERVER: 10 10\n
 CLIENT: Look\n
-SERVER: [player food],[linemate],[food sibur],[],[],[],[],[]\n
+SERVER: [player food],[food sibur],[linemate],[],[],[],[],[]\n
 CLIENT: Forward\n
 SERVER: ok\n
 CLIENT: Take linemate\n

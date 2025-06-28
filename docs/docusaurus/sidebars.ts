@@ -14,6 +14,7 @@ const sidebars: SidebarsConfig = {
   // Documentation principale de Zappy avec structure manuelle
   tutorialSidebar: [
     'intro',
+    'gameplay-guide',
     'getting-started',
     'architecture',
     'development-guide',
