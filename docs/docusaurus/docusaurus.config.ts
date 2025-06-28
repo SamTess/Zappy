@@ -6,11 +6,11 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'Zappy',
-  tagline: 'Un serveur de jeu multijoueur avec client GUI et bot IA',
+  tagline: 'A multiplayer game server with a GUI client and AI bot',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://epitech.github.io',
+  url: 'https://samtess.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/Zappy/',
@@ -46,7 +46,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/Epitech/Zappy/tree/main/docs/docusaurus/',
+            'https://github.com/SamTess/Zappy/tree/main/docs/docusaurus/',
         },
         // blog section removed as it's not needed for Zappy documentation
         theme: {
@@ -99,7 +99,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/Epitech/Zappy',
+          href: 'https://github.com/SamTess/Zappy',
           label: 'GitHub',
           position: 'right',
         },
@@ -148,7 +148,7 @@ const config: Config = {
 
             {
               label: 'GitHub',
-              href: 'https://github.com/Epitech/Zappy',
+              href: 'https://github.com/SamTess/Zappy',
             },
           ],
         },
