@@ -60,7 +60,7 @@ The project uses an advanced client-server architecture with secure TCP/IP commu
 - **[UI Architecture](ui_architecture.md)** - Design patterns for user interface, class hierarchy, extensibility
 
 ### Advanced Documentation
-- **[Design Patterns](design_patterns_map_renderer.md)** - Patterns used in the rendering engine with implementation examples
+- **[Design Patterns](design_patterns.md)** - Patterns used in the rendering engine with implementation examples
 - **[Rendering Implementation](map_renderer_implementation.md)** - Technical details of the rendering system, LOD optimizations, performance metrics
 
 ## Interactive Documentation
