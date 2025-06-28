@@ -80,8 +80,11 @@ void send_all_player_info_to_one_client(game_t *game, zappy_client_t *clients,
         return;
     while (current) {
         if (current->player && current->type == AI &&
-            current->is_fully_connected)
+            current->is_fully_connected){
             send_pnw_command(game, clients, current, recipient);
+            send_pin_command(game, clients, current, recipient);
+            send_plv_command(game, clients, current, recipient);
+        }
         current = current->next;
     }
 }
