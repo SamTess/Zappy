@@ -145,7 +145,7 @@ install_dependancies:
 	 des dépendances...$(RESET)"
 	@sudo apt update
 	@sudo apt install -y build-essential cmake git python3 python3-pip \
-	python3-venv
+	python3-venv pkg-config
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
 	 installées avec succès !$(RESET)"
 
