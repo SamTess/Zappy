@@ -145,7 +145,8 @@ install_dependancies:
 	 des dépendances...$(RESET)"
 	@sudo apt update
 	@sudo apt install -y build-essential cmake git python3 python3-pip \
-	python3-venv pkg-config
+	python3-venv pkg-config libx11-dev libxrandr-dev libxinerama-dev \
+	libxcursor-dev libxi-dev libgl1-mesa-de libxext-dev
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
 	 installées avec succès !$(RESET)"
 
