@@ -121,7 +121,8 @@ debug:
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Compilation\
 	 en mode debug terminée !$(RESET)"
 
-install_requirements: install_ai check_raylib check_submodules
+install_requirements: install_dependancies install_ai check_raylib \
+check_submodules
 	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
 	 installées avec succès !$(RESET)"
 	@echo ""
@@ -138,6 +139,15 @@ install_requirements: install_ai check_raylib check_submodules
 	@echo "$(CYAN)╚════════════════════════════════\
 	═════════════════════════════╝$(RESET)"
 	@echo ""
+
+install_dependancies:
+	@echo "$(CYAN)[$(BOLD)INSTALL$(RESET)$(CYAN)]$(RESET) $(BOLD)Installation\
+	 des dépendances...$(RESET)"
+	@sudo apt update
+	@sudo apt install -y build-essential cmake git python3 python3-pip \
+	python3-venv
+	@echo "$(GREEN)[$(BOLD)OK$(RESET)$(GREEN)]$(RESET) $(BOLD)Dépendances\
+	 installées avec succès !$(RESET)"
 
 install_ai:
 	@echo "$(CYAN)[$(BOLD)INSTALL$(RESET)$(CYAN)]$(RESET) $(BOLD)Installation\
@@ -333,4 +343,4 @@ style_cpp: fclean
 .PHONY: all zappy_server zappy_gui zappy_ai tests tests_run \
 debug install_ai init check_submodules clean fclean re coverage \
 docs docusaurus-build docusaurus-serve docusaurus-start docusaurus-deploy \
-style style_cpp test_network_gui install_requirements
+style style_cpp test_network_gui install_requirements install_dependancies
